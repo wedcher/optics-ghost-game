@@ -7,5 +7,8 @@
     "test:e2e": "node tests/e2e-concave-lens.js",
     "check:geometry:convex": "node tests/check-geometry-convex.js",
     "test": "node tests/check-geometry.js && node tests/check-geometry-convex.js && node tests/e2e-concave-lens.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.1"
   }
 }

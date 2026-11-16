@@ -67,7 +67,7 @@
 
 ## 尚未驗證
 
-- **`node tests/check-geometry-convex.js` 沒有在 Node 下執行過**（這一輪的工作環境沒有 Node）。同一份檢查在瀏覽器中是 140/140。
+- `node tests/check-geometry-convex.js`：已於 2026-11-16 在 Node 26 下執行，140/140 通過。
 - **沒有 headless 自動化測試**（凹透鏡有 `tests/e2e-concave-lens.js`，凸透鏡還沒有對應的腳本）。上面的操作實測是手動加上一次性的程式驅動，沒有留成可重跑的測試。
 - 沒有真人測試；沒有在實體手機、iOS Safari 上測過。
 - 配置 B、C、D 沒有用真的點擊走完封印（只用程式驅動到「交點落在目標格」）。
