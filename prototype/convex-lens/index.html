@@ -44,8 +44,10 @@
     #zoomBox { flex-direction:row; }
     #banner { font-size:12px; padding:6px 10px; width:min(70%, 520px); }
   }
-  /* 凸透鏡：布幕與實像標記在畫面右下，所以縮放鈕放右上 */
+  /* 凸透鏡：布幕與實像標記在畫面右側。標記在下半部時縮放鈕放右上；
+     標記在上半部（鬼在主光軸下方的配置）時改放右下（app.js 加上 .low），才不會蓋住標記。 */
   #zoomBox { top:8px; bottom:auto; }
+  #zoomBox.low { top:auto; bottom:8px; }
   [hidden] { display:none !important; }
 </style>
 </head>

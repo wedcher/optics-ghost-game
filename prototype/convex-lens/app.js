@@ -690,6 +690,7 @@
     $('exploreControls').hidden = analysis;
     $('analysisControls').hidden = !analysis;
     $('zoomBox').hidden = !analysis;
+    $('zoomBox').classList.toggle('low', !!state.marker && state.marker.y > 0); // 避開實像標記（見 index.html）
     $('toAnalysis').disabled = !state.marker;
     $('toAnalysis').classList.toggle('primary', !!state.marker);
     $('markBtn').classList.toggle('primary', !state.marker);
@@ -832,7 +833,9 @@
   window.__protoConvex = {
     state: state, stats: stats, cfg: cfg, configs: Cfg, GHOST_COLOR: GHOST_COLOR, SNAP_PX: SNAP_PX,
     w2s: w2s, s2w: s2w, snapPoints: snapPoints, studentIntersections: studentIntersections, wallNow: wallNow,
-    regions: regions, canvasSize: function () { return { W: W, H: H, DPR: DPR }; }, render: render
+    regions: regions, canvasSize: function () { return { W: W, H: H, DPR: DPR }; }, render: render,
+    replaySpec: replaySpec,
+    art: function () { return { pending: artPending, corridor: ART.corridor.ready, lens: ART.lens.ready }; }
   };
 
   resetRound(0);

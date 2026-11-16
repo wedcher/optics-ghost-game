@@ -16,6 +16,7 @@
 const path = require('path');
 const fs = require('fs');
 const { chromium } = require('playwright');
+const { checkReplay, checkReplayIdle } = require('./replay-checks.js');
 
 const ROOT = path.join(__dirname, '..');
 // 用本機 HTTP 伺服器開頁面：背景是圖片檔，file:// 下 canvas 會被標成 tainted，
@@ -236,6 +237,20 @@ async function run(profile, browser) {
     };
     let info = await leak('分析開始');
     ok(info.near === 0, T('分析開始：吸附點裡沒有物點'));
+    // 預設縮放下，每個吸附點都要點得到（不被縮放鈕等控制項蓋住）
+    {
+      const covered = await page.evaluate(() => {
+        const H = window.__proto, cv = document.getElementById('view'), r = cv.getBoundingClientRect(), out = [];
+        H.snapPoints().forEach((p) => {
+          const q = H.w2s(p);
+          if (q.x < 0 || q.y < 0 || q.x > r.width || q.y > r.height) return; // 在畫面外不算「被蓋住」（F′ 作圖用不到）
+          const el = document.elementFromPoint(r.left + q.x, r.top + q.y);
+          if (el !== cv) out.push(p.label + ' 被 #' + (el ? el.id || el.tagName : 'null') + ' 蓋住');
+        });
+        return out;
+      });
+      ok(covered.length === 0, T('預設縮放下所有吸附點都點得到（沒有被按鈕蓋住）'), covered.join('；') || undefined);
+    }
 
     // 畫線模式點地板格 → 不會選格
     const cellPt = await w2s({ x: -(c.targetCell - 0.5) * 100, y: -175 });
@@ -326,6 +341,7 @@ async function run(profile, browser) {
     ok(during.every((n) => n === 0) && await countColor(GHOST) === 0 && !s.stats.ghostRevealed, T('錯誤封印全程不顯示鬼'), '動畫取樣 ' + during.join('/'));
     ok(!/[左右前後遠近]|太|靠|第\s*\d|格子?\s*\d|\d/.test(status), T('錯誤訊息不含方向／距離／格號線索'), '「' + status + '」');
     await leak('錯誤封印後');
+    await checkReplayIdle({ page, hook: '__proto', ok, T, when: '錯誤封印後' });
 
     // ---------- 正確封印（對照組：確認「顯形」真的偵測得到） ----------
     wp = await w2s({ x: -(c.targetCell - 0.5) * 100, y: 60 }); // 點直欄上方也能選到格
@@ -336,6 +352,27 @@ async function run(profile, browser) {
     s = await st();
     ok(s.solved && await countColor(GHOST) > 20, T('封印作圖交點所在格 → 成功並顯形'));
     if (first) await shot('8-seal-success');
+
+    // ---------- 光路重現 ----------
+    await checkReplay({
+      page, hook: '__proto', ok, T, press,
+      shot: first ? () => shot('10-replay-end') : null,
+      physics: (spec) => {
+        // 用配置（物點、虛像、焦距）驗證，不拿 spec 自己對自己。透鏡在 x = 0，物與虛像都在 x < 0。
+        const o = c.object, O = { x: 0, y: 0 }, F = { x: -Math.abs(c.f), y: 0 }, Pt = { x: 0, y: o.y }, sg = spec.segments;
+        const same = (p, q) => Math.hypot(p.x - q.x, p.y - q.y) < 1e-6;
+        const col = (a, b, p) => Math.abs((b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x)) / (Math.hypot(b.x - a.x, b.y - a.y) || 1);
+        return [
+          { ok: sg.length === 6 && sg.slice(0, 4).every((x) => x.kind === 'ray') && sg.slice(4).every((x) => x.kind === 'extension'), label: '四段實際光線＋兩段反向延長線' },
+          { ok: same(sg[0].a, o) && same(sg[1].a, o), label: '兩條光線都從鬼本體出發' },
+          { ok: same(sg[0].b, Pt) && same(sg[2].a, Pt), label: '光線 1 平行主軸射到透鏡上的 P' },
+          { ok: sg[2].b.x > 0 && col(F, Pt, sg[2].b) < 1e-6 && Math.abs(sg[2].b.y) > Math.abs(o.y), label: '光線 1 折射後發散，方向像是從物側焦點 F 射出', detail: '偏離 ' + col(F, Pt, sg[2].b).toExponential(1) + ' cm' },
+          { ok: same(sg[1].b, O) && same(sg[3].a, O) && sg[3].b.x > 0 && col(o, O, sg[3].b) < 1e-6, label: '光線 2 通過光心 O 不偏折' },
+          { ok: same(sg[4].a, Pt) && same(sg[4].b, F) && same(sg[5].a, O) && same(sg[5].b, c.image), label: '反向延長線：P → F、O → 虛像' },
+          { ok: col(Pt, F, c.image) < 1e-6 && col(O, o, c.image) < 1e-6 && same(spec.points[0].p, c.image), label: '兩條反向延長線交於虛像', detail: '(' + c.image.x.toFixed(2) + ', ' + c.image.y.toFixed(2) + ')' }
+        ];
+      }
+    });
 
     // ---------- Debug ----------
     if (first) {

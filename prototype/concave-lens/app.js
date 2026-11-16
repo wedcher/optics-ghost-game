@@ -953,7 +953,7 @@
       state: state, stats: stats, cfg: cfg, configs: Cfg, GHOST_COLOR: GHOST_COLOR, SNAP_PX: SNAP_PX,
       w2s: w2s, s2w: s2w, snapPoints: snapPoints, imageScreenPos: imageScreenPos,
       studentIntersections: studentIntersections, exploreMetrics: exploreMetrics,
-      canvasSize: function () { return { W: W, H: H, DPR: DPR }; }, render: render,
+      canvasSize: function () { return { W: W, H: H, DPR: DPR }; }, render: render, replaySpec: replaySpec,
       background: function () { return { ready: bg.ready, src: bgOff ? null : BG_DIRS.map(function (d) { return d.src; }) }; }
     };
   }

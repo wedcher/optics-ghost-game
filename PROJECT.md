@@ -1,6 +1,6 @@
 # PROJECT — Current Status
 
-更新：2026-11-16
+更新：2026-11-17
 
 ## 專案階段
 
@@ -113,17 +113,25 @@
 
 - 凹透鏡：`prototype/concave-lens/`，紀錄在 `docs/prototype-findings.md`（含「追加：Sprint 01b」）。
 - 凸透鏡：`prototype/convex-lens/`，紀錄在 `docs/prototype-findings-convex.md`。
-- **自動測試狀態（2026-11-16，Node 26 / Playwright 1.65）：** `npm test` 全部通過——凹透鏡幾何 97/97、凸透鏡幾何 140/140、凹透鏡瀏覽器實測 319/319（橫向手機跑全部四組配置；直向與桌機為抽查）。截圖與結果在 `docs/screenshots/`。
+- **自動測試狀態：** `npm test` 全部通過（最新數字見下方「目前 `npm test`」）。橫向手機跑全部配置；直向與桌機為抽查。截圖與結果在 `docs/screenshots/`。
 - 畫面一律橫向（見 `docs/decisions.md`）。凸透鏡已換上 GPT 的走廊與鏡片圖；成像面用程式畫的布幕（已認可）。鬼仍是 placeholder，規格見 `docs/concepts/README.md`。
 - 破關後有「光路重現」動畫（`prototype/shared/ray-replay.js`）。
 
-**接手的工作階段：**
+**接手的工作階段（上面三項已於 2026-11-17 完成，分支 `test/convex-e2e`）：**
 
-1. `npm ci && npx playwright install chromium`，然後 `npm test` 確認仍然全過。
-2. **凸透鏡還沒有 headless e2e**：比照 `tests/e2e-concave-lens.js` 補一支（掛鉤是 `window.__protoConvex`），並把光路重現納入檢查。
-3. 光路重現目前沒有自動檢查，只在瀏覽器手動看過兩個原型的配置 A。
+1. ~~重跑測試~~：Windows / Node 24 / Playwright 1.65 下原有測試全過。
+2. ~~凸透鏡 headless e2e~~：`tests/e2e-convex-lens.js`，橫向手機跑四組配置 × 兩個清晰位置。
+3. ~~光路重現自動檢查~~：`tests/replay-checks.js`，兩個原型的 e2e 共用，所有配置都檢查。
 
-之後等使用者試玩回饋；沒有新指示時，依下方 NEXT 做平面鏡 prototype。
+**目前 `npm test`：** 凹透鏡幾何 97/97、凸透鏡幾何 140/140、凹透鏡 e2e 445/445、凸透鏡 e2e 732/732。
+
+新測試抓到三個畫面問題（細節在 `docs/prototype-findings-convex.md` 文末 ISSUES 19–22 與 `docs/prototype-findings.md` 文末）：
+
+- 已修：凸透鏡的實像標記在上半部時被縮放鈕蓋住、點不到（縮放鈕改為避開標記）。
+- 已修：凹透鏡配置 C 的光路重現說明框蓋住光線（擋到時改放下方）。
+- **未修，需要使用者決定**：凸透鏡四組配置的「放大像」都超出布幕 18–41 cm，被布幕邊緣裁掉。
+
+**下一個工作階段：** 等使用者試玩回饋與上面那項決定；沒有新指示時，依下方 NEXT 做平面鏡 prototype。
 視覺與氛圍依 `docs/visual-handoff.md`；GPT 負責美術，prototype 用 placeholder 即可。
 
 ---

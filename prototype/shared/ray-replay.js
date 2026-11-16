@@ -24,6 +24,19 @@
   function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
   function ease(t) { return t * t * (3 - 2 * t); }
 
+  /** 螢幕上的矩形（外加 6px 邊界）是否蓋到任何一段光線。 */
+  function boxHitsRays(w2s, spec, x, y, w, h) {
+    var pad = 6, N = 40;
+    for (var i = 0; i < spec.segments.length; i++) {
+      var a = w2s(spec.segments[i].a), b = w2s(spec.segments[i].b);
+      for (var k = 0; k <= N; k++) {
+        var px = a.x + ((b.x - a.x) * k) / N, py = a.y + ((b.y - a.y) * k) / N;
+        if (px > x - pad && px < x + w + pad && py > y - pad && py < y + h + pad) return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * 畫出時間 tau（秒）時的畫面。w2s：世界座標 → 螢幕座標。
    * area：{ x, y, w, h } 說明文字要置中的區域（螢幕座標）。
@@ -82,6 +95,13 @@
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       var tw = Math.min(area.w - 16, ctx.measureText(text).width + 28), th = 32;
       var cx = area.x + area.w / 2, cy = area.y + th / 2 + 8;
+      // 說明框預設在上方；若會蓋到光線（例如鬼在高處、平行光線貼近畫面上緣），改放下方。
+      // 用整段動畫裡最寬的那一句、全部的光線來判斷，位置才不會播到一半跳動。
+      var maxW = 0;
+      for (i = 0; i < spec.captions.length; i++) maxW = Math.max(maxW, ctx.measureText(spec.captions[i].text).width + 28);
+      maxW = Math.min(area.w - 16, maxW);
+      var cyBottom = area.y + area.h - th / 2 - 8;
+      if (boxHitsRays(w2s, spec, cx - maxW / 2, cy - th / 2, maxW, th) && !boxHitsRays(w2s, spec, cx - maxW / 2, cyBottom - th / 2, maxW, th)) cy = cyBottom;
       ctx.fillStyle = 'rgba(14,12,30,.88)'; ctx.strokeStyle = '#b980ff'; ctx.lineWidth = 1.5;
       ctx.beginPath();
       if (ctx.roundRect) ctx.roundRect(cx - tw / 2, cy - th / 2, tw, th, 10); else ctx.rect(cx - tw / 2, cy - th / 2, tw, th);
