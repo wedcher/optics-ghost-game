@@ -7,7 +7,8 @@
 2. `GAME_SPEC.md`
 3. `PROJECT.md`
 4. `docs/decisions.md`
-5. 當前 `prompts/` 任務單
+5. `docs/visual-handoff.md`（畫面、氛圍與體驗；概念圖在 `docs/concepts/`）
+6. 當前 `prompts/` 任務單
 
 ## 最高原則
 

@@ -32,7 +32,7 @@
 - 學生端以瀏覽器即可執行為優先，避免安裝。
 - 優先採固定場景背景 + 動態光學／互動圖層，不追求不必要的完整 3D。
 - 光學物理必須正確；若視覺效果與物理衝突，優先修正物理。
-- 新 AI 進入專案時，必須先讀 `GAME_SPEC.md`、`PROJECT.md`、`docs/decisions.md`。
+- 新 AI 進入專案時，必須先讀 `GAME_SPEC.md`、`PROJECT.md`、`docs/decisions.md`、`docs/visual-handoff.md`。
 
 ## 目前階段
 
@@ -54,4 +54,6 @@
 - `PROJECT.md`：目前進度、風險與下一步。
 - `CLAUDE.md`：給參與開發的 AI 的工作規則。
 - `docs/decisions.md`：已確認決策與禁止重推事項。
+- `docs/visual-handoff.md`：畫面、氛圍與互動體驗的交接文件。
+- `docs/concepts/`：概念圖（非定稿，以文字規格為準）。
 - `prompts/`：每一輪 AI 任務單。
