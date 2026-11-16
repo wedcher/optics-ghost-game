@@ -32,6 +32,13 @@
   var canvas = $('view');
   var ctx = canvas.getContext('2d');
 
+  // 第二關：3 條命內抓到 5 隻鬼（docs/story-and-flow.md）。
+  // 網址加 ?free=1 是自由練習／開發模式：沒有過場、不計命，並顯示配置選單與 Debug。
+  var FREE = /[?&]free=1/.test(location.search);
+  var LEVEL_LIVES = 3, LEVEL_GOAL = 5;
+  var INTRO_BG = 'assets/intro-corridor.webp', MENU_URL = '../index.html';
+  var level = { on: !FREE, screen: FREE ? 'play' : 'intro', lives: LEVEL_LIVES, sealed: 0, goal: LEVEL_GOAL, scene: null };
+
   var state = {
     cfgIndex: 0,
     phase: 'observe',     // 'observe' | 'analysis'
@@ -39,7 +46,7 @@
     marker: null,         // { lensX, y }：標記時透鏡的位置與牆上像點的高度
     mode: 'draw', tool: 'line', dashed: false, pending: null, lines: [],
     selectedCell: null, seal: null, solved: false, attempts: 0,
-    debug: /[?&]debug=1/.test(location.search),
+    debug: FREE && /[?&]debug=1/.test(location.search),
     zoomIdx: 0,
     view: { s: 1, tx: 0, ty: 0 },
     seenAnalysisIntro: false
@@ -433,6 +440,12 @@
       state.lines.forEach(function (l) {
         strokeInfinite(geomLine(l), state.replay ? 'rgba(255,255,255,.22)' : (l.kind === 'parallel' ? '#7dffb2' : '#ffd166'), 2, l.dashed ? [8, 6] : null);
       });
+      if (state.dragParallel) {
+        // 拖曳中的平行線預覽
+        strokeInfinite(Optics.horizontalLine(state.dragParallel), 'rgba(125,255,178,.75)', 3, [5, 5]);
+        q = w2s(state.dragParallel); ctx.strokeStyle = '#7dffb2'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(q.x, q.y, 18, 0, 7); ctx.stroke();
+      }
       studentIntersections().forEach(function (pt) {
         q = w2s(pt); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
         ctx.beginPath(); ctx.arc(q.x, q.y, 5, 0, 7); ctx.stroke();
@@ -605,12 +618,21 @@
       state.seal.done = true;
       if (success) {
         state.solved = true;
+        if (level.on) level.sealed++;
         setStatus('封印成功！鬼被迫顯形——布幕上的只是牠的像，本體在透鏡的另一邊。看看光是怎麼走的。');
         startReplay();
       } else {
         state.selectedCell = null;
         giggle();
-        setStatus('法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。');
+        if (level.on) {
+          // 扣命只看「抓錯」這件事本身，訊息與畫面都不帶任何位置線索
+          level.lives--;
+          flashHud();
+          setStatus('法陣落空，裡面什麼也沒有……（嘻）　失去一顆心。再檢查你的光線作圖。');
+          if (level.lives <= 0) failLevel();
+        } else {
+          setStatus('法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。');
+        }
       }
       syncUI(); requestRender();
     }, 1500);
@@ -630,6 +652,32 @@
     } catch (e) { /* 沒有音效也不影響玩法 */ }
   }
 
+  // 從標示點橫向拖曳 = 拉出通過該點、平行主光軸的線（手機上比先切「平行線」工具再點快）。
+  // 拖曳中先顯示預覽；手指放開時預覽還在就留下這條線，往上／下拉開則取消。
+  // 只在畫線模式、起點落在標示點上、而且一開始就是橫向拖曳時才算；其他拖曳照舊是平移畫面。
+  var DRAG_DECIDE_PX = 18, PARALLEL_DRAG_PX = 40;
+  function updateDragParallel(p) {
+    var dx = Math.abs(p.x - gesture.x0), dy = Math.abs(p.y - gesture.y0), sp = gesture.snap;
+    var active = dx >= PARALLEL_DRAG_PX && dy <= Math.max(24, dx * 0.35);
+    var was = !!state.dragParallel;
+    state.dragParallel = active ? { x: sp.x, y: sp.y, label: sp.label } : null;
+    if (active && !was) setStatus('放開手指：畫出通過「' + sp.label + '」、平行主光軸的線。往上或往下拉開則取消。');
+    else if (!active && was) setStatus('已取消平行線。拉回水平方向可以再拉出來。');
+  }
+  function cancelDragParallel() { if (state.dragParallel) { state.dragParallel = null; requestRender(); } }
+  function finishDragParallel(commit) {
+    var pt = state.dragParallel;
+    state.dragParallel = null;
+    if (pt && commit) {
+      state.lines.push({ kind: 'parallel', a: pt, b: null, dashed: state.dashed });
+      state.pending = null;
+      setStatus('已畫出通過「' + pt.label + '」、平行主光軸的線。');
+    } else {
+      setStatus('沒有畫線。從標示點往左或往右拖，可以拉出平行主光軸的線。');
+    }
+    syncUI(); requestRender();
+  }
+
   var pointers = {}, gesture = null;
   function localPos(e) { var r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
   function pointerCount() { return Object.keys(pointers).length; }
@@ -639,16 +687,25 @@
     pointers[e.pointerId] = true;
     if (pointerCount() === 1) {
       var p = localPos(e);
-      gesture = { id: e.pointerId, x0: p.x, y0: p.y, lx: p.x, ly: p.y, moved: false, multi: false };
+      gesture = { id: e.pointerId, x0: p.x, y0: p.y, lx: p.x, ly: p.y, moved: false, multi: false, kind: null,
+        snap: state.phase === 'analysis' && state.mode === 'draw' && !state.solved ? nearestSnap(p.x, p.y) : null };
       try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     } else if (gesture) {
-      gesture.multi = true; // 兩指：不做任何事（縮放只用按鈕）
+      gesture.multi = true; cancelDragParallel(); // 兩指：不做任何事（縮放只用按鈕）
     }
   });
   canvas.addEventListener('pointermove', function (e) {
     if (!gesture || gesture.id !== e.pointerId || gesture.multi) return;
     var p = localPos(e);
     if (!gesture.moved && Math.hypot(p.x - gesture.x0, p.y - gesture.y0) > TAP_SLOP_PX) gesture.moved = true;
+    if (gesture.snap) {
+      // 起點在標示點上：等拖得夠遠再判斷是「橫向拉平行線」還是「平移畫面」
+      if (!gesture.kind && Math.hypot(p.x - gesture.x0, p.y - gesture.y0) > DRAG_DECIDE_PX) {
+        gesture.kind = Math.abs(p.y - gesture.y0) <= Math.abs(p.x - gesture.x0) * 0.5 ? 'parallel' : 'pan';
+      }
+      if (gesture.kind === 'parallel') { updateDragParallel(p); requestRender(); }
+      if (gesture.kind !== 'pan') { gesture.lx = p.x; gesture.ly = p.y; return; }
+    }
     if (gesture.moved) {
       if (state.phase === 'analysis') {
         state.view.tx += p.x - gesture.lx; state.view.ty += p.y - gesture.ly;
@@ -664,6 +721,7 @@
   function endPointer(e, cancelled) {
     delete pointers[e.pointerId];
     if (!gesture) return;
+    if (gesture.id === e.pointerId && gesture.kind === 'parallel') finishDragParallel(!cancelled && !gesture.multi);
     if (gesture.id === e.pointerId && !gesture.moved && !gesture.multi && !cancelled) {
       var p = localPos(e);
       if (state.phase === 'analysis') analysisTap(p.x, p.y);
@@ -708,7 +766,19 @@
     $('castBtn').hidden = state.solved;
     $('toExplore').hidden = state.solved; // 破關後不能回去重新對焦：那會把法陣和現身的鬼清掉，而且觀察畫面沒有「下一組配置」
     $('nextBtn').hidden = !state.solved;
+    var cleared = level.on && level.sealed >= level.goal;
+    $('nextBtn').textContent = !level.on ? '下一組配置' : (cleared ? '過關 ➜' : '下一隻鬼 ➜');
+    $('nextBtn').classList.toggle('primary', level.on);
     $('replayBtn').hidden = !state.solved;
+    // 關卡模式：左上角是愛心與封印數；配置選單與 Debug 是開發工具，只在 ?free=1 出現
+    $('title').hidden = level.on; $('configSel').hidden = level.on; $('debugBtn').hidden = level.on;
+    $('hud').hidden = !level.on;
+    if (level.on) {
+      var hearts = $('hearts').children;
+      for (var hi = 0; hi < hearts.length; hi++) hearts[hi].classList.toggle('lost', hi >= level.lives);
+      $('hearts').setAttribute('aria-label', '剩下 ' + level.lives + ' 條命');
+      $('sealCount').textContent = '封印 ' + level.sealed + '／' + level.goal;
+    }
     $('zoomIn').disabled = state.zoomIdx >= ZOOM_STEPS.length - 1;
     $('zoomOut').disabled = state.zoomIdx <= 0;
     $('debugBtn').classList.toggle('on', state.debug);
@@ -727,6 +797,69 @@
       '目前 lensX = ' + f2(state.lensX) + '   模糊圓 = ' + (w && isFinite(w.blur) ? f2(w.blur) + ' cm' : '—') + '\n' +
       '實像標記 = ' + (state.marker ? '(0, ' + f2(state.marker.y) + ')' : '—') + '\n' +
       '封印次數 = ' + state.attempts + '   線 = ' + state.lines.length;
+  }
+
+  // ====================================================================
+  // 關卡流程：開場過場 → 抓鬼 → 失敗／過關（畫面用 ../shared/story-scene.js）
+  // ====================================================================
+
+  var hudTimer = null;
+  function flashHud() {
+    var h = $('hud'); h.classList.remove('hit'); void h.offsetWidth; h.classList.add('hit');
+    clearTimeout(hudTimer); hudTimer = setTimeout(function () { h.classList.remove('hit'); }, 700);
+  }
+  function closeScene() { if (level.scene) { level.scene.close(); level.scene = null; } }
+
+  function showIntro() {
+    closeScene();
+    level.screen = 'intro';
+    level.scene = window.StoryScene.show({
+      id: 'intro', background: INTRO_BG,
+      lines: [
+        { speaker: '你', text: '看不到鬼了……' },
+        { speaker: '你', text: '這鬼似乎只能用鏡子看到。' },
+        { speaker: '你', text: '咦？這裡怎麼有一個這麼大的凸透鏡？' }
+      ],
+      note: '走廊裡鬼影重重。' + LEVEL_LIVES + ' 條命內抓到 ' + LEVEL_GOAL + ' 隻鬼；抓錯會失去一顆心。',
+      buttons: [{ id: 'startHuntBtn', label: '開始抓鬼', primary: true, onClick: startHunt }]
+    });
+  }
+  /** 進入（或重新進入）抓鬼：命數與封印數重置，換一隻新的鬼。 */
+  function startHunt() {
+    closeScene();
+    level.screen = 'play'; level.lives = LEVEL_LIVES; level.sealed = 0;
+    state.seenAnalysisIntro = false;
+    resetRound(nextRandomConfig());
+  }
+  function failLevel() {
+    level.screen = 'failed';
+    closeScene();
+    level.scene = window.StoryScene.show({
+      id: 'failed', background: INTRO_BG,
+      title: '三顆心都用完了……',
+      note: '鬼還躲在走廊裡。這次封印了 ' + level.sealed + ' 隻。重新挑戰會從頭算起。',
+      buttons: [
+        { id: 'retryBtn', label: '重新挑戰', primary: true, onClick: startHunt },
+        { id: 'failMenuBtn', label: '回關卡選單', href: MENU_URL }
+      ]
+    });
+  }
+  function showCleared() {
+    level.screen = 'cleared';
+    closeScene();
+    level.scene = window.StoryScene.show({
+      id: 'cleared', background: INTRO_BG, scatter: 7,
+      lines: [
+        { text: '剩下的鬼一哄而散，逃出了城堡！' },
+        { speaker: '你', text: '想跑？追！' }
+      ],
+      title: '第二關過關！',
+      note: '你在走廊封印了 ' + level.sealed + ' 隻鬼。下一站：城外的荒野。（原型階段：關卡解鎖尚未接上）',
+      buttons: [
+        { id: 'clearMenuBtn', label: '回關卡選單', primary: true, href: MENU_URL },
+        { id: 'againBtn', label: '再玩一次', onClick: startHunt }
+      ]
+    });
   }
 
   // 隨機出題：把所有配置洗牌後依序出；出完再洗一次。同一組不會連續出現，也不會照固定順序讓人背答案。
@@ -843,7 +976,9 @@
   $('undoBtn').addEventListener('click', function () { if (state.pending) state.pending = null; else state.lines.pop(); syncUI(); requestRender(); });
   $('clearBtn').addEventListener('click', function () { state.lines = []; state.pending = null; setStatus('已清除所有線。'); syncUI(); requestRender(); });
   $('castBtn').addEventListener('click', castSeal);
-  $('nextBtn').addEventListener('click', function () { resetRound(nextRandomConfig()); });
+  $('nextBtn').addEventListener('click', function () {
+    if (level.on && level.sealed >= level.goal) showCleared(); else resetRound(nextRandomConfig());
+  });
   $('replayBtn').addEventListener('click', function () { if (state.solved) startReplay(); });
   $('zoomIn').addEventListener('click', function () { setZoom(state.zoomIdx + 1); });
   $('zoomOut').addEventListener('click', function () { setZoom(state.zoomIdx - 1); });
@@ -857,9 +992,10 @@
     state: state, stats: stats, cfg: cfg, configs: Cfg, GHOST_COLOR: GHOST_COLOR, SNAP_PX: SNAP_PX,
     w2s: w2s, s2w: s2w, snapPoints: snapPoints, studentIntersections: studentIntersections, wallNow: wallNow,
     regions: regions, canvasSize: function () { return { W: W, H: H, DPR: DPR }; }, render: render,
-    replaySpec: replaySpec,
+    replaySpec: replaySpec, level: level,
     art: function () { return { pending: artPending, corridor: ART.corridor.ready, lens: ART.lens.ready }; }
   };
 
   resetRound(nextRandomConfig()); // 一開始也隨機，不固定從配置 A 開始
+  if (level.on) showIntro();
 })();

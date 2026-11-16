@@ -55,7 +55,7 @@ const PROFILES = [
   // 遊戲一律橫向（docs/decisions.md）。橫向手機是主要情境：四組配置 × 兩個清晰位置全跑。
   { name: 'phone-landscape', viewport: { width: 812, height: 375 }, touch: true, dsf: 2, runs: ALL_RUNS, shots: /./ },
   // 直向只當備援版面檢查：用 ?portrait=1 關掉「請橫放」提示。
-  { name: 'phone-portrait', viewport: { width: 375, height: 812 }, touch: true, dsf: 2, runs: [[0, 0]], shots: /^[258]-/, query: '?portrait=1' },
+  { name: 'phone-portrait', viewport: { width: 375, height: 812 }, touch: true, dsf: 2, runs: [[0, 0]], shots: /^[258]-/, query: '&portrait=1' },
   { name: 'desktop', viewport: { width: 1280, height: 800 }, touch: false, dsf: 1, runs: [[0, 1], [2, 0]], shots: /^[258]-/ }
 ];
 
@@ -362,9 +362,16 @@ async function run(profile, browser) {
     await press('#zoomIn');
     if (first) await layoutCheck('分析／放大後');
     s0 = await st();
-    await drag(cs.w * 0.3, cs.h * 0.6, cs.w * 0.3 + 90, cs.h * 0.6 + 25);
+    // 平移拖曳的起點要避開標示點：從標示點橫向拖曳現在是「拉平行線」
+    const freeY = (x) => page.evaluate(({ x, h, hook }) => {
+      const H = window[hook], pts = H.snapPoints().map((p) => H.w2s(p));
+      return [0.6, 0.78, 0.42, 0.3].map((f) => h * f).find((y) => pts.every((q) => Math.hypot(q.x - x, q.y - y) > H.SNAP_PX + 15)) || h * 0.6;
+    }, { x, h: cs.h, hook: '__protoConvex' });
+    const panY1 = await freeY(cs.w * 0.3);
+    await drag(cs.w * 0.3, panY1, cs.w * 0.3 + 90, panY1 + 25);
     const mid = await st();
-    await drag(cs.w * 0.6, cs.h * 0.6, cs.w * 0.6 - 90, cs.h * 0.6 - 25);
+    const panY2 = await freeY(cs.w * 0.6); // 第一次平移後標示點的位置變了，重新找
+    await drag(cs.w * 0.6, panY2, cs.w * 0.6 - 90, panY2 - 25);
     s = await st();
     const moved = Math.max(Math.abs(mid.tx - s0.tx), Math.abs(s.tx - mid.tx));
     ok(moved > 40, T('放大後單指拖曳可平移'), 'Δx=' + moved.toFixed(0) + 'px');
@@ -372,9 +379,9 @@ async function run(profile, browser) {
     const onO = await snap('O');
     if (onO.x > 20 && onO.x < cs.w - 100 && onO.y > 70 && onO.y < cs.h - 10) {
       await press('#toolLine');
-      await drag(onO.x, onO.y, onO.x + 70, onO.y + 10);
+      await drag(onO.x, onO.y, onO.x + 30, onO.y + 60);
       s = await st();
-      ok(!s.pending && s.lines === 3, T('從吸附點上開始的拖曳不會被當成畫線'));
+      ok(!s.pending && s.lines === 3, T('從吸附點上開始的斜向拖曳不會被當成畫線'));
     }
     if (profile.touch) {
       s0 = await st();
@@ -386,6 +393,61 @@ async function run(profile, browser) {
     if (first) await shot('6-analysis-zoomed');
     await press('#zoomFit');
     ok((await st()).zoomIdx === 0, T('「全圖」回到預設視圖'));
+
+    // ---------- 從標示點橫向拖曳 = 拉出平行線 ----------
+    {
+      const sp0 = await snap('O'), cb = await canvasBox(), dir = sp0.x > cb.w / 2 ? -1 : 1;
+      const path = async (pts, mid) => {
+        let out;
+        if (profile.touch) {
+          await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: cb.x + pts[0][0], y: cb.y + pts[0][1], id: 1 }] });
+          for (let i = 1; i < pts.length; i++) for (let k = 1; k <= 4; k++) {
+            await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: cb.x + pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * k / 4, y: cb.y + pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * k / 4, id: 1 }] });
+          }
+          await page.waitForTimeout(40); if (mid) out = await mid();
+          await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+          // headless Chromium：用 CDP 模擬的拖曳結束後，緊接的第一次點擊不會產生 click（平移拖曳也一樣，是測試工具的現象）。
+          // 先在標題列空白處點一下把它消耗掉。
+          await page.waitForTimeout(40); await page.touchscreen.tap(4, 4);
+        } else {
+          await page.mouse.move(cb.x + pts[0][0], cb.y + pts[0][1]); await page.mouse.down();
+          for (let i = 1; i < pts.length; i++) await page.mouse.move(cb.x + pts[i][0], cb.y + pts[i][1], { steps: 4 });
+          await page.waitForTimeout(40); if (mid) out = await mid();
+          await page.mouse.up();
+        }
+        await page.waitForTimeout(60);
+        return out;
+      };
+      const peek = () => page.evaluate(() => { const s = window.__protoConvex.state, l = s.lines[s.lines.length - 1]; return { n: s.lines.length, preview: s.dragParallel ? { x: s.dragParallel.x, y: s.dragParallel.y } : null, last: l ? { kind: l.kind, x: l.a.x, y: l.a.y } : null, tx: s.view.tx, ty: s.view.ty, pending: !!s.pending }; });
+      const world = await page.evaluate(() => window.__protoConvex.snapPoints().find((q) => q.id === 'O'));
+      const n0 = (await peek()).n;
+      await press('#modeDraw'); await press('#toolLine');
+      // 橫向拖曳：拖曳中有預覽、還沒有線；放開後留下平行線
+      let mid = await path([[sp0.x + 4, sp0.y - 3], [sp0.x + dir * 80, sp0.y + 6]], peek);
+      let after = await peek();
+      ok(mid.preview && Math.abs(mid.preview.y - world.y) < 1e-9 && mid.n === n0, T('從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線'));
+      ok(after.n === n0 + 1 && !after.preview && after.last.kind === 'parallel' && Math.abs(after.last.y - world.y) < 1e-9 && Math.abs(after.last.x - world.x) < 1e-9 && !after.pending,
+        T('放開手指：留下通過該點、平行主光軸的線'));
+      // 直向備援版面：狀態列文字換行會改變畫布高度、重新排版，不是平移，所以不比
+      if (profile.name !== 'phone-portrait') ok(Math.abs(after.tx - mid.tx) < 1e-9 && Math.abs(after.ty - mid.ty) < 1e-9, T('拉平行線時畫面不會跟著平移'));
+      await press('#undoBtn');
+      ok((await peek()).n === n0, T('「復原」可以拿掉拖出來的平行線'));
+      // 先橫向拉出預覽，再往下拉開 → 取消
+      mid = await path([[sp0.x, sp0.y], [sp0.x + dir * 80, sp0.y + 4], [sp0.x + dir * 90, sp0.y + 90]], peek);
+      after = await peek();
+      ok(!mid.preview && after.n === n0 && !after.preview, T('橫向拖曳後又拉到別處：平行線取消，放開不留線'));
+      // 一開始就不是橫向（斜向／直向）→ 照舊是平移，不畫線
+      await path([[sp0.x, sp0.y], [sp0.x + dir * 30, sp0.y + 70]]);
+      after = await peek();
+      ok(after.n === n0 && !after.preview && !after.pending, T('從標示點斜向拖曳不會畫線'));
+      // 選格封印模式下不會拉出線
+      await press('#modeSeal');
+      mid = await path([[sp0.x, sp0.y], [sp0.x + dir * 80, sp0.y + 4]], peek);
+      after = await peek();
+      ok(!mid.preview && after.n === n0, T('選格封印模式下，橫向拖曳不會畫線'));
+      await press('#modeDraw');
+      await press('#zoomFit');
+    }
 
     // ---------- 錯誤封印 ----------
     await press('#modeSeal');
@@ -475,7 +537,7 @@ async function run(profile, browser) {
 
 (async () => {
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
-  URL = 'http://127.0.0.1:' + server.address().port + '/prototype/convex-lens/index.html';
+  URL = 'http://127.0.0.1:' + server.address().port + '/prototype/convex-lens/index.html?free=1'; // 自由練習模式：可指定配置、不計命。關卡流程由 e2e-convex-level.js 測
   const browser = await chromium.launch();
   for (const p of PROFILES) {
     try { await run(p, browser); } catch (e) { ok(false, '[' + p.name + '] 測試腳本例外', e.message); }

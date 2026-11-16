@@ -38,9 +38,16 @@
   PASS  [phone-landscape] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 812×242
   PASS  [phone-landscape] 配置A 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置A 拖曳平移不會畫線／選格／改變縮放
-  PASS  [phone-landscape] 配置A 從吸附點上開始的拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置A 從吸附點上開始的斜向拖曳不會被當成畫線
   PASS  [phone-landscape] 配置A 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置A 「全圖」回到預設視圖
+  PASS  [phone-landscape] 配置A 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
+  PASS  [phone-landscape] 配置A 放開手指：留下通過該點、平行主光軸的線
+  PASS  [phone-landscape] 配置A 拉平行線時畫面不會跟著平移
+  PASS  [phone-landscape] 配置A 「復原」可以拿掉拖出來的平行線
+  PASS  [phone-landscape] 配置A 橫向拖曳後又拉到別處：平行線取消，放開不留線
+  PASS  [phone-landscape] 配置A 從標示點斜向拖曳不會畫線
+  PASS  [phone-landscape] 配置A 選格封印模式下，橫向拖曳不會畫線
   PASS  [phone-landscape] 分析／封印：所有控制項都在畫面內  — canvas 812×242
   PASS  [phone-landscape] 分析／封印：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-landscape] 分析／封印：頁面不需捲動
@@ -71,7 +78,7 @@
   PASS  [phone-landscape] 配置A 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置A 光路重現：結束時標出像點  — 129 px（重現前 71）
   PASS  [phone-landscape] 配置A 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
   PASS  [phone-landscape] 配置A 關閉 Debug 後面板清空
   PASS  [phone-landscape] 配置B 裸眼畫面沒有鬼
@@ -100,9 +107,16 @@
   PASS  [phone-landscape] 配置B ＋ 按鈕放大  — 1.50×
   PASS  [phone-landscape] 配置B 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置B 拖曳平移不會畫線／選格／改變縮放
-  PASS  [phone-landscape] 配置B 從吸附點上開始的拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置B 從吸附點上開始的斜向拖曳不會被當成畫線
   PASS  [phone-landscape] 配置B 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置B 「全圖」回到預設視圖
+  PASS  [phone-landscape] 配置B 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
+  PASS  [phone-landscape] 配置B 放開手指：留下通過該點、平行主光軸的線
+  PASS  [phone-landscape] 配置B 拉平行線時畫面不會跟著平移
+  PASS  [phone-landscape] 配置B 「復原」可以拿掉拖出來的平行線
+  PASS  [phone-landscape] 配置B 橫向拖曳後又拉到別處：平行線取消，放開不留線
+  PASS  [phone-landscape] 配置B 從標示點斜向拖曳不會畫線
+  PASS  [phone-landscape] 配置B 選格封印模式下，橫向拖曳不會畫線
   PASS  [phone-landscape] 配置B 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置B 點地板格可選取（虛像所在的第 2 格）
   PASS  [phone-landscape] 配置B 封印虛像所在格 → 失敗
@@ -156,9 +170,16 @@
   PASS  [phone-landscape] 配置C ＋ 按鈕放大  — 1.50×
   PASS  [phone-landscape] 配置C 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置C 拖曳平移不會畫線／選格／改變縮放
-  PASS  [phone-landscape] 配置C 從吸附點上開始的拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置C 從吸附點上開始的斜向拖曳不會被當成畫線
   PASS  [phone-landscape] 配置C 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置C 「全圖」回到預設視圖
+  PASS  [phone-landscape] 配置C 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
+  PASS  [phone-landscape] 配置C 放開手指：留下通過該點、平行主光軸的線
+  PASS  [phone-landscape] 配置C 拉平行線時畫面不會跟著平移
+  PASS  [phone-landscape] 配置C 「復原」可以拿掉拖出來的平行線
+  PASS  [phone-landscape] 配置C 橫向拖曳後又拉到別處：平行線取消，放開不留線
+  PASS  [phone-landscape] 配置C 從標示點斜向拖曳不會畫線
+  PASS  [phone-landscape] 配置C 選格封印模式下，橫向拖曳不會畫線
   PASS  [phone-landscape] 配置C 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置C 點地板格可選取（虛像所在的第 3 格）
   PASS  [phone-landscape] 配置C 封印虛像所在格 → 失敗
@@ -212,9 +233,16 @@
   PASS  [phone-landscape] 配置D ＋ 按鈕放大  — 1.50×
   PASS  [phone-landscape] 配置D 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置D 拖曳平移不會畫線／選格／改變縮放
-  PASS  [phone-landscape] 配置D 從吸附點上開始的拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置D 從吸附點上開始的斜向拖曳不會被當成畫線
   PASS  [phone-landscape] 配置D 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置D 「全圖」回到預設視圖
+  PASS  [phone-landscape] 配置D 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
+  PASS  [phone-landscape] 配置D 放開手指：留下通過該點、平行主光軸的線
+  PASS  [phone-landscape] 配置D 拉平行線時畫面不會跟著平移
+  PASS  [phone-landscape] 配置D 「復原」可以拿掉拖出來的平行線
+  PASS  [phone-landscape] 配置D 橫向拖曳後又拉到別處：平行線取消，放開不留線
+  PASS  [phone-landscape] 配置D 從標示點斜向拖曳不會畫線
+  PASS  [phone-landscape] 配置D 選格封印模式下，橫向拖曳不會畫線
   PASS  [phone-landscape] 配置D 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置D 點地板格可選取（虛像所在的第 2 格）
   PASS  [phone-landscape] 配置D 封印虛像所在格 → 失敗
@@ -241,7 +269,7 @@
   PASS  [phone-landscape] 配置D 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置D 光路重現：結束時標出像點  — 137 px（重現前 70）
   PASS  [phone-landscape] 配置D 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置D 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置D 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 沒有 JS 錯誤
   PASS  [phone-portrait] 背景圖已載入
   PASS  [phone-portrait] 探索：所有控制項都在畫面內  — canvas 375×597
@@ -285,6 +313,12 @@
   PASS  [phone-portrait] 配置A 拖曳平移不會畫線／選格／改變縮放
   PASS  [phone-portrait] 配置A 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-portrait] 配置A 「全圖」回到預設視圖
+  PASS  [phone-portrait] 配置A 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
+  PASS  [phone-portrait] 配置A 放開手指：留下通過該點、平行主光軸的線
+  PASS  [phone-portrait] 配置A 「復原」可以拿掉拖出來的平行線
+  PASS  [phone-portrait] 配置A 橫向拖曳後又拉到別處：平行線取消，放開不留線
+  PASS  [phone-portrait] 配置A 從標示點斜向拖曳不會畫線
+  PASS  [phone-portrait] 配置A 選格封印模式下，橫向拖曳不會畫線
   PASS  [phone-portrait] 分析／封印：所有控制項都在畫面內  — canvas 375×597
   PASS  [phone-portrait] 分析／封印：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-portrait] 分析／封印：頁面不需捲動
@@ -359,8 +393,15 @@
   PASS  [desktop] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 1280×591
   PASS  [desktop] 配置A 放大後單指拖曳可平移  — Δx=90px
   PASS  [desktop] 配置A 拖曳平移不會畫線／選格／改變縮放
-  PASS  [desktop] 配置A 從吸附點上開始的拖曳不會被當成畫線
+  PASS  [desktop] 配置A 從吸附點上開始的斜向拖曳不會被當成畫線
   PASS  [desktop] 配置A 「全圖」回到預設視圖
+  PASS  [desktop] 配置A 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
+  PASS  [desktop] 配置A 放開手指：留下通過該點、平行主光軸的線
+  PASS  [desktop] 配置A 拉平行線時畫面不會跟著平移
+  PASS  [desktop] 配置A 「復原」可以拿掉拖出來的平行線
+  PASS  [desktop] 配置A 橫向拖曳後又拉到別處：平行線取消，放開不留線
+  PASS  [desktop] 配置A 從標示點斜向拖曳不會畫線
+  PASS  [desktop] 配置A 選格封印模式下，橫向拖曳不會畫線
   PASS  [desktop] 分析／封印：所有控制項都在畫面內  — canvas 1280×591
   PASS  [desktop] 分析／封印：按鈕點擊區 ≥ 40×40 px
   PASS  [desktop] 分析／封印：頁面不需捲動
@@ -420,8 +461,15 @@
   PASS  [desktop] 配置C ＋ 按鈕放大  — 1.50×
   PASS  [desktop] 配置C 放大後單指拖曳可平移  — Δx=90px
   PASS  [desktop] 配置C 拖曳平移不會畫線／選格／改變縮放
-  PASS  [desktop] 配置C 從吸附點上開始的拖曳不會被當成畫線
+  PASS  [desktop] 配置C 從吸附點上開始的斜向拖曳不會被當成畫線
   PASS  [desktop] 配置C 「全圖」回到預設視圖
+  PASS  [desktop] 配置C 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
+  PASS  [desktop] 配置C 放開手指：留下通過該點、平行主光軸的線
+  PASS  [desktop] 配置C 拉平行線時畫面不會跟著平移
+  PASS  [desktop] 配置C 「復原」可以拿掉拖出來的平行線
+  PASS  [desktop] 配置C 橫向拖曳後又拉到別處：平行線取消，放開不留線
+  PASS  [desktop] 配置C 從標示點斜向拖曳不會畫線
+  PASS  [desktop] 配置C 選格封印模式下，橫向拖曳不會畫線
   PASS  [desktop] 配置C 封印模式下點擊不會畫線
   PASS  [desktop] 配置C 點地板格可選取（虛像所在的第 3 格）
   PASS  [desktop] 配置C 封印虛像所在格 → 失敗
@@ -451,4 +499,4 @@
   PASS  [desktop] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [desktop] 沒有 JS 錯誤
 
-ALL PASS: 452/452 checks
+ALL PASS: 500/500 checks

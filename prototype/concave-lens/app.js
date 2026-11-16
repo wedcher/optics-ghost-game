@@ -587,7 +587,13 @@
     state.lines.forEach(function (l) {
       strokeInfinite(geomLine(l), state.replay ? 'rgba(255,255,255,.22)' : (l.kind === 'parallel' ? '#7dffb2' : '#ffd166'), 2, l.dashed ? [8, 6] : null);
     });
-    studentIntersections().forEach(function (pt) {
+    if (state.dragParallel) {
+        // 拖曳中的平行線預覽
+        strokeInfinite(Optics.horizontalLine(state.dragParallel), 'rgba(125,255,178,.75)', 3, [5, 5]);
+        q = w2s(state.dragParallel); ctx.strokeStyle = '#7dffb2'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(q.x, q.y, 18, 0, 7); ctx.stroke();
+      }
+      studentIntersections().forEach(function (pt) {
       q = w2s(pt); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.arc(q.x, q.y, 5, 0, 7); ctx.stroke();
     });
@@ -755,6 +761,32 @@
   // 共用：輸入、UI、繪製排程
   // ====================================================================
 
+  // 從標示點橫向拖曳 = 拉出通過該點、平行主光軸的線（手機上比先切「平行線」工具再點快）。
+  // 拖曳中先顯示預覽；手指放開時預覽還在就留下這條線，往上／下拉開則取消。
+  // 只在畫線模式、起點落在標示點上、而且一開始就是橫向拖曳時才算；其他拖曳照舊是平移畫面。
+  var DRAG_DECIDE_PX = 18, PARALLEL_DRAG_PX = 40;
+  function updateDragParallel(p) {
+    var dx = Math.abs(p.x - gesture.x0), dy = Math.abs(p.y - gesture.y0), sp = gesture.snap;
+    var active = dx >= PARALLEL_DRAG_PX && dy <= Math.max(24, dx * 0.35);
+    var was = !!state.dragParallel;
+    state.dragParallel = active ? { x: sp.x, y: sp.y, label: sp.label } : null;
+    if (active && !was) setStatus('放開手指：畫出通過「' + sp.label + '」、平行主光軸的線。往上或往下拉開則取消。');
+    else if (!active && was) setStatus('已取消平行線。拉回水平方向可以再拉出來。');
+  }
+  function cancelDragParallel() { if (state.dragParallel) { state.dragParallel = null; requestRender(); } }
+  function finishDragParallel(commit) {
+    var pt = state.dragParallel;
+    state.dragParallel = null;
+    if (pt && commit) {
+      state.lines.push({ kind: 'parallel', a: pt, b: null, dashed: state.dashed });
+      state.pending = null;
+      setStatus('已畫出通過「' + pt.label + '」、平行主光軸的線。');
+    } else {
+      setStatus('沒有畫線。從標示點往左或往右拖，可以拉出平行主光軸的線。');
+    }
+    syncUI(); requestRender();
+  }
+
   var pointers = {}, gesture = null;
   function localPos(e) { var r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
   function pointerCount() { return Object.keys(pointers).length; }
@@ -764,16 +796,25 @@
     pointers[e.pointerId] = true;
     if (pointerCount() === 1) {
       var p = localPos(e);
-      gesture = { id: e.pointerId, x0: p.x, y0: p.y, lx: p.x, ly: p.y, moved: false, multi: false };
+      gesture = { id: e.pointerId, x0: p.x, y0: p.y, lx: p.x, ly: p.y, moved: false, multi: false, kind: null,
+        snap: state.phase === 'analysis' && state.mode === 'draw' && !state.solved ? nearestSnap(p.x, p.y) : null };
       try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     } else if (gesture) {
-      gesture.multi = true; // 兩指：既不畫線也不縮放（縮放只用按鈕）
+      gesture.multi = true; cancelDragParallel(); // 兩指：既不畫線也不縮放（縮放只用按鈕）
     }
   });
   canvas.addEventListener('pointermove', function (e) {
     if (!gesture || gesture.id !== e.pointerId || gesture.multi) return;
     var p = localPos(e);
     if (!gesture.moved && Math.hypot(p.x - gesture.x0, p.y - gesture.y0) > TAP_SLOP_PX) gesture.moved = true;
+    if (gesture.snap) {
+      // 起點在標示點上：等拖得夠遠再判斷是「橫向拉平行線」還是「平移畫面」
+      if (!gesture.kind && Math.hypot(p.x - gesture.x0, p.y - gesture.y0) > DRAG_DECIDE_PX) {
+        gesture.kind = Math.abs(p.y - gesture.y0) <= Math.abs(p.x - gesture.x0) * 0.5 ? 'parallel' : 'pan';
+      }
+      if (gesture.kind === 'parallel') { updateDragParallel(p); requestRender(); }
+      if (gesture.kind !== 'pan') { gesture.lx = p.x; gesture.ly = p.y; return; }
+    }
     if (gesture.moved && state.phase === 'analysis') {
       state.view.tx += p.x - gesture.lx; state.view.ty += p.y - gesture.ly;
       clampView(); requestRender();
@@ -783,6 +824,7 @@
   function endPointer(e, cancelled) {
     delete pointers[e.pointerId];
     if (!gesture) return;
+    if (gesture.id === e.pointerId && gesture.kind === 'parallel') finishDragParallel(!cancelled && !gesture.multi);
     if (gesture.id === e.pointerId && !gesture.moved && !gesture.multi && !cancelled) {
       var p = localPos(e);
       if (state.phase === 'explore') exploreTap(p.x, p.y); else analysisTap(p.x, p.y);

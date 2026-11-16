@@ -14,7 +14,7 @@ GPT 後續會負責概念美術與視覺 refinement，目前 prototype 可以放
 | `convex-lens.png` | 凸透鏡：側面看的鏡片（透明背景）。 | 使用中 |
 | `ghost01.png` | 鬼的角色圖（本體與所有的像共用這一張）。透明背景，5:7。 | 尚未使用（原型仍是 placeholder） |
 | `mirror-room-storyboard.png` | 平面鏡關的四格流程：發現鬼影 → 顯示格線 → 錯誤示範（對鏡子丟符）→ 正確封印。 | 氛圍／流程參考 |
-| `convex-intro-corridor.webp` | 凸透鏡關開場過場的背景：透視的城堡長廊（使用者 2026-11-17 指定）。見 `docs/story-and-flow.md`。 | 尚未使用 |
+| `convex-intro-corridor.webp` | 凸透鏡關開場過場的背景：透視的城堡長廊（使用者 2026-11-17 指定）。見 `docs/story-and-flow.md`。原型載入的是 `prototype/convex-lens/assets/intro-corridor.webp`（同一個檔案的複本）。 | 使用中 |
 
 ## 使用注意
 

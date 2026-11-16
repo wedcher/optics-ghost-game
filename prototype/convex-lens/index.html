@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>凸透鏡原型 — Optics Ghost Game (Sprint 02)</title>
+<title>第二關：凸透鏡走廊 — Optics Ghost Game</title>
 <style>
   :root { --bg:#0d1020; --panel:#171b33; --line:#2c3359; --text:#e8ebff; --dim:#9aa3cf; --accent:#ffd166; --mark:#ff5fd2; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -20,6 +20,11 @@
   button:disabled { opacity:.38; cursor:default; }
   button.on { background:#4a3f12; border-color:var(--accent); color:var(--accent); }
   button.primary { background:#5b2a86; border-color:#b980ff; font-weight:600; }
+  #hud { flex:1 1 auto; display:flex; align-items:center; gap:14px; min-height:40px; font-size:16px; font-weight:600; }
+  #hearts { display:inline-flex; gap:4px; font-size:26px; line-height:1; color:#ff4d6d; text-shadow:0 0 8px rgba(255,77,109,.6); }
+  #hearts .lost { color:#3a3f5e; text-shadow:none; }
+  #hud.hit #hearts { animation:hudHit .6s ease-out; }
+  @keyframes hudHit { 0%,100% { transform:translateX(0); } 20% { transform:translateX(-5px); } 40% { transform:translateX(5px); } 60% { transform:translateX(-3px); } 80% { transform:translateX(3px); } }
   #debugBtn { min-height:40px; font-size:13px; padding:2px 8px; }
   #configSel { min-height:40px; font-size:14px; }
   #status { padding:6px 10px; font-size:14px; line-height:1.35; min-height:3.2em; background:#12152a; border-bottom:1px solid var(--line); display:flex; align-items:center; }
@@ -54,7 +59,11 @@
 <body>
 <div id="app">
   <header id="topbar">
-    <h1>凸透鏡原型 <small>Sprint 02</small></h1>
+    <h1 id="title">凸透鏡原型 <small>自由練習</small></h1>
+    <div id="hud" hidden>
+      <span id="hearts" role="img"><span>♥</span><span>♥</span><span>♥</span></span>
+      <span id="sealCount"></span>
+    </div>
     <select id="configSel" aria-label="測試配置"></select>
     <button id="debugBtn" type="button" aria-pressed="false">Debug</button>
   </header>
@@ -104,6 +113,7 @@
 <script src="../shared/landscape.js"></script>
 <script src="../shared/optics-core.js"></script>
 <script src="../shared/ray-replay.js"></script>
+<script src="../shared/story-scene.js"></script>
 <script src="configs.js"></script>
 <script src="app.js"></script>
 </body>
