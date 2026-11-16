@@ -66,3 +66,18 @@
 **DO NOT RE-DERIVE**
 - Prototype scope ≠ Product scope。
 - 單一 prototype 不能被當成整款遊戲的重新定義。
+
+## 2026-11-16 — 畫面方向
+
+**CONFIRMED**
+- 遊戲一律**橫向**遊玩，不做直向版面。
+- 網頁無法強制手機轉向，所以觸控裝置直向拿著時顯示「請把手機橫放」提示（`prototype/shared/landscape.js`）。
+- 之後所有畫面、UI、美術以橫向為準設計；直向版面只是開發時的備援（網址加 `?portrait=1`），不需要顧。
+
+## 2026-11-16 — 凸透鏡場景美術
+
+**CONFIRMED**
+- 走廊背景與凸透鏡使用 GPT 的概念圖（`docs/concepts/convex-corridor-bg.png`、`convex-lens.png`）。
+
+**PENDING**
+- 成像的面是「布幕」還是「石牆」。目前原型用程式畫的米白布幕當 placeholder。

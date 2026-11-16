@@ -46,8 +46,10 @@ function ok(cond, label, detail) {
 }
 
 const PROFILES = [
-  { name: 'phone-portrait', viewport: { width: 375, height: 812 }, touch: true, dsf: 2, configs: [0, 1, 2, 3], shots: /./ },
-  { name: 'phone-landscape', viewport: { width: 812, height: 375 }, touch: true, dsf: 1, configs: [0], shots: /^[258]-/ },
+  // 遊戲一律橫向（docs/decisions.md）。橫向手機是主要情境，跑完全部配置。
+  { name: 'phone-landscape', viewport: { width: 812, height: 375 }, touch: true, dsf: 2, configs: [0, 1, 2, 3], shots: /./ },
+  // 直向只當備援版面檢查：用 ?portrait=1 關掉「請橫放」提示。
+  { name: 'phone-portrait', viewport: { width: 375, height: 812 }, touch: true, dsf: 2, configs: [0], shots: /^[258]-/, query: '?portrait=1' },
   { name: 'desktop', viewport: { width: 1280, height: 800 }, touch: false, dsf: 1, configs: [0, 2], shots: /^[258]-/ }
 ];
 
@@ -61,7 +63,7 @@ async function run(profile, browser) {
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
-  await page.goto(URL);
+  await page.goto(URL + (profile.query || ''));
   await page.waitForFunction(() => window.__proto);
   ok(await page.evaluate(() => window.__proto.background().ready), '[' + profile.name + '] 背景圖已載入');
 

@@ -21,6 +21,7 @@
 - 錯誤音效若存在，必須短、方向性不明、不可成為定位工具。
 - 現階段不做完整 3D 瞄準。
 - 手機觸控優先。
+- 畫面一律橫向，不做直向版面。
 - 格子不是難度來源。
 - 凸透鏡與凹透鏡可畫輔助光線。
 - 平面鏡不強制畫線。
@@ -120,6 +121,9 @@
 2. `npm test`。其中 `tests/e2e-concave-lens.js` 上一輪有改（改用本機 HTTP 伺服器、鬼體色常數）但**尚未執行過**；`tests/check-geometry-convex.js` 也還沒在 Node 下跑過（同一份檢查在瀏覽器是 140/140）。若失敗，先修好再做別的事。
 3. 通過後把更新的 `docs/screenshots/` 與 `e2e-results.txt` 一起 commit。
 4. 為凸透鏡補一支 headless e2e（比照凹透鏡那支；掛鉤是 `window.__protoConvex`）。
+
+**畫面一律橫向**（見 `docs/decisions.md`）；e2e 腳本已改成以橫向手機為主，同樣尚未執行過。
+凸透鏡已換上 GPT 的走廊與鏡片圖；布幕的圖還沒有（placeholder）。
 
 之後等使用者試玩回饋；沒有新指示時，依下方 NEXT 做平面鏡 prototype。
 視覺與氛圍依 `docs/visual-handoff.md`；GPT 負責美術，prototype 用 placeholder 即可。

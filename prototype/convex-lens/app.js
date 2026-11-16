@@ -1,16 +1,16 @@
 /*
  * 凸透鏡 vertical prototype（Sprint 02）
  *
- * 流程：移動凸透鏡 → 投影牆上出現清楚的倒立實像 → 標記 → 側視光路分析（兩條可逆主光線）
+ * 流程：移動凸透鏡 → 布幕上出現清楚的倒立實像 → 標記 → 側視光路分析（兩條可逆主光線）
  *       → 選地板格 → 封印。
  *
- * 畫面：固定走廊（側視）＋投影牆正面視圖；鬼、像、光線、法陣都是動態圖層。
+ * 畫面：固定走廊（側視）＋布幕正面視圖；鬼、像、光線、法陣都是動態圖層。
  * 幾何全部來自 ../shared/optics-core.js 與 configs.js，這裡只負責畫面與互動。
  *
  * 側視分析的畫線／吸附／縮放／選格邏輯與 ../concave-lens/app.js 相同（目前是複製，
  * 之後三套玩法整合成共用 shell 時再抽出）。
  *
- * 座標：走廊座標，投影牆在 X = 0，走廊在左側（X < 0），主光軸 y = 0，y 向上為正。
+ * 座標：走廊座標，布幕在 X = 0，走廊在左側（X < 0），主光軸 y = 0，y 向上為正。
  */
 (function () {
   'use strict';
@@ -48,6 +48,25 @@
   var W = 300, H = 300, DPR = 1;
 
   function cfg() { return Cfg.all[state.cfgIndex]; }
+
+  // 美術圖層（docs/concepts/ 的概念圖，壓縮後放在 assets/）。載入失敗時退回程式畫的 placeholder。
+  // 走廊背景：側視的石牆長廊。floorAt／ceilAt 是圖中「牆腳線」與「橫樑下緣」占圖高的比例，
+  // 用來把圖對齊到走廊座標（地板 y = -axisHeight、天花板 y = +axisHeight）。
+  var ART = {
+    corridor: { src: 'assets/corridor.jpg', img: null, ready: false, floorAt: 0.795, ceilAt: 0.09, leftX: -1100 },
+    lens: { src: 'assets/lens.png', img: null, ready: false }
+  };
+  var artOff = /[?&]art=0/.test(location.search);
+  var artPending = 0;
+  Object.keys(ART).forEach(function (k) {
+    if (artOff) return;
+    var a = ART[k];
+    artPending++;
+    a.img = new Image();
+    a.img.onload = function () { a.ready = true; artPending--; requestRender(); };
+    a.img.onerror = function () { artPending--; };
+    a.img.src = a.src;
+  });
   function clampLens(x) { return Math.max(WORLD.lensMinX, Math.min(WORLD.lensMaxX, x)); }
   function wallNow() { var c = cfg(); return Cfg.wallImage(c.f, c.object.x, c.h, state.lensX, WORLD.lensRadius); }
   function nearestSharp() {
@@ -57,7 +76,7 @@
   }
 
   // ====================================================================
-  // 版面：觀察階段把畫布分成「投影牆正面」與「走廊側視」兩塊
+  // 版面：觀察階段把畫布分成「布幕正面」與「走廊側視」兩塊
   // ====================================================================
 
   function regions() {
@@ -181,7 +200,7 @@
   }
 
   // ====================================================================
-  // 投影牆正面視圖：牆上的光由幾何決定（位置、大小、倒立、模糊圓）
+  // 布幕正面視圖：牆上的光由幾何決定（位置、大小、倒立、模糊圓）
   // ====================================================================
 
   function renderWall(r) {
@@ -192,12 +211,13 @@
     var k = Math.min((r.w - 2 * pad) / (2 * WORLD.wallHalfWidth), (r.h - 2 * pad - 18) / (2 * WORLD.axisHeight));
     var cx = r.x + r.w / 2, cy = r.y + 18 + (r.h - 18) / 2;
     var wx = cx - WORLD.wallHalfWidth * k, wy = cy - WORLD.axisHeight * k, ww = 2 * WORLD.wallHalfWidth * k, wh = 2 * WORLD.axisHeight * k;
-    // 牆面（暗走廊裡的白牆：本身偏暗，亮的是投影上去的光）
-    var g = ctx.createRadialGradient(cx, cy, ww * 0.1, cx, cy, ww * 0.8);
-    g.addColorStop(0, '#4a4f66'); g.addColorStop(1, '#2a2d40');
+    // 布幕（placeholder：暗走廊裡的米白布，本身偏暗，亮的是投影上去的光）
+    ctx.fillStyle = '#4a3823'; ctx.fillRect(wx - 5, wy - 5, ww + 10, wh + 10);
+    var g = ctx.createRadialGradient(cx, cy, ww * 0.1, cx, cy, ww * 0.85);
+    g.addColorStop(0, '#5b574c'); g.addColorStop(1, '#37342d');
     ctx.fillStyle = g; ctx.fillRect(wx, wy, ww, wh);
-    ctx.strokeStyle = 'rgba(0,0,0,.18)'; ctx.lineWidth = 1;
-    for (var by = 1; by < 6; by++) { ctx.beginPath(); ctx.moveTo(wx, wy + (wh * by) / 6); ctx.lineTo(wx + ww, wy + (wh * by) / 6); ctx.stroke(); }
+    ctx.strokeStyle = 'rgba(0,0,0,.10)'; ctx.lineWidth = 1;
+    for (var by = 1; by < 5; by++) { ctx.beginPath(); ctx.moveTo(wx + (ww * by) / 5, wy); ctx.quadraticCurveTo(wx + (ww * by) / 5 + 3, cy, wx + (ww * by) / 5, wy + wh); ctx.stroke(); }
     // 主光軸打在牆上的位置
     ctx.strokeStyle = 'rgba(160,175,240,.35)'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(cx - 8, cy); ctx.lineTo(cx + 8, cy); ctx.moveTo(cx, cy - 8); ctx.lineTo(cx, cy + 8); ctx.stroke();
@@ -224,9 +244,9 @@
       }
       ctx.restore();
     }
-    ctx.strokeStyle = '#8b90ad'; ctx.lineWidth = 2; ctx.strokeRect(wx, wy, ww, wh);
+    ctx.strokeStyle = '#7a6040'; ctx.lineWidth = 2; ctx.strokeRect(wx, wy, ww, wh);
     if (state.marker) drawMarker(cx, cy - state.marker.y * k);
-    label('投影牆（正面看）', r.x + 8, r.y + 12, '#aab3e6', 'left');
+    label('布幕（正面看）', r.x + 8, r.y + 12, '#aab3e6', 'left');
     if (state.marker) label('實像標記', cx + 22, cy - state.marker.y * k - 18, MARK_COLOR, 'left');
     ctx.restore();
   }
@@ -280,11 +300,24 @@
 
     // 走廊內部
     var a = w2s({ x: LEFT, y: TOP }), b = w2s({ x: 0, y: G });
-    var gr = ctx.createLinearGradient(0, a.y, 0, b.y);
-    gr.addColorStop(0, '#15131f'); gr.addColorStop(1, '#1d1a26');
-    ctx.fillStyle = gr; ctx.fillRect(a.x, a.y, b.x - a.x, b.y - a.y);
-    // 壁燈（固定位置，與鬼無關）
-    [-880, -560, -240].forEach(function (tx) {
+    var useArt = ART.corridor.ready;
+    if (useArt) {
+      // 固定背景圖：牆腳線對齊地板、橫樑下緣對齊天花板
+      var A = ART.corridor, ih = A.img.naturalHeight, iw = A.img.naturalWidth;
+      var cmPerPx = (2 * WORLD.axisHeight) / ((A.floorAt - A.ceilAt) * ih);
+      var topY = TOP + A.ceilAt * ih * cmPerPx;
+      var i0 = w2s({ x: A.leftX, y: topY });
+      ctx.drawImage(A.img, i0.x, i0.y, iw * cmPerPx * s, ih * cmPerPx * s);
+      // 分析時把背景壓暗，讓光線與標示點清楚
+      ctx.fillStyle = analysis ? 'rgba(6,8,18,.62)' : 'rgba(6,8,18,.18)';
+      ctx.fillRect(clipRect.x, clipRect.y, clipRect.w, clipRect.h);
+    } else {
+      var gr = ctx.createLinearGradient(0, a.y, 0, b.y);
+      gr.addColorStop(0, '#15131f'); gr.addColorStop(1, '#1d1a26');
+      ctx.fillStyle = gr; ctx.fillRect(a.x, a.y, b.x - a.x, b.y - a.y);
+    }
+    // 壁燈（固定位置，與鬼無關）——只有沒有背景圖時才畫
+    (useArt ? [] : [-880, -560, -240]).forEach(function (tx) {
       q = w2s({ x: tx, y: TOP - 34 });
       var rg = ctx.createRadialGradient(q.x, q.y, 0, q.x, q.y, 120 * s);
       rg.addColorStop(0, 'rgba(255,170,80,.30)'); rg.addColorStop(1, 'rgba(255,170,80,0)');
@@ -307,16 +340,18 @@
     }
 
     // 天花板、地板、左端牆
-    ctx.fillStyle = '#2a2633';
-    ctx.fillRect(a.x - 14 * s, a.y - 14 * s, b.x - a.x + 28 * s, 14 * s);
-    ctx.fillRect(a.x - 14 * s, a.y, 14 * s, b.y - a.y);
     var tileH = 34 * s;
-    ctx.fillRect(a.x - 14 * s, b.y, b.x - a.x + 28 * s, tileH + 10 * s);
+    if (!useArt) {
+      ctx.fillStyle = '#2a2633';
+      ctx.fillRect(a.x - 14 * s, a.y - 14 * s, b.x - a.x + 28 * s, 14 * s);
+      ctx.fillRect(a.x - 14 * s, a.y, 14 * s, b.y - a.y);
+      ctx.fillRect(a.x - 14 * s, b.y, b.x - a.x + 28 * s, tileH + 10 * s);
+    }
     // 地板格只在分析階段出現
     if (analysis) {
       for (i = 1; i <= floor.count; i++) {
         var x0 = w2s({ x: -i * floor.width, y: G }).x, x1 = w2s({ x: -(i - 1) * floor.width, y: G }).x;
-        ctx.fillStyle = i % 2 ? '#2b3550' : '#232b42';
+        ctx.fillStyle = useArt ? (i % 2 ? 'rgba(43,53,80,.82)' : 'rgba(35,43,66,.82)') : (i % 2 ? '#2b3550' : '#232b42');
         ctx.fillRect(x0, b.y, x1 - x0, tileH);
         if (state.selectedCell === i) {
           ctx.fillStyle = 'rgba(255,209,102,.16)'; ctx.fillRect(x0, a.y, x1 - x0, b.y - a.y);
@@ -330,11 +365,14 @@
         }
       }
     }
-    ctx.strokeStyle = '#6f6a80'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(a.x, b.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    if (!useArt || analysis) { ctx.strokeStyle = '#6f6a80'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(a.x, b.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
 
-    // 投影牆
-    ctx.fillStyle = '#d9dceb'; ctx.fillRect(b.x, a.y, Math.max(3, 10 * s), b.y - a.y);
-    label('投影牆', b.x + Math.max(3, 10 * s) / 2, a.y - 10, '#d9dceb', analysis ? 'center' : 'right');
+    // 投影布幕（側面看是一條薄薄的布，掛在木架上）
+    var sw = Math.max(3, 8 * s);
+    ctx.fillStyle = '#5a4630'; ctx.fillRect(b.x - sw * 0.5, a.y - 6 * s, sw * 2, 6 * s);
+    ctx.fillRect(b.x - sw * 0.5, b.y, sw * 2, 5 * s);
+    ctx.fillStyle = '#e6dfcc'; ctx.fillRect(b.x, a.y, sw, b.y - a.y);
+    label('布幕', b.x + sw / 2, a.y - 6 * s - 10, '#e6dfcc', 'center');
 
     // 主光軸
     p = w2s({ x: 0, y: 0 });
@@ -362,6 +400,10 @@
     // 凸透鏡
     if (analysis) {
       var lt = w2s({ x: state.lensX, y: WORLD.lensRadius }), lb = w2s({ x: state.lensX, y: -WORLD.lensRadius });
+      if (ART.lens.ready) {
+        var ah = 2 * WORLD.lensRadius * s, aw = (ah * ART.lens.img.naturalWidth) / ART.lens.img.naturalHeight;
+        ctx.save(); ctx.globalAlpha = 0.35; ctx.drawImage(ART.lens.img, lt.x - aw / 2, lt.y, aw, ah); ctx.restore();
+      }
       ctx.strokeStyle = '#9fd8ff'; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.moveTo(lt.x, lt.y); ctx.lineTo(lb.x, lb.y);
       ctx.moveTo(lt.x - 8, lt.y + 9); ctx.lineTo(lt.x, lt.y); ctx.lineTo(lt.x + 8, lt.y + 9);
@@ -374,8 +416,13 @@
       ctx.beginPath(); ctx.moveTo(L.x, L.y + WORLD.lensRadius * s); ctx.lineTo(base.x, base.y); ctx.stroke();
       ctx.lineWidth = Math.max(2, 4 * s);
       ctx.beginPath(); ctx.moveTo(base.x - 26 * s, base.y); ctx.lineTo(base.x + 26 * s, base.y); ctx.stroke();
-      ctx.fillStyle = 'rgba(159,216,255,.30)'; ctx.strokeStyle = '#9fd8ff'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.ellipse(L.x, L.y, Math.max(3, 9 * s), WORLD.lensRadius * s, 0, 0, 7); ctx.fill(); ctx.stroke();
+      if (ART.lens.ready) {
+        var lh = 2 * WORLD.lensRadius * s, lw = (lh * ART.lens.img.naturalWidth) / ART.lens.img.naturalHeight;
+        ctx.save(); ctx.globalAlpha = 0.92; ctx.drawImage(ART.lens.img, L.x - lw / 2, L.y - lh / 2, lw, lh); ctx.restore();
+      } else {
+        ctx.fillStyle = 'rgba(159,216,255,.30)'; ctx.strokeStyle = '#9fd8ff'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.ellipse(L.x, L.y, Math.max(3, 9 * s), WORLD.lensRadius * s, 0, 0, 7); ctx.fill(); ctx.stroke();
+      }
       // 拖曳提示
       ctx.fillStyle = '#9fd8ff'; ctx.font = '600 13px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText('◀ 凸透鏡 ▶', L.x, b.y + tileH + 10 * s + 12);
@@ -641,7 +688,7 @@
     state.selectedCell = null; state.seal = null; state.solved = false; state.attempts = 0;
     state.zoomIdx = 0;
     $('configSel').value = String(idx);
-    setStatus('走廊深處有鬼，但肉眼看不到。左右拖曳移動凸透鏡，讓投影牆上出現清楚的鬼像，再按「標記實像」。');
+    setStatus('走廊深處有鬼，但肉眼看不到。左右拖曳移動凸透鏡，讓布幕上出現清楚的鬼像，再按「標記實像」。');
     layout();
   }
 
@@ -652,7 +699,7 @@
     setStatus(state.solved ? '已封印。' : '側視圖：從牆上的「實像標記」出發，用主光線反推鬼本體在哪一格。先選起點，再選終點。');
     if (!state.seenAnalysisIntro) {
       state.seenAnalysisIntro = true;
-      showBanner('現在只看走廊的側視圖：右邊是投影牆和你標記的實像，中間是凸透鏡，鬼藏在透鏡左邊的某一格。', 5200);
+      showBanner('現在只看走廊的側視圖：右邊是布幕和你標記的實像，中間是凸透鏡，鬼藏在透鏡左邊的某一格。', 5200);
     }
   }
 

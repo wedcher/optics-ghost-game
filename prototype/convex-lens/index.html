@@ -44,6 +44,8 @@
     #zoomBox { flex-direction:row; }
     #banner { font-size:12px; padding:6px 10px; width:min(70%, 520px); }
   }
+  /* 凸透鏡：布幕與實像標記在畫面右下，所以縮放鈕放右上 */
+  #zoomBox { top:8px; bottom:auto; }
   [hidden] { display:none !important; }
 </style>
 </head>
@@ -96,6 +98,7 @@
     </div>
   </footer>
 </div>
+<script src="../shared/landscape.js"></script>
 <script src="../shared/optics-core.js"></script>
 <script src="configs.js"></script>
 <script src="app.js"></script>
