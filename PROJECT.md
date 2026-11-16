@@ -139,7 +139,19 @@
 - 排行榜（趕鬼時間、荒野封印數）仍是 PENDING，不實作。
 - 鬼的角色圖使用者已有，但透明背景的圖檔還沒進 repo。
 
-**下一個工作階段：** 等使用者試玩回饋與上面那項決定；沒有新指示時，依下方 NEXT 做平面鏡 prototype。
+**下一個工作階段（使用者 2026-11-17 指定）：把凸透鏡補成完整的第二關。** 平面鏡 prototype 排在這之後。
+
+依 `docs/story-and-flow.md` 的「第二關：凸透鏡走廊」與「過場對話畫面」：
+
+1. 開場過場：背景 `docs/concepts/convex-intro-corridor.webp`、三句玩家台詞、點畫面換句、可跳過、最後出現【開始抓鬼】。
+2. 3 條命抓 5 隻：左上角三顆愛心與封印數；抓對換下一隻（沿用現有的隨機出題）；抓錯扣一條命，錯誤封印仍不得洩漏位置。
+3. 失敗畫面（命用完，可重新挑戰，命數與目標重置）與過關畫面（過關演出：鬼一哄而散、「想跑？追！」）。
+4. e2e 要涵蓋：扣命、命用完、抓滿 5 隻、重新挑戰後狀態重置。
+
+開工前先問使用者（`docs/story-and-flow.md`「仍待確認」）：凸透鏡配置 A～D 的放大像超出布幕要不要調；鬼的透明背景 PNG 是否已放進 `docs/concepts/ghost.png`（有的話順便換掉 placeholder，注意測試目前用鬼體色像素判斷，見 `docs/concepts/README.md`）。
+不要做：排行榜、後端、計時（趕鬼時間的規則未定）。
+
+本機試玩：`node .claude/serve.js`，然後開 `http://localhost:8123/prototype/index.html`。
 視覺與氛圍依 `docs/visual-handoff.md`；GPT 負責美術，prototype 用 placeholder 即可。
 
 ---
