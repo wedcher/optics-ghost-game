@@ -1,0 +1,10 @@
+{
+  "name": "optics-ghost-game",
+  "private": true,
+  "description": "國中光學抓鬼遊戲（原型階段）。遊戲本體無相依套件；以下指令只用於驗證。",
+  "scripts": {
+    "check:geometry": "node tests/check-geometry.js",
+    "test:e2e": "node tests/e2e-concave-lens.js",
+    "test": "node tests/check-geometry.js && node tests/e2e-concave-lens.js"
+  }
+}

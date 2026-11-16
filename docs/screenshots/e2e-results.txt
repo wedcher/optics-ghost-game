@@ -1,0 +1,317 @@
+  PASS  [phone-portrait] 探索：所有控制項都在畫面內  — canvas 375×597
+  PASS  [phone-portrait] 探索：按鈕點擊區 ≥ 40×40 px
+  PASS  [phone-portrait] 探索：頁面不需捲動
+  PASS  [phone-portrait] 探索：畫布仍有足夠空間（≥300×150）  — 375×597
+  PASS  [phone-portrait] 配置A 裸眼畫面沒有鬼
+  PASS  [phone-portrait] 配置A 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 66% 像素改變；此方位沒有鬼
+  PASS  [phone-portrait] 配置A 透鏡外畫面不變  — 0.00%
+  PASS  [phone-portrait] 配置A 鬼像只出現在一個方位的透鏡內  — 出現於方位 1
+  PASS  [phone-portrait] 配置A 鬼像整個在透鏡圓內
+  PASS  [phone-portrait] 配置A 鬼像畫在幾何算出的虛像視角位置
+  PASS  [phone-portrait] 配置A 透鏡外沒有鬼的像素
+  PASS  [phone-portrait] 配置A 點在沒有鬼像的地方不會產生標記
+  PASS  [phone-portrait] 配置A 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-portrait] 配置A 放下透鏡後鬼像消失
+  PASS  [phone-portrait] 配置A 放下透鏡後標記保留
+  PASS  [phone-portrait] 配置A 切到側視分析
+  PASS  [phone-portrait] 分析／畫線：所有控制項都在畫面內  — canvas 375×597
+  PASS  [phone-portrait] 分析／畫線：按鈕點擊區 ≥ 40×40 px
+  PASS  [phone-portrait] 分析／畫線：頁面不需捲動
+  PASS  [phone-portrait] 分析／畫線：畫布仍有足夠空間（≥300×150）  — 375×597
+  PASS  [phone-portrait] （資訊）預設縮放下一格寬 43.9 px，畫布 375×597
+  PASS  [phone-portrait] 配置A 分析開始：畫面上沒有鬼本體
+  PASS  [phone-portrait] 配置A 分析開始：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-portrait] 配置A 分析開始：吸附點裡沒有物點
+  PASS  [phone-portrait] 配置A 畫線模式下點地板格：不選格、不畫線
+  PASS  [phone-portrait] 配置A 線 1：虛像 ↔ 光心 O（點擊偏 12px 仍吸附）
+  PASS  [phone-portrait] 配置A 線 2：F ↔ 虛像，延長後在透鏡上產生可吸附的 P = (0, h)  — P.y=100.000
+  PASS  [phone-portrait] 配置A 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 6.4e-14 cm
+  PASS  [phone-portrait] 配置A 學生作圖的交點落在唯一一格的中央附近  — 格 4，離格線 0.50 格
+  PASS  [phone-portrait] 配置A 畫完三條線：畫面上沒有鬼本體
+  PASS  [phone-portrait] 配置A 畫完三條線：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-portrait] 配置A ＋ 按鈕放大  — 1.50×
+  PASS  [phone-portrait] 分析／放大後：所有控制項都在畫面內  — canvas 375×603
+  PASS  [phone-portrait] 分析／放大後：按鈕點擊區 ≥ 40×40 px
+  PASS  [phone-portrait] 分析／放大後：頁面不需捲動
+  PASS  [phone-portrait] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 375×603
+  PASS  [phone-portrait] 配置A 放大後單指拖曳可平移  — Δx=90px
+  PASS  [phone-portrait] 配置A 拖曳平移不會畫線／選格／改變縮放
+  PASS  [phone-portrait] 配置A 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
+  PASS  [phone-portrait] 配置A 「全圖」回到預設視圖
+  PASS  [phone-portrait] 分析／封印：所有控制項都在畫面內  — canvas 375×597
+  PASS  [phone-portrait] 分析／封印：按鈕點擊區 ≥ 40×40 px
+  PASS  [phone-portrait] 分析／封印：頁面不需捲動
+  PASS  [phone-portrait] 分析／封印：畫布仍有足夠空間（≥300×150）  — 375×597
+  PASS  [phone-portrait] 配置A 封印模式下點擊不會畫線
+  PASS  [phone-portrait] 配置A 點地板格可選取（虛像所在的第 2 格）
+  PASS  [phone-portrait] 配置A 封印虛像所在格 → 失敗
+  PASS  [phone-portrait] 配置A 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
+  PASS  [phone-portrait] 配置A 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-portrait] 配置A 錯誤封印後：畫面上沒有鬼本體
+  PASS  [phone-portrait] 配置A 錯誤封印後：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-portrait] 配置A 整個直欄都是該格的點擊區
+  PASS  [phone-portrait] 配置A 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-portrait] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
+  PASS  [phone-portrait] 配置A 關閉 Debug 後面板清空
+  PASS  [phone-portrait] 配置B 裸眼畫面沒有鬼
+  PASS  [phone-portrait] 配置B 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 68% 像素改變；此方位沒有鬼
+  PASS  [phone-portrait] 配置B 透鏡外畫面不變  — 0.00%
+  PASS  [phone-portrait] 配置B 鬼像只出現在一個方位的透鏡內  — 出現於方位 2
+  PASS  [phone-portrait] 配置B 鬼像整個在透鏡圓內
+  PASS  [phone-portrait] 配置B 鬼像畫在幾何算出的虛像視角位置
+  PASS  [phone-portrait] 配置B 透鏡外沒有鬼的像素
+  PASS  [phone-portrait] 配置B 點在沒有鬼像的地方不會產生標記
+  PASS  [phone-portrait] 配置B 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-portrait] 配置B 放下透鏡後鬼像消失
+  PASS  [phone-portrait] 配置B 放下透鏡後標記保留
+  PASS  [phone-portrait] 配置B 切到側視分析
+  PASS  [phone-portrait] 配置B 分析開始：畫面上沒有鬼本體
+  PASS  [phone-portrait] 配置B 分析開始：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-portrait] 配置B 分析開始：吸附點裡沒有物點
+  PASS  [phone-portrait] 配置B 畫線模式下點地板格：不選格、不畫線
+  PASS  [phone-portrait] 配置B 線 1：虛像 ↔ 光心 O（點擊偏 12px 仍吸附）
+  PASS  [phone-portrait] 配置B 線 2：F ↔ 虛像，延長後在透鏡上產生可吸附的 P = (0, h)  — P.y=-90.000
+  PASS  [phone-portrait] 配置B 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
+  PASS  [phone-portrait] 配置B 學生作圖的交點落在唯一一格的中央附近  — 格 6，離格線 0.50 格
+  PASS  [phone-portrait] 配置B 畫完三條線：畫面上沒有鬼本體
+  PASS  [phone-portrait] 配置B 畫完三條線：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-portrait] 配置B ＋ 按鈕放大  — 1.50×
+  PASS  [phone-portrait] 配置B 放大後單指拖曳可平移  — Δx=90px
+  PASS  [phone-portrait] 配置B 拖曳平移不會畫線／選格／改變縮放
+  PASS  [phone-portrait] 配置B 從吸附點上開始的拖曳不會被當成畫線
+  PASS  [phone-portrait] 配置B 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
+  PASS  [phone-portrait] 配置B 「全圖」回到預設視圖
+  PASS  [phone-portrait] 配置B 封印模式下點擊不會畫線
+  PASS  [phone-portrait] 配置B 點地板格可選取（虛像所在的第 2 格）
+  PASS  [phone-portrait] 配置B 封印虛像所在格 → 失敗
+  PASS  [phone-portrait] 配置B 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
+  PASS  [phone-portrait] 配置B 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-portrait] 配置B 錯誤封印後：畫面上沒有鬼本體
+  PASS  [phone-portrait] 配置B 錯誤封印後：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-portrait] 配置B 整個直欄都是該格的點擊區
+  PASS  [phone-portrait] 配置B 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-portrait] 配置C 裸眼畫面沒有鬼
+  PASS  [phone-portrait] 配置C 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 55% 像素改變；此方位沒有鬼
+  PASS  [phone-portrait] 配置C 透鏡外畫面不變  — 0.00%
+  PASS  [phone-portrait] 配置C 鬼像只出現在一個方位的透鏡內  — 出現於方位 3
+  PASS  [phone-portrait] 配置C 鬼像整個在透鏡圓內
+  PASS  [phone-portrait] 配置C 鬼像畫在幾何算出的虛像視角位置
+  PASS  [phone-portrait] 配置C 透鏡外沒有鬼的像素
+  PASS  [phone-portrait] 配置C 點在沒有鬼像的地方不會產生標記
+  PASS  [phone-portrait] 配置C 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-portrait] 配置C 放下透鏡後鬼像消失
+  PASS  [phone-portrait] 配置C 放下透鏡後標記保留
+  PASS  [phone-portrait] 配置C 切到側視分析
+  PASS  [phone-portrait] 配置C 分析開始：畫面上沒有鬼本體
+  PASS  [phone-portrait] 配置C 分析開始：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-portrait] 配置C 分析開始：吸附點裡沒有物點
+  PASS  [phone-portrait] 配置C 畫線模式下點地板格：不選格、不畫線
+  PASS  [phone-portrait] 配置C 線 1：虛像 ↔ 光心 O（點擊偏 12px 仍吸附）
+  PASS  [phone-portrait] 配置C 線 2：F ↔ 虛像，延長後在透鏡上產生可吸附的 P = (0, h)  — P.y=120.000
+  PASS  [phone-portrait] 配置C 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 2.3e-13 cm
+  PASS  [phone-portrait] 配置C 學生作圖的交點落在唯一一格的中央附近  — 格 7，離格線 0.50 格
+  PASS  [phone-portrait] 配置C 畫完三條線：畫面上沒有鬼本體
+  PASS  [phone-portrait] 配置C 畫完三條線：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-portrait] 配置C ＋ 按鈕放大  — 1.50×
+  PASS  [phone-portrait] 配置C 放大後單指拖曳可平移  — Δx=90px
+  PASS  [phone-portrait] 配置C 拖曳平移不會畫線／選格／改變縮放
+  PASS  [phone-portrait] 配置C 從吸附點上開始的拖曳不會被當成畫線
+  PASS  [phone-portrait] 配置C 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
+  PASS  [phone-portrait] 配置C 「全圖」回到預設視圖
+  PASS  [phone-portrait] 配置C 封印模式下點擊不會畫線
+  PASS  [phone-portrait] 配置C 點地板格可選取（虛像所在的第 3 格）
+  PASS  [phone-portrait] 配置C 封印虛像所在格 → 失敗
+  PASS  [phone-portrait] 配置C 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
+  PASS  [phone-portrait] 配置C 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-portrait] 配置C 錯誤封印後：畫面上沒有鬼本體
+  PASS  [phone-portrait] 配置C 錯誤封印後：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-portrait] 配置C 整個直欄都是該格的點擊區
+  PASS  [phone-portrait] 配置C 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-portrait] 配置D 裸眼畫面沒有鬼
+  PASS  [phone-portrait] 配置D 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 52% 像素改變；此方位沒有鬼
+  PASS  [phone-portrait] 配置D 透鏡外畫面不變  — 0.00%
+  PASS  [phone-portrait] 配置D 鬼像只出現在一個方位的透鏡內  — 出現於方位 0
+  PASS  [phone-portrait] 配置D 鬼像整個在透鏡圓內
+  PASS  [phone-portrait] 配置D 鬼像畫在幾何算出的虛像視角位置
+  PASS  [phone-portrait] 配置D 透鏡外沒有鬼的像素
+  PASS  [phone-portrait] 配置D 點在沒有鬼像的地方不會產生標記
+  PASS  [phone-portrait] 配置D 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-portrait] 配置D 放下透鏡後鬼像消失
+  PASS  [phone-portrait] 配置D 放下透鏡後標記保留
+  PASS  [phone-portrait] 配置D 切到側視分析
+  PASS  [phone-portrait] 配置D 分析開始：畫面上沒有鬼本體
+  PASS  [phone-portrait] 配置D 分析開始：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-portrait] 配置D 分析開始：吸附點裡沒有物點
+  PASS  [phone-portrait] 配置D 畫線模式下點地板格：不選格、不畫線
+  PASS  [phone-portrait] 配置D 線 1：虛像 ↔ 光心 O（點擊偏 12px 仍吸附）
+  PASS  [phone-portrait] 配置D 線 2：F ↔ 虛像，延長後在透鏡上產生可吸附的 P = (0, h)  — P.y=-70.000
+  PASS  [phone-portrait] 配置D 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 2.8e-14 cm
+  PASS  [phone-portrait] 配置D 學生作圖的交點落在唯一一格的中央附近  — 格 3，離格線 0.50 格
+  PASS  [phone-portrait] 配置D 畫完三條線：畫面上沒有鬼本體
+  PASS  [phone-portrait] 配置D 畫完三條線：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-portrait] 配置D ＋ 按鈕放大  — 1.50×
+  PASS  [phone-portrait] 配置D 放大後單指拖曳可平移  — Δx=90px
+  PASS  [phone-portrait] 配置D 拖曳平移不會畫線／選格／改變縮放
+  PASS  [phone-portrait] 配置D 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
+  PASS  [phone-portrait] 配置D 「全圖」回到預設視圖
+  PASS  [phone-portrait] 配置D 封印模式下點擊不會畫線
+  PASS  [phone-portrait] 配置D 點地板格可選取（虛像所在的第 2 格）
+  PASS  [phone-portrait] 配置D 封印虛像所在格 → 失敗
+  PASS  [phone-portrait] 配置D 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
+  PASS  [phone-portrait] 配置D 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-portrait] 配置D 錯誤封印後：畫面上沒有鬼本體
+  PASS  [phone-portrait] 配置D 錯誤封印後：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-portrait] 配置D 整個直欄都是該格的點擊區
+  PASS  [phone-portrait] 配置D 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-portrait] 沒有 JS 錯誤
+  PASS  [phone-landscape] 探索：所有控制項都在畫面內  — canvas 812×242
+  PASS  [phone-landscape] 探索：按鈕點擊區 ≥ 40×40 px
+  PASS  [phone-landscape] 探索：頁面不需捲動
+  PASS  [phone-landscape] 探索：畫布仍有足夠空間（≥300×150）  — 812×242
+  PASS  [phone-landscape] 配置A 裸眼畫面沒有鬼
+  PASS  [phone-landscape] 配置A 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 67% 像素改變；此方位沒有鬼
+  PASS  [phone-landscape] 配置A 透鏡外畫面不變  — 0.00%
+  PASS  [phone-landscape] 配置A 鬼像只出現在一個方位的透鏡內  — 出現於方位 1
+  PASS  [phone-landscape] 配置A 鬼像整個在透鏡圓內
+  PASS  [phone-landscape] 配置A 鬼像畫在幾何算出的虛像視角位置
+  PASS  [phone-landscape] 配置A 透鏡外沒有鬼的像素
+  PASS  [phone-landscape] 配置A 點在沒有鬼像的地方不會產生標記
+  PASS  [phone-landscape] 配置A 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-landscape] 配置A 放下透鏡後鬼像消失
+  PASS  [phone-landscape] 配置A 放下透鏡後標記保留
+  PASS  [phone-landscape] 配置A 切到側視分析
+  PASS  [phone-landscape] 分析／畫線：所有控制項都在畫面內  — canvas 812×242
+  PASS  [phone-landscape] 分析／畫線：按鈕點擊區 ≥ 40×40 px
+  PASS  [phone-landscape] 分析／畫線：頁面不需捲動
+  PASS  [phone-landscape] 分析／畫線：畫布仍有足夠空間（≥300×150）  — 812×242
+  PASS  [phone-landscape] （資訊）預設縮放下一格寬 62.7 px，畫布 812×242
+  PASS  [phone-landscape] 配置A 分析開始：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置A 分析開始：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置A 分析開始：吸附點裡沒有物點
+  PASS  [phone-landscape] 配置A 畫線模式下點地板格：不選格、不畫線
+  PASS  [phone-landscape] 配置A 線 1：虛像 ↔ 光心 O（點擊偏 12px 仍吸附）
+  PASS  [phone-landscape] 配置A 線 2：F ↔ 虛像，延長後在透鏡上產生可吸附的 P = (0, h)  — P.y=100.000
+  PASS  [phone-landscape] 配置A 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 6.4e-14 cm
+  PASS  [phone-landscape] 配置A 學生作圖的交點落在唯一一格的中央附近  — 格 4，離格線 0.50 格
+  PASS  [phone-landscape] 配置A 畫完三條線：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置A 畫完三條線：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置A ＋ 按鈕放大  — 1.50×
+  PASS  [phone-landscape] 分析／放大後：所有控制項都在畫面內  — canvas 812×242
+  PASS  [phone-landscape] 分析／放大後：按鈕點擊區 ≥ 40×40 px
+  PASS  [phone-landscape] 分析／放大後：頁面不需捲動
+  PASS  [phone-landscape] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 812×242
+  PASS  [phone-landscape] 配置A 放大後單指拖曳可平移  — Δx=90px
+  PASS  [phone-landscape] 配置A 拖曳平移不會畫線／選格／改變縮放
+  PASS  [phone-landscape] 配置A 從吸附點上開始的拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置A 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
+  PASS  [phone-landscape] 配置A 「全圖」回到預設視圖
+  PASS  [phone-landscape] 分析／封印：所有控制項都在畫面內  — canvas 812×242
+  PASS  [phone-landscape] 分析／封印：按鈕點擊區 ≥ 40×40 px
+  PASS  [phone-landscape] 分析／封印：頁面不需捲動
+  PASS  [phone-landscape] 分析／封印：畫布仍有足夠空間（≥300×150）  — 812×242
+  PASS  [phone-landscape] 配置A 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置A 點地板格可選取（虛像所在的第 2 格）
+  PASS  [phone-landscape] 配置A 封印虛像所在格 → 失敗
+  PASS  [phone-landscape] 配置A 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
+  PASS  [phone-landscape] 配置A 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置A 錯誤封印後：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置A 錯誤封印後：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置A 整個直欄都是該格的點擊區
+  PASS  [phone-landscape] 配置A 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
+  PASS  [phone-landscape] 配置A 關閉 Debug 後面板清空
+  PASS  [phone-landscape] 沒有 JS 錯誤
+  PASS  [desktop] 探索：所有控制項都在畫面內  — canvas 1280×591
+  PASS  [desktop] 探索：按鈕點擊區 ≥ 40×40 px
+  PASS  [desktop] 探索：頁面不需捲動
+  PASS  [desktop] 探索：畫布仍有足夠空間（≥300×150）  — 1280×591
+  PASS  [desktop] 配置A 裸眼畫面沒有鬼
+  PASS  [desktop] 配置A 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 66% 像素改變；此方位沒有鬼
+  PASS  [desktop] 配置A 透鏡外畫面不變  — 0.00%
+  PASS  [desktop] 配置A 鬼像只出現在一個方位的透鏡內  — 出現於方位 1
+  PASS  [desktop] 配置A 鬼像整個在透鏡圓內
+  PASS  [desktop] 配置A 鬼像畫在幾何算出的虛像視角位置
+  PASS  [desktop] 配置A 透鏡外沒有鬼的像素
+  PASS  [desktop] 配置A 點在沒有鬼像的地方不會產生標記
+  PASS  [desktop] 配置A 點鬼像（偏 11px）可標記虛像
+  PASS  [desktop] 配置A 放下透鏡後鬼像消失
+  PASS  [desktop] 配置A 放下透鏡後標記保留
+  PASS  [desktop] 配置A 切到側視分析
+  PASS  [desktop] 分析／畫線：所有控制項都在畫面內  — canvas 1280×591
+  PASS  [desktop] 分析／畫線：按鈕點擊區 ≥ 40×40 px
+  PASS  [desktop] 分析／畫線：頁面不需捲動
+  PASS  [desktop] 分析／畫線：畫布仍有足夠空間（≥300×150）  — 1280×591
+  PASS  [desktop] （資訊）預設縮放下一格寬 149.7 px，畫布 1280×591
+  PASS  [desktop] 配置A 分析開始：畫面上沒有鬼本體
+  PASS  [desktop] 配置A 分析開始：DOM／文字／Debug 圖層沒有答案
+  PASS  [desktop] 配置A 分析開始：吸附點裡沒有物點
+  PASS  [desktop] 配置A 畫線模式下點地板格：不選格、不畫線
+  PASS  [desktop] 配置A 線 1：虛像 ↔ 光心 O（點擊偏 12px 仍吸附）
+  PASS  [desktop] 配置A 線 2：F ↔ 虛像，延長後在透鏡上產生可吸附的 P = (0, h)  — P.y=100.000
+  PASS  [desktop] 配置A 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 6.4e-14 cm
+  PASS  [desktop] 配置A 學生作圖的交點落在唯一一格的中央附近  — 格 4，離格線 0.50 格
+  PASS  [desktop] 配置A 畫完三條線：畫面上沒有鬼本體
+  PASS  [desktop] 配置A 畫完三條線：DOM／文字／Debug 圖層沒有答案
+  PASS  [desktop] 配置A ＋ 按鈕放大  — 1.50×
+  PASS  [desktop] 分析／放大後：所有控制項都在畫面內  — canvas 1280×591
+  PASS  [desktop] 分析／放大後：按鈕點擊區 ≥ 40×40 px
+  PASS  [desktop] 分析／放大後：頁面不需捲動
+  PASS  [desktop] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 1280×591
+  PASS  [desktop] 配置A 放大後單指拖曳可平移  — Δx=90px
+  PASS  [desktop] 配置A 拖曳平移不會畫線／選格／改變縮放
+  PASS  [desktop] 配置A 從吸附點上開始的拖曳不會被當成畫線
+  PASS  [desktop] 配置A 「全圖」回到預設視圖
+  PASS  [desktop] 分析／封印：所有控制項都在畫面內  — canvas 1280×591
+  PASS  [desktop] 分析／封印：按鈕點擊區 ≥ 40×40 px
+  PASS  [desktop] 分析／封印：頁面不需捲動
+  PASS  [desktop] 分析／封印：畫布仍有足夠空間（≥300×150）  — 1280×591
+  PASS  [desktop] 配置A 封印模式下點擊不會畫線
+  PASS  [desktop] 配置A 點地板格可選取（虛像所在的第 2 格）
+  PASS  [desktop] 配置A 封印虛像所在格 → 失敗
+  PASS  [desktop] 配置A 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
+  PASS  [desktop] 配置A 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [desktop] 配置A 錯誤封印後：畫面上沒有鬼本體
+  PASS  [desktop] 配置A 錯誤封印後：DOM／文字／Debug 圖層沒有答案
+  PASS  [desktop] 配置A 整個直欄都是該格的點擊區
+  PASS  [desktop] 配置A 封印作圖交點所在格 → 成功並顯形
+  PASS  [desktop] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
+  PASS  [desktop] 配置A 關閉 Debug 後面板清空
+  PASS  [desktop] 配置C 裸眼畫面沒有鬼
+  PASS  [desktop] 配置C 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 54% 像素改變；此方位沒有鬼
+  PASS  [desktop] 配置C 透鏡外畫面不變  — 0.00%
+  PASS  [desktop] 配置C 鬼像只出現在一個方位的透鏡內  — 出現於方位 3
+  PASS  [desktop] 配置C 鬼像整個在透鏡圓內
+  PASS  [desktop] 配置C 鬼像畫在幾何算出的虛像視角位置
+  PASS  [desktop] 配置C 透鏡外沒有鬼的像素
+  PASS  [desktop] 配置C 點在沒有鬼像的地方不會產生標記
+  PASS  [desktop] 配置C 點鬼像（偏 11px）可標記虛像
+  PASS  [desktop] 配置C 放下透鏡後鬼像消失
+  PASS  [desktop] 配置C 放下透鏡後標記保留
+  PASS  [desktop] 配置C 切到側視分析
+  PASS  [desktop] 配置C 分析開始：畫面上沒有鬼本體
+  PASS  [desktop] 配置C 分析開始：DOM／文字／Debug 圖層沒有答案
+  PASS  [desktop] 配置C 分析開始：吸附點裡沒有物點
+  PASS  [desktop] 配置C 畫線模式下點地板格：不選格、不畫線
+  PASS  [desktop] 配置C 線 1：虛像 ↔ 光心 O（點擊偏 12px 仍吸附）
+  PASS  [desktop] 配置C 線 2：F ↔ 虛像，延長後在透鏡上產生可吸附的 P = (0, h)  — P.y=120.000
+  PASS  [desktop] 配置C 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 2.3e-13 cm
+  PASS  [desktop] 配置C 學生作圖的交點落在唯一一格的中央附近  — 格 7，離格線 0.50 格
+  PASS  [desktop] 配置C 畫完三條線：畫面上沒有鬼本體
+  PASS  [desktop] 配置C 畫完三條線：DOM／文字／Debug 圖層沒有答案
+  PASS  [desktop] 配置C ＋ 按鈕放大  — 1.50×
+  PASS  [desktop] 配置C 放大後單指拖曳可平移  — Δx=90px
+  PASS  [desktop] 配置C 拖曳平移不會畫線／選格／改變縮放
+  PASS  [desktop] 配置C 從吸附點上開始的拖曳不會被當成畫線
+  PASS  [desktop] 配置C 「全圖」回到預設視圖
+  PASS  [desktop] 配置C 封印模式下點擊不會畫線
+  PASS  [desktop] 配置C 點地板格可選取（虛像所在的第 3 格）
+  PASS  [desktop] 配置C 封印虛像所在格 → 失敗
+  PASS  [desktop] 配置C 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
+  PASS  [desktop] 配置C 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [desktop] 配置C 錯誤封印後：畫面上沒有鬼本體
+  PASS  [desktop] 配置C 錯誤封印後：DOM／文字／Debug 圖層沒有答案
+  PASS  [desktop] 配置C 整個直欄都是該格的點擊區
+  PASS  [desktop] 配置C 封印作圖交點所在格 → 成功並顯形
+  PASS  [desktop] 沒有 JS 錯誤
+
+ALL PASS: 315/315 checks
