@@ -585,7 +585,7 @@
 
     // 學生畫的線
     state.lines.forEach(function (l) {
-      strokeInfinite(geomLine(l), l.kind === 'parallel' ? '#7dffb2' : '#ffd166', 2, l.dashed ? [8, 6] : null);
+      strokeInfinite(geomLine(l), state.replay ? 'rgba(255,255,255,.22)' : (l.kind === 'parallel' ? '#7dffb2' : '#ffd166'), 2, l.dashed ? [8, 6] : null);
     });
     studentIntersections().forEach(function (pt) {
       q = w2s(pt); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
@@ -627,6 +627,19 @@
       }
     }
 
+    // 破關後的光路重現（正推）：鬼本體 → 兩條光線 → 凹透鏡 → 反向延長 → 虛像
+    if (state.replay && state.solved) {
+      var spec = replaySpec();
+      var tau = Math.min(spec.duration, (performance.now() - state.replay.t0) / 1000);
+      if (tau > spec.imageAt) {
+        var ip = w2s(c.image);
+        ctx.save(); ctx.globalAlpha = 0.6 * Math.min(1, (tau - spec.imageAt) / 0.5);
+        drawGhostShape(ctx, ip.x, ip.y, Math.max(4, WORLD.ghostHalfWidth * c.m * s), Math.max(6, WORLD.ghostHalfHeight * c.m * s));
+        ctx.restore();
+      }
+      window.RayReplay.draw(ctx, w2s, spec, tau, { x: 0, y: 0, w: W, h: H });
+    }
+
     // Debug overlay（理論光線、物點、目標格）
     if (state.debug) {
       stats.debugDrawn = true;
@@ -640,6 +653,35 @@
       ctx.setLineDash([5, 4]); ctx.strokeRect(tx0, fl.y, tx1 - tx0, tileH); ctx.setLineDash([]);
     }
   }
+
+  // 光路重現的內容：全部由配置的幾何座標組成（透鏡在 x = 0）。
+  //   光線 1：由鬼平行主軸射到透鏡上的 P，折射後發散，反向延長通過物側焦點 F。
+  //   光線 2：由鬼射向光心 O，直線通過。
+  //   兩條折射光的反向延長線交於虛像。
+  function replaySpec() {
+    var c = cfg(), o = c.object, F = c.focal.objectSide, R = 105;
+    var P = { x: 0, y: o.y }, O = { x: 0, y: 0 };
+    return {
+      duration: 3.8, imageAt: 2.9,
+      segments: [
+        { a: o, b: P, start: 0, end: 1.0, kind: 'ray' },
+        { a: o, b: O, start: 0, end: 1.0, kind: 'ray' },
+        { a: P, b: { x: R, y: o.y + (o.y * R) / Math.abs(c.f) }, start: 1.0, end: 1.8, kind: 'ray' },
+        { a: O, b: { x: R, y: (o.y * R) / o.x }, start: 1.0, end: 1.8, kind: 'ray' },
+        { a: P, b: F, start: 1.9, end: 2.9, kind: 'extension' },
+        { a: O, b: c.image, start: 1.9, end: 2.9, kind: 'extension' }
+      ],
+      points: [{ p: c.image, start: 2.9 }],
+      captions: [
+        { start: 0, text: '鬼身上發出兩條光線' },
+        { start: 1.0, text: '經過凹透鏡：平行的那條發散，過光心的直走' },
+        { start: 1.9, text: '把折射後的光線反向延長（虛線）' },
+        { start: 2.9, text: '實際光路 → 反向延長 → 虛像位置' }
+      ]
+    };
+  }
+  function replayRunning() { return !!state.replay && (performance.now() - state.replay.t0) / 1000 < replaySpec().duration + 0.3; }
+  function startReplay() { $('banner').hidden = true; state.replay = { t0: performance.now() }; animate(); }
 
   function analysisTap(x, y) {
     if (state.mode === 'seal') {
@@ -683,7 +725,8 @@
       state.seal.done = true;
       if (success) {
         state.solved = true;
-        setStatus('封印成功！鬼被迫顯形——牠的本體不在你標記的虛像位置。');
+        setStatus('封印成功！鬼被迫顯形——牠的本體不在你標記的虛像位置。看看光是怎麼走的。');
+        startReplay();
       } else {
         state.selectedCell = null;
         giggle();
@@ -782,6 +825,7 @@
     $('castBtn').disabled = state.selectedCell == null || state.solved || !!(state.seal && !state.seal.done);
     $('castBtn').hidden = state.solved;
     $('nextBtn').hidden = !state.solved;
+    $('replayBtn').hidden = !state.solved;
     $('zoomIn').disabled = state.zoomIdx >= ZOOM_STEPS.length - 1;
     $('zoomOut').disabled = state.zoomIdx <= 0;
     $('debugBtn').classList.toggle('on', state.debug);
@@ -808,7 +852,7 @@
     state.cfgIndex = idx;
     state.phase = 'explore'; state.facing = 0; state.lensUp = false; state.marker = null;
     state.mode = 'draw'; state.tool = 'line'; state.dashed = false; state.pending = null; state.lines = [];
-    state.selectedCell = null; state.seal = null; state.solved = false; state.attempts = 0;
+    state.selectedCell = null; state.seal = null; state.solved = false; state.attempts = 0; state.replay = null;
     state.zoomIdx = 0;
     $('configSel').value = String(idx);
     setStatus('荒野裡有異象。轉向四周，舉起凹透鏡找出鬼的像，然後點它做標記。');
@@ -854,7 +898,7 @@
     animating = true;
     (function tick() {
       render();
-      if (state.seal && performance.now() - state.seal.t0 < 2200) requestAnimationFrame(tick); else animating = false;
+      if ((state.seal && performance.now() - state.seal.t0 < 2200) || replayRunning()) requestAnimationFrame(tick); else animating = false;
     })();
   }
   function render() {
@@ -894,6 +938,7 @@
   $('clearBtn').addEventListener('click', function () { state.lines = []; state.pending = null; setStatus('已清除所有線。'); syncUI(); requestRender(); });
   $('castBtn').addEventListener('click', castSeal);
   $('nextBtn').addEventListener('click', function () { resetRound((state.cfgIndex + 1) % Cfg.all.length); });
+  $('replayBtn').addEventListener('click', function () { if (state.solved) startReplay(); });
   $('zoomIn').addEventListener('click', function () { setZoom(state.zoomIdx + 1); });
   $('zoomOut').addEventListener('click', function () { setZoom(state.zoomIdx - 1); });
   $('zoomFit').addEventListener('click', function () { setZoom(0); });

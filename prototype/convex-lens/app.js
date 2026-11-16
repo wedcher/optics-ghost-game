@@ -430,7 +430,7 @@
 
     if (analysis) {
       state.lines.forEach(function (l) {
-        strokeInfinite(geomLine(l), l.kind === 'parallel' ? '#7dffb2' : '#ffd166', 2, l.dashed ? [8, 6] : null);
+        strokeInfinite(geomLine(l), state.replay ? 'rgba(255,255,255,.22)' : (l.kind === 'parallel' ? '#7dffb2' : '#ffd166'), 2, l.dashed ? [8, 6] : null);
       });
       studentIntersections().forEach(function (pt) {
         q = w2s(pt); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
@@ -473,6 +473,23 @@
       } else if (t < 1.5) {
         drawMagicCircle(cc.x, cc.y + tileH * 0.4, rx * Math.min(1, t / 0.5), t < 0.8 ? 1 : 1 - (t - 0.8) / 0.7, t * 1.5);
       }
+    }
+
+    // 破關後的光路重現（正推）：鬼本體 → 兩條光線 → 凸透鏡 → 會聚 → 實像
+    if (analysis && state.replay && state.solved && state.marker) {
+      var spec = replaySpec();
+      var tau = Math.min(spec.duration, (performance.now() - state.replay.t0) / 1000);
+      if (tau > spec.imageAt) {
+        var mag = -state.lensX / (state.lensX - c.object.x);
+        var ihw = Math.max(4, WORLD.ghostHalfWidth * mag * s), ihh = Math.max(6, WORLD.ghostHalfHeight * mag * s);
+        var ip = w2s({ x: 0, y: state.marker.y });
+        ctx.save(); ctx.globalAlpha = 0.7 * Math.min(1, (tau - spec.imageAt) / 0.5);
+        ctx.fillStyle = GHOST_COLOR;
+        ghostPath(ctx, ip.x - ihw - 4, ip.y, ihw, ihh, 1, -1); // 倒立的實像
+        ctx.fill('evenodd');
+        ctx.restore();
+      }
+      window.RayReplay.draw(ctx, w2s, spec, tau, clipRect);
     }
 
     // Debug overlay
@@ -519,6 +536,32 @@
     syncUI(); requestRender();
   }
 
+  // 光路重現的內容：全部由配置的幾何座標組成（走廊座標）。
+  //   光線 1：由鬼平行主軸射到透鏡上的 P，折射後通過像側焦點 F′，到達布幕。
+  //   光線 2：由鬼射向光心 O，直線通過，到達布幕。
+  //   兩條光線在布幕上會聚成實像。
+  function replaySpec() {
+    var c = cfg(), o = c.object, lx = state.lensX;
+    var P = { x: lx, y: o.y }, O = { x: lx, y: 0 }, I = { x: 0, y: state.marker ? state.marker.y : 0 };
+    return {
+      duration: 3.2, imageAt: 2.2,
+      segments: [
+        { a: o, b: P, start: 0, end: 1.0, kind: 'ray' },
+        { a: o, b: O, start: 0, end: 1.0, kind: 'ray' },
+        { a: P, b: I, start: 1.0, end: 2.2, kind: 'ray' },
+        { a: O, b: I, start: 1.0, end: 2.2, kind: 'ray' }
+      ],
+      points: [{ p: I, start: 2.2 }],
+      captions: [
+        { start: 0, text: '鬼身上發出兩條光線' },
+        { start: 1.0, text: '經過凸透鏡：平行的那條折向焦點 F′，過光心的直走' },
+        { start: 2.2, text: '實際光路 → 光線會聚 → 實像位置' }
+      ]
+    };
+  }
+  function replayRunning() { return !!state.replay && (performance.now() - state.replay.t0) / 1000 < replaySpec().duration + 0.3; }
+  function startReplay() { $('banner').hidden = true; state.replay = { t0: performance.now() }; animate(); }
+
   function analysisTap(x, y) {
     if (state.mode === 'seal') {
       if (state.solved || (state.seal && !state.seal.done)) return;
@@ -561,7 +604,8 @@
       state.seal.done = true;
       if (success) {
         state.solved = true;
-        setStatus('封印成功！鬼被迫顯形——牆上的只是牠的像，本體在透鏡的另一邊。');
+        setStatus('封印成功！鬼被迫顯形——布幕上的只是牠的像，本體在透鏡的另一邊。看看光是怎麼走的。');
+        startReplay();
       } else {
         state.selectedCell = null;
         giggle();
@@ -661,6 +705,7 @@
     $('castBtn').disabled = state.selectedCell == null || state.solved || !!(state.seal && !state.seal.done);
     $('castBtn').hidden = state.solved;
     $('nextBtn').hidden = !state.solved;
+    $('replayBtn').hidden = !state.solved;
     $('zoomIn').disabled = state.zoomIdx >= ZOOM_STEPS.length - 1;
     $('zoomOut').disabled = state.zoomIdx <= 0;
     $('debugBtn').classList.toggle('on', state.debug);
@@ -685,7 +730,7 @@
     state.cfgIndex = idx;
     state.phase = 'observe'; state.lensX = -350; state.marker = null;
     state.mode = 'draw'; state.tool = 'line'; state.dashed = false; state.pending = null; state.lines = [];
-    state.selectedCell = null; state.seal = null; state.solved = false; state.attempts = 0;
+    state.selectedCell = null; state.seal = null; state.solved = false; state.attempts = 0; state.replay = null;
     state.zoomIdx = 0;
     $('configSel').value = String(idx);
     setStatus('走廊深處有鬼，但肉眼看不到。左右拖曳移動凸透鏡，讓布幕上出現清楚的鬼像，再按「標記實像」。');
@@ -730,7 +775,7 @@
     animating = true;
     (function tick() {
       render();
-      if (state.seal && performance.now() - state.seal.t0 < 2200) requestAnimationFrame(tick); else animating = false;
+      if ((state.seal && performance.now() - state.seal.t0 < 2200) || replayRunning()) requestAnimationFrame(tick); else animating = false;
     })();
   }
   function render() {
@@ -775,6 +820,7 @@
   $('clearBtn').addEventListener('click', function () { state.lines = []; state.pending = null; setStatus('已清除所有線。'); syncUI(); requestRender(); });
   $('castBtn').addEventListener('click', castSeal);
   $('nextBtn').addEventListener('click', function () { resetRound((state.cfgIndex + 1) % Cfg.all.length); });
+  $('replayBtn').addEventListener('click', function () { if (state.solved) startReplay(); });
   $('zoomIn').addEventListener('click', function () { setZoom(state.zoomIdx + 1); });
   $('zoomOut').addEventListener('click', function () { setZoom(state.zoomIdx - 1); });
   $('zoomFit').addEventListener('click', function () { setZoom(0); });
