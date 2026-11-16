@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optics Ghost Game — 原型入口</title>
+<style>
+  html, body { margin:0; min-height:100%; background:#0d1020; color:#e8ebff;
+    font-family: system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; }
+  main { max-width:560px; margin:0 auto; padding:24px 16px 40px; }
+  h1 { font-size:22px; margin:0 0 4px; }
+  p.lead { color:#9aa3cf; margin:0 0 20px; line-height:1.6; }
+  a.card { display:block; padding:16px; margin:0 0 12px; border:1px solid #3b4478; border-radius:14px; background:#171b33; color:inherit; text-decoration:none; }
+  a.card:active { background:#232a4d; }
+  a.card strong { display:block; font-size:18px; margin-bottom:4px; }
+  a.card span { color:#9aa3cf; font-size:14px; line-height:1.5; }
+  .todo { padding:16px; border:1px dashed #3b4478; border-radius:14px; color:#9aa3cf; font-size:14px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Optics Ghost Game</h1>
+  <p class="lead">玩法原型入口。完整遊戲包含平面鏡、凸透鏡、凹透鏡三套玩法；這裡的每一個原型只驗證其中一套。</p>
+  <a class="card" href="concave-lens/index.html">
+    <strong>凹透鏡 — 荒野</strong>
+    <span>轉向四周，舉起凹透鏡找出鬼的縮小虛像，標記後切到側視圖，用主光線反推鬼本體。</span>
+  </a>
+  <a class="card" href="convex-lens/index.html">
+    <strong>凸透鏡 — 走廊</strong>
+    <span>移動凸透鏡，讓投影牆上出現清楚的倒立實像，標記後用主光線反推鬼本體。</span>
+  </a>
+  <div class="todo">平面鏡：尚未製作。</div>
+</main>
+</body>
+</html>

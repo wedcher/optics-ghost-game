@@ -106,24 +106,30 @@
 - 側視圖中虛像的深度由系統給定，玩家的點擊只提供方向。
 - 側視圖只能定深度，地板格目前是沿視線方向的一排，不是二維棋盤。
 
-### Sprint 01b 狀態（2026-11-16）— 交接點
+### 交接點（2026-11-16，Sprint 01b + Sprint 02 之後）
 
-**探索畫面已改用 `docs/concepts/` 的荒野背景圖；透鏡內由同一張圖光學重映射。**
+**目前有兩個原型：凹透鏡（荒野，已換上概念圖背景）與凸透鏡（走廊）。入口：`prototype/index.html`。**
 
-- 已在瀏覽器手動實測（手機直向／橫向、桌機）；詳見 `docs/prototype-findings.md` 的「追加：Sprint 01b」。
-- **接手的工作階段請先做：**
-  1. `npm i -D playwright && npx playwright install chromium`
-  2. `npm test`（幾何檢查＋瀏覽器實測）。e2e 腳本本輪有改但**尚未執行過**；若失敗先修腳本或程式，再做別的事。
-  3. 通過後把更新的 `docs/screenshots/` 與 `e2e-results.txt` 一起 commit。
-- 之後等使用者試玩回饋；沒有新指示時依下方 NEXT 進凸透鏡 prototype。
-- 視覺與氛圍依 `docs/visual-handoff.md`；GPT 負責美術，prototype 用 placeholder 即可。
+- 凹透鏡：`prototype/concave-lens/`，紀錄在 `docs/prototype-findings.md`（含「追加：Sprint 01b」）。
+- 凸透鏡：`prototype/convex-lens/`，紀錄在 `docs/prototype-findings-convex.md`。
+- 兩者都只在瀏覽器中手動實測過；**最近兩輪的工作環境沒有 Node，自動化測試沒有重跑。**
+
+**接手的工作階段請先做（依序）：**
+
+1. `npm i -D playwright && npx playwright install chromium`
+2. `npm test`。其中 `tests/e2e-concave-lens.js` 上一輪有改（改用本機 HTTP 伺服器、鬼體色常數）但**尚未執行過**；`tests/check-geometry-convex.js` 也還沒在 Node 下跑過（同一份檢查在瀏覽器是 140/140）。若失敗，先修好再做別的事。
+3. 通過後把更新的 `docs/screenshots/` 與 `e2e-results.txt` 一起 commit。
+4. 為凸透鏡補一支 headless e2e（比照凹透鏡那支；掛鉤是 `window.__protoConvex`）。
+
+之後等使用者試玩回饋；沒有新指示時，依下方 NEXT 做平面鏡 prototype。
+視覺與氛圍依 `docs/visual-handoff.md`；GPT 負責美術，prototype 用 placeholder 即可。
 
 ---
 
 ## NEXT
 
 Sprint 01 通過後，不停留在美化凹透鏡：
-1. 凸透鏡 prototype。
+1. 凸透鏡 prototype。（已建立，見上方交接點；尚待自動化測試與真人試玩）
 2. 平面鏡 prototype。
 3. 三套玩法整合成共用遊戲 shell。
 4. 再進正式美術與關卡節奏。

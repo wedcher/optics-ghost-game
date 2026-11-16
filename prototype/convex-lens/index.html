@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>凸透鏡原型 — Optics Ghost Game (Sprint 02)</title>
+<style>
+  :root { --bg:#0d1020; --panel:#171b33; --line:#2c3359; --text:#e8ebff; --dim:#9aa3cf; --accent:#ffd166; --mark:#ff5fd2; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--text);
+    font-family: system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    overscroll-behavior: none; touch-action: manipulation; }
+  #app { display:grid; grid-template-rows:auto auto minmax(0,1fr) auto; height:100vh; height:100dvh; width:100%; overflow:hidden; }
+  #topbar { display:flex; align-items:center; gap:8px; padding:6px 8px; background:var(--panel); border-bottom:1px solid var(--line); }
+  #topbar h1 { font-size:14px; margin:0; flex:1 1 auto; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:600; }
+  #topbar h1 small { color:var(--dim); font-weight:400; }
+  select, button { font:inherit; color:var(--text); background:#232a4d; border:1px solid #3b4478; border-radius:10px; min-height:46px; padding:4px 10px; font-size:15px; }
+  button { cursor:pointer; user-select:none; -webkit-user-select:none; touch-action: manipulation; }
+  button:active { background:#34407a; }
+  button:disabled { opacity:.38; cursor:default; }
+  button.on { background:#4a3f12; border-color:var(--accent); color:var(--accent); }
+  button.primary { background:#5b2a86; border-color:#b980ff; font-weight:600; }
+  #debugBtn { min-height:40px; font-size:13px; padding:2px 8px; }
+  #configSel { min-height:40px; font-size:14px; }
+  #status { padding:6px 10px; font-size:14px; line-height:1.35; min-height:3.2em; background:#12152a; border-bottom:1px solid var(--line); display:flex; align-items:center; }
+  #stage { position:relative; min-height:0; overflow:hidden; background:#000; }
+  #view { position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:none; }
+  #zoomBox { position:absolute; right:8px; bottom:8px; display:flex; flex-direction:column; gap:6px; }
+  #zoomBox button { width:50px; height:50px; min-height:50px; padding:0; font-size:22px; background:rgba(35,42,77,.92); }
+  #zoomBox #zoomFit { font-size:13px; }
+  #debugPanel { position:absolute; left:6px; top:6px; max-width:min(92%, 330px); font:11px/1.45 ui-monospace, Menlo, Consolas, monospace; background:rgba(0,0,0,.72); color:#9dffb0; border:1px solid #2f7a45; border-radius:6px; padding:6px 8px; pointer-events:none; white-space:pre-wrap; }
+  #banner { position:absolute; left:50%; top:10px; transform:translateX(-50%); width:min(92%, 430px); background:rgba(20,16,40,.94); border:1px solid #b980ff; border-radius:12px; padding:10px 12px; font-size:14px; line-height:1.45; pointer-events:none; text-align:center; transition:opacity .4s; }
+  #controls { background:var(--panel); border-top:1px solid var(--line); padding:6px 6px calc(6px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:6px; }
+  .row { display:flex; gap:6px; flex-wrap:wrap; }
+  .row > button { flex:1 1 0; min-width:60px; padding:4px 6px; }
+  /* 橫放的手機：高度很少，把兩排控制項併成一排、狀態列縮成一行 */
+  @media (max-height: 480px) {
+    #topbar { padding:3px 8px; }
+    #status { min-height:0; padding:4px 10px; font-size:13px; }
+    #exploreControls, #analysisControls { display:flex; gap:6px; }
+    #exploreControls > .row, #analysisControls > .row { flex:1 1 0; margin-top:0 !important; flex-wrap:nowrap; }
+    #exploreControls > .row:last-child { flex:0 0 190px; }
+    .row > button { min-width:44px; padding:4px 2px; font-size:14px; }
+    #zoomBox { flex-direction:row; }
+    #banner { font-size:12px; padding:6px 10px; width:min(70%, 520px); }
+  }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <h1>凸透鏡原型 <small>Sprint 02</small></h1>
+    <select id="configSel" aria-label="測試配置"></select>
+    <button id="debugBtn" type="button" aria-pressed="false">Debug</button>
+  </header>
+  <div id="status" role="status" aria-live="polite"></div>
+  <main id="stage">
+    <canvas id="view"></canvas>
+    <div id="zoomBox" hidden>
+      <button id="zoomIn" type="button" aria-label="放大">＋</button>
+      <button id="zoomOut" type="button" aria-label="縮小">－</button>
+      <button id="zoomFit" type="button" aria-label="顯示全圖">全圖</button>
+    </div>
+    <div id="debugPanel" hidden></div>
+    <div id="banner" hidden></div>
+  </main>
+  <footer id="controls">
+    <div id="exploreControls">
+      <div class="row">
+        <button id="nudgeLeft" type="button" aria-label="透鏡往左微調">◀ 微調</button>
+        <button id="markBtn" type="button" class="primary">標記實像</button>
+        <button id="nudgeRight" type="button" aria-label="透鏡往右微調">微調 ▶</button>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <button id="toAnalysis" type="button" disabled>開始光路分析 ➜</button>
+      </div>
+    </div>
+    <div id="analysisControls" hidden>
+      <div class="row">
+        <button id="modeDraw" type="button" class="on">畫線</button>
+        <button id="modeSeal" type="button">選格封印</button>
+        <button id="toExplore" type="button">重新對焦</button>
+      </div>
+      <div class="row" id="drawRow" style="margin-top:6px">
+        <button id="toolLine" type="button" class="on">連線</button>
+        <button id="toolParallel" type="button">平行線</button>
+        <button id="styleBtn" type="button">實線</button>
+        <button id="undoBtn" type="button">復原</button>
+        <button id="clearBtn" type="button">清除</button>
+      </div>
+      <div class="row" id="sealRow" style="margin-top:6px" hidden>
+        <button id="castBtn" type="button" class="primary" disabled>施放封印法陣</button>
+        <button id="nextBtn" type="button" hidden>下一組配置</button>
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="../shared/optics-core.js"></script>
+<script src="configs.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
