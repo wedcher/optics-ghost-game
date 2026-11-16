@@ -251,34 +251,42 @@
   //   - 地平線以上的像素：當成無限遠
   // 每個深度套用和鬼相同的薄透鏡等效深度公式，所以透鏡內是同一張圖被光學重映射，
   // 不是另一張縮小圖。直立物（拱門、枯樹）在地平線以下的部分被當成地面，會有些微變形。
-  // 網址加 ?bg=1|2|3 換圖；?bg=0 改用程式畫的場景。
+  // 網址加 ?bg=0 改用程式畫的場景。
   // --------------------------------------------------------------------
-  var BG_LIST = {
-    1: { src: 'assets/wilderness-1.jpg', horizon: 0.53 },
-    2: { src: 'assets/wilderness-2.jpg', horizon: 0.55 },
-    3: { src: 'assets/wilderness-3.jpg', horizon: 0.52 }
-  };
-  var bgMatch = /[?&]bg=(\d)/.exec(location.search);
-  var bgSpec = BG_LIST[bgMatch ? bgMatch[1] : 3] || null;
-  var bg = { img: null, ready: false, settled: !bgSpec, horizon: bgSpec ? bgSpec.horizon : 0.5 };
+  // 四個方位各一張圖（北、東、南、西）。horizon = 地平線占圖高的比例（目測）。
+  var BG_DIRS = [
+    { src: 'assets/wilderness-3-moon.jpg', horizon: 0.52 },     // 北：滿月與拱門
+    { src: 'assets/wilderness-2-pillars.jpg', horizon: 0.55 },  // 東：石柱遺跡
+    { src: 'assets/wilderness-1-open.jpg', horizon: 0.53 },     // 南：空曠草原
+    { src: 'assets/wilderness-4-wall.jpg', horizon: 0.54 }      // 西：斷牆
+  ];
+  var bgOff = /[?&]bg=0/.test(location.search);
+  var bg = { imgs: [], ready: false, settled: bgOff, img: null, horizon: 0.5 };
   var bgWaiters = [];
   function bgSettle(ok) {
     bg.ready = ok; bg.settled = true;
     bgWaiters.splice(0).forEach(function (fn) { fn(); });
   }
-  if (bgSpec) {
-    bg.img = new Image();
-    bg.img.onload = function () { bgSettle(true); };
-    bg.img.onerror = function () { bgSettle(false); };
-    bg.img.src = bgSpec.src;
+  if (!bgOff) {
+    var bgLeft = BG_DIRS.length, bgFailed = false;
+    BG_DIRS.forEach(function (d, i) {
+      var im = new Image();
+      im.onload = function () { if (--bgLeft === 0) bgSettle(!bgFailed); };
+      im.onerror = function () { bgFailed = true; if (--bgLeft === 0) bgSettle(false); };
+      im.src = d.src;
+      bg.imgs[i] = im;
+    });
   }
+  // 選定目前方位的圖（四張都載入成功才會用圖；否則整體退回程式畫的場景）
+  function bgUse(facing) { bg.img = bg.imgs[facing]; bg.horizon = BG_DIRS[facing].horizon; }
 
-  // 背景圖在螢幕上的擺放：地平線對齊主光軸高度（cy），四個方位平均分配在全景寬度上。
+  // 背景圖在螢幕上的擺放：地平線對齊主光軸高度（cy），圖水平置中。
   function bgLayout(m, facing) {
+    bgUse(facing);
     var iw = bg.img.naturalWidth, ih = bg.img.naturalHeight, hf = bg.horizon;
     var h = 1.02 * Math.max(m.cy / hf, (H - m.cy) / (1 - hf), (W * 1.5 * ih) / iw);
     var w = (h * iw) / ih;
-    return { x: -(w - W) * (facing / 3), y: m.cy - hf * h, w: w, h: h };
+    return { x: -(w - W) / 2, y: m.cy - hf * h, w: w, h: h };
   }
 
   function drawBgNaked(m, facing) {
@@ -901,7 +909,7 @@
       w2s: w2s, s2w: s2w, snapPoints: snapPoints, imageScreenPos: imageScreenPos,
       studentIntersections: studentIntersections, exploreMetrics: exploreMetrics,
       canvasSize: function () { return { W: W, H: H, DPR: DPR }; }, render: render,
-      background: function () { return { ready: bg.ready, src: bgSpec ? bgSpec.src : null }; }
+      background: function () { return { ready: bg.ready, src: bgOff ? null : BG_DIRS.map(function (d) { return d.src; }) }; }
     };
   }
 

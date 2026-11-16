@@ -79,5 +79,14 @@
 **CONFIRMED**
 - 走廊背景與凸透鏡使用 GPT 的概念圖（`docs/concepts/convex-corridor-bg.png`、`convex-lens.png`）。
 
+- 成像的面用**布幕**（不是石牆）。目前程式畫的木框米白布幕使用者已認可，可沿用。
+
+## 2026-11-16 — 凹透鏡場景美術
+
+**CONFIRMED**
+- 荒野四個方位各用一張背景圖（北月亮、東石柱、南空曠、西斷牆）。
+
+## 2026-11-16 — 鬼的造型
+
 **PENDING**
-- 成像的面是「布幕」還是「石牆」。目前原型用程式畫的米白布幕當 placeholder。
+- 鬼目前是程式畫的 placeholder；GPT 畫好後替換。需要的圖片規格見 `docs/concepts/README.md`。
