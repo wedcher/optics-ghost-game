@@ -25,7 +25,7 @@
   var WORLD = {
     corridorLength: 1000,
     axisHeight: 150,      // 主光軸離地高度；天花板在主光軸上方同樣距離
-    wallHalfWidth: 150,   // 投影牆正面視圖的半寬
+    wallHalfWidth: 80,    // 布幕正面視圖的半寬。鬼像永遠在主光軸正上／正下方，最寬的清晰像半寬約 56 cm，不需要正方形
     cellWidth: 100,
     cellCount: 10,        // 第 1 格緊鄰投影牆，第 10 格最遠
     lensMinX: -620,       // 透鏡可移動範圍（永遠在鬼與牆之間，不會穿過鬼）
@@ -42,7 +42,13 @@
     { id: 'A', f: 200, targetCell: 9, h: 70 },
     { id: 'B', f: 150, targetCell: 7, h: -60 },
     { id: 'C', f: 220, targetCell: 10, h: 65 },
-    { id: 'D', f: 160, targetCell: 8, h: -50 }
+    { id: 'D', f: 160, targetCell: 8, h: -50 },
+    // E～I：挑過離軸高度，放大的那個像也完整落在布幕內（A～D 的放大像會超出布幕，見 findings ISSUE 20）
+    { id: 'E', f: 110, targetCell: 5, h: -60 },
+    { id: 'F', f: 130, targetCell: 6, h: 50 },
+    { id: 'G', f: 180, targetCell: 8, h: 55 },
+    { id: 'H', f: 150, targetCell: 7, h: 45 },
+    { id: 'I', f: 200, targetCell: 9, h: -50 }
   ];
 
   var floor = Optics.makeFloorRow(WORLD.cellWidth, WORLD.cellCount);
@@ -85,11 +91,11 @@
    * 幾何自我檢查；回傳 [{ ok, label, detail }]。
    * 瀏覽器與 Node（tests/check-geometry-convex.js）都呼叫這一份。
    */
-  function selfCheck() {
+  function selfCheck(list) {
     var out = [];
     function ok(cond, label, detail) { out.push({ ok: !!cond, label: label, detail: detail || '' }); }
     function near(a, b, tol) { return Math.abs(a - b) <= (tol == null ? 1e-6 : tol); }
-    all.forEach(function (c) {
+    (list || all).forEach(function (c) {
       var T = function (s) { return '配置' + c.id + ' ' + s; };
       ok(c.sharp.length === 2, T('有兩個清晰位置（D > 4f）'), 'D=' + (-c.object.x) + ' 4f=' + 4 * c.f);
       ok(floor.cellAt(c.object.x) === c.targetCell && near(floor.edgeMargin(c.object.x), 0.5), T('物點在目標格正中央'));
@@ -101,6 +107,7 @@
         ok(sp.dObj > c.f, S('物在焦點外（實像）'));
         ok(sp.m < 0, S('倒立'), 'm=' + sp.m.toFixed(3));
         ok(Math.abs(sp.imageY) + 6 < WORLD.axisHeight, S('像的中心落在牆面內'), 'y=' + sp.imageY.toFixed(2));
+        ok(WORLD.ghostHalfWidth * Math.abs(sp.m) + 6 < WORLD.wallHalfWidth, S('清晰像的寬度落在布幕內'), '半寬 ' + (WORLD.ghostHalfWidth * Math.abs(sp.m)).toFixed(1) + ' cm');
         var w = wallImage(c.f, c.object.x, c.h, sp.lensX, WORLD.lensRadius);
         ok(w.blur < 1e-6, S('模糊圓為 0'), String(w.blur));
         // 兩條可逆主光線反推（透鏡座標：像點 = (dImg, imageY)）

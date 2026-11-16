@@ -49,7 +49,8 @@ function ok(cond, label, detail) {
 
 // runs：[配置索引, 清晰位置索引]。0 = 離布幕遠、放大的像；1 = 離布幕近、縮小的像。
 const ALL_RUNS = [];
-for (let c = 0; c < 4; c++) for (let s = 0; s < 2; s++) ALL_RUNS.push([c, s]);
+const CONFIG_COUNT = require('../prototype/convex-lens/configs.js').all.length;
+for (let c = 0; c < CONFIG_COUNT; c++) for (let s = 0; s < 2; s++) ALL_RUNS.push([c, s]);
 const PROFILES = [
   // 遊戲一律橫向（docs/decisions.md）。橫向手機是主要情境：四組配置 × 兩個清晰位置全跑。
   { name: 'phone-landscape', viewport: { width: 812, height: 375 }, touch: true, dsf: 2, runs: ALL_RUNS, shots: /./ },
@@ -448,6 +449,25 @@ async function run(profile, browser) {
       ok(off === 0, T('關閉 Debug 後面板清空'));
     }
     void cs0;
+
+    // ---------- 下一組配置：隨機出題 ----------
+    if (first) {
+      // 頁面載入時已經從牌堆抽走一張，所以先按 N-1 次抽完第一副，再按 N 次剛好是完整的第二副。
+      const seen = await page.evaluate(() => {
+        const H = window.__protoConvex, out = [{ idx: H.state.cfgIndex }];
+        for (let i = 0; i < 2 * H.configs.all.length - 1; i++) {
+          H.state.solved = true; // 只是讓按鈕可用；resetRound 會清掉
+          document.getElementById('nextBtn').click();
+          out.push({ idx: H.state.cfgIndex, phase: H.state.phase, solved: H.state.solved, marker: !!H.state.marker, lines: H.state.lines.length });
+        }
+        return out;
+      });
+      const steps = seen.slice(1);
+      ok(steps.every((s, i) => s.idx !== seen[i].idx), T('「下一組配置」不會連續出同一組'), seen.map((s) => s.idx).join('→'));
+      const second = steps.slice(CONFIG_COUNT - 1).map((s) => s.idx);
+      ok(new Set(steps.slice(0, CONFIG_COUNT - 1).map((s) => s.idx)).size === CONFIG_COUNT - 1 && new Set(second).size === CONFIG_COUNT, T('「下一組配置」每一輪內每組各出一次、不重複'), second.join(','));
+      ok(steps.every((s) => s.phase === 'observe' && !s.solved && !s.marker && s.lines === 0), T('換配置後回到觀察階段，標記與作圖線都清空'));
+    }
   }
   ok(errors.length === 0, P('沒有 JS 錯誤'), errors.join(' | ') || undefined);
   await context.close();

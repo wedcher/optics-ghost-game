@@ -824,6 +824,7 @@
     $('clearBtn').disabled = !state.lines.length && !state.pending;
     $('castBtn').disabled = state.selectedCell == null || state.solved || !!(state.seal && !state.seal.done);
     $('castBtn').hidden = state.solved;
+    $('toExplore').hidden = state.solved; // 破關後不能回探索：那會把法陣和現身的鬼清掉，而且探索畫面沒有「下一組配置」
     $('nextBtn').hidden = !state.solved;
     $('replayBtn').hidden = !state.solved;
     $('zoomIn').disabled = state.zoomIdx >= ZOOM_STEPS.length - 1;

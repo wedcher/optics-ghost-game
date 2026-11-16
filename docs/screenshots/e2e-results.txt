@@ -56,6 +56,7 @@
   PASS  [phone-landscape] 配置A 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置A 封印作圖交點所在格 → 成功並顯形
   PASS  [phone-landscape] 配置A 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [phone-landscape] 配置A 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
   PASS  [phone-landscape] 配置A 光路重現：四段實際光線＋兩段反向延長線
   PASS  [phone-landscape] 配置A 光路重現：兩條光線都從鬼本體出發
   PASS  [phone-landscape] 配置A 光路重現：光線 1 平行主軸射到透鏡上的 P
@@ -70,7 +71,7 @@
   PASS  [phone-landscape] 配置A 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置A 光路重現：結束時標出像點  — 129 px（重現前 71）
   PASS  [phone-landscape] 配置A 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
   PASS  [phone-landscape] 配置A 關閉 Debug 後面板清空
   PASS  [phone-landscape] 配置B 裸眼畫面沒有鬼
@@ -113,6 +114,7 @@
   PASS  [phone-landscape] 配置B 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置B 封印作圖交點所在格 → 成功並顯形
   PASS  [phone-landscape] 配置B 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [phone-landscape] 配置B 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
   PASS  [phone-landscape] 配置B 光路重現：四段實際光線＋兩段反向延長線
   PASS  [phone-landscape] 配置B 光路重現：兩條光線都從鬼本體出發
   PASS  [phone-landscape] 配置B 光路重現：光線 1 平行主軸射到透鏡上的 P
@@ -168,6 +170,7 @@
   PASS  [phone-landscape] 配置C 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置C 封印作圖交點所在格 → 成功並顯形
   PASS  [phone-landscape] 配置C 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [phone-landscape] 配置C 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
   PASS  [phone-landscape] 配置C 光路重現：四段實際光線＋兩段反向延長線
   PASS  [phone-landscape] 配置C 光路重現：兩條光線都從鬼本體出發
   PASS  [phone-landscape] 配置C 光路重現：光線 1 平行主軸射到透鏡上的 P
@@ -182,7 +185,7 @@
   PASS  [phone-landscape] 配置C 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置C 光路重現：結束時標出像點  — 130 px（重現前 70）
   PASS  [phone-landscape] 配置C 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置D 裸眼畫面沒有鬼
   PASS  [phone-landscape] 配置D 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 48% 像素改變；此方位沒有鬼
   PASS  [phone-landscape] 配置D 透鏡外畫面不變  — 0.00%
@@ -223,6 +226,7 @@
   PASS  [phone-landscape] 配置D 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置D 封印作圖交點所在格 → 成功並顯形
   PASS  [phone-landscape] 配置D 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [phone-landscape] 配置D 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
   PASS  [phone-landscape] 配置D 光路重現：四段實際光線＋兩段反向延長線
   PASS  [phone-landscape] 配置D 光路重現：兩條光線都從鬼本體出發
   PASS  [phone-landscape] 配置D 光路重現：光線 1 平行主軸射到透鏡上的 P
@@ -296,6 +300,7 @@
   PASS  [phone-portrait] 配置A 整個直欄都是該格的點擊區
   PASS  [phone-portrait] 配置A 封印作圖交點所在格 → 成功並顯形
   PASS  [phone-portrait] 配置A 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [phone-portrait] 配置A 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
   PASS  [phone-portrait] 配置A 光路重現：四段實際光線＋兩段反向延長線
   PASS  [phone-portrait] 配置A 光路重現：兩條光線都從鬼本體出發
   PASS  [phone-portrait] 配置A 光路重現：光線 1 平行主軸射到透鏡上的 P
@@ -310,7 +315,7 @@
   PASS  [phone-portrait] 配置A 光路重現：畫面上方有說明文字框
   PASS  [phone-portrait] 配置A 光路重現：結束時標出像點  — 137 px（重現前 67）
   PASS  [phone-portrait] 配置A 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-portrait] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-portrait] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-portrait] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
   PASS  [phone-portrait] 配置A 關閉 Debug 後面板清空
   PASS  [phone-portrait] 沒有 JS 錯誤
@@ -371,6 +376,7 @@
   PASS  [desktop] 配置A 整個直欄都是該格的點擊區
   PASS  [desktop] 配置A 封印作圖交點所在格 → 成功並顯形
   PASS  [desktop] 配置A 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [desktop] 配置A 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
   PASS  [desktop] 配置A 光路重現：四段實際光線＋兩段反向延長線
   PASS  [desktop] 配置A 光路重現：兩條光線都從鬼本體出發
   PASS  [desktop] 配置A 光路重現：光線 1 平行主軸射到透鏡上的 P
@@ -427,6 +433,7 @@
   PASS  [desktop] 配置C 整個直欄都是該格的點擊區
   PASS  [desktop] 配置C 封印作圖交點所在格 → 成功並顯形
   PASS  [desktop] 配置C 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [desktop] 配置C 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
   PASS  [desktop] 配置C 光路重現：四段實際光線＋兩段反向延長線
   PASS  [desktop] 配置C 光路重現：兩條光線都從鬼本體出發
   PASS  [desktop] 配置C 光路重現：光線 1 平行主軸射到透鏡上的 P
@@ -444,4 +451,4 @@
   PASS  [desktop] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [desktop] 沒有 JS 錯誤
 
-ALL PASS: 445/445 checks
+ALL PASS: 452/452 checks

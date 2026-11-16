@@ -81,7 +81,8 @@
 
   function regions() {
     if (W > H * 1.25) {
-      var ww = Math.round(Math.min(W * 0.36, H * 1.05));
+      // 布幕是直的窄長條（寬:高 = wallHalfWidth:axisHeight），只留它需要的寬度，其餘給走廊側視
+      var ww = Math.round(Math.min(W * 0.36, (H - 38) * WORLD.wallHalfWidth / WORLD.axisHeight + 34));
       return { wall: { x: W - ww, y: 0, w: ww, h: H }, side: { x: 0, y: 0, w: W - ww, h: H } };
     }
     var wh = Math.round(H * 0.58);
@@ -705,6 +706,7 @@
     $('clearBtn').disabled = !state.lines.length && !state.pending;
     $('castBtn').disabled = state.selectedCell == null || state.solved || !!(state.seal && !state.seal.done);
     $('castBtn').hidden = state.solved;
+    $('toExplore').hidden = state.solved; // 破關後不能回去重新對焦：那會把法陣和現身的鬼清掉，而且觀察畫面沒有「下一組配置」
     $('nextBtn').hidden = !state.solved;
     $('replayBtn').hidden = !state.solved;
     $('zoomIn').disabled = state.zoomIdx >= ZOOM_STEPS.length - 1;
@@ -727,9 +729,30 @@
       '封印次數 = ' + state.attempts + '   線 = ' + state.lines.length;
   }
 
+  // 隨機出題：把所有配置洗牌後依序出；出完再洗一次。同一組不會連續出現，也不會照固定順序讓人背答案。
+  var deck = [], roundsStarted = 0;
+  function nextRandomConfig() {
+    if (!deck.length) {
+      deck = Cfg.all.map(function (_, i) { return i; });
+      for (var i = deck.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = deck[i]; deck[i] = deck[j]; deck[j] = t; }
+      if (roundsStarted > 0 && deck.length > 1 && deck[deck.length - 1] === state.cfgIndex) deck.unshift(deck.pop());
+    }
+    return deck.pop();
+  }
+
+  // 透鏡的起始位置：離兩個清晰位置都夠遠，否則一開場布幕上就幾乎是清楚的像（等於不用對焦）。
+  function startLensX(c) {
+    var best = -350, bestGap = -1;
+    [-350, -200, -500, -120, -600].forEach(function (x) {
+      var gap = Math.min.apply(null, c.sharp.map(function (sp) { return Math.abs(sp.lensX - x); }));
+      if (gap >= 60 && bestGap < 60) { best = x; bestGap = gap; }
+    });
+    return best;
+  }
+
   function resetRound(idx) {
-    state.cfgIndex = idx;
-    state.phase = 'observe'; state.lensX = -350; state.marker = null;
+    state.cfgIndex = idx; roundsStarted++;
+    state.phase = 'observe'; state.lensX = startLensX(Cfg.all[idx]); state.marker = null;
     state.mode = 'draw'; state.tool = 'line'; state.dashed = false; state.pending = null; state.lines = [];
     state.selectedCell = null; state.seal = null; state.solved = false; state.attempts = 0; state.replay = null;
     state.zoomIdx = 0;
@@ -820,7 +843,7 @@
   $('undoBtn').addEventListener('click', function () { if (state.pending) state.pending = null; else state.lines.pop(); syncUI(); requestRender(); });
   $('clearBtn').addEventListener('click', function () { state.lines = []; state.pending = null; setStatus('已清除所有線。'); syncUI(); requestRender(); });
   $('castBtn').addEventListener('click', castSeal);
-  $('nextBtn').addEventListener('click', function () { resetRound((state.cfgIndex + 1) % Cfg.all.length); });
+  $('nextBtn').addEventListener('click', function () { resetRound(nextRandomConfig()); });
   $('replayBtn').addEventListener('click', function () { if (state.solved) startReplay(); });
   $('zoomIn').addEventListener('click', function () { setZoom(state.zoomIdx + 1); });
   $('zoomOut').addEventListener('click', function () { setZoom(state.zoomIdx - 1); });
@@ -838,5 +861,5 @@
     art: function () { return { pending: artPending, corridor: ART.corridor.ready, lens: ART.lens.ready }; }
   };
 
-  resetRound(0);
+  resetRound(nextRandomConfig()); // 一開始也隨機，不固定從配置 A 開始
 })();

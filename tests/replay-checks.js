@@ -82,6 +82,9 @@ async function checkReplay({ page, hook, ok, T, press, physics, shot }) {
     return { started: !!Hk.state.replay, btnHidden: document.getElementById('replayBtn').hidden, spec: Hk.replaySpec() };
   }, hook);
   ok(info.started && !info.btnHidden, T('封印成功後自動播放光路重現，並出現「光路重現」按鈕'));
+  // 真人試玩發現：破關後按返回鈕會回到觀察畫面，法陣和鬼被清掉，也找不到「下一組配置」。
+  const after = await page.evaluate(() => ({ back: document.getElementById('toExplore').hidden, next: document.getElementById('nextBtn').hidden }));
+  ok(after.back && !after.next, T('封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」'));
   const spec = info.spec;
   (physics ? physics(spec) : []).forEach((r) => ok(r.ok, T('光路重現：' + r.label), r.detail));
 
