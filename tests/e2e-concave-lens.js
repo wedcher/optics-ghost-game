@@ -18,7 +18,20 @@ const fs = require('fs');
 const { chromium } = require('playwright');
 
 const ROOT = path.join(__dirname, '..');
-const URL = 'file://' + path.join(ROOT, 'prototype/concave-lens/index.html');
+// 用本機 HTTP 伺服器開頁面：背景是圖片檔，file:// 下 canvas 會被標成 tainted，
+// 測試就不能用 getImageData 讀像素。（學生直接雙擊開啟仍可正常遊玩，只是不能讀回像素。）
+const http = require('http');
+const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.jpg': 'image/jpeg', '.png': 'image/png' };
+const server = http.createServer((req, res) => {
+  const file = path.normalize(path.join(ROOT, decodeURIComponent(req.url.split('?')[0])));
+  if (!file.startsWith(ROOT)) { res.writeHead(403); res.end(); return; }
+  fs.readFile(file, (err, data) => {
+    if (err) { res.writeHead(404); res.end(); return; }
+    res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream' });
+    res.end(data);
+  });
+});
+let URL = null; // 伺服器啟動後設定
 const SHOTS = path.join(ROOT, 'docs/screenshots');
 fs.mkdirSync(SHOTS, { recursive: true });
 
@@ -50,6 +63,7 @@ async function run(profile, browser) {
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   await page.goto(URL);
   await page.waitForFunction(() => window.__proto);
+  ok(await page.evaluate(() => window.__proto.background().ready), '[' + profile.name + '] 背景圖已載入');
 
   const P = (label) => '[' + profile.name + '] ' + label;
   const shot = async (name) => { if (profile.shots.test(name)) await page.screenshot({ path: path.join(SHOTS, profile.name + '-' + name + '.png') }); };
@@ -97,7 +111,7 @@ async function run(profile, browser) {
     }
     return cnt;
   }, { hex, region });
-  const GHOST = '#b4f5ff', MARK = '#ff5fd2';
+  const GHOST = '#9dffd8', MARK = '#ff5fd2';
   const st = () => page.evaluate(() => {
     const s = window.__proto.state;
     return { phase: s.phase, facing: s.facing, lensUp: s.lensUp, marker: s.marker, mode: s.mode, lines: s.lines.length, pending: !!s.pending,
@@ -337,11 +351,14 @@ async function run(profile, browser) {
 }
 
 (async () => {
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  URL = 'http://127.0.0.1:' + server.address().port + '/prototype/concave-lens/index.html';
   const browser = await chromium.launch();
   for (const p of PROFILES) {
     try { await run(p, browser); } catch (e) { ok(false, '[' + p.name + '] 測試腳本例外', e.message); }
   }
   await browser.close();
+  server.close();
   console.log('\n' + (failures === 0 ? 'ALL PASS' : 'FAILED') + ': ' + (checks - failures) + '/' + checks + ' checks');
   fs.writeFileSync(path.join(ROOT, 'docs/screenshots/e2e-results.txt'), results.join('\n') + '\n\n' + (failures === 0 ? 'ALL PASS' : 'FAILED') + ': ' + (checks - failures) + '/' + checks + ' checks\n');
   process.exit(failures === 0 ? 0 : 1);

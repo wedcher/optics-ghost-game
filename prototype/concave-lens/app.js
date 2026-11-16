@@ -17,7 +17,9 @@
   var WORLD = Cfg.WORLD;
   var floor = Cfg.floor;
 
-  var GHOST_COLOR = '#b4f5ff';
+  // 鬼體色：薄荷綠。夜景背景圖偏藍（月亮接近淡青），用背景裡不會出現的顏色，
+  // 這樣「畫面上有沒有鬼」可以用像素顏色可靠地檢查。
+  var GHOST_COLOR = '#9dffd8';
   var MARK_COLOR = '#ff5fd2';
   var SNAP_PX = 30;          // 吸附半徑（CSS px）；視覺點半徑只有 5
   var TAP_SLOP_PX = 10;      // 移動超過這個距離就算拖曳（平移），不算點擊
@@ -142,7 +144,7 @@
 
   function drawGhostShape(c, px, py, hw, hh) {
     c.save();
-    c.shadowColor = 'rgba(150,240,255,.9)';
+    c.shadowColor = 'rgba(120,255,200,.9)';
     c.shadowBlur = Math.max(4, hw * 0.6);
     c.fillStyle = GHOST_COLOR;
     ghostPath(c, px, py, hw, hh);
@@ -241,6 +243,97 @@
     if (!ghostDone) drawGhostNow();
   }
 
+  // --------------------------------------------------------------------
+  // 背景圖（docs/concepts/ 的荒野概念圖，壓成 JPEG 放在 assets/）
+  //
+  // 圖是一張寬幅全景，本身沒有深度資料。透鏡內的重映射用「地面＋遠景」深度模型：
+  //   - 地平線以下的像素：當成地面上的點，深度 z = fp·eyeHeight / (離地平線的螢幕距離)
+  //   - 地平線以上的像素：當成無限遠
+  // 每個深度套用和鬼相同的薄透鏡等效深度公式，所以透鏡內是同一張圖被光學重映射，
+  // 不是另一張縮小圖。直立物（拱門、枯樹）在地平線以下的部分被當成地面，會有些微變形。
+  // 網址加 ?bg=1|2|3 換圖；?bg=0 改用程式畫的場景。
+  // --------------------------------------------------------------------
+  var BG_LIST = {
+    1: { src: 'assets/wilderness-1.jpg', horizon: 0.53 },
+    2: { src: 'assets/wilderness-2.jpg', horizon: 0.55 },
+    3: { src: 'assets/wilderness-3.jpg', horizon: 0.52 }
+  };
+  var bgMatch = /[?&]bg=(\d)/.exec(location.search);
+  var bgSpec = BG_LIST[bgMatch ? bgMatch[1] : 3] || null;
+  var bg = { img: null, ready: false, settled: !bgSpec, horizon: bgSpec ? bgSpec.horizon : 0.5 };
+  var bgWaiters = [];
+  function bgSettle(ok) {
+    bg.ready = ok; bg.settled = true;
+    bgWaiters.splice(0).forEach(function (fn) { fn(); });
+  }
+  if (bgSpec) {
+    bg.img = new Image();
+    bg.img.onload = function () { bgSettle(true); };
+    bg.img.onerror = function () { bgSettle(false); };
+    bg.img.src = bgSpec.src;
+  }
+
+  // 背景圖在螢幕上的擺放：地平線對齊主光軸高度（cy），四個方位平均分配在全景寬度上。
+  function bgLayout(m, facing) {
+    var iw = bg.img.naturalWidth, ih = bg.img.naturalHeight, hf = bg.horizon;
+    var h = 1.02 * Math.max(m.cy / hf, (H - m.cy) / (1 - hf), (W * 1.5 * ih) / iw);
+    var w = (h * iw) / ih;
+    return { x: -(w - W) * (facing / 3), y: m.cy - hf * h, w: w, h: h };
+  }
+
+  function drawBgNaked(m, facing) {
+    var L = bgLayout(m, facing);
+    ctx.fillStyle = '#050814'; ctx.fillRect(0, 0, W, H);
+    ctx.drawImage(bg.img, L.x, L.y, L.w, L.h);
+  }
+
+  // 透鏡內：螢幕上離地平線 v 的那一列，顯示的是裸眼畫面中離地平線 V 的那一列（V ≥ v），
+  // 並以透鏡中心為準水平縮小 v/V 倍。由 v 反求 V 用二分法（關係單調）。
+  function lensRatioAtDepth(f, z) {
+    var L = WORLD.eyeToLens;
+    var zz = Math.max(z, L + 5);
+    return zz / Optics.effectiveDepthThroughLens(f, L, zz - L);
+  }
+  function drawBgLens(m, facing, f) {
+    var Lay = bgLayout(m, facing);
+    var iw = bg.img.naturalWidth, ih = bg.img.naturalHeight;
+    var kx = iw / Lay.w, ky = ih / Lay.h;
+    var rInf = lensRatioAtDepth(f, 1e9);
+    var groundK = m.fp * WORLD.eyeHeight;
+    var r = m.rLens;
+    function sourceV(v) {
+      if (v <= 0) return v / rInf;
+      var lo = v, hi = v / rInf, i, mid;
+      for (i = 0; i < 22; i++) {
+        mid = (lo + hi) / 2;
+        if (mid * lensRatioAtDepth(f, groundK / mid) < v) lo = mid; else hi = mid;
+      }
+      return (lo + hi) / 2;
+    }
+    ctx.fillStyle = '#050814'; ctx.fillRect(m.cx - r, m.cy - r, 2 * r, 2 * r);
+    var y0 = Math.floor(m.cy - r), y1 = Math.ceil(m.cy + r), y;
+    var V = sourceV(y0 - m.cy), Vn;
+    for (y = y0; y < y1; y++, V = Vn) {
+      Vn = sourceV(y + 1 - m.cy);
+      var v = y + 0.5 - m.cy;
+      var ratio = Math.abs(v) < 0.5 ? rInf : (v / ((V + Vn) / 2));
+      var halfSrc = r / ratio;
+      var sx = (m.cx - halfSrc - Lay.x) * kx, sw = 2 * halfSrc * kx;
+      var sy = (m.cy + V - Lay.y) * ky, sh = Math.max(0.5, (Vn - V) * ky);
+      var dx = m.cx - r, dw = 2 * r;
+      // 來源超出圖片範圍時，裁掉超出的部分並等比例縮短目的端
+      if (sx < 0) { dx += (-sx / sw) * dw; dw *= (sw + sx) / sw; sw += sx; sx = 0; }
+      if (sx + sw > iw) { dw *= (iw - sx) / sw; sw = iw - sx; }
+      if (sy < 0 || sy + sh > ih || sw <= 0) continue;
+      ctx.drawImage(bg.img, sx, sy, sw, sh, dx, y, dw, 1.6);
+    }
+  }
+
+  function drawGhostThroughLens(m, c) {
+    var gp = makeProjector(m, c.f)(0, c.h, WORLD.eyeToLens + c.dObj);
+    drawGhostShape(ctx, gp.x, gp.y, WORLD.ghostHalfWidth * gp.k, WORLD.ghostHalfHeight * gp.k);
+  }
+
   function imageScreenPos() {
     var c = cfg(), m = exploreMetrics();
     var tan = Optics.apparentTanThroughLens(c.f, WORLD.eyeToLens, c.dObj, c.h);
@@ -249,7 +342,9 @@
 
   function renderExplore() {
     var c = cfg(), m = exploreMetrics(), sc = scenes[state.facing];
-    drawScene(sc, m, makeProjector(m, null), null); // 裸眼：永遠沒有鬼
+    var useBg = bg.ready;
+    // 裸眼：永遠沒有鬼
+    if (useBg) drawBgNaked(m, state.facing); else drawScene(sc, m, makeProjector(m, null), null);
     stats.ghostInLens = false;
     if (state.lensUp) {
       var showGhost = state.facing === c.direction && !state.solved;
@@ -257,7 +352,16 @@
       ctx.fillStyle = '#3a2d22'; ctx.fillRect(m.cx - 9, m.cy + m.rLens, 18, H);
       ctx.save();
       ctx.beginPath(); ctx.arc(m.cx, m.cy, m.rLens, 0, Math.PI * 2); ctx.clip();
-      drawScene(sc, m, makeProjector(m, c.f), showGhost ? c : null);
+      if (useBg) {
+        drawBgLens(m, state.facing, c.f);
+        if (showGhost) drawGhostThroughLens(m, c);
+        // 鏡片邊緣較厚：往邊緣略暗，讓鏡片看起來像玻璃
+        var vg = ctx.createRadialGradient(m.cx, m.cy, m.rLens * 0.55, m.cx, m.cy, m.rLens);
+        vg.addColorStop(0, 'rgba(8,12,30,0)'); vg.addColorStop(1, 'rgba(8,12,30,.38)');
+        ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+      } else {
+        drawScene(sc, m, makeProjector(m, c.f), showGhost ? c : null);
+      }
       ctx.fillStyle = 'rgba(170,205,255,.07)'; ctx.fillRect(0, 0, W, H);
       ctx.restore();
       stats.ghostInLens = showGhost;
@@ -790,12 +894,18 @@
   if (window.ResizeObserver) new ResizeObserver(layout).observe($('stage'));
 
   // 測試／開發用掛鉤（tests/e2e-concave-lens.js 使用；不是學生 UI）
-  window.__proto = {
-    state: state, stats: stats, cfg: cfg, configs: Cfg, GHOST_COLOR: GHOST_COLOR, SNAP_PX: SNAP_PX,
-    w2s: w2s, s2w: s2w, snapPoints: snapPoints, imageScreenPos: imageScreenPos,
-    studentIntersections: studentIntersections, exploreMetrics: exploreMetrics,
-    canvasSize: function () { return { W: W, H: H, DPR: DPR }; }, render: render
-  };
+  // 背景圖載入（或失敗）之後才掛上，測試才不會在換圖前後各取一次畫面。
+  function exposeHooks() {
+    window.__proto = {
+      state: state, stats: stats, cfg: cfg, configs: Cfg, GHOST_COLOR: GHOST_COLOR, SNAP_PX: SNAP_PX,
+      w2s: w2s, s2w: s2w, snapPoints: snapPoints, imageScreenPos: imageScreenPos,
+      studentIntersections: studentIntersections, exploreMetrics: exploreMetrics,
+      canvasSize: function () { return { W: W, H: H, DPR: DPR }; }, render: render,
+      background: function () { return { ready: bg.ready, src: bgSpec ? bgSpec.src : null }; }
+    };
+  }
 
   resetRound(0);
+  if (bg.settled) exposeHooks();
+  else bgWaiters.push(function () { render(); exposeHooks(); });
 })();

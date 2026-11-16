@@ -106,6 +106,18 @@
 - 側視圖中虛像的深度由系統給定，玩家的點擊只提供方向。
 - 側視圖只能定深度，地板格目前是沿視線方向的一排，不是二維棋盤。
 
+### Sprint 01b 狀態（2026-11-16）— 交接點
+
+**探索畫面已改用 `docs/concepts/` 的荒野背景圖；透鏡內由同一張圖光學重映射。**
+
+- 已在瀏覽器手動實測（手機直向／橫向、桌機）；詳見 `docs/prototype-findings.md` 的「追加：Sprint 01b」。
+- **接手的工作階段請先做：**
+  1. `npm i -D playwright && npx playwright install chromium`
+  2. `npm test`（幾何檢查＋瀏覽器實測）。e2e 腳本本輪有改但**尚未執行過**；若失敗先修腳本或程式，再做別的事。
+  3. 通過後把更新的 `docs/screenshots/` 與 `e2e-results.txt` 一起 commit。
+- 之後等使用者試玩回饋；沒有新指示時依下方 NEXT 進凸透鏡 prototype。
+- 視覺與氛圍依 `docs/visual-handoff.md`；GPT 負責美術，prototype 用 placeholder 即可。
+
 ---
 
 ## NEXT
