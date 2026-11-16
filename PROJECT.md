@@ -134,7 +134,7 @@
 - 畫面一律橫向（見 `docs/decisions.md`）。凸透鏡已換上 GPT 的走廊與鏡片圖；成像面用程式畫的布幕（已認可）。鬼仍是 placeholder，規格見 `docs/concepts/README.md`。
 - 破關後有「光路重現」動畫（`prototype/shared/ray-replay.js`）。
 
-**接手的工作階段（上面三項已於 2026-11-17 完成，分支 `test/convex-e2e`）：**
+**接手的工作階段（上面三項已於 2026-11-17 完成；2026-11-17 已合併進 `main`）：**
 
 1. ~~重跑測試~~：Windows / Node 24 / Playwright 1.65 下原有測試全過。
 2. ~~凸透鏡 headless e2e~~：`tests/e2e-convex-lens.js`，橫向手機跑四組配置 × 兩個清晰位置。
@@ -169,6 +169,8 @@
 不要做：排行榜、後端、計時（趕鬼時間的規則未定）。
 
 本機試玩：`node .claude/serve.js`，然後開 `http://localhost:8123/prototype/index.html`。
+
+**分支：** 2026-11-17 起所有工作都已合併進 `main`，接手時拿 `main` 即可。之後每完成一段就合併回 `main`（使用者是單人開發，`main` 保持為最新可用版本）。
 視覺與氛圍依 `docs/visual-handoff.md`；GPT 負責美術，prototype 用 placeholder 即可。
 
 ---
