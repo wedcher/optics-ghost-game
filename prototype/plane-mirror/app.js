@@ -98,8 +98,11 @@
   function setZoom(z) {
     var old = ZOOMS[view.zoom];
     view.zoom = Math.max(0, Math.min(ZOOMS.length - 1, z));
-    var k = ZOOMS[view.zoom] / old; // 以畫面中央為準縮放
-    view.panX *= k; view.panY *= k;
+    var k = ZOOMS[view.zoom] / old;
+    // 左右以畫面中央為準；上下以「鏡子底邊附近」（圖高的 72%）為準，放大後地板和鏡子下半才不會跑出畫面
+    var sOld = Math.min(W / IW, H / IH) * old;
+    view.panX *= k;
+    view.panY -= (IH * 0.72 - IH / 2) * sOld * (k - 1);
     if (view.zoom === 0) { view.panX = 0; view.panY = 0; }
     applyView();
   }
@@ -167,9 +170,9 @@
       var d = R.door, dp = projPoly(T, [{ x: d.x0, y: 0, z: R.length }, { x: d.x1, y: 0, z: R.length }, { x: d.x1, y: d.y1, z: R.length }, { x: d.x0, y: d.y1, z: R.length }]);
       if (dp.length >= 3) { path(dp); ctx.fillStyle = '#120b07'; ctx.fill(); ctx.strokeStyle = '#3a281b'; ctx.lineWidth = 2; ctx.stroke(); }
     }
-    // 正面牆的壁燈
-    if (skip.indexOf('back') < 0) R.lamps.forEach(function (l) {
-      var s = proj(T, { x: l.x, y: l.y, z: 0 });
+    // 壁燈
+    R.lamps.forEach(function (l) {
+      var s = proj(T, l);
       if (!s) return;
       var r = 0.9 * cam.f / s.depth, g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, r);
       g.addColorStop(0, 'rgba(255,190,110,.75)'); g.addColorStop(0.12, 'rgba(255,150,70,.38)'); g.addColorStop(1, 'rgba(255,140,60,0)');
@@ -192,7 +195,7 @@
     }
     // 燈光在地板上的暖色光暈（只是氣氛）
     R.lamps.forEach(function (l) {
-      var s = proj(T, { x: l.x, y: 0, z: 0.9 });
+      var s = proj(T, { x: Math.max(0.6, Math.min(R.cols - 0.6, l.x)), y: 0, z: Math.max(0.6, l.z) });
       if (!s) return;
       var r = 1.7 * cam.f / s.depth;
       ctx.save(); ctx.translate(s.x, s.y); ctx.scale(1, 0.34);
@@ -215,7 +218,7 @@
     // 鏡子打碎後散在地上的碎片
     if (state.phase === 2) {
       for (i = 0; i < 16; i++) {
-        var sx = R.cols - 0.08 - hash(i, 3) * 0.75, sz = 1.0 + hash(i, 7) * 2.6, e = 0.03 + hash(i, 11) * 0.05, an = hash(i, 5) * 6.28;
+        var sx = R.cols - 0.08 - hash(i, 3) * 0.75, sz = R.shards.z0 + hash(i, 7) * (R.shards.z1 - R.shards.z0), e = 0.03 + hash(i, 11) * 0.05, an = hash(i, 5) * 6.28;
         p = projPoly(T, [0, 2.2, 4.1].map(function (o) { return { x: sx + Math.cos(an + o) * e, y: 0, z: sz + Math.sin(an + o) * e }; }));
         fillPoly(p, 'rgba(210,222,235,' + (0.5 + hash(i, 13) * 0.4).toFixed(2) + ')');
       }
@@ -403,7 +406,7 @@
       ctx.strokeStyle = 'rgba(232,186,96,.9)'; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.moveTo(g[3].x, g[3].y); ctx.lineTo(g[2].x, g[2].y); ctx.stroke();
     });
-    if (state.phase === 2) fillPoly(R.brokenGlassPx, 'rgba(5,5,10,.55)'); // 原圖碎鏡裡畫死的反射：壓暗
+    if (state.phase === 2 && R.brokenDarken > 0) fillPoly(R.brokenGlassPx, 'rgba(5,5,10,' + R.brokenDarken + ')'); // 圖裡碎鏡若有畫死的反射：壓暗
     ['back', 'right'].forEach(function (id) {
       stats.images[id] = !!state.ghost && intact.indexOf(id) >= 0 && C.visibility(R, cam, state.ghost, id).any;
     });

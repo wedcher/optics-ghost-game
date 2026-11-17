@@ -301,13 +301,13 @@ async function freeMode(profile, browser) {
   ok(hit === cells.length, '每一格點中央都選得到', hit + ' / ' + cells.length);
   const sizes = await page.evaluate(() => {
     const m = window.__protoMirror, S = m.canvasInfo().S;
-    return [1, 2, 3, 4].map((row) => (m.core.project(m.cam, { x: 2, y: 0, z: row }).y - m.core.project(m.cam, { x: 2, y: 0, z: row - 1 }).y) * S);
+    return [1, 2, 3].map((row) => (m.core.project(m.cam, { x: 2, y: 0, z: row }).y - m.core.project(m.cam, { x: 2, y: 0, z: row - 1 }).y) * S);
   });
   console.log('   各排在螢幕上的高度（CSS px，由遠到近）：' + sizes.map((v) => v.toFixed(0)).join('、'));
 
   // 自由練習抓錯不扣命
   await page.evaluate(() => window.__protoMirror.setGhost(3, 2));
-  await t.tapCell('c2r4'); await press('#castBtn'); await t.waitIdle();
+  await t.tapCell('c2r3'); await press('#castBtn'); await t.waitIdle();
   s = await info();
   ok(s.stats.wrong === 1 && s.lives === 3 && s.ghost === 'c3r2', '自由練習抓錯不扣命、鬼不換位置');
 
@@ -315,25 +315,37 @@ async function freeMode(profile, browser) {
   await press('#zoomIn'); await press('#zoomIn');
   s = await info();
   ok(s.zoom === 2, '按兩次＋放大到 2 倍', String(s.zoom));
-  await t.tapCell('c2r2');
-  ok((await info()).selected === 'c2r2', '放大後點格子仍選到正確的格');
-  const st = await page.evaluate(() => { const b = document.getElementById('stage').getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; });
+  // 放大是以畫面中央為準，地板在圖的下方，所以先往上拖把地板拉進來，再點格子
+  const st = await page.evaluate(() => { const b = document.getElementById('stage').getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2, l: b.left, t: b.top, r: b.right, b: b.bottom }; });
+  const cdp = profile.touch ? await t.context.newCDPSession(page) : null;
+  const drag = async (dx, dy) => {
+    if (cdp) {
+      const tp = (x, y) => [{ x, y, id: 1 }];
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: tp(st.x, st.y) });
+      for (let i = 1; i <= 6; i++) await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: tp(st.x + dx * i / 6, st.y + dy * i / 6) });
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    } else {
+      await page.mouse.move(st.x, st.y); await page.mouse.down();
+      for (let i = 1; i <= 6; i++) await page.mouse.move(st.x + dx * i / 6, st.y + dy * i / 6);
+      await page.mouse.up();
+    }
+    await page.waitForTimeout(80);
+  };
+  const before = await info();
   const pan0 = await page.evaluate(() => window.__protoMirror.canvasInfo());
-  if (profile.touch) {
-    const cdp = await t.context.newCDPSession(page);
-    const tp = (x, y) => [{ x, y, id: 1 }];
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: tp(st.x, st.y) });
-    for (let i = 1; i <= 6; i++) await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: tp(st.x - i * 15, st.y - i * 8) });
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-  } else {
-    await page.mouse.move(st.x, st.y); await page.mouse.down();
-    for (let i = 1; i <= 6; i++) await page.mouse.move(st.x - i * 15, st.y - i * 8);
-    await page.mouse.up();
-  }
+  await drag(-90, -300);
   const pan1 = await page.evaluate(() => window.__protoMirror.canvasInfo());
   s = await info();
   ok(Math.abs(pan1.OX - pan0.OX) > 40 && Math.abs(pan1.OY - pan0.OY) > 20, '放大後拖曳會平移畫面', JSON.stringify([pan0.OX - pan1.OX, pan0.OY - pan1.OY].map(Math.round)));
-  ok(s.selected === 'c2r2' && s.stats.casts === 1, '拖曳不會改選格、不會施放');
+  ok(s.selected === before.selected && s.stats.casts === before.stats.casts, '拖曳不會改選格、不會施放');
+  const visible = await page.evaluate((box) => {
+    const m = window.__protoMirror;
+    return m.selectable.map((c) => ({ id: m.core.cellId(c.col, c.row), p: m.cellClient(c.col, c.row) }))
+      .filter((c) => (!m.state.selected || c.id !== m.core.cellId(m.state.selected.col, m.state.selected.row)) && c.p.x > box.l + 30 && c.p.x < box.r - 30 && c.p.y > box.t + 30 && c.p.y < box.b - 30).map((c) => c.id);
+  }, st);
+  ok(visible.length > 0, '平移後畫面裡有地板格', visible.join(' '));
+  await t.tapCell(visible[0]);
+  ok((await info()).selected === visible[0], '放大後點格子仍選到正確的格', visible[0]);
   await t.shot('mirror-9-zoom');
   await page.waitForTimeout(80);
   await press('#zoomFit');
