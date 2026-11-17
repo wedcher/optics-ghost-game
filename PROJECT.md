@@ -223,7 +223,7 @@
 
 - 流程照 CONFIRMED：開場 → 兩面鏡抓 2 次 → 過場（鬼打碎右鏡）→ 一面鏡抓 3 次 → 過關 →【前往第二關】。過場用共用的 `prototype/shared/story-scene.js`。
 - 幾何在 `prototype/shared/mirror-core.js`（相機投影、鏡射、鏡中可見範圍、出題格）；房間與相機參數在 `prototype/plane-mirror/configs.js`（對著 `docs/concepts/Mirror4.png` 量的，換背景圖要重量）。
-- 測試（已併入 `npm test`）：`tests/check-geometry-mirror.js` 342/342、`tests/e2e-plane-mirror.js` 150/150。截圖 `docs/screenshots/mirror-*.png`。
+- 測試（已併入 `npm test`）：`tests/check-geometry-mirror.js` 342/342、`tests/e2e-plane-mirror.js` 174/174。截圖 `docs/screenshots/mirror-*.png`。
 - 2026-11-17 各測試結果：凹透鏡幾何 97/97、凸透鏡幾何 333/333、平面鏡幾何 283/283、凸透鏡 e2e 1494/1494、第二關流程 142/142、第一關 e2e 148/148；凹透鏡 e2e 在 `npm test` 裡通過。
 - **已知的偶發失敗（不是這輪造成的，凸透鏡程式這輪沒動）**：`tests/e2e-convex-lens.js` 的「『下一組配置』不會連續出同一組」有時會失敗（這次第一次跑 1492/1494，序列開頭是 0→0；重跑 1494/1494）。`npm test` 用 `&&` 串接，它一失敗後面的測試就不會跑。還沒修。
 - **第一版已由使用者在電腦上試玩過一次**（線上版），回饋與處理：
@@ -234,6 +234,8 @@
   1. 鏡子底邊的框要粗一點 → 已改成有寬度的金色門檻。
   2. 使用者提供**女鬼的背面圖** `docs/concepts/ghost01-back.png` → **已實作**：鬼面向玩家；直接看（抓到後現身）與右鏡裡是正面，正面鏡裡是背面（背面圖左右翻轉後貼上，舉手的那一側和現身時相同）。判斷寫在 `app.js` 的 `seesBack()`：把鬼的朝向跟著鏡射變換，看視點在人形的哪一側。這解決了 findings 的 ISSUE 6。
      - 第一次上傳的檔是黑底、帶白霧；使用者已請美工重出透明背景、沒有光暈的版本並取代原檔，遊戲用的 `prototype/plane-mirror/assets/ghost-back.webp` 已由新圖重做（步驟見 findings 文末）。
+- **小螢幕文字放大（2026-11-17）**：平面鏡關已照凸、凹透鏡的標準調整（說明 15 px、按鈕 15～16 px、畫布格號最小 12 px，短邊 < 420 px 時 ×1.25）。自由練習的工具移到房間畫面右上角。細節與實測見 findings 文末。`prototype/plane-mirror/index.html` 的 `<head>` 裡全螢幕用的幾行和 `../shared/fullscreen.js` 是另一個工作階段加的，**不要拿掉**。
+- **跑 `npm test` 會重拍所有關卡的截圖**：平面鏡這邊只 commit `docs/screenshots/mirror-*`，其他關卡的截圖用 `git checkout` 還原，免得兩個工作階段一直衝突。
 - 等使用者回覆：PENDING 13 的各項（其中「背景圖要不要重畫」已解決）。
 - 使用者手上有兩段給美工 AI 的提示詞（地磚貼圖、有門那面牆的正面圖），圖到了再換上；目前地板與鏡中的牆都是程式畫的。
 - **拖曳連線由另一台電腦的 Claude 在做**（凸、凹透鏡），這個分支沒有碰那兩個原型。

@@ -18,6 +18,7 @@
 
   var canvas = $('view'), ctx = canvas.getContext('2d');
   var W = 0, H = 0, DPR = 1, S = 1, OX = 0, OY = 0; // 影像座標 → 畫布：x·S + OX
+  var FS = 1; // 畫布文字的放大倍率：畫布短邊小（手機）時放大 1.25 倍，標準和凸、凹透鏡一致（見 layout）
 
   function loadArt(src) {
     var a = { img: new Image(), ready: false };
@@ -79,6 +80,7 @@
     DPR = Math.min(window.devicePixelRatio || 1, 2.5);
     W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
     canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
+    FS = Math.min(W, H) < 420 ? 1.25 : 1;
     applyView();
   }
   // 縮放只用按鈕（＋／－／全圖），放大後拖曳平移；不做雙指縮放，避免和點格子打架。
@@ -464,7 +466,10 @@
 
   function drawDebug() {
     ctx.save();
-    ctx.lineWidth = 2; ctx.font = '22px ui-monospace, Menlo, Consolas, monospace'; ctx.textAlign = 'center';
+    // 格號：螢幕上至少 12 px，小螢幕再乘 FS（畫在影像座標裡，所以要除以縮放 S）
+    var labelCss = Math.max(12, 22 * S) * FS, labelPx = labelCss / S;
+    stats.labelCss = labelCss;
+    ctx.lineWidth = 2; ctx.font = Math.round(labelPx) + 'px ui-monospace, Menlo, Consolas, monospace'; ctx.textAlign = 'center';
     ctx.strokeStyle = '#00e5ff';
     ['back', 'right', 'left'].forEach(function (id) { var p = C.projectPoly(cam, WALLS[id]); if (p.length > 2) { path(p); ctx.stroke(); } });
     ctx.strokeStyle = '#ff5fd2';
@@ -473,7 +478,7 @@
       var s = C.project(cam, C.cellCenter(c.col, c.row));
       var inPool = POOLS[state.phase].some(function (p) { return sameCell(p, c); });
       ctx.fillStyle = inPool ? '#9dffb0' : '#6b7a70';
-      ctx.fillText(C.cellId(c.col, c.row), s.x, s.y + 7);
+      ctx.fillText(C.cellId(c.col, c.row), s.x, s.y + labelPx * 0.32);
     });
     if (state.ghost) {
       path(C.projectPoly(cam, C.cellPoly(state.ghost.col, state.ghost.row)));
@@ -558,7 +563,8 @@
     casting: '法陣展開中……',
     wrong: '法陣裡沒有東西……少了一顆心。鬼還躲在原地，再看一次鏡子。',
     wrongFree: '法陣裡沒有東西。鬼還躲在原地，再看一次鏡子。',
-    moved: '鬼掙脫了，換了一個地方躲。'
+    moved: '鬼掙脫了，換了一個地方躲。再從鏡子裡找出牠站在哪一格。',
+    movedOne: '鬼掙脫了，換了一個地方躲。只剩一面鏡子，再找出牠站在哪一格。'
   };
   function setStatus(t) { $('status').textContent = t; }
 
@@ -599,7 +605,7 @@
     if (!FREE && state.sealed >= R.catchesTotal) { showClear(); return; }
     if (!FREE && state.phase === 1 && state.sealed >= R.catchesTwoMirrors) { showBreak(); return; }
     newGhost();
-    setStatus(MSG.moved + (state.phase === 2 ? MSG.startOne : MSG.start));
+    setStatus(state.phase === 2 ? MSG.movedOne : MSG.moved);
     syncUI(); requestRender();
   }
 
@@ -734,7 +740,7 @@
   // 測試／開發用掛鉤（不是學生 UI）
   window.__protoMirror = {
     state: state, stats: stats, room: R, core: C, cam: cam, FREE: FREE, pools: POOLS, selectable: SELECTABLE, GHOST_COLOR: GHOST_COLOR,
-    intactMirrors: intactMirrors, render: render,
+    intactMirrors: intactMirrors, render: render, messages: MSG, setStatus: setStatus,
     scene: function () { return scene ? scene.info() : null; },
     art: function () { return { intact: ART.intact.ready, broken: ART.broken.ready, ghost: ART.ghost.ready && ART.ghostBack.ready }; },
     // 透過某一串鏡子看到的是鬼的正面還是背面（[] = 直接看）

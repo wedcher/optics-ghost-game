@@ -115,6 +115,26 @@ async function open(profile, browser, query) {
   return { context, page, errors, tapAt, press, info, pixels, cellPt, tapCell, otherCell, shot, catchGhost, castWrong, waitIdle };
 }
 
+
+// 字級（對齊凸、凹透鏡的標準）與「每一句說明都完整顯示」
+async function textChecks(page, label) {
+  const r = await page.evaluate(() => {
+    const m = window.__protoMirror, st = document.getElementById('status'), fs = (sel) => parseFloat(getComputedStyle(document.querySelector(sel)).fontSize);
+    const keep = st.textContent;
+    const samples = Object.keys(m.messages).map((k) => m.messages[k]).concat([
+      '抓到了！（封印 4／5）可是牠正在掙脫法陣……', '又抓到了！（封印 2／5）鬼氣得渾身發抖……', '第 5 次抓到牠了！鬼再也待不住了……', '抓到了！鬼就站在這一格。']);
+    const cut = [];
+    samples.forEach((t) => { st.textContent = t; if (st.scrollHeight > st.clientHeight + 1 || st.scrollWidth > st.clientWidth + 1) cut.push(t); });
+    st.textContent = keep;
+    return { status: fs('#status'), cast: fs('#castBtn'), next: fs('#nextBtn'), menu: fs('#menuLink'), hud: fs('#hud'), title: fs('#title'), zoomFit: fs('#zoomFit'),
+      cut: cut, n: samples.length, box: [st.clientWidth, st.clientHeight] };
+  });
+  ok(r.status >= 15, label + '說明文字 ≥ 15 px', r.status + ' px');
+  ok(r.cast >= 15 && r.next >= 15 && r.menu >= 15, label + '按鈕文字 ≥ 15 px', [r.cast, r.next, r.menu].join(' / '));
+  ok(r.hud >= 16 && r.title >= 15 && r.zoomFit >= 14, label + '命數／標題／縮放鈕文字', [r.hud, r.title, r.zoomFit].join(' / '));
+  ok(r.cut.length === 0, label + '每一句說明都完整顯示（' + r.n + ' 句，說明框 ' + r.box.join('×') + '）', r.cut.join(' ｜ '));
+}
+
 async function levelFlow(profile, browser) {
   console.log('\n===== ' + profile.name + '：關卡流程 =====');
   const t = await open(profile, browser, '');
@@ -278,13 +298,14 @@ async function levelFlow(profile, browser) {
   // ---- 版面 ----
   const lay = await page.evaluate(() => {
     const r = (e) => { const b = e.getBoundingClientRect(); return { x: b.left, y: b.top, w: b.width, h: b.height, r: b.right, b: b.bottom }; };
-    const els = Array.from(document.querySelectorAll('#side button, #side a.btn, #zoomBox button')).filter((e) => e.offsetParent !== null);
+    const els = Array.from(document.querySelectorAll('#side button, #side a.btn, #zoomBox button, #freeTools select, #freeTools button')).filter((e) => e.offsetParent !== null);
     return { vw: innerWidth, vh: innerHeight, sw: document.documentElement.scrollWidth, sh: document.documentElement.scrollHeight,
       items: els.map((e) => Object.assign({ id: e.id }, r(e))), stage: r(document.getElementById('stage')), info: window.__protoMirror.canvasInfo() };
   });
   ok(lay.sw <= lay.vw && lay.sh <= lay.vh, '頁面不捲動');
   ok(lay.items.every((i) => i.x >= 0 && i.y >= 0 && i.r <= lay.vw + 0.5 && i.b <= lay.vh + 0.5), '所有按鈕都在畫面內');
   ok(lay.items.every((i) => i.w >= 44 && i.h >= 44), '所有按鈕至少 44×44', lay.items.map((i) => i.id + ' ' + Math.round(i.w) + '×' + Math.round(i.h)).join(', '));
+  await textChecks(page, '');
   console.log('   房間畫面 ' + Math.round(lay.stage.w) + '×' + Math.round(lay.stage.h) + '，背景圖縮放 ' + lay.info.S.toFixed(3));
   ok(t.errors.length === 0, '沒有 JS 錯誤或載入失敗', t.errors.join(' | '));
   await t.context.close();
@@ -363,6 +384,16 @@ async function freeMode(profile, browser) {
   await press('#debugBtn');
   await page.waitForFunction(() => /鬼本體/.test(document.getElementById('debugPanel').textContent));
   ok(await page.isVisible('#debugPanel') && /鬼本體/.test(await page.textContent('#debugPanel')), 'Debug 面板可開');
+  const lab = await page.evaluate(() => window.__protoMirror.stats.labelCss);
+  ok(lab >= 12, '畫布上的格號在螢幕上 ≥ 12 px', lab.toFixed(1) + ' px');
+  await textChecks(page, '自由練習：');
+  const ft = await page.evaluate(() => {
+    const st = document.getElementById('stage').getBoundingClientRect();
+    return Array.from(document.querySelectorAll('#freeTools select, #freeTools button, #zoomBox button')).map((e) => { const b = e.getBoundingClientRect(); return { id: e.id, w: b.width, h: b.height, inside: b.left >= st.left && b.right <= st.right && b.top >= st.top && b.bottom <= st.bottom, l: b.left, r: b.right }; });
+  });
+  ok(ft.every((i) => i.inside && i.w >= 40 && i.h >= 40), '開發工具與縮放鈕都在房間畫面內、至少 40×40', ft.map((i) => i.id + ' ' + Math.round(i.w) + '×' + Math.round(i.h)).join(', '));
+  const zr = Math.max(...ft.filter((i) => /^zoom/.test(i.id)).map((i) => i.r)), fl = Math.min(...ft.filter((i) => !/^zoom/.test(i.id)).map((i) => i.l));
+  ok(zr < fl, '開發工具沒有蓋到縮放鈕', Math.round(zr) + ' < ' + Math.round(fl));
   await page.selectOption('#phaseSel', '2');
   s = await info();
   ok(s.phase === 2 && s.intact.join() === 'back', '可切到一面鏡');
