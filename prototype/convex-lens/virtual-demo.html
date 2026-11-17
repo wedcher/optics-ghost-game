@@ -11,6 +11,9 @@
   .bar select, .bar button { min-height:44px; font-size:15px; border-radius:10px; border:1px solid #3a4170; background:#20264a; color:#e8ebff; padding:0 12px; }
   .bar button.on { background:#6b5a1e; border-color:#e0c25a; }
   .bar button.primary { background:#2c5a3a; border-color:#6fd18f; }
+  .seg { display:inline-flex; }
+  .seg button:first-child { border-radius:10px 0 0 10px; }
+  .seg button:last-child { border-radius:0 10px 10px 0; border-left:none; }
   .bar label { font-size:13px; color:#aab3e6; }
   #info { padding:4px 10px; font-size:15px; min-height:22px; background:#11142a; }
   #say { padding:6px 10px; font-size:17px; color:#ffe9a8; background:#2a2140; display:none; }
@@ -29,7 +32,7 @@
     <option value="full">整條走廊（鬼和布幕之間）</option>
     <option value="inF">只在鬼和焦點之間</option>
   </select>
-  <button id="viewBtn" type="button">看布幕</button>
+  <span class="seg"><button id="viewScreen" type="button" class="on">看布幕</button><button id="viewLens" type="button">看凸透鏡</button></span>
   <button id="markBtn" class="primary" type="button">標記</button>
   <button id="rayBtn" type="button" class="on">顯示鬼和光線（示範用）</button>
 </div>
@@ -109,8 +112,8 @@
     }
     var D = -st.ox; if (D <= 4 * p.f) t += '｜這題布幕上永遠不會有清楚的像（鬼到布幕 ' + D + ' ≤ 4f = ' + 4 * p.f + '）';
     $('info').textContent = t;
-    $('viewBtn').textContent = st.view === 'screen' ? '看布幕 ⇄' : '看凸透鏡 ⇄';
-    $('viewBtn').classList.toggle('on', st.view === 'lens');
+    $('viewScreen').classList.toggle('on', st.view === 'screen');
+    $('viewLens').classList.toggle('on', st.view === 'lens');
     draw();
   }
 
@@ -212,18 +215,22 @@
     } else {
       text('隔著凸透鏡看（你站在布幕這邊）', panel.x + 8, panel.y + 16, '#aab3e6', 'left');
       // 角度換成畫面：鏡框的角半徑對到面板的 40%
-      var dLens = -st.lens, angR = R / dLens, K = Math.min(panel.w, panel.h) * 0.4 / angR;
+      var lensLabel = null, dLens = -st.lens, angR = R / dLens, K = Math.min(panel.w, panel.h) * 0.4 / angR;
       ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, angR * K, 0, 7); ctx.fillStyle = '#1b2036'; ctx.fill(); ctx.clip();
       if (!o.inf && o.eye !== 'blur') {
         var d = -o.x, s = 1 / d; // 像到眼睛的距離
         var am = Math.abs(o.m), gx = cx, gy = cy - o.y * s * K, ghw = HW * am * s * K, ghh = HH * am * s * K;
-        ctx.fillStyle = '#7dffc8'; ghostPath(gx, gy, ghw, ghh, o.real ? -1 : 1, o.real ? -1 : 1); ctx.fill('evenodd');
+        // 看到的是鬼的「像」，不是鬼本體：和側視圖一樣，虛像紫色、實像粉紅，半透明
+        ctx.save(); ctx.globalAlpha = 0.75; ctx.fillStyle = o.real ? '#ff9ad5' : '#b7a6ff';
+        ghostPath(gx, gy, ghw, ghh, o.real ? -1 : 1, o.real ? -1 : 1); ctx.fill('evenodd'); ctx.restore();
+        lensLabel = [o.real ? '鬼的實像（倒立）' : '鬼的虛像（正立、放大）', o.real ? '#ff9ad5' : '#b7a6ff'];
       } else if (!o.inf) {
         var gr = ctx.createRadialGradient(cx, cy, 0, cx, cy, angR * K); gr.addColorStop(0, 'rgba(125,255,200,.35)'); gr.addColorStop(1, 'rgba(125,255,200,.05)');
         ctx.fillStyle = gr; ctx.fillRect(cx - angR * K, cy - angR * K, 2 * angR * K, 2 * angR * K);
       }
       ctx.restore();
       ctx.strokeStyle = '#8fd0ff'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(cx, cy, angR * K, 0, 7); ctx.stroke();
+      text(lensLabel ? lensLabel[0] : (o.inf ? '' : '模糊，看不清楚'), cx, cy + angR * K + 18, lensLabel ? lensLabel[1] : '#8f98c9');
     }
     ctx.restore();
   }
@@ -241,7 +248,9 @@
   $('right').addEventListener('click', function () { moveLens(st.lens + 10); });
   $('preset').addEventListener('change', function () { load(Number(this.value)); });
   $('range').addEventListener('change', function () { st.lens = clampLens(st.lens); st.mark = null; say(''); update(); });
-  $('viewBtn').addEventListener('click', function () { st.view = st.view === 'screen' ? 'lens' : 'screen'; st.mark = null; say(''); update(); });
+  function setView(v) { if (st.view === v) return; st.view = v; st.mark = null; say(''); update(); }
+  $('viewScreen').addEventListener('click', function () { setView('screen'); });
+  $('viewLens').addEventListener('click', function () { setView('lens'); });
   $('rayBtn').addEventListener('click', function () { st.rays = !st.rays; this.classList.toggle('on', st.rays); draw(); });
   $('markBtn').addEventListener('click', function () {
     var o = optics();
