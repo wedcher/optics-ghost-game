@@ -1,8 +1,8 @@
   PASS  [phone-landscape] 背景圖已載入
-  PASS  [phone-landscape] 探索：所有控制項都在畫面內  — canvas 812×242
+  PASS  [phone-landscape] 探索：所有控制項都在畫面內  — canvas 812×240
   PASS  [phone-landscape] 探索：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-landscape] 探索：頁面不需捲動
-  PASS  [phone-landscape] 探索：畫布仍有足夠空間（≥300×150）  — 812×242
+  PASS  [phone-landscape] 探索：畫布仍有足夠空間（≥300×150）  — 812×240
   PASS  [phone-landscape] 配置A 裸眼畫面沒有鬼
   PASS  [phone-landscape] 配置A 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 49% 像素改變；此方位沒有鬼
   PASS  [phone-landscape] 配置A 透鏡外畫面不變  — 0.00%
@@ -15,11 +15,11 @@
   PASS  [phone-landscape] 配置A 放下透鏡後鬼像消失
   PASS  [phone-landscape] 配置A 放下透鏡後標記保留
   PASS  [phone-landscape] 配置A 切到側視分析
-  PASS  [phone-landscape] 分析／畫線：所有控制項都在畫面內  — canvas 812×242
+  PASS  [phone-landscape] 分析／畫線：所有控制項都在畫面內  — canvas 812×240
   PASS  [phone-landscape] 分析／畫線：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-landscape] 分析／畫線：頁面不需捲動
-  PASS  [phone-landscape] 分析／畫線：畫布仍有足夠空間（≥300×150）  — 812×242
-  PASS  [phone-landscape] （資訊）預設縮放下一格寬 62.7 px，畫布 812×242
+  PASS  [phone-landscape] 分析／畫線：畫布仍有足夠空間（≥300×150）  — 812×240
+  PASS  [phone-landscape] （資訊）預設縮放下一格寬 62.2 px，畫布 812×240
   PASS  [phone-landscape] 配置A 分析開始：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置A 分析開始：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置A 分析開始：吸附點裡沒有物點
@@ -32,10 +32,10 @@
   PASS  [phone-landscape] 配置A 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置A 畫完三條線：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置A ＋ 按鈕放大  — 1.50×
-  PASS  [phone-landscape] 分析／放大後：所有控制項都在畫面內  — canvas 812×242
+  PASS  [phone-landscape] 分析／放大後：所有控制項都在畫面內  — canvas 812×240
   PASS  [phone-landscape] 分析／放大後：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-landscape] 分析／放大後：頁面不需捲動
-  PASS  [phone-landscape] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 812×242
+  PASS  [phone-landscape] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 812×240
   PASS  [phone-landscape] 配置A 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置A 拖曳平移不會畫線／選格／改變縮放
   PASS  [phone-landscape] 配置A 從標示點斜向拖到空白處放開：不留線、不算點擊
@@ -59,10 +59,10 @@
   PASS  [phone-landscape] 配置A 「復原」可以拿掉拖出來的連線
   PASS  [phone-landscape] 配置A 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置A 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
-  PASS  [phone-landscape] 分析／封印：所有控制項都在畫面內  — canvas 812×242
+  PASS  [phone-landscape] 分析／封印：所有控制項都在畫面內  — canvas 812×240
   PASS  [phone-landscape] 分析／封印：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-landscape] 分析／封印：頁面不需捲動
-  PASS  [phone-landscape] 分析／封印：畫布仍有足夠空間（≥300×150）  — 812×242
+  PASS  [phone-landscape] 分析／封印：畫布仍有足夠空間（≥300×150）  — 812×240
   PASS  [phone-landscape] 配置A 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置A 點地板格可選取（虛像所在的第 2 格）
   PASS  [phone-landscape] 配置A 封印虛像所在格 → 失敗
@@ -75,19 +75,22 @@
   PASS  [phone-landscape] 配置A 封印作圖交點所在格 → 成功並顯形
   PASS  [phone-landscape] 配置A 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [phone-landscape] 配置A 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
-  PASS  [phone-landscape] 配置A 光路重現：四段實際光線＋兩段反向延長線
-  PASS  [phone-landscape] 配置A 光路重現：兩條光線都從鬼本體出發
+  PASS  [phone-landscape] 配置A 光路重現：六段實際光線＋三段反向延長線（三條主光線）
+  PASS  [phone-landscape] 配置A 光路重現：三條光線都從鬼本體出發
   PASS  [phone-landscape] 配置A 光路重現：光線 1 平行主軸射到透鏡上的 P
   PASS  [phone-landscape] 配置A 光路重現：光線 1 折射後發散，方向像是從物側焦點 F 射出  — 偏離 0.0e+0 cm
   PASS  [phone-landscape] 配置A 光路重現：光線 2 通過光心 O 不偏折
   PASS  [phone-landscape] 配置A 光路重現：反向延長線：P → F、O → 虛像
-  PASS  [phone-landscape] 配置A 光路重現：兩條反向延長線交於虛像  — (-127.27, 36.36)
-  PASS  [phone-landscape] 配置A 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [phone-landscape] 配置A 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [phone-landscape] 配置A 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [phone-landscape] 配置A 光路重現 t=3.80s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
+  PASS  [phone-landscape] 配置A 光路重現：光線 3 對準另一側焦點 F′ 射到透鏡  — 偏離 0.0e+0 cm
+  PASS  [phone-landscape] 配置A 光路重現：光線 3 折射後平行主光軸
+  PASS  [phone-landscape] 配置A 光路重現：光線 3 的反向延長線（水平）通過虛像
+  PASS  [phone-landscape] 配置A 光路重現：三條反向延長線交於虛像  — (-127.27, 36.36)
+  PASS  [phone-landscape] 配置A 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置A 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置A 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置A 光路重現 t=3.80s：全部光線都畫出來了  — 13/13 個取樣點在畫面內
   PASS  [phone-landscape] 配置A 光路重現：畫面上方有說明文字框
-  PASS  [phone-landscape] 配置A 光路重現：結束時標出像點  — 129 px（重現前 71）
+  PASS  [phone-landscape] 配置A 光路重現：結束時標出像點  — 139 px（重現前 64）
   PASS  [phone-landscape] 配置A 光路重現：反向延長線用另一種顏色的虛線
   PASS  [phone-landscape] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
@@ -153,21 +156,24 @@
   PASS  [phone-landscape] 配置B 封印作圖交點所在格 → 成功並顯形
   PASS  [phone-landscape] 配置B 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [phone-landscape] 配置B 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
-  PASS  [phone-landscape] 配置B 光路重現：四段實際光線＋兩段反向延長線
-  PASS  [phone-landscape] 配置B 光路重現：兩條光線都從鬼本體出發
+  PASS  [phone-landscape] 配置B 光路重現：六段實際光線＋三段反向延長線（三條主光線）
+  PASS  [phone-landscape] 配置B 光路重現：三條光線都從鬼本體出發
   PASS  [phone-landscape] 配置B 光路重現：光線 1 平行主軸射到透鏡上的 P
   PASS  [phone-landscape] 配置B 光路重現：光線 1 折射後發散，方向像是從物側焦點 F 射出  — 偏離 0.0e+0 cm
   PASS  [phone-landscape] 配置B 光路重現：光線 2 通過光心 O 不偏折
   PASS  [phone-landscape] 配置B 光路重現：反向延長線：P → F、O → 虛像
-  PASS  [phone-landscape] 配置B 光路重現：兩條反向延長線交於虛像  — (-171.88, -28.13)
-  PASS  [phone-landscape] 配置B 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [phone-landscape] 配置B 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [phone-landscape] 配置B 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [phone-landscape] 配置B 光路重現 t=3.80s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
+  PASS  [phone-landscape] 配置B 光路重現：光線 3 對準另一側焦點 F′ 射到透鏡  — 偏離 0.0e+0 cm
+  PASS  [phone-landscape] 配置B 光路重現：光線 3 折射後平行主光軸
+  PASS  [phone-landscape] 配置B 光路重現：光線 3 的反向延長線（水平）通過虛像
+  PASS  [phone-landscape] 配置B 光路重現：三條反向延長線交於虛像  — (-171.88, -28.13)
+  PASS  [phone-landscape] 配置B 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置B 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置B 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置B 光路重現 t=3.80s：全部光線都畫出來了  — 13/13 個取樣點在畫面內
   PASS  [phone-landscape] 配置B 光路重現：畫面上方有說明文字框
-  PASS  [phone-landscape] 配置B 光路重現：結束時標出像點  — 134 px（重現前 64）
+  PASS  [phone-landscape] 配置B 光路重現：結束時標出像點  — 137 px（重現前 66）
   PASS  [phone-landscape] 配置B 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置B 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 23 次
+  PASS  [phone-landscape] 配置B 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 配置C 裸眼畫面沒有鬼
   PASS  [phone-landscape] 配置C 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 59% 像素改變；此方位沒有鬼
   PASS  [phone-landscape] 配置C 透鏡外畫面不變  — 0.00%
@@ -229,23 +235,26 @@
   PASS  [phone-landscape] 配置C 封印作圖交點所在格 → 成功並顯形
   PASS  [phone-landscape] 配置C 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [phone-landscape] 配置C 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
-  PASS  [phone-landscape] 配置C 光路重現：四段實際光線＋兩段反向延長線
-  PASS  [phone-landscape] 配置C 光路重現：兩條光線都從鬼本體出發
+  PASS  [phone-landscape] 配置C 光路重現：六段實際光線＋三段反向延長線（三條主光線）
+  PASS  [phone-landscape] 配置C 光路重現：三條光線都從鬼本體出發
   PASS  [phone-landscape] 配置C 光路重現：光線 1 平行主軸射到透鏡上的 P
   PASS  [phone-landscape] 配置C 光路重現：光線 1 折射後發散，方向像是從物側焦點 F 射出  — 偏離 0.0e+0 cm
   PASS  [phone-landscape] 配置C 光路重現：光線 2 通過光心 O 不偏折
   PASS  [phone-landscape] 配置C 光路重現：反向延長線：P → F、O → 虛像
-  PASS  [phone-landscape] 配置C 光路重現：兩條反向延長線交於虛像  — (-205.26, 37.89)
-  PASS  [phone-landscape] 配置C 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [phone-landscape] 配置C 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [phone-landscape] 配置C 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [phone-landscape] 配置C 光路重現 t=3.80s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
+  PASS  [phone-landscape] 配置C 光路重現：光線 3 對準另一側焦點 F′ 射到透鏡  — 偏離 0.0e+0 cm
+  PASS  [phone-landscape] 配置C 光路重現：光線 3 折射後平行主光軸
+  PASS  [phone-landscape] 配置C 光路重現：光線 3 的反向延長線（水平）通過虛像
+  PASS  [phone-landscape] 配置C 光路重現：三條反向延長線交於虛像  — (-205.26, 37.89)
+  PASS  [phone-landscape] 配置C 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置C 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置C 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置C 光路重現 t=3.80s：全部光線都畫出來了  — 14/14 個取樣點在畫面內
   PASS  [phone-landscape] 配置C 光路重現：畫面上方有說明文字框
-  PASS  [phone-landscape] 配置C 光路重現：結束時標出像點  — 130 px（重現前 70）
+  PASS  [phone-landscape] 配置C 光路重現：結束時標出像點  — 136 px（重現前 64）
   PASS  [phone-landscape] 配置C 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 配置D 裸眼畫面沒有鬼
-  PASS  [phone-landscape] 配置D 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 48% 像素改變；此方位沒有鬼
+  PASS  [phone-landscape] 配置D 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 47% 像素改變；此方位沒有鬼
   PASS  [phone-landscape] 配置D 透鏡外畫面不變  — 0.00%
   PASS  [phone-landscape] 配置D 鬼像只出現在一個方位的透鏡內  — 出現於方位 0
   PASS  [phone-landscape] 配置D 鬼像整個在透鏡圓內
@@ -303,27 +312,30 @@
   PASS  [phone-landscape] 配置D 封印作圖交點所在格 → 成功並顯形
   PASS  [phone-landscape] 配置D 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [phone-landscape] 配置D 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
-  PASS  [phone-landscape] 配置D 光路重現：四段實際光線＋兩段反向延長線
-  PASS  [phone-landscape] 配置D 光路重現：兩條光線都從鬼本體出發
+  PASS  [phone-landscape] 配置D 光路重現：六段實際光線＋三段反向延長線（三條主光線）
+  PASS  [phone-landscape] 配置D 光路重現：三條光線都從鬼本體出發
   PASS  [phone-landscape] 配置D 光路重現：光線 1 平行主軸射到透鏡上的 P
   PASS  [phone-landscape] 配置D 光路重現：光線 1 折射後發散，方向像是從物側焦點 F 射出  — 偏離 0.0e+0 cm
   PASS  [phone-landscape] 配置D 光路重現：光線 2 通過光心 O 不偏折
   PASS  [phone-landscape] 配置D 光路重現：反向延長線：P → F、O → 虛像
-  PASS  [phone-landscape] 配置D 光路重現：兩條反向延長線交於虛像  — (-104.65, -29.30)
-  PASS  [phone-landscape] 配置D 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [phone-landscape] 配置D 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [phone-landscape] 配置D 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [phone-landscape] 配置D 光路重現 t=3.80s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
+  PASS  [phone-landscape] 配置D 光路重現：光線 3 對準另一側焦點 F′ 射到透鏡  — 偏離 0.0e+0 cm
+  PASS  [phone-landscape] 配置D 光路重現：光線 3 折射後平行主光軸
+  PASS  [phone-landscape] 配置D 光路重現：光線 3 的反向延長線（水平）通過虛像
+  PASS  [phone-landscape] 配置D 光路重現：三條反向延長線交於虛像  — (-104.65, -29.30)
+  PASS  [phone-landscape] 配置D 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置D 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置D 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置D 光路重現 t=3.80s：全部光線都畫出來了  — 13/13 個取樣點在畫面內
   PASS  [phone-landscape] 配置D 光路重現：畫面上方有說明文字框
-  PASS  [phone-landscape] 配置D 光路重現：結束時標出像點  — 137 px（重現前 70）
+  PASS  [phone-landscape] 配置D 光路重現：結束時標出像點  — 130 px（重現前 70）
   PASS  [phone-landscape] 配置D 光路重現：反向延長線用另一種顏色的虛線
   PASS  [phone-landscape] 配置D 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 沒有 JS 錯誤
   PASS  [phone-portrait] 背景圖已載入
-  PASS  [phone-portrait] 探索：所有控制項都在畫面內  — canvas 375×597
+  PASS  [phone-portrait] 探索：所有控制項都在畫面內  — canvas 375×595
   PASS  [phone-portrait] 探索：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-portrait] 探索：頁面不需捲動
-  PASS  [phone-portrait] 探索：畫布仍有足夠空間（≥300×150）  — 375×597
+  PASS  [phone-portrait] 探索：畫布仍有足夠空間（≥300×150）  — 375×595
   PASS  [phone-portrait] 配置A 裸眼畫面沒有鬼
   PASS  [phone-portrait] 配置A 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 49% 像素改變；此方位沒有鬼
   PASS  [phone-portrait] 配置A 透鏡外畫面不變  — 0.00%
@@ -336,11 +348,11 @@
   PASS  [phone-portrait] 配置A 放下透鏡後鬼像消失
   PASS  [phone-portrait] 配置A 放下透鏡後標記保留
   PASS  [phone-portrait] 配置A 切到側視分析
-  PASS  [phone-portrait] 分析／畫線：所有控制項都在畫面內  — canvas 375×597
+  PASS  [phone-portrait] 分析／畫線：所有控制項都在畫面內  — canvas 375×595
   PASS  [phone-portrait] 分析／畫線：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-portrait] 分析／畫線：頁面不需捲動
-  PASS  [phone-portrait] 分析／畫線：畫布仍有足夠空間（≥300×150）  — 375×597
-  PASS  [phone-portrait] （資訊）預設縮放下一格寬 43.9 px，畫布 375×597
+  PASS  [phone-portrait] 分析／畫線：畫布仍有足夠空間（≥300×150）  — 375×595
+  PASS  [phone-portrait] （資訊）預設縮放下一格寬 43.9 px，畫布 375×595
   PASS  [phone-portrait] 配置A 分析開始：畫面上沒有鬼本體
   PASS  [phone-portrait] 配置A 分析開始：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-portrait] 配置A 分析開始：吸附點裡沒有物點
@@ -353,10 +365,10 @@
   PASS  [phone-portrait] 配置A 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-portrait] 配置A 畫完三條線：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-portrait] 配置A ＋ 按鈕放大  — 1.50×
-  PASS  [phone-portrait] 分析／放大後：所有控制項都在畫面內  — canvas 375×603
+  PASS  [phone-portrait] 分析／放大後：所有控制項都在畫面內  — canvas 375×600
   PASS  [phone-portrait] 分析／放大後：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-portrait] 分析／放大後：頁面不需捲動
-  PASS  [phone-portrait] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 375×603
+  PASS  [phone-portrait] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 375×600
   PASS  [phone-portrait] 配置A 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-portrait] 配置A 拖曳平移不會畫線／選格／改變縮放
   PASS  [phone-portrait] 配置A 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
@@ -377,10 +389,10 @@
   PASS  [phone-portrait] 配置A 「復原」可以拿掉拖出來的連線
   PASS  [phone-portrait] 配置A 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-portrait] 配置A 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
-  PASS  [phone-portrait] 分析／封印：所有控制項都在畫面內  — canvas 375×597
+  PASS  [phone-portrait] 分析／封印：所有控制項都在畫面內  — canvas 375×595
   PASS  [phone-portrait] 分析／封印：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-portrait] 分析／封印：頁面不需捲動
-  PASS  [phone-portrait] 分析／封印：畫布仍有足夠空間（≥300×150）  — 375×597
+  PASS  [phone-portrait] 分析／封印：畫布仍有足夠空間（≥300×150）  — 375×595
   PASS  [phone-portrait] 配置A 封印模式下點擊不會畫線
   PASS  [phone-portrait] 配置A 點地板格可選取（虛像所在的第 2 格）
   PASS  [phone-portrait] 配置A 封印虛像所在格 → 失敗
@@ -393,17 +405,20 @@
   PASS  [phone-portrait] 配置A 封印作圖交點所在格 → 成功並顯形
   PASS  [phone-portrait] 配置A 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [phone-portrait] 配置A 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
-  PASS  [phone-portrait] 配置A 光路重現：四段實際光線＋兩段反向延長線
-  PASS  [phone-portrait] 配置A 光路重現：兩條光線都從鬼本體出發
+  PASS  [phone-portrait] 配置A 光路重現：六段實際光線＋三段反向延長線（三條主光線）
+  PASS  [phone-portrait] 配置A 光路重現：三條光線都從鬼本體出發
   PASS  [phone-portrait] 配置A 光路重現：光線 1 平行主軸射到透鏡上的 P
   PASS  [phone-portrait] 配置A 光路重現：光線 1 折射後發散，方向像是從物側焦點 F 射出  — 偏離 0.0e+0 cm
   PASS  [phone-portrait] 配置A 光路重現：光線 2 通過光心 O 不偏折
   PASS  [phone-portrait] 配置A 光路重現：反向延長線：P → F、O → 虛像
-  PASS  [phone-portrait] 配置A 光路重現：兩條反向延長線交於虛像  — (-127.27, 36.36)
-  PASS  [phone-portrait] 配置A 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [phone-portrait] 配置A 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [phone-portrait] 配置A 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [phone-portrait] 配置A 光路重現 t=3.80s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
+  PASS  [phone-portrait] 配置A 光路重現：光線 3 對準另一側焦點 F′ 射到透鏡  — 偏離 0.0e+0 cm
+  PASS  [phone-portrait] 配置A 光路重現：光線 3 折射後平行主光軸
+  PASS  [phone-portrait] 配置A 光路重現：光線 3 的反向延長線（水平）通過虛像
+  PASS  [phone-portrait] 配置A 光路重現：三條反向延長線交於虛像  — (-127.27, 36.36)
+  PASS  [phone-portrait] 配置A 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-portrait] 配置A 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-portrait] 配置A 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-portrait] 配置A 光路重現 t=3.80s：全部光線都畫出來了  — 13/13 個取樣點在畫面內
   PASS  [phone-portrait] 配置A 光路重現：畫面上方有說明文字框
   PASS  [phone-portrait] 配置A 光路重現：結束時標出像點  — 137 px（重現前 67）
   PASS  [phone-portrait] 配置A 光路重現：反向延長線用另一種顏色的虛線
@@ -412,10 +427,10 @@
   PASS  [phone-portrait] 配置A 關閉 Debug 後面板清空
   PASS  [phone-portrait] 沒有 JS 錯誤
   PASS  [desktop] 背景圖已載入
-  PASS  [desktop] 探索：所有控制項都在畫面內  — canvas 1280×591
+  PASS  [desktop] 探索：所有控制項都在畫面內  — canvas 1280×588
   PASS  [desktop] 探索：按鈕點擊區 ≥ 40×40 px
   PASS  [desktop] 探索：頁面不需捲動
-  PASS  [desktop] 探索：畫布仍有足夠空間（≥300×150）  — 1280×591
+  PASS  [desktop] 探索：畫布仍有足夠空間（≥300×150）  — 1280×588
   PASS  [desktop] 配置A 裸眼畫面沒有鬼
   PASS  [desktop] 配置A 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 52% 像素改變；此方位沒有鬼
   PASS  [desktop] 配置A 透鏡外畫面不變  — 0.00%
@@ -428,11 +443,11 @@
   PASS  [desktop] 配置A 放下透鏡後鬼像消失
   PASS  [desktop] 配置A 放下透鏡後標記保留
   PASS  [desktop] 配置A 切到側視分析
-  PASS  [desktop] 分析／畫線：所有控制項都在畫面內  — canvas 1280×591
+  PASS  [desktop] 分析／畫線：所有控制項都在畫面內  — canvas 1280×588
   PASS  [desktop] 分析／畫線：按鈕點擊區 ≥ 40×40 px
   PASS  [desktop] 分析／畫線：頁面不需捲動
-  PASS  [desktop] 分析／畫線：畫布仍有足夠空間（≥300×150）  — 1280×591
-  PASS  [desktop] （資訊）預設縮放下一格寬 149.7 px，畫布 1280×591
+  PASS  [desktop] 分析／畫線：畫布仍有足夠空間（≥300×150）  — 1280×588
+  PASS  [desktop] （資訊）預設縮放下一格寬 149.7 px，畫布 1280×588
   PASS  [desktop] 配置A 分析開始：畫面上沒有鬼本體
   PASS  [desktop] 配置A 分析開始：DOM／文字／Debug 圖層沒有答案
   PASS  [desktop] 配置A 分析開始：吸附點裡沒有物點
@@ -445,10 +460,10 @@
   PASS  [desktop] 配置A 畫完三條線：畫面上沒有鬼本體
   PASS  [desktop] 配置A 畫完三條線：DOM／文字／Debug 圖層沒有答案
   PASS  [desktop] 配置A ＋ 按鈕放大  — 1.50×
-  PASS  [desktop] 分析／放大後：所有控制項都在畫面內  — canvas 1280×591
+  PASS  [desktop] 分析／放大後：所有控制項都在畫面內  — canvas 1280×588
   PASS  [desktop] 分析／放大後：按鈕點擊區 ≥ 40×40 px
   PASS  [desktop] 分析／放大後：頁面不需捲動
-  PASS  [desktop] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 1280×591
+  PASS  [desktop] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 1280×588
   PASS  [desktop] 配置A 放大後單指拖曳可平移  — Δx=90px
   PASS  [desktop] 配置A 拖曳平移不會畫線／選格／改變縮放
   PASS  [desktop] 配置A 從標示點斜向拖到空白處放開：不留線、不算點擊
@@ -473,10 +488,10 @@
   PASS  [desktop] 配置A 放開：留下通過兩個標示點的直線（手指沒有碰到第二個點）
   PASS  [desktop] 配置A 選格封印模式下，從標示點拖曳不會畫線
   PASS  [desktop] 配置A 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
-  PASS  [desktop] 分析／封印：所有控制項都在畫面內  — canvas 1280×591
+  PASS  [desktop] 分析／封印：所有控制項都在畫面內  — canvas 1280×588
   PASS  [desktop] 分析／封印：按鈕點擊區 ≥ 40×40 px
   PASS  [desktop] 分析／封印：頁面不需捲動
-  PASS  [desktop] 分析／封印：畫布仍有足夠空間（≥300×150）  — 1280×591
+  PASS  [desktop] 分析／封印：畫布仍有足夠空間（≥300×150）  — 1280×588
   PASS  [desktop] 配置A 封印模式下點擊不會畫線
   PASS  [desktop] 配置A 點地板格可選取（虛像所在的第 2 格）
   PASS  [desktop] 配置A 封印虛像所在格 → 失敗
@@ -489,21 +504,24 @@
   PASS  [desktop] 配置A 封印作圖交點所在格 → 成功並顯形
   PASS  [desktop] 配置A 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [desktop] 配置A 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
-  PASS  [desktop] 配置A 光路重現：四段實際光線＋兩段反向延長線
-  PASS  [desktop] 配置A 光路重現：兩條光線都從鬼本體出發
+  PASS  [desktop] 配置A 光路重現：六段實際光線＋三段反向延長線（三條主光線）
+  PASS  [desktop] 配置A 光路重現：三條光線都從鬼本體出發
   PASS  [desktop] 配置A 光路重現：光線 1 平行主軸射到透鏡上的 P
   PASS  [desktop] 配置A 光路重現：光線 1 折射後發散，方向像是從物側焦點 F 射出  — 偏離 0.0e+0 cm
   PASS  [desktop] 配置A 光路重現：光線 2 通過光心 O 不偏折
   PASS  [desktop] 配置A 光路重現：反向延長線：P → F、O → 虛像
-  PASS  [desktop] 配置A 光路重現：兩條反向延長線交於虛像  — (-127.27, 36.36)
-  PASS  [desktop] 配置A 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [desktop] 配置A 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [desktop] 配置A 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [desktop] 配置A 光路重現 t=3.80s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
+  PASS  [desktop] 配置A 光路重現：光線 3 對準另一側焦點 F′ 射到透鏡  — 偏離 0.0e+0 cm
+  PASS  [desktop] 配置A 光路重現：光線 3 折射後平行主光軸
+  PASS  [desktop] 配置A 光路重現：光線 3 的反向延長線（水平）通過虛像
+  PASS  [desktop] 配置A 光路重現：三條反向延長線交於虛像  — (-127.27, 36.36)
+  PASS  [desktop] 配置A 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 18/18 個取樣點在畫面內
+  PASS  [desktop] 配置A 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 18/18 個取樣點在畫面內
+  PASS  [desktop] 配置A 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 18/18 個取樣點在畫面內
+  PASS  [desktop] 配置A 光路重現 t=3.80s：全部光線都畫出來了  — 18/18 個取樣點在畫面內
   PASS  [desktop] 配置A 光路重現：畫面上方有說明文字框
-  PASS  [desktop] 配置A 光路重現：結束時標出像點  — 31 px（重現前 13）
+  PASS  [desktop] 配置A 光路重現：結束時標出像點  — 32 px（重現前 15）
   PASS  [desktop] 配置A 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [desktop] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [desktop] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 23 次
   PASS  [desktop] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
   PASS  [desktop] 配置A 關閉 Debug 後面板清空
   PASS  [desktop] 配置C 裸眼畫面沒有鬼
@@ -566,21 +584,24 @@
   PASS  [desktop] 配置C 封印作圖交點所在格 → 成功並顯形
   PASS  [desktop] 配置C 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [desktop] 配置C 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
-  PASS  [desktop] 配置C 光路重現：四段實際光線＋兩段反向延長線
-  PASS  [desktop] 配置C 光路重現：兩條光線都從鬼本體出發
+  PASS  [desktop] 配置C 光路重現：六段實際光線＋三段反向延長線（三條主光線）
+  PASS  [desktop] 配置C 光路重現：三條光線都從鬼本體出發
   PASS  [desktop] 配置C 光路重現：光線 1 平行主軸射到透鏡上的 P
   PASS  [desktop] 配置C 光路重現：光線 1 折射後發散，方向像是從物側焦點 F 射出  — 偏離 0.0e+0 cm
   PASS  [desktop] 配置C 光路重現：光線 2 通過光心 O 不偏折
   PASS  [desktop] 配置C 光路重現：反向延長線：P → F、O → 虛像
-  PASS  [desktop] 配置C 光路重現：兩條反向延長線交於虛像  — (-205.26, 37.89)
-  PASS  [desktop] 配置C 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [desktop] 配置C 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [desktop] 配置C 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [desktop] 配置C 光路重現 t=3.80s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
+  PASS  [desktop] 配置C 光路重現：光線 3 對準另一側焦點 F′ 射到透鏡  — 偏離 0.0e+0 cm
+  PASS  [desktop] 配置C 光路重現：光線 3 折射後平行主光軸
+  PASS  [desktop] 配置C 光路重現：光線 3 的反向延長線（水平）通過虛像
+  PASS  [desktop] 配置C 光路重現：三條反向延長線交於虛像  — (-205.26, 37.89)
+  PASS  [desktop] 配置C 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 18/18 個取樣點在畫面內
+  PASS  [desktop] 配置C 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 18/18 個取樣點在畫面內
+  PASS  [desktop] 配置C 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 18/18 個取樣點在畫面內
+  PASS  [desktop] 配置C 光路重現 t=3.80s：全部光線都畫出來了  — 18/18 個取樣點在畫面內
   PASS  [desktop] 配置C 光路重現：畫面上方有說明文字框
-  PASS  [desktop] 配置C 光路重現：結束時標出像點  — 29 px（重現前 15）
+  PASS  [desktop] 配置C 光路重現：結束時標出像點  — 27 px（重現前 16）
   PASS  [desktop] 配置C 光路重現：反向延長線用另一種顏色的虛線
   PASS  [desktop] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [desktop] 沒有 JS 錯誤
 
-ALL PASS: 584/584 checks
+ALL PASS: 605/605 checks

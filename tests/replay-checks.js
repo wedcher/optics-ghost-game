@@ -89,7 +89,16 @@ async function checkReplay({ page, hook, ok, T, press, physics, shot }) {
   (physics ? physics(spec) : []).forEach((r) => ok(r.ok, T('光路重現：' + r.label), r.detail));
 
   // 依動畫時間判斷每個取樣點該不該亮
-  const samples = specSamples(spec);
+  // 三條主光線在像點附近會靠得很近：取樣點若離「另一段同色的線」不到 10 px，讀到的可能是旁邊那條線，
+  // 判斷不出這一段亮不亮，所以略過這種取樣點。
+  const pxPerCm = await page.evaluate((hook) => { const H = window[hook]; return Math.abs(H.w2s({ x: 1, y: 0 }).x - H.w2s({ x: 0, y: 0 }).x); }, hook);
+  const distToSeg = (pt, sg) => {
+    const dx = sg.b.x - sg.a.x, dy = sg.b.y - sg.a.y, L2 = dx * dx + dy * dy || 1;
+    const t = Math.max(0, Math.min(1, ((pt.x - sg.a.x) * dx + (pt.y - sg.a.y) * dy) / L2));
+    return Math.hypot(pt.x - (sg.a.x + t * dx), pt.y - (sg.a.y + t * dy));
+  };
+  const samples = specSamples(spec).filter((sm) => !spec.segments.some((sg, i) =>
+    i !== sm.seg && sg.kind === spec.segments[sm.seg].kind && distToSeg(sm.p, sg) * pxPerCm < 10));
   const expectLit = (sm, tau) => {
     const sg = spec.segments[sm.seg];
     return tau > sg.start && sm.fr < ease((tau - sg.start) / (sg.end - sg.start)) - 0.08;
