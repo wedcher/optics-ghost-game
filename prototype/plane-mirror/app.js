@@ -22,10 +22,12 @@
 
   function loadArt(src) {
     var a = { img: new Image(), ready: false };
-    a.img.onload = function () { a.ready = true; requestRender(); };
+    a.img.onload = function () { a.ready = true; requestRender(); if (pendingIntro && artReady()) { pendingIntro = false; showIntro(); } };
     a.img.src = src;
     return a;
   }
+  var pendingIntro = false; // 開場要等圖都載好才出現（背景是遊戲畫面的快照）
+  function artReady() { return ART.intact.ready && ART.broken.ready && ART.ghost.ready && ART.ghostBack.ready; }
   var ART = { intact: loadArt('assets/room-intact.jpg'), broken: loadArt('assets/room-broken.jpg'), ghost: loadArt('assets/ghost.webp'), ghostBack: loadArt('assets/ghost-back.webp') };
   // 測試用：把鬼畫成單一顏色的剪影，測試才能用顏色數「鬼出現在哪裡」（見 __protoMirror.setMask）
   var ghostMask = {};
@@ -520,7 +522,7 @@
     }
     return null;
   }
-  function canAct() { return !state.busy && !state.revealed && !state.over && !scene; }
+  function canAct() { return !state.busy && !state.revealed && !state.over && !scene && !pendingIntro; }
 
   var down = null, TAP_PX = 12;
   canvas.addEventListener('pointerdown', function (e) {
@@ -563,8 +565,7 @@
     casting: '法陣展開中……',
     wrong: '法陣裡沒有東西……少了一顆心。鬼還躲在原地，再看一次鏡子。',
     wrongFree: '法陣裡沒有東西。鬼還躲在原地，再看一次鏡子。',
-    moved: '鬼掙脫了，換了一個地方躲。再從鏡子裡找出牠站在哪一格。',
-    movedOne: '鬼掙脫了，換了一個地方躲。只剩一面鏡子，再找出牠站在哪一格。'
+    moved: '鬼掙脫了，換了一個地方躲。'
   };
   function setStatus(t) { $('status').textContent = t; }
 
@@ -605,7 +606,7 @@
     if (!FREE && state.sealed >= R.catchesTotal) { showClear(); return; }
     if (!FREE && state.phase === 1 && state.sealed >= R.catchesTwoMirrors) { showBreak(); return; }
     newGhost();
-    setStatus(state.phase === 2 ? MSG.movedOne : MSG.moved);
+    setStatus(MSG.moved);
     syncUI(); requestRender();
   }
 
@@ -649,9 +650,27 @@
     setStatus(MSG.start);
     syncUI(); requestRender();
   }
+  // 過場的背景：把房間照遊戲實際的畫法畫一張（鏡子裡有反射、有鬼的像），不用背景原圖。
+  // 原圖的鏡面是一片暗色（反射是程式畫的），直接當背景時「鏡子裡有東西」會對不上畫面。
+  // o.phase：1 兩面鏡、2 右鏡已碎；o.ghost：鬼的位置，null = 鏡子裡沒有鬼。
+  function snapshot(id, o) {
+    stats.sceneBg = { id: id, phase: o.phase, ghost: !!o.ghost, snapshot: artReady() };
+    if (!artReady()) return o.phase === 1 ? 'assets/room-intact.jpg' : 'assets/room-broken.jpg';
+    var k = { canvas: canvas, ctx: ctx, W: W, H: H, DPR: DPR, S: S, OX: OX, OY: OY, phase: state.phase, ghost: state.ghost, selected: state.selected,
+      revealed: state.revealed, cast: state.cast, fx: state.fx, debug: state.debug, mask: state.mask };
+    var cv = document.createElement('canvas'), sc = 0.75, url;
+    cv.width = Math.round(IW * sc); cv.height = Math.round(IH * sc);
+    canvas = cv; ctx = cv.getContext('2d'); W = cv.width; H = cv.height; DPR = 1; S = sc; OX = 0; OY = 0;
+    state.phase = o.phase; state.ghost = o.ghost; state.selected = null; state.revealed = false; state.cast = null; state.fx = null; state.debug = false; state.mask = false;
+    try { render(); url = cv.toDataURL('image/jpeg', 0.85); } catch (e) { url = o.phase === 1 ? 'assets/room-intact.jpg' : 'assets/room-broken.jpg'; }
+    canvas = k.canvas; ctx = k.ctx; W = k.W; H = k.H; DPR = k.DPR; S = k.S; OX = k.OX; OY = k.OY;
+    state.phase = k.phase; state.ghost = k.ghost; state.selected = k.selected; state.revealed = k.revealed; state.cast = k.cast; state.fx = k.fx; state.debug = k.debug; state.mask = k.mask;
+    requestRender();
+    return url;
+  }
   function showIntro() {
     scene = window.StoryScene.show({
-      id: 'intro', background: 'assets/room-intact.jpg',
+      id: 'intro', background: snapshot('intro', { phase: 1, ghost: state.ghost }),
       lines: [
         { text: '你受邀到一座古老的城堡過夜。' },
         { text: '半夜，有一間房間不斷傳出奇怪的聲響。' },
@@ -665,7 +684,7 @@
   }
   function showBreak() {
     scene = window.StoryScene.show({
-      id: 'break', background: 'assets/room-broken.jpg',
+      id: 'break', background: snapshot('break', { phase: 2, ghost: null }),
       lines: [
         { text: '鬼被抓了兩次，氣得撞向右邊的鏡子——' },
         { text: '匡啷！鏡子碎了一地。' },
@@ -682,7 +701,7 @@
   }
   function showFail() {
     scene = window.StoryScene.show({
-      id: 'fail', background: state.phase === 1 ? 'assets/room-intact.jpg' : 'assets/room-broken.jpg',
+      id: 'fail', background: snapshot('fail', { phase: state.phase, ghost: state.ghost }),
       title: '封印失敗', note: '三顆心都用完了……鬼還躲在房間裡。',
       buttons: [
         { id: 'retryBtn', label: '重新挑戰', primary: true, onClick: function () { closeScene(); resetLevel(); } },
@@ -693,7 +712,7 @@
   function showClear() {
     if (window.GameProgress) window.GameProgress.markCleared('mirror'); // 過關紀錄：解鎖第二關（入口頁用）
     scene = window.StoryScene.show({
-      id: 'clear', background: 'assets/room-broken.jpg',
+      id: 'clear', background: snapshot('clear', { phase: 2, ghost: null }),
       lines: [
         { text: '鬼被抓了五次，再也待不住了——' },
         { text: '牠尖叫著衝出房門，逃進了走廊！' },
@@ -758,5 +777,5 @@
   if (FREE) { $('title').innerHTML = '平面鏡原型 <small>自由練習</small>'; fillCellSel(); }
   layout();
   resetLevel();
-  if (!FREE) showIntro();
+  if (!FREE) { if (artReady()) showIntro(); else pendingIntro = true; }
 })();

@@ -106,7 +106,7 @@ ok(pool1.length >= R.catchesTwoMirrors + 2, '雙鏡出題格夠用（抓 2 次�
 ok(pool2.length >= (R.catchesTotal - R.catchesTwoMirrors) + 2, '單鏡出題格夠用（抓 3 次、不連續重複）', String(pool2.length));
 pool1.forEach((c) => {
   const b = C.visibility(R, cam, c, 'back'), r = C.visibility(R, cam, c, 'right');
-  ok((b.core || r.core) && b.any && r.any, `雙鏡 ${id(c)}：一面鏡看得到腳身頭，另一面至少露一部分`);
+  ok(b.full && r.full, `雙鏡 ${id(c)}：兩面鏡裡都看得到整隻鬼`);
   ok(selectable.some((s) => id(s) === id(c)), `雙鏡 ${id(c)}：點得到`);
 });
 pool2.forEach((c) => {

@@ -144,7 +144,9 @@ async function levelFlow(profile, browser) {
   // ---- 開場 ----
   let s = await info();
   ok(s.scene && s.scene.id === 'intro' && s.scene.line === 0, '一進來是開場過場的第一句');
-  ok(await page.evaluate(() => getComputedStyle(document.querySelector('.story-bg')).backgroundImage.includes('room-intact')), '開場背景是鏡子完好的房間');
+  const bgInfo = () => page.evaluate(() => ({ bg: Object.assign({}, window.__protoMirror.stats.sceneBg), data: getComputedStyle(document.querySelector('.story-bg')).backgroundImage.startsWith('url("data:image/jpeg') }));
+  let bg = await bgInfo();
+  ok(bg.data && bg.bg.snapshot && bg.bg.id === 'intro' && bg.bg.phase === 1 && bg.bg.ghost, '開場背景是遊戲畫面的快照：兩面鏡完好、鏡子裡有鬼', JSON.stringify(bg.bg));
   await shot('mirror-1-intro');
   for (let i = 1; i <= 3; i++) {
     await t.tapAt(vp.width / 2, vp.height / 2);
@@ -162,6 +164,8 @@ async function levelFlow(profile, browser) {
   ok(s.intact.join() === 'back,right', '兩面鏡都完好');
   ok(await page.evaluate(() => window.__protoMirror.pools[1].some((c) => window.__protoMirror.core.cellId(c.col, c.row) === window.__protoMirror.core.cellId(window.__protoMirror.state.ghost.col, window.__protoMirror.state.ghost.row))), '鬼在雙鏡出題格內', s.ghost);
   ok(s.images.back && s.images.right, '兩面鏡裡都有鬼的像');
+  const vis0 = await page.evaluate(() => { const m = window.__protoMirror, g = m.state.ghost; return ['back', 'right'].map((id) => m.core.visibility(m.room, m.cam, g, id).full); });
+  ok(vis0[0] && vis0[1], '雙鏡階段：鬼站的位置兩面鏡都照得到整隻');
   const sides = await page.evaluate(() => { const m = window.__protoMirror; return [m.ghostSide([]), m.ghostSide(['back']), m.ghostSide(['right']), m.ghostSide(['back', 'right'])]; });
   ok(sides.join() === 'front,back,front,back', '鬼面向玩家：直接看與右鏡是正面，正面鏡（與穿過正面鏡的二次像）是背面', sides.join());
   let px = await pixels();
@@ -221,6 +225,9 @@ async function levelFlow(profile, browser) {
   s = await info();
   ok(s.ghost !== ghost0 && !s.revealed && s.selected === null, '按繼續後鬼換了位置', ghost0 + ' → ' + s.ghost);
   ok(s.phase === 1 && s.scene === null, '抓到 1 次還是兩面鏡');
+  const vis1 = await page.evaluate(() => { const m = window.__protoMirror, g = m.state.ghost; return ['back', 'right'].map((id) => m.core.visibility(m.room, m.cam, g, id).full); });
+  ok(vis1[0] && vis1[1], '雙鏡階段第 2 隻：兩面鏡也都照得到整隻');
+  ok(s.status === '鬼掙脫了，換了一個地方躲。', '換位置的說明是短的那一句', s.status);
   px = await pixels();
   ok(px.ghostOut < EDGE_PX, '換位置後房間裡又看不到鬼');
 
@@ -231,7 +238,8 @@ async function levelFlow(profile, browser) {
   await press('#nextBtn');
   s = await info();
   ok(s.scene && s.scene.id === 'break', '抓到 2 次後播「打碎鏡子」過場');
-  ok(await page.evaluate(() => getComputedStyle(document.querySelector('.story-bg')).backgroundImage.includes('room-broken')), '過場背景是鏡子打碎的房間');
+  bg = await bgInfo();
+  ok(bg.data && bg.bg.id === 'break' && bg.bg.phase === 2 && !bg.bg.ghost, '過場背景是右鏡打碎的房間（鬼躲起來了）', JSON.stringify(bg.bg));
   await shot('mirror-6-break-scene');
   for (let i = 0; i < 3; i++) await t.tapAt(vp.width / 2, vp.height / 2);
   ok(await page.isVisible('#resumeBtn'), '過場最後出現【繼續抓鬼】');
@@ -272,6 +280,8 @@ async function levelFlow(profile, browser) {
   await press('#nextBtn');
   s = await info();
   ok(s.scene && s.scene.id === 'clear', '播過關演出');
+  bg = await bgInfo();
+  ok(bg.data && bg.bg.id === 'clear' && bg.bg.phase === 2 && !bg.bg.ghost, '過關背景：右鏡已碎、鏡子裡沒有鬼（牠逃走了）', JSON.stringify(bg.bg));
   for (let i = 0; i < 3; i++) await t.tapAt(vp.width / 2, vp.height / 2);
   await page.waitForTimeout(ARM_WAIT);
   ok(await page.isVisible('#toLevel2Btn'), '過關畫面有【前往第二關】');
@@ -287,6 +297,10 @@ async function levelFlow(profile, browser) {
   await page.waitForFunction(() => window.__protoMirror.scene() && window.__protoMirror.scene().id === 'fail');
   s = await info();
   ok(s.lives === 0 && s.over && s.ghost === g1, '抓錯 3 次：命用完、出現失敗畫面');
+  bg = await bgInfo();
+  ok(bg.data && bg.bg.id === 'fail' && bg.bg.phase === 1, '失敗畫面的背景是當時的房間', JSON.stringify(bg.bg));
+  const after = await pixels();
+  ok(after.ghostOut < EDGE_PX, '拍完過場背景後，遊戲畫面沒有被改動（房間裡仍沒有鬼）');
   ok(!LEAK_WORDS.test(await page.textContent('.story-end')), '失敗畫面沒有位置資訊');
   await page.waitForTimeout(ARM_WAIT);
   await press('#retryBtn');
