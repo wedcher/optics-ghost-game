@@ -563,8 +563,7 @@
     casting: '法陣展開中……',
     wrong: '法陣裡沒有東西……少了一顆心。鬼還躲在原地，再看一次鏡子。',
     wrongFree: '法陣裡沒有東西。鬼還躲在原地，再看一次鏡子。',
-    moved: '鬼掙脫了，換了一個地方躲。再從鏡子裡找出牠站在哪一格。',
-    movedOne: '鬼掙脫了，換了一個地方躲。只剩一面鏡子，再找出牠站在哪一格。'
+    moved: '鬼掙脫了，換了一個地方躲。'
   };
   function setStatus(t) { $('status').textContent = t; }
 
@@ -605,7 +604,7 @@
     if (!FREE && state.sealed >= R.catchesTotal) { showClear(); return; }
     if (!FREE && state.phase === 1 && state.sealed >= R.catchesTwoMirrors) { showBreak(); return; }
     newGhost();
-    setStatus(state.phase === 2 ? MSG.movedOne : MSG.moved);
+    setStatus(MSG.moved);
     syncUI(); requestRender();
   }
 
