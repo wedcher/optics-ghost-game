@@ -44,13 +44,18 @@
   #controls { background:var(--panel); border-top:1px solid var(--line); padding:6px 6px calc(6px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:6px; }
   .row { display:flex; gap:6px; flex-wrap:wrap; }
   .row > button { flex:1 1 0; min-width:60px; padding:4px 6px; }
+  /* 「看布幕／看凸透鏡」兩個並排的切換鈕 */
+  .row > .seg { flex:2 1 0; display:flex; min-width:0; }
+  .seg > button { flex:1 1 0; min-width:0; padding:4px 4px; }
+  .seg > button:first-child { border-radius:10px 0 0 10px; }
+  .seg > button:last-child { border-radius:0 10px 10px 0; border-left:none; }
   /* 橫放的手機：高度很少，把兩排控制項併成一排、狀態列縮成一行 */
   @media (max-height: 480px) {
     #topbar { padding:3px 8px; }
     #status { min-height:0; padding:4px 10px; font-size:15px; }
     #exploreControls, #analysisControls { display:flex; gap:6px; }
     #exploreControls > .row, #analysisControls > .row { flex:1 1 0; margin-top:0 !important; flex-wrap:nowrap; }
-    #exploreControls > .row:last-child { flex:0 0 190px; }
+    #exploreControls > .row:last-child { flex:1.15 1 0; }
     .row > button { min-width:44px; padding:4px 2px; font-size:15px; }
     #zoomBox { flex-direction:row; }
     #banner { font-size:14px; padding:6px 10px; width:min(70%, 520px); }
@@ -97,11 +102,12 @@
     <div id="exploreControls">
       <div class="row">
         <button id="nudgeLeft" type="button" aria-label="透鏡往左微調">◀ 微調</button>
-        <button id="markBtn" type="button" class="primary">標記實像</button>
+        <button id="markBtn" type="button" class="primary">標記</button>
         <button id="nudgeRight" type="button" aria-label="透鏡往右微調">微調 ▶</button>
       </div>
       <div class="row" style="margin-top:6px">
-        <button id="toAnalysis" type="button" disabled>開始光路分析 ➜</button>
+        <span class="seg"><button id="lookScreen" type="button" class="on" aria-pressed="true">看布幕</button><button id="lookLens" type="button" aria-pressed="false">看凸透鏡</button></span>
+        <button id="toAnalysis" type="button" disabled>光路分析 ➜</button>
       </div>
     </div>
     <div id="analysisControls" hidden>

@@ -11,6 +11,10 @@
  * 同一個物與牆的距離 D > 4f 時，有兩個透鏡位置都能在牆上成清晰實像
  * （共軛位置：一個放大、一個縮小）。兩個位置反推回去是同一個物點。
  *
+ * 虛像題（kind: 'virtual'，實驗中）：D < 4f，布幕上永遠沒有清楚的實像；
+ * 從布幕這邊（眼睛在 X = 0）隔著透鏡看，只有透鏡移到鬼和焦點之間時看得到正立、放大的虛像。
+ * 玩家在「看凸透鏡」時標記虛像，標記打在虛像的位置（透鏡左邊）。
+ *
  * 長度單位：cm。
  */
 (function (root, factory) {
@@ -28,9 +32,11 @@
     wallHalfWidth: 80,    // 布幕正面視圖的半寬。鬼像永遠在主光軸正上／正下方，最寬的清晰像半寬約 56 cm，不需要正方形
     cellWidth: 100,
     cellCount: 10,        // 第 1 格緊鄰投影牆，第 10 格最遠
-    lensMinX: -620,       // 透鏡可移動範圍（永遠在鬼與牆之間，不會穿過鬼）
+    lensMinX: -620,       // 透鏡可移動範圍：每一題都一樣，可以越過鬼（不能從「拉不過去」猜出題型）。透鏡在鬼後面時看不到像
     lensMaxX: -80,
     lensRadius: 120,      // 大型凸透鏡的口徑半徑（決定失焦時的模糊圓大小）
+    virtualMaxY: 100,     // 虛像：像高（= 從標記水平畫到透鏡的 P）要在鏡片口徑內才能標記
+    eyeX: 0,              // 「看凸透鏡」時眼睛的位置（站在布幕那一側）
     lockBlurRatio: 0.18,  // 模糊圓半徑 ÷ 牆上鬼像半寬 小於這個比例才能標記（約等於偏離 ±5～12 cm；標記時自動對準）
     checkOffset: 8,       // 自我檢查用：離清晰位置這麼遠時應該已經看得出模糊
     ghostHalfHeight: 35,
@@ -48,7 +54,11 @@
     { id: 'F', f: 130, targetCell: 6, h: 50 },
     { id: 'G', f: 180, targetCell: 8, h: 55 },
     { id: 'H', f: 150, targetCell: 7, h: 45 },
-    { id: 'I', f: 200, targetCell: 9, h: -50 }
+    { id: 'I', f: 200, targetCell: 9, h: -50 },
+    // J～L：虛像題（D < 4f）。布幕上永遠不會有清楚的像，只能隔著透鏡看到正立、放大的虛像
+    { id: 'J', f: 200, targetCell: 4, h: 30, kind: 'virtual' },
+    { id: 'K', f: 220, targetCell: 5, h: -30, kind: 'virtual' },
+    { id: 'L', f: 210, targetCell: 7, h: -30, kind: 'virtual' }
   ];
 
   var floor = Optics.makeFloorRow(WORLD.cellWidth, WORLD.cellCount);
@@ -82,7 +92,54 @@
       var w = wallImage(raw.f, objX, raw.h, lensX, WORLD.lensRadius);
       return { lensX: lensX, dObj: w.dObj, dImg: w.s, m: -w.scale, imageY: w.centerY };
     });
-    return { id: raw.id, element: 'convex-lens', f: raw.f, targetCell: raw.targetCell, h: raw.h, object: { x: objX, y: raw.h }, sharp: sharp };
+    var vw = virtualWindow(raw.f, objX, raw.h);
+    return { id: raw.id, element: 'convex-lens', kind: raw.kind || 'real', f: raw.f, targetCell: raw.targetCell, h: raw.h, object: { x: objX, y: raw.h }, sharp: sharp,
+      virtualWindow: vw, virtualLensX: vw ? Math.round((vw.from + vw.to) / 2) : null };
+  }
+
+  /**
+   * 從布幕這邊（眼睛在 X = eyeX）隔著透鏡看鬼：
+   *   eye = 'none'：透鏡在鬼的後面（或貼著鬼），鬼的光不會穿過透鏡到眼睛這邊
+   *         'virtual'：鬼在焦點內 → 正立、放大的虛像（在透鏡左邊）
+   *         'realInFront'：實像落在透鏡和眼睛之間 → 看得到倒立的像（虛像題不會發生）
+   *         'blur'：實像落在眼睛後面，或物在焦點上 → 模糊看不清
+   * x、y：像點（走廊座標）。markable：虛像可以標記（在走廊內、P 落在鏡片口徑內）。
+   * angMag：從眼睛看，像的視角 ÷ 不用透鏡直接看鬼的視角。
+   */
+  function lensView(f, objX, h, lensX) {
+    var u = lensX - objX, eye = WORLD.eyeX;
+    if (!(u > 5)) return { eye: 'none', u: u };
+    var img = Optics.thinLensImage(f, u, h);
+    if (!img || Math.abs(u - f) < 0.5) return { eye: 'blur', u: u };
+    var x = lensX + img.dImg, y = img.m * h, out = { u: u, v: img.dImg, m: img.m, x: x, y: y };
+    if (img.isVirtual) out.eye = 'virtual';
+    else out.eye = x < eye - 25 ? 'realInFront' : 'blur';
+    out.angMag = Math.abs(img.m) * (eye - objX) / Math.abs(eye - x);
+    out.markable = out.eye === 'virtual' && x >= -WORLD.corridorLength && Math.abs(y) <= WORLD.virtualMaxY;
+    return out;
+  }
+
+  /** 透鏡在哪個範圍（每 1 cm 取樣）看得到可以標記的虛像：{ from, to }；沒有就是 null。 */
+  function virtualWindow(f, objX, h) {
+    var a = null, b = null;
+    for (var x = WORLD.lensMinX; x <= WORLD.lensMaxX; x++) {
+      if (lensView(f, objX, h, x).markable) { if (a == null) a = x; b = x; }
+    }
+    return a == null ? null : { from: a, to: b };
+  }
+
+  /**
+   * 虛像標記反推（走廊座標）。學生能走的路線：
+   *   A. 標記 ↔ 光心 O
+   *   B. 標記水平畫到透鏡得 P → 連 P 與物側焦點 F（F′ 可能在布幕後面，畫不到）
+   *   C. 標記 ↔ 像側焦點 F′，交透鏡於 P′ → 過 P′ 的水平線（F′ 在布幕前面時才畫得到）
+   */
+  function reverseVirtual(f, lensX, mark) {
+    var O = { x: lensX, y: 0 }, F = { x: lensX - f, y: 0 }, F2 = { x: lensX + f, y: 0 };
+    var center = Optics.lineThrough(mark, O);
+    var P = { x: lensX, y: mark.y };
+    var P2 = Optics.intersectVertical(Optics.lineThrough(mark, F2), lensX);
+    return { P: P, P2: P2, viaF: Optics.intersect(center, Optics.lineThrough(P, F)), viaF2: Optics.intersect(center, Optics.horizontalLine(P2)) };
   }
 
   var all = RAW.map(build);
@@ -97,6 +154,7 @@
     function near(a, b, tol) { return Math.abs(a - b) <= (tol == null ? 1e-6 : tol); }
     (list || all).forEach(function (c) {
       var T = function (s) { return '配置' + c.id + ' ' + s; };
+      if (c.kind === 'virtual') { checkVirtual(c, ok, near, T); return; }
       ok(c.sharp.length === 2, T('有兩個清晰位置（D > 4f）'), 'D=' + (-c.object.x) + ' 4f=' + 4 * c.f);
       ok(floor.cellAt(c.object.x) === c.targetCell && near(floor.edgeMargin(c.object.x), 0.5), T('物點在目標格正中央'));
       ok(Math.abs(c.h) + WORLD.ghostHalfHeight < WORLD.axisHeight, T('鬼不穿出地板／天花板'));
@@ -131,9 +189,52 @@
       });
       ok(c.sharp.length === 2 && near(c.sharp[0].m * c.sharp[1].m, 1, 1e-9), T('兩個清晰位置的放大率互為倒數'));
       ok(c.sharp.length === 2 && Math.abs(c.sharp[0].lensX - c.sharp[1].lensX) > 4 * WORLD.checkOffset, T('兩個清晰位置分得開'));
+      // 實像題的透鏡也能移到鬼和焦點之間：那時看到的虛像，標記後一樣反推得回鬼（物理上正確，允許）
+      if (c.virtualWindow) checkVirtualMarks(c, ok, near, T);
     });
     return out;
   }
 
-  return { WORLD: WORLD, RAW: RAW, floor: floor, build: build, all: all, sharpLensPositions: sharpLensPositions, wallImage: wallImage, selfCheck: selfCheck };
+  function checkVirtualMarks(c, ok, near, T) {
+    var bad = [], n = 0;
+    for (var x = c.virtualWindow.from; x <= c.virtualWindow.to; x += 5) {
+      var v = lensView(c.f, c.object.x, c.h, x);
+      if (!v.markable) continue;
+      n++;
+      var r = reverseVirtual(c.f, x, { x: v.x, y: v.y });
+      var good = near(r.viaF.x, c.object.x, 1e-6) && near(r.viaF.y, c.h, 1e-6) && near(r.viaF2.x, c.object.x, 1e-6) && near(r.viaF2.y, c.h, 1e-6) &&
+        near(r.P2.y, c.h, 1e-6) && Math.abs(r.P.y) < WORLD.lensRadius && v.m > 1 && v.angMag > 1;
+      if (!good) bad.push(x);
+    }
+    ok(n > 0 && bad.length === 0, T('看得到虛像的每個透鏡位置：標記↔O 配「標記水平到 P → P↔F」或「標記↔F′ → 過 P′ 水平」都反推回鬼；正立、放大，看起來比直接看大'),
+      '透鏡 ' + c.virtualWindow.from + '～' + c.virtualWindow.to + '，取樣 ' + n + ' 個' + (bad.length ? '，失敗 ' + bad.join(',') : ''));
+  }
+
+  function checkVirtual(c, ok, near, T) {
+    var D = -c.object.x;
+    ok(D < 4 * c.f && c.sharp.length === 0, T('虛像題：鬼到布幕 < 4f，沒有清晰實像的位置'), 'D=' + D + ' 4f=' + 4 * c.f);
+    ok(floor.cellAt(c.object.x) === c.targetCell && near(floor.edgeMargin(c.object.x), 0.5), T('物點在目標格正中央'));
+    ok(Math.abs(c.h) + WORLD.ghostHalfHeight < WORLD.axisHeight, T('鬼不穿出地板／天花板'));
+    var minRatio = Infinity, inFront = 0, behind = 0;
+    for (var x = WORLD.lensMinX; x <= WORLD.lensMaxX; x++) {
+      var w = wallImage(c.f, c.object.x, c.h, x, WORLD.lensRadius);
+      if (w && w.blurRatio < minRatio) minRatio = w.blurRatio;
+      var v = lensView(c.f, c.object.x, c.h, x);
+      if (v.eye === 'realInFront') inFront++;
+      if (v.eye === 'none') behind++;
+    }
+    ok(minRatio > 2 * WORLD.lockBlurRatio, T('透鏡在可移動範圍內任何位置，布幕上都不夠清楚、不能標記'), '最小模糊比 ' + minRatio.toFixed(2) + '（門檻 ' + WORLD.lockBlurRatio + '）');
+    ok(inFront === 0, T('隔著透鏡也永遠看不到倒立的實像（實像都落在布幕後面）'));
+    ok(true, T('（資訊）透鏡範圍和實像題一樣；能越過鬼的位置'), behind ? behind + ' 個（越過時布幕和透鏡裡都看不到像）' : '0 個（鬼在透鏡最左端之外）');
+    var vw = c.virtualWindow;
+    ok(vw && vw.to - vw.from >= 40, T('看得到可標記虛像的透鏡範圍夠寬（≥ 40 cm）'), vw ? vw.from + '～' + vw.to : '無');
+    if (!vw) return;
+    checkVirtualMarks(c, ok, near, T);
+    var mid = lensView(c.f, c.object.x, c.h, c.virtualLensX);
+    var ang = Math.atan(Math.abs(mid.y) / Math.abs(c.virtualLensX - mid.x)) * 180 / Math.PI;
+    ok(ang >= 3, T('範圍中點：標記↔O 與水平線的夾角 ≥ 3°'), 'lensX=' + c.virtualLensX + '，虛像 (' + mid.x.toFixed(0) + ', ' + mid.y.toFixed(0) + ')，m=' + mid.m.toFixed(2) + '，看起來 ' + mid.angMag.toFixed(2) + ' 倍，夾角 ' + ang.toFixed(1) + '°');
+  }
+
+  return { WORLD: WORLD, RAW: RAW, floor: floor, build: build, all: all, sharpLensPositions: sharpLensPositions, wallImage: wallImage,
+    lensView: lensView, virtualWindow: virtualWindow, reverseVirtual: reverseVirtual, selfCheck: selfCheck };
 });

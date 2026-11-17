@@ -140,12 +140,16 @@ async function run(profile, browser) {
 
   // 走到「可以施放」：對焦（掛鉤）→ 標記 → 分析 → 選格模式。回傳這一隻鬼的資料。
   const toSealMode = async () => {
+    // 虛像題（沒有清晰實像位置）：透鏡放在看得到虛像的位置，改「看凸透鏡」再標記
     const c = await page.evaluate(() => {
-      const H = window.__protoConvex, c = H.cfg();
-      if (H.state.phase === 'observe') { H.state.lensX = c.sharp[1].lensX; H.render(); }
-      return { id: c.id, targetCell: c.targetCell, lensX: c.sharp[1].lensX, phase: H.state.phase };
+      const H = window.__protoConvex, c = H.cfg(), virt = c.kind === 'virtual', lx = virt ? c.virtualLensX : c.sharp[1].lensX;
+      if (H.state.phase === 'observe') { H.state.lensX = lx; H.render(); }
+      return { id: c.id, targetCell: c.targetCell, lensX: lx, phase: H.state.phase, virt };
     });
-    if (c.phase === 'observe') { await press('#markBtn'); await press('#toAnalysis', 120); }
+    if (c.phase === 'observe') {
+      if (c.virt) await press('#lookLens');
+      await press('#markBtn'); await press('#toAnalysis', 120);
+    }
     await press('#modeSeal');
     return c;
   };

@@ -43,7 +43,8 @@
     cfgIndex: 0,
     phase: 'observe',     // 'observe' | 'analysis'
     lensX: -350,
-    marker: null,         // { lensX, y }：標記時透鏡的位置與牆上像點的高度
+    look: 'screen',       // 觀察時看哪裡：'screen' 布幕（找實像）｜'lens' 從布幕這邊隔著凸透鏡看（找虛像）
+    marker: null,         // { lensX, x, y, virtual }：標記時透鏡的位置與像點（實像 x = 0 在布幕上；虛像在透鏡左邊）
     mode: 'draw', pending: null, lines: [], drag: null,
     selectedCell: null, seal: null, solved: false, attempts: 0,
     debug: FREE && /[?&]debug=1/.test(location.search),
@@ -77,6 +78,7 @@
   });
   function clampLens(x) { return Math.max(WORLD.lensMinX, Math.min(WORLD.lensMaxX, x)); }
   function wallNow() { var c = cfg(); return Cfg.wallImage(c.f, c.object.x, c.h, state.lensX, WORLD.lensRadius); }
+  function lensViewNow() { var c = cfg(); return Cfg.lensView(c.f, c.object.x, c.h, state.lensX); }
   function nearestSharp() {
     var best = null;
     cfg().sharp.forEach(function (sp) { if (!best || Math.abs(sp.lensX - state.lensX) < Math.abs(best.lensX - state.lensX)) best = sp; });
@@ -254,9 +256,65 @@
       ctx.restore();
     }
     ctx.strokeStyle = '#7a6040'; ctx.lineWidth = 2; ctx.strokeRect(wx, wy, ww, wh);
-    if (state.marker) drawMarker(cx, cy - state.marker.y * k);
+    var realMark = state.marker && !state.marker.virtual;
+    if (realMark) drawMarker(cx, cy - state.marker.y * k);
     label('布幕（正面看）', r.x + 8, r.y + 12, '#aab3e6', 'left');
-    if (state.marker) label('實像標記', cx + 22, cy - state.marker.y * k - 18, MARK_COLOR, 'left');
+    if (realMark) label('實像標記', cx + 22, cy - state.marker.y * k - 18, MARK_COLOR, 'left');
+    ctx.restore();
+  }
+
+  // ====================================================================
+  // 「看凸透鏡」：眼睛站在布幕這邊（X = 0），隔著透鏡往鬼的方向看。
+  // 佔原本布幕那一格；鏡框最大和布幕一樣寬。畫的是鬼的「像」（不是鬼本體），
+  // 位置與大小按從眼睛看的視角（y ÷ 到眼睛的距離）計算。
+  // ====================================================================
+
+  var VIRTUAL_COLOR = '#b7a6ff', REAL_IMG_COLOR = '#ff9ad5';
+  function renderLensView(r) {
+    var c = cfg(), pad = 10;
+    ctx.save();
+    ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip();
+    ctx.fillStyle = '#0a0b16'; ctx.fillRect(r.x, r.y, r.w, r.h);
+    var k = Math.min((r.w - 2 * pad) / (2 * WORLD.wallHalfWidth), (r.h - 2 * pad - 18) / (2 * WORLD.axisHeight));
+    var foot = Math.round(34 * FS);                              // 底部一列：直接看鬼的大小（對照）
+    var cx = r.x + r.w / 2, cy = r.y + 22 + (r.h - 22 - foot) / 2;
+    var maxR = Math.min(WORLD.wallHalfWidth * k, (r.h - 22 - foot) / 2 - 6); // 鏡框半徑上限 = 布幕半寬（不比布幕大）
+    var eye = WORLD.eyeX, D = eye - c.object.x, dLens = eye - state.lensX;
+    var angR = WORLD.lensRadius / dLens, naked = WORLD.ghostHalfHeight / D;
+    var K = Math.min(maxR * 0.3 / naked, maxR / angR);          // 視角（正切）→ 畫面 px；直接看鬼時鬼的半高 = 鏡框上限的 30%
+    var rad = angR * K;
+    var lv = lensViewNow();
+    // 鏡片（正面看是圓形；木框＋玻璃）
+    ctx.fillStyle = '#5a4630'; ctx.beginPath(); ctx.arc(cx, cy, rad + 5, 0, 7); ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, rad, 0, 7); ctx.clip();
+    var gg = ctx.createRadialGradient(cx - rad * 0.3, cy - rad * 0.35, rad * 0.05, cx, cy, rad);
+    gg.addColorStop(0, '#26304f'); gg.addColorStop(1, '#141a30');
+    ctx.fillStyle = gg; ctx.fillRect(cx - rad, cy - rad, 2 * rad, 2 * rad);
+    if (!state.solved && (lv.eye === 'virtual' || lv.eye === 'realInFront')) {
+      var d = eye - lv.x, am = Math.abs(lv.m), virt = lv.eye === 'virtual';
+      ctx.save(); ctx.globalAlpha = 0.78; ctx.fillStyle = virt ? VIRTUAL_COLOR : REAL_IMG_COLOR;
+      ghostPath(ctx, cx, cy - (lv.y / d) * K, WORLD.ghostHalfWidth * am / d * K, WORLD.ghostHalfHeight * am / d * K, virt ? 1 : -1, virt ? 1 : -1);
+      ctx.fill('evenodd'); ctx.restore();
+    } else if (!state.solved && lv.eye === 'blur') {
+      var gr = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
+      gr.addColorStop(0, 'rgba(157,255,216,.30)'); gr.addColorStop(1, 'rgba(157,255,216,.04)');
+      ctx.fillStyle = gr; ctx.fillRect(cx - rad, cy - rad, 2 * rad, 2 * rad);
+    }
+    // 玻璃反光
+    ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = Math.max(2, rad * 0.06);
+    ctx.beginPath(); ctx.arc(cx, cy, rad * 0.78, Math.PI * 1.1, Math.PI * 1.45); ctx.stroke();
+    ctx.restore();
+    ctx.strokeStyle = '#9fd8ff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, rad, 0, 7); ctx.stroke();
+    if (state.marker && state.marker.virtual) {
+      var my = cy - (state.marker.y / (eye - state.marker.x)) * K;
+      drawMarker(cx, my);
+    }
+    // 對照：不用透鏡、直接看鬼時看起來的大小（灰色虛線，底部一列）
+    var rw = WORLD.ghostHalfWidth / D * K, rh = naked * K, fy = r.y + r.h - foot / 2;
+    ctx.save(); ctx.strokeStyle = 'rgba(200,205,230,.85)'; ctx.setLineDash([4, 3]); ctx.lineWidth = 1.5;
+    ghostPath(ctx, r.x + 10 + rw, fy, rw, rh, 1, 1); ctx.stroke(); ctx.restore();
+    label('← 直接看', r.x + 10 + rw * 2.6, fy, '#aab3e6', 'left');
+    label('隔著凸透鏡看', r.x + 8, r.y + 12, '#aab3e6', 'left');
     ctx.restore();
   }
 
@@ -273,8 +331,8 @@
       { id: 'O', label: 'O', x: lx, y: 0 },
       { id: 'F', label: 'F', x: lx - c.f, y: 0 },
       { id: 'F2', label: 'F′', x: lx + c.f, y: 0 }
-    ];
-    if (state.marker) pts.push({ id: 'I', label: '實像', x: 0, y: state.marker.y });
+    ].filter(function (p) { return p.x <= 0; }); // 虛像題的 F′ 可能落在布幕後面：那裡畫不到，不給吸附
+    if (state.marker) pts.push({ id: 'I', label: state.marker.virtual ? '虛像' : '實像', x: state.marker.x, y: state.marker.y });
     state.lines.forEach(function (l) {
       var p = Optics.intersectVertical(geomLine(l), lx);
       if (!p || Math.abs(p.y) > 400) return;
@@ -460,7 +518,7 @@
       });
       snapPoints().forEach(function (sp) {
         q = w2s(sp);
-        if (sp.id === 'I') { drawMarker(q.x, q.y); label('實像標記', q.x - 22, q.y + (sp.y >= 0 ? -24 : 24), MARK_COLOR, 'right'); return; }
+        if (sp.id === 'I') { drawMarker(q.x, q.y); label(sp.label + '標記', q.x - 22, q.y + (sp.y >= 0 ? -24 : 24), MARK_COLOR, 'right'); return; }
         ctx.fillStyle = sp.id === 'P' ? '#7dffb2' : '#fff';
         ctx.beginPath(); ctx.arc(q.x, q.y, 5, 0, 7); ctx.fill();
         if (state.mode === 'draw') { ctx.strokeStyle = 'rgba(255,255,255,.22)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(q.x, q.y, 14, 0, 7); ctx.stroke(); }
@@ -472,7 +530,7 @@
         ctx.beginPath(); ctx.arc(q.x, q.y, 18, 0, 7); ctx.stroke();
       }
     } else if (state.marker) {
-      q = w2s({ x: 0, y: state.marker.y });
+      q = w2s({ x: state.marker.x, y: state.marker.y });
       drawMarker(q.x, q.y);
     }
 
@@ -502,12 +560,14 @@
       var spec = replaySpec();
       var tau = Math.min(spec.duration, (performance.now() - state.replay.t0) / 1000);
       if (tau > spec.imageAt) {
-        var mag = -state.lensX / (state.lensX - c.object.x);
+        var vm = state.marker.virtual;
+        var mag = (state.lensX - state.marker.x) / (state.lensX - c.object.x);
         var ihw = Math.max(4, WORLD.ghostHalfWidth * mag * s), ihh = Math.max(6, WORLD.ghostHalfHeight * mag * s);
-        var ip = w2s({ x: 0, y: state.marker.y });
+        var ip = w2s({ x: state.marker.x, y: state.marker.y });
         ctx.save(); ctx.globalAlpha = 0.7 * Math.min(1, (tau - spec.imageAt) / 0.5);
-        ctx.fillStyle = GHOST_COLOR;
-        ghostPath(ctx, ip.x - ihw - 4, ip.y, ihw, ihh, -1, -1); // 倒立實像：上下、左右都相反（和布幕正面視圖、課本一致）
+        ctx.fillStyle = vm ? VIRTUAL_COLOR : GHOST_COLOR;
+        // 實像：倒立，上下、左右都相反（和布幕正面視圖、課本一致），畫在布幕左邊。虛像：正立，畫在虛像的位置
+        if (vm) ghostPath(ctx, ip.x, ip.y, ihw, ihh, 1, 1); else ghostPath(ctx, ip.x - ihw - 4, ip.y, ihw, ihh, -1, -1);
         ctx.fill('evenodd');
         ctx.restore();
       }
@@ -524,7 +584,7 @@
         ctx.fillStyle = '#3dff7a'; ctx.beginPath(); ctx.moveTo(u.x, u.y); ctx.lineTo(u.x - 6, u.y + 10); ctx.lineTo(u.x + 6, u.y + 10); ctx.closePath(); ctx.fill();
       });
       if (analysis && state.marker) {
-        var r = Optics.reverseConstruct(c.f, { x: -state.lensX, y: state.marker.y });
+        var r = Optics.reverseConstruct(c.f, { x: state.marker.x - state.lensX, y: state.marker.y });
         var shift = function (ln) { return { p: { x: ln.p.x + state.lensX, y: ln.p.y }, d: ln.d }; };
         [r.centerLine, r.focusLine, r.parallelLine].forEach(function (ln) { strokeInfinite(shift(ln), 'rgba(61,255,122,.8)', 1, [3, 5]); });
       }
@@ -545,16 +605,40 @@
 
   function markImage() {
     if (state.solved) return;
-    var c = cfg(), sp = nearestSharp();
+    if (state.look === 'lens') { markVirtual(); return; }
+    var sp = nearestSharp();
     var w = wallNow();
     if (!sp || !w || !(w.blurRatio <= WORLD.lockBlurRatio)) {
-      setStatus(w && w.blurRatio < 0.5 ? '快清楚了，但輪廓還有點糊。再微調一下透鏡。' : '牆上的光還是一團模糊。移動透鏡，直到看得出清楚的鬼像。');
+      setStatus(!w ? '布幕上看不到鬼的光。移動透鏡，或改「看凸透鏡」。'
+        : w.blurRatio < 0.5 ? '快清楚了，但輪廓還有點糊。再微調一下透鏡。' : '牆上的光還是一團模糊。移動透鏡，或改「看凸透鏡」。');
       return;
     }
     state.lensX = sp.lensX; // 對準清晰位置（相當於自動對焦的最後一小步）
-    state.marker = { lensX: sp.lensX, y: sp.imageY };
+    state.marker = { lensX: sp.lensX, x: 0, y: sp.imageY, virtual: false };
     setStatus('已標記牆上的「實像」——它是倒立的' + (Math.abs(sp.m) > 1 ? '、放大的' : '、縮小的') + '。鬼本體在透鏡的另一邊。接著做光路分析。');
-    void c;
+    syncUI(); requestRender();
+  }
+
+  // 「看凸透鏡」時的標記：只有看到正立、放大的虛像才能標記；標記打在虛像的位置（透鏡左邊）。不自動移動透鏡。
+  function markVirtual() {
+    var lv = lensViewNow();
+    if (lv.eye === 'virtual' && lv.markable) {
+      state.marker = { lensX: state.lensX, x: lv.x, y: lv.y, virtual: true };
+      setStatus('你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」');
+      syncUI(); requestRender();
+      return;
+    }
+    setStatus(lv.eye === 'virtual' ? '透鏡裡的鬼放大得太厲害，看不清全貌。稍微移動透鏡再試。'
+      : lv.eye === 'realInFront' ? '透鏡裡看到的是倒立的像——那不是虛像。要標記倒立的實像，請改「看布幕」。'
+      : lv.eye === 'none' ? '透鏡裡看不到鬼的像。移動透鏡試試。'
+      : '透鏡裡模糊一片，看不清楚。移動透鏡試試。');
+  }
+
+  function setLook(v) {
+    if (state.look === v || state.solved) return;
+    state.look = v;
+    if (state.marker) state.marker = null;
+    setStatus(v === 'lens' ? '你站在布幕這邊，隔著凸透鏡往走廊看。看到清楚的鬼像就按「標記」。' : '看布幕：布幕上出現清楚的鬼像就按「標記」。');
     syncUI(); requestRender();
   }
 
@@ -563,6 +647,7 @@
   //   光線 2：由鬼射向光心 O，直線通過，到達布幕。
   //   兩條光線在布幕上會聚成實像。
   function replaySpec() {
+    if (state.marker && state.marker.virtual) return replaySpecVirtual();
     var c = cfg(), o = c.object, lx = state.lensX;
     var P = { x: lx, y: o.y }, O = { x: lx, y: 0 }, I = { x: 0, y: state.marker ? state.marker.y : 0 };
     // 第三條主光線：通過物側焦點 F，打在透鏡上的 Q，折射後平行主光軸（Q 的高度 = 像高）
@@ -582,6 +667,41 @@
         { start: 0, text: '鬼身上發出三條光線' },
         { start: 1.0, text: '經過凸透鏡：平行的折向焦點 F′，過光心的直走，過焦點 F 的變平行' },
         { start: 2.2, text: '實際光路 → 光線會聚 → 實像位置' }
+      ]
+    };
+  }
+  // 虛像：三條主光線折射後發散，一路走到布幕（布幕上不會聚成像）；
+  // 從布幕這邊看，眼睛把它們反向延長（虛線），交在透鏡左邊的虛像。
+  function replaySpecVirtual() {
+    var c = cfg(), o = c.object, lx = state.lensX, I = { x: state.marker.x, y: state.marker.y };
+    var P = { x: lx, y: o.y }, O = { x: lx, y: 0 };
+    var Fo = { x: lx - c.f, y: 0 }, Q = { x: lx, y: o.y + ((Fo.y - o.y) / (Fo.x - o.x)) * (lx - o.x) }; // 從 F 的方向來（鬼在 F 與透鏡之間）
+    // 沿方向 (dx, dy) 走到布幕；先碰到地板或天花板就停在那裡
+    var atWall = function (a, dy, dx) {
+      var y = a.y + (dy / dx) * (0 - a.x), lim = WORLD.axisHeight;
+      if (Math.abs(y) <= lim) return { x: 0, y: y };
+      var yl = y > 0 ? lim : -lim;
+      return { x: a.x + (yl - a.y) * dx / dy, y: yl };
+    };
+    return {
+      duration: 4.2, imageAt: 3.2,
+      segments: [
+        { a: o, b: P, start: 0, end: 1.0, kind: 'ray' },
+        { a: o, b: O, start: 0, end: 1.0, kind: 'ray' },
+        { a: P, b: atWall(P, -o.y, c.f), start: 1.0, end: 2.2, kind: 'ray' },            // 折向 F′ 的方向
+        { a: O, b: atWall(O, O.y - o.y, O.x - o.x), start: 1.0, end: 2.2, kind: 'ray' },  // 過光心直走
+        { a: o, b: Q, start: 0, end: 1.0, kind: 'ray' },
+        { a: Q, b: { x: 0, y: Q.y }, start: 1.0, end: 2.2, kind: 'ray' },                 // 平行主光軸
+        { a: P, b: I, start: 2.2, end: 3.2, kind: 'extension' },
+        { a: O, b: I, start: 2.2, end: 3.2, kind: 'extension' },
+        { a: Q, b: I, start: 2.2, end: 3.2, kind: 'extension' }
+      ],
+      points: [{ p: I, start: 3.2 }],
+      captions: [
+        { start: 0, text: '鬼身上發出三條光線' },
+        { start: 1.0, text: '鬼在焦點內：折射後的光線彼此分開，布幕上不會聚成像' },
+        { start: 2.2, text: '從布幕這邊看，光線像是從同一點發出（反向延長的虛線）' },
+        { start: 3.2, text: '虛線交點 → 正立、放大的虛像，和鬼在透鏡同一側' }
       ]
     };
   }
@@ -628,7 +748,9 @@
       if (success) {
         state.solved = true;
         if (level.on) level.sealed++;
-        setStatus('封印成功！鬼被迫顯形——布幕上的只是牠的像，本體在透鏡的另一邊。看看光是怎麼走的。');
+        setStatus(state.marker && state.marker.virtual
+          ? '封印成功！鬼被迫顯形——透鏡裡看到的只是牠的虛像，本體和虛像都在透鏡的另一邊。看看光是怎麼走的。'
+          : '封印成功！鬼被迫顯形——布幕上的只是牠的像，本體在透鏡的另一邊。看看光是怎麼走的。');
         startReplay();
       } else {
         state.selectedCell = null;
@@ -791,10 +913,14 @@
     $('exploreControls').hidden = analysis;
     $('analysisControls').hidden = !analysis;
     $('zoomBox').hidden = !analysis;
-    $('zoomBox').classList.toggle('low', !!state.marker && state.marker.y > 0); // 避開實像標記（見 index.html）
+    $('zoomBox').classList.toggle('low', !!state.marker && !state.marker.virtual && state.marker.y > 0); // 避開布幕上的實像標記（見 index.html）；虛像標記在走廊中間，不必避
     $('toAnalysis').disabled = !state.marker;
     $('toAnalysis').classList.toggle('primary', !!state.marker);
     $('markBtn').classList.toggle('primary', !state.marker);
+    $('lookScreen').classList.toggle('on', state.look === 'screen');
+    $('lookLens').classList.toggle('on', state.look === 'lens');
+    $('lookScreen').setAttribute('aria-pressed', String(state.look === 'screen'));
+    $('lookLens').setAttribute('aria-pressed', String(state.look === 'lens'));
     $('modeDraw').classList.toggle('on', state.mode === 'draw');
     $('modeSeal').classList.toggle('on', state.mode === 'seal');
     $('drawRow').hidden = state.mode !== 'draw';
@@ -833,9 +959,11 @@
     return 'DEBUG 配置 ' + c.id + '（僅供開發驗證）\n' +
       '焦距 f = ' + c.f + ' cm\n' +
       '物點 = (' + f2(c.object.x) + ', ' + f2(c.object.y) + ')   目標格 = ' + c.targetCell + '\n' +
-      '清晰位置 lensX = ' + c.sharp.map(function (s) { return f2(s.lensX) + '（m=' + f2(s.m) + '）'; }).join('、') + '\n' +
+      '題型 = ' + (c.kind === 'virtual' ? '虛像（D < 4f）' : '實像') + '\n' +
+      '清晰位置 lensX = ' + (c.sharp.length ? c.sharp.map(function (s) { return f2(s.lensX) + '（m=' + f2(s.m) + '）'; }).join('、') : '無') + '\n' +
+      '虛像可標記 lensX = ' + (c.virtualWindow ? c.virtualWindow.from + '～' + c.virtualWindow.to : '無') + '\n' +
       '目前 lensX = ' + f2(state.lensX) + '   模糊圓 = ' + (w && isFinite(w.blur) ? f2(w.blur) + ' cm' : '—') + '\n' +
-      '實像標記 = ' + (state.marker ? '(0, ' + f2(state.marker.y) + ')' : '—') + '\n' +
+      '標記 = ' + (state.marker ? (state.marker.virtual ? '虛像' : '實像') + ' (' + f2(state.marker.x) + ', ' + f2(state.marker.y) + ')' : '—') + '\n' +
       '封印次數 = ' + state.attempts + '   線 = ' + state.lines.length;
   }
 
@@ -868,7 +996,7 @@
   function startHunt() {
     closeScene();
     level.screen = 'play'; level.lives = LEVEL_LIVES; level.sealed = 0;
-    state.seenAnalysisIntro = false;
+    state.seenAnalysisIntro = false; state.seenVirtualIntro = false;
     resetRound(nextRandomConfig());
   }
   function failLevel() {
@@ -923,10 +1051,13 @@
   }
 
   // 透鏡的起始位置：離兩個清晰位置都夠遠，否則一開場布幕上就幾乎是清楚的像（等於不用對焦）。
+  // 也不能一開場就在鬼的後面，或隔著透鏡就看得到虛像。
   function startLensX(c) {
     var best = -350, bestGap = -1;
     [-350, -200, -500, -120, -600].forEach(function (x) {
-      var gap = Math.min.apply(null, c.sharp.map(function (sp) { return Math.abs(sp.lensX - x); }));
+      var gap = Math.min.apply(null, c.sharp.map(function (sp) { return Math.abs(sp.lensX - x); }).concat([Infinity]));
+      var lv = Cfg.lensView(c.f, c.object.x, c.h, x);
+      if (lv.eye === 'none' || lv.eye === 'virtual') return;
       if (gap >= 60 && bestGap < 60) { best = x; bestGap = gap; }
     });
     return best;
@@ -934,12 +1065,12 @@
 
   function resetRound(idx) {
     state.cfgIndex = idx; roundsStarted++;
-    state.phase = 'observe'; state.lensX = startLensX(Cfg.all[idx]); state.marker = null;
+    state.phase = 'observe'; state.lensX = startLensX(Cfg.all[idx]); state.marker = null; state.look = 'screen';
     state.mode = 'draw'; state.pending = null; state.lines = []; state.drag = null;
     state.selectedCell = null; state.seal = null; state.solved = false; state.attempts = 0; state.replay = null;
     state.zoomIdx = 0;
     $('configSel').value = String(idx);
-    setStatus('走廊深處有鬼，但肉眼看不到。左右拖曳移動凸透鏡，讓布幕上出現清楚的鬼像，再按「標記實像」。');
+    setStatus('走廊深處有鬼，肉眼看不到。左右拖曳移動凸透鏡，找到清楚的鬼像就按「標記」。');
     layout();
   }
 
@@ -947,10 +1078,13 @@
     if (!state.marker) return;
     state.phase = 'analysis'; state.pending = null;
     syncUI(); layout();
-    setStatus(state.solved ? '已封印。' : '側視圖：從牆上的「實像標記」出發，用主光線反推鬼本體在哪一格。先選起點，再選終點。');
-    if (!state.seenAnalysisIntro) {
+    var vm = state.marker.virtual;
+    setStatus(state.solved ? '已封印。' : '側視圖：從「' + (vm ? '虛像' : '實像') + '標記」出發，用主光線反推鬼本體在哪一格。先選起點，再選終點。');
+    if (!state.seenAnalysisIntro || (vm && !state.seenVirtualIntro)) {
       state.seenAnalysisIntro = true;
-      showBanner('現在只看走廊的側視圖：右邊是布幕和你標記的實像，中間是凸透鏡，鬼藏在透鏡左邊的某一格。', 5200);
+      if (vm) state.seenVirtualIntro = true;
+      showBanner(vm ? '現在只看走廊的側視圖：你標記的虛像在透鏡左邊，鬼也藏在透鏡左邊的某一格。'
+        : '現在只看走廊的側視圖：右邊是布幕和你標記的實像，中間是凸透鏡，鬼藏在透鏡左邊的某一格。', 5200);
     }
   }
 
@@ -994,7 +1128,7 @@
     } else {
       var rg = regions();
       renderSide(rg.side);
-      renderWall(rg.wall);
+      if (state.look === 'lens') renderLensView(rg.wall); else renderWall(rg.wall);
       ctx.strokeStyle = '#2c3359'; ctx.lineWidth = 2;
       ctx.beginPath();
       if (rg.wall.y === 0 && rg.wall.x > 0) { ctx.moveTo(rg.wall.x, 0); ctx.lineTo(rg.wall.x, H); }
@@ -1012,6 +1146,8 @@
   $('nudgeLeft').addEventListener('click', function () { if (!state.solved) { moveLens(state.lensX - NUDGE_CM); requestRender(); syncUI(); } });
   $('nudgeRight').addEventListener('click', function () { if (!state.solved) { moveLens(state.lensX + NUDGE_CM); requestRender(); syncUI(); } });
   $('markBtn').addEventListener('click', markImage);
+  $('lookScreen').addEventListener('click', function () { setLook('screen'); });
+  $('lookLens').addEventListener('click', function () { setLook('lens'); });
   $('toAnalysis').addEventListener('click', enterAnalysis);
   $('toExplore').addEventListener('click', function () {
     state.phase = 'observe'; state.pending = null; state.lines = []; state.selectedCell = null; state.seal = null; state.mode = 'draw';
@@ -1039,7 +1175,7 @@
   // 測試／開發用掛鉤（不是學生 UI）
   window.__protoConvex = {
     state: state, stats: stats, cfg: cfg, configs: Cfg, GHOST_COLOR: GHOST_COLOR, SNAP_PX: SNAP_PX,
-    w2s: w2s, s2w: s2w, snapPoints: snapPoints, nearestSnap: nearestSnap, studentIntersections: studentIntersections, wallNow: wallNow,
+    w2s: w2s, s2w: s2w, snapPoints: snapPoints, nearestSnap: nearestSnap, studentIntersections: studentIntersections, wallNow: wallNow, lensViewNow: lensViewNow,
     regions: regions, canvasSize: function () { return { W: W, H: H, DPR: DPR }; }, render: render,
     replaySpec: replaySpec, level: level,
     art: function () { return { pending: artPending, corridor: ART.corridor.ready, lens: ART.lens.ready }; }

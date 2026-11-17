@@ -48,15 +48,17 @@ function ok(cond, label, detail) {
 }
 
 // runs：[配置索引, 清晰位置索引]。0 = 離布幕遠、放大的像；1 = 離布幕近、縮小的像。
-const ALL_RUNS = [];
-const CONFIG_COUNT = require('../prototype/convex-lens/configs.js').all.length;
-for (let c = 0; c < CONFIG_COUNT; c++) for (let s = 0; s < 2; s++) ALL_RUNS.push([c, s]);
+const ALL_RUNS = [], VIRTUAL_RUNS = [];
+const ALL_CFGS = require('../prototype/convex-lens/configs.js').all;
+const CONFIG_COUNT = ALL_CFGS.length;
+// 實像題跑兩個清晰位置；虛像題（D < 4f，沒有清晰位置）另外跑「看凸透鏡 → 標記虛像」的流程
+ALL_CFGS.forEach((c, i) => { if (c.kind === 'virtual') VIRTUAL_RUNS.push(i); else for (let s = 0; s < 2; s++) ALL_RUNS.push([i, s]); });
 const PROFILES = [
-  // 遊戲一律橫向（docs/decisions.md）。橫向手機是主要情境：四組配置 × 兩個清晰位置全跑。
-  { name: 'phone-landscape', viewport: { width: 812, height: 375 }, touch: true, dsf: 2, runs: ALL_RUNS, shots: /./ },
+  // 遊戲一律橫向（docs/decisions.md）。橫向手機是主要情境：所有配置全跑。
+  { name: 'phone-landscape', viewport: { width: 812, height: 375 }, touch: true, dsf: 2, runs: ALL_RUNS, virtualRuns: VIRTUAL_RUNS, shots: /./ },
   // 直向只當備援版面檢查：用 ?portrait=1 關掉「請橫放」提示。
-  { name: 'phone-portrait', viewport: { width: 375, height: 812 }, touch: true, dsf: 2, runs: [[0, 0]], shots: /^[258]-/, query: '&portrait=1' },
-  { name: 'desktop', viewport: { width: 1280, height: 800 }, touch: false, dsf: 1, runs: [[0, 1], [2, 0]], shots: /^[258]-/ }
+  { name: 'phone-portrait', viewport: { width: 375, height: 812 }, touch: true, dsf: 2, runs: [[0, 0]], virtualRuns: VIRTUAL_RUNS.slice(0, 1), shots: /^[258]-/, query: '&portrait=1' },
+  { name: 'desktop', viewport: { width: 1280, height: 800 }, touch: false, dsf: 1, runs: [[0, 1], [2, 0]], virtualRuns: VIRTUAL_RUNS.slice(-1), shots: /^[258]-/ }
 ];
 
 const GHOST = '#9dffd8', MARK = '#ff5fd2';
@@ -129,7 +131,8 @@ async function run(profile, browser) {
   });
   const cfgInfo = () => page.evaluate(() => {
     const H = window.__protoConvex, c = H.cfg();
-    return { id: c.id, f: c.f, h: c.h, targetCell: c.targetCell, object: c.object, sharp: c.sharp, lock: H.configs.WORLD.lockBlurRatio, world: H.configs.WORLD };
+    return { id: c.id, f: c.f, h: c.h, targetCell: c.targetCell, object: c.object, sharp: c.sharp, lock: H.configs.WORLD.lockBlurRatio, world: H.configs.WORLD,
+      kind: c.kind, virtualWindow: c.virtualWindow, virtualLensX: c.virtualLensX };
   });
   const layoutCheck = async (where) => {
     const r = await page.evaluate(() => {
@@ -628,6 +631,153 @@ async function run(profile, browser) {
       ok(steps.every((s) => s.phase === 'observe' && !s.solved && !s.marker && s.lines === 0), T('換配置後回到觀察階段，標記與作圖線都清空'));
     }
   }
+  // ---------- 虛像題：看布幕找不到 → 看凸透鏡 → 標記虛像 → 反推 → 封印 → 重播 ----------
+  // 「看凸透鏡」畫面裡虛像的紫色（半透明疊在暗色鏡片上）
+  const countVirtual = () => page.evaluate(() => {
+    const H = window.__protoConvex; H.render();
+    const r = H.regions().wall, dpr = H.canvasSize().DPR, g = document.getElementById('view').getContext('2d');
+    const d = g.getImageData(Math.round(r.x * dpr), Math.round(r.y * dpr), Math.round(r.w * dpr), Math.round(r.h * dpr)).data;
+    let n = 0;
+    for (let i = 0; i < d.length; i += 4) if (d[i + 2] > 180 && d[i + 1] < 170 && d[i] > 115 && d[i] < 200 && d[i] > d[i + 1]) n++;
+    return n;
+  });
+  for (const ci of (profile.virtualRuns || [])) {
+    await page.selectOption('#configSel', String(ci));
+    await page.waitForTimeout(60);
+    const c = await cfgInfo();
+    const T = (label) => P('配置' + c.id + '·虛像題 ' + label);
+    const shotV = profile.name === 'phone-landscape' && ci === profile.virtualRuns[0] ? (n) => shot('v' + n) : async () => {};
+    const noLeak = async (when) => {
+      const info = await page.evaluate(() => {
+        const H = window.__protoConvex, o = H.cfg().object, dp = document.getElementById('debugPanel');
+        return { text: document.body.innerText, dpLen: dp.textContent.length, revealed: H.stats.ghostRevealed, debugDrawn: H.stats.debugDrawn };
+      });
+      ok(await countColor(GHOST) === 0 && !info.revealed && !/目標格|物點|清晰位置|DEBUG|虛像題/.test(info.text) && info.dpLen === 0 && !info.debugDrawn, T(when + '：畫面、文字、Debug 都沒有鬼本體或答案'));
+    };
+    let s = await st();
+    ok(s.phase === 'observe' && !s.marker && await page.evaluate(() => window.__protoConvex.state.look === 'screen'), T('開場：看布幕、沒有標記'));
+    await noLeak('開始觀察');
+    // 透鏡可移動範圍和實像題一樣；整個範圍內布幕上都不夠清楚
+    const scan = await page.evaluate(() => {
+      const H = window.__protoConvex, W = H.configs.WORLD, s = H.state, keep = s.lensX;
+      let minR = Infinity;
+      for (let x = W.lensMinX; x <= W.lensMaxX; x += 2) { s.lensX = x; const w = H.wallNow(); if (w && w.blurRatio < minR) minR = w.blurRatio; }
+      s.lensX = keep; H.render();
+      return { minR, min: W.lensMinX, max: W.lensMaxX };
+    });
+    ok(scan.min === -620 && scan.max === -80 && scan.minR > c.lock, T('透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光'), '最小模糊比 ' + scan.minR.toFixed(2));
+    await nudgeTo(c.virtualLensX);
+    await press('#markBtn');
+    s = await st();
+    ok(!s.marker && s.toAnalysisDisabled && /模糊|看不到/.test(s.status), T('看布幕時按「標記」被拒絕（布幕上沒有清楚的像）'), '「' + s.status + '」');
+    ok(await countVirtual() === 0, T('看布幕時沒有畫虛像'));
+    // 切到「看凸透鏡」
+    await press('#lookLens');
+    const look = await page.evaluate(() => ({ look: window.__protoConvex.state.look, a: document.getElementById('lookLens').getAttribute('aria-pressed'), b: document.getElementById('lookScreen').getAttribute('aria-pressed') }));
+    ok(look.look === 'lens' && look.a === 'true' && look.b === 'false', T('按「看凸透鏡」切換畫面（兩個並排按鈕，狀態正確）'));
+    const lvInfo = await page.evaluate(() => { const H = window.__protoConvex, r = H.regions(); return { lv: H.lensViewNow(), wall: r.wall }; });
+    const purple = await countVirtual();
+    ok(lvInfo.lv.eye === 'virtual' && lvInfo.lv.m > 1 && lvInfo.lv.angMag > 1 && purple > 20, T('透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大'),
+      'm=' + lvInfo.lv.m.toFixed(2) + '，視角放大 ' + lvInfo.lv.angMag.toFixed(2) + ' 倍，' + purple + ' px');
+    await noLeak('看凸透鏡');
+    await shotV('1-lens-view');
+    // 透鏡越過鬼：透鏡裡和布幕上都沒有像
+    if (c.object.x - 15 >= c.world.lensMinX) {
+      await nudgeTo(c.object.x - 15);
+      await press('#markBtn');
+      s = await st();
+      const n1 = await countVirtual();
+      await press('#lookScreen');
+      const wallLit = await page.evaluate(() => window.__protoConvex.wallNow());
+      await press('#lookLens');
+      ok(!s.marker && n1 === 0 && wallLit === null && /看不到/.test(s.status), T('透鏡越過鬼：透鏡裡、布幕上都看不到像，不能標記'));
+    }
+    await nudgeTo(c.virtualLensX);
+    await press('#markBtn');
+    s = await st();
+    const lv = await page.evaluate(() => window.__protoConvex.lensViewNow());
+    ok(s.marker && s.marker.virtual && Math.abs(s.marker.x - lv.x) < 1e-9 && Math.abs(s.marker.y - lv.y) < 1e-9 && s.marker.x < s.lensX && !s.toAnalysisDisabled,
+      T('看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動'), '標記 (' + (s.marker ? s.marker.x.toFixed(0) + ', ' + s.marker.y.toFixed(0) : '—') + ')，透鏡 ' + s.lensX.toFixed(1));
+    ok(s.status.includes('這是，正立、放大、虛像，鬼與像都在透鏡對面。'), T('標記後出現台詞'), '「' + s.status + '」');
+    ok(await countColor(MARK) > 30, T('畫面上有標記'));
+    await shotV('2-lens-marked');
+    // 切回布幕：標記取消
+    await press('#lookScreen');
+    ok(!(await st()).marker, T('切到「看布幕」：虛像標記取消'));
+    await press('#lookLens');
+    await press('#markBtn');
+    ok(!!(await st()).marker, T('切回「看凸透鏡」可以重新標記'));
+    await layoutCheck('虛像題／看凸透鏡已標記');
+    // 直向只是備援版面：側視圖太窄（標記離鏡片只有十幾 px），作圖流程只在橫向與桌機測
+    if (profile.name === 'phone-portrait') continue;
+
+    // 側視分析
+    await press('#toAnalysis');
+    await page.waitForTimeout(120);
+    s = await st();
+    ok(s.phase === 'analysis', T('切到側視分析'));
+    const sp0 = await page.evaluate(() => window.__protoConvex.snapPoints().map((p) => ({ id: p.id, label: p.label, x: p.x, y: p.y })));
+    const I0 = sp0.find((p) => p.id === 'I');
+    ok(I0 && I0.label === '虛像' && I0.x < s.lensX && sp0.every((p) => p.x <= 0), T('虛像標記在透鏡左邊；所有吸附點都在布幕前面（F′ 在布幕後面就不出現）'), sp0.map((p) => p.label + '(' + p.x.toFixed(0) + ')').join(' '));
+    await noLeak('分析開始');
+    if (profile.name === 'phone-landscape') await page.waitForTimeout(5300); // 等說明橫幅淡出，才不會蓋住截圖
+    // 線 1：從虛像標記水平拉向透鏡 → 透鏡上出現 P（高度 = 虛像高）
+    let a = await snap('I');
+    let b = await freeEnd(a, 'h');
+    await drag(a.x + 3, a.y - 2, b.x, b.y);
+    if (profile.touch) { await page.waitForTimeout(40); await page.touchscreen.tap(4, 4); }
+    const Pp = (await page.evaluate(() => window.__protoConvex.snapPoints())).find((q) => q.id === 'P');
+    ok((await st()).lines === 1 && Pp && Math.abs(Pp.x - s.lensX) < 1e-9 && Math.abs(Pp.y - I0.y) < 1e-9, T('線 1：從虛像標記拉水平線，交透鏡於 P'), Pp ? 'P.y=' + Pp.y.toFixed(2) : 'no P');
+    // 線 2：P ↔ 物側焦點 F
+    a = await snap('P'); b = await snap('F');
+    await tap(a.x + 4, a.y + 4); await tap(b.x - 5, b.y + 5);
+    // 線 3：虛像標記 ↔ 光心 O
+    a = await snap('I'); b = await snap('O');
+    await tap(a.x - 4, a.y - 4); await tap(b.x + 5, b.y + 5);
+    const inter = await page.evaluate(() => {
+      const H = window.__protoConvex, o = H.cfg().object;
+      const best = H.studentIntersections().map((p) => ({ p, d: Math.hypot(p.x - o.x, p.y - o.y) })).sort((x, y) => x.d - y.d)[0];
+      return best ? { d: best.d, cell: H.configs.floor.cellAt(best.p.x), n: H.state.lines.length, kinds: H.state.lines.map((l) => l.kind).join(',') } : { d: Infinity, n: H.state.lines.length };
+    });
+    ok(inter.n === 3 && inter.d < 1e-6 && inter.cell === c.targetCell, T('「標記→水平得 P → P 連 F → 標記連 O」交點 = 鬼，落在目標格'), '誤差 ' + inter.d.toExponential(1) + ' cm，格 ' + inter.cell + '（' + inter.kinds + '）');
+    ok(await page.evaluate(() => !document.getElementById('styleBtn')), T('學生畫的線一律實線（沒有實線／虛線切換）'));
+    await noLeak('畫完三條線');
+    await shotV('3-analysis-lines');
+    // 封印
+    await press('#modeSeal');
+    const wp = await w2s({ x: -(c.targetCell - 0.5) * 100, y: 60 });
+    await tap(wp.x, wp.y);
+    ok((await st()).selectedCell === c.targetCell, T('選目標格'));
+    await press('#castBtn');
+    await page.waitForTimeout(1750);
+    s = await st();
+    ok(s.solved && await countColor(GHOST) > 20, T('封印成功並顯形'));
+    ok(/虛像/.test(s.status), T('過關訊息說明透鏡裡看到的是虛像'), '「' + s.status + '」');
+    await checkReplay({
+      page, hook: '__protoConvex', ok, T, press,
+      shot: profile.name === 'phone-landscape' && ci === profile.virtualRuns[0] ? () => shot('v4-replay-end') : null,
+      physics: (spec) => {
+        // 用配置自己算（物點、焦距、透鏡位置 → 1/f = 1/u + 1/v），不拿 spec 自己對自己
+        const o = c.object, L = s.lensX, u = L - o.x, v = (u * c.f) / (u - c.f), I = { x: L + v, y: (-v / u) * o.y };
+        const O = { x: L, y: 0 }, F = { x: L - c.f, y: 0 }, F2 = { x: L + c.f, y: 0 }, sg = spec.segments;
+        const same = (p, q) => Math.hypot(p.x - q.x, p.y - q.y) < 1e-6;
+        const rays = sg.filter((x) => x.kind === 'ray'), ext = sg.filter((x) => x.kind === 'extension');
+        const inside = rays.every((x) => x.b.x <= 1e-9 && Math.abs(x.b.y) <= c.world.axisHeight + 1e-9);
+        return [
+          { ok: v < 0 && -v / u > 1, label: '虛像：像距為負、放大率 > 1（正立、放大）', detail: 'v=' + v.toFixed(1) + '，m=' + (-v / u).toFixed(2) },
+          { ok: rays.length === 6 && ext.length === 3, label: '六段實際光線（實線）＋三段反向延長線（虛線）' },
+          { ok: same(sg[0].a, o) && same(sg[1].a, o) && same(sg[4].a, o), label: '三條光線都從鬼本體出發' },
+          { ok: same(sg[0].b, { x: L, y: o.y }) && collinear(sg[2].a, sg[2].b, F2) < 1e-6, label: '平行主軸的光線折射後朝 F′ 的方向走' },
+          { ok: same(sg[1].b, O) && collinear(o, sg[3].b, O) < 1e-6, label: '過光心的光線不偏折' },
+          { ok: collinear(o, sg[4].b, F) < 1e-6 && Math.abs(sg[5].b.y - sg[5].a.y) < 1e-9 && Math.abs(sg[4].b.y) < c.world.lensRadius, label: '從 F 方向來的光線折射後平行主光軸，打在鏡片內' },
+          { ok: !same(sg[2].b, sg[3].b) && !same(sg[3].b, sg[5].b) && inside, label: '折射後的光線發散，到布幕（或地板／天花板）為止，沒有會聚成像' },
+          { ok: ext.every((x) => same(x.b, I)) && same(ext[0].a, sg[2].a) && same(ext[1].a, sg[3].a) && same(ext[2].a, sg[5].a) && same(spec.points[0].p, I) && same(I, { x: s.marker.x, y: s.marker.y }),
+            label: '三條反向延長線交在虛像（= 玩家的標記）', detail: '(' + I.x.toFixed(1) + ', ' + I.y.toFixed(1) + ')' }
+        ];
+      }
+    });
+  }
+
   ok(errors.length === 0, P('沒有 JS 錯誤'), errors.join(' | ') || undefined);
   await context.close();
 }
