@@ -6,6 +6,8 @@
  * 幾何全部在 ../shared/mirror-core.js；這個檔只管畫面、操作與關卡流程。
  *
  * 預設是關卡模式：開場 → 兩面鏡抓 2 次 → 鬼打碎右邊的鏡子 → 一面鏡再抓 3 次 → 過關。3 條命整關共用。
+ * 第一次點地板時插一段「丟圓盤」：對話 → 鏘 → 直接在那一格展開法陣 → 結果出來後再一段對話（只在第一次）。
+ * 劇本以使用者的 Google 文件《光學抓鬼遊戲 劇本初稿》為準（見 docs/story-and-flow.md「劇本修訂」）。
  * 網址加 ?free=1 是自由練習（開發用）：沒有過場、不計命，可指定鏡子數與鬼的位置、開 Debug。
  */
 (function () {
@@ -57,6 +59,8 @@
   };
   var stats = { casts: 0, wrong: 0, mirrorTaps: 0, pans: 0, sides: {}, ghostRevealed: false, images: { back: false, right: false }, lastPick: null };
   var scene = null, history = [];
+  var discTaught = FREE; // 「丟圓盤」那段只播一次（重新挑戰、再玩一次都不再播）；自由練習不播
+  var throwing = false;  // 這次施放是第一次丟圓盤：結果出來後要接後段對話
 
   function intactMirrors() { return state.phase === 1 ? ['back', 'right'] : ['back']; }
   function sameCell(a, b) { return !!a && !!b && a.col === b.col && a.row === b.row; }
@@ -544,6 +548,7 @@
     var p = toImage(e.clientX, e.clientY), cell = cellAt(p);
     if (cell) {
       state.selected = cell; stats.lastPick = C.cellId(cell.col, cell.row);
+      if (!discTaught) { showThrow(); syncUI(); requestRender(); return; }
       setStatus(MSG.selected);
     } else {
       var m = mirrorAt(p);
@@ -563,7 +568,7 @@
     mirrorTap: '鏡子裡的是像，封印不到。你看到的是鬼，還是鬼的像？請點地板的格子。',
     brokenTap: '這面鏡子已經碎了，照不出東西。',
     casting: '法陣展開中……',
-    wrong: '法陣裡沒有東西……少了一顆心。鬼還躲在原地，再看一次鏡子。',
+    wrong: '法陣裡沒有東西……扣一❤️，請重新推算鬼的位置。',
     wrongFree: '法陣裡沒有東西。鬼還躲在原地，再看一次鏡子。',
     moved: '鬼掙脫了，換了一個地方躲。'
   };
@@ -583,6 +588,7 @@
         else if (state.sealed >= R.catchesTotal) setStatus('第 ' + R.catchesTotal + ' 次抓到牠了！鬼再也待不住了……');
         else if (state.sealed === R.catchesTwoMirrors && state.phase === 1) setStatus('又抓到了！（封印 ' + state.sealed + '／' + R.catchesTotal + '）鬼氣得渾身發抖……');
         else setStatus('抓到了！（封印 ' + state.sealed + '／' + R.catchesTotal + '）可是牠正在掙脫法陣……');
+        if (throwing) setTimeout(showAfterThrow, AFTER_THROW_MS); // 等抓完鬼（鬼現身）再接
       } else {
         stats.wrong++;
         giggle();
@@ -591,6 +597,7 @@
           $('hud').classList.remove('hit'); void $('hud').offsetWidth; $('hud').classList.add('hit');
         }
         setStatus(FREE ? MSG.wrongFree : MSG.wrong);
+        if (throwing) setTimeout(showAfterThrow, AFTER_THROW_MS); // 等魔法陣亮起、確定落空再接
       }
       syncUI(); requestRender();
       if (!ok) setTimeout(function () {
@@ -599,6 +606,38 @@
         syncUI(); requestRender();
       }, CAST_FADE);
     }, CAST_GROW);
+  }
+
+  // ---------- 第一次丟圓盤（第一次點地板） ----------
+  var AFTER_THROW_MS = 900;
+  function showThrow() {
+    scene = window.StoryScene.show({
+      id: 'throw', overlay: true,
+      lines: [
+        { speaker: '你', text: '我找到了！……然後咧？怎麼辦啊？' },
+        { speaker: '你', text: '（拿起圓盤）這個嗎？', image: window.StoryArt.get('disc') },
+        { speaker: '你', text: '丟出去嗎？阿阿阿？' }
+      ],
+      onDone: function () {
+        scene = null; discTaught = true; throwing = true;
+        if (window.Sfx) window.Sfx.clang();
+        cast(); // 圓盤落地的那一格直接出現魔法陣
+      }
+    });
+  }
+  function showAfterThrow() {
+    throwing = false;
+    if (scene || state.over) return;
+    scene = window.StoryScene.show({
+      id: 'afterThrow', overlay: true,
+      lines: [
+        { speaker: '你', text: '……' },
+        { speaker: '你', text: '還真的用丟的喔！？' },
+        { speaker: '你', text: '它飛回來了？', image: window.StoryArt.get('disc') }
+      ],
+      onDone: function () { scene = null; syncUI(); requestRender(); }
+    });
+    syncUI();
   }
 
   function next() {
@@ -670,16 +709,22 @@
   }
   function showIntro() {
     if (window.Leaderboard) window.Leaderboard.startRun(); // 趕鬼計時開始（已開始就不歸零；只在關卡模式呼叫）
+    var A = window.StoryArt, room = snapshot('intro', { phase: 1, ghost: state.ghost });
     scene = window.StoryScene.show({
-      id: 'intro', background: snapshot('intro', { phase: 1, ghost: state.ghost }),
+      id: 'intro', background: room,
       lines: [
-        { text: '你受邀到一座古老的城堡過夜。' },
-        { text: '半夜，有一間房間不斷傳出奇怪的聲響。' },
-        { speaker: '你', text: '房間裡……明明沒有人啊？' },
+        { background: A.get('castle'), text: '你受邀到一座古老的城堡過夜。' },
+        { background: A.get('letter'), text: '晚餐後，你回到房間，發現桌上有一封奇怪的信：' },
+        { letter: '如果你能看見牠們，代表牠們也已經發現你了。' },
+        { letter: '別相信眼睛看到的位置。' },
+        { letter: '找到牠真正所在之處，才能封印牠。' },
+        { text: '有一個古老金屬圓盤壓在信件上面。' },
+        { background: 'black', text: '半夜，有一間房間不斷傳出奇怪的聲響。', onShow: function () { if (window.Sfx) window.Sfx.nightNoise(); } },
+        { background: room, speaker: '你', text: '房間裡……明明沒有人啊？' },
         { speaker: '你', text: '等等，鏡子裡有東西！' }
       ],
       title: '第一關：鏡子房間',
-      note: '鬼只有在鏡子裡才看得到。從鏡中的像推出牠真正站在哪一格，再展開封印法陣。3 條命，要抓到牠 ' + R.catchesTotal + ' 次；抓錯會失去一顆心。',
+      note: '鬼只有在鏡子裡才看得到。請推算出牠真正所在的位置，再展開封印法陣。3 條命，要抓到牠 ' + R.catchesTotal + ' 次；抓錯會失去一顆心。',
       buttons: [{ id: 'startBtn', label: '開始抓鬼', primary: true, onClick: function () { closeScene(); syncUI(); requestRender(); } }]
     });
   }
@@ -703,7 +748,7 @@
   function showFail() {
     scene = window.StoryScene.show({
       id: 'fail', background: snapshot('fail', { phase: state.phase, ghost: state.ghost }),
-      title: '封印失敗', note: '三顆心都用完了……鬼還躲在房間裡。',
+      title: '封印失敗', note: '❤️用完了……還沒成功抓住鬼。',
       buttons: [
         { id: 'retryBtn', label: '重新挑戰', primary: true, onClick: function () { closeScene(); resetLevel(); } },
         { id: 'failMenuBtn', label: '回關卡選單', href: '../index.html' }
@@ -716,9 +761,9 @@
     scene = window.StoryScene.show({
       id: 'clear', background: snapshot('clear', { phase: 2, ghost: null }),
       lines: [
-        { text: '鬼被抓了五次，再也待不住了——' },
-        { text: '牠尖叫著衝出房門，逃進了走廊！' },
-        { speaker: '你', text: '別跑！' }
+        { text: '女鬼終於被封印了，房間響起騷動——' },
+        { text: '大量的鬼衝出房間，逃進走廊。', scatter: 14 }, // 小怪的圖還沒生，先用 placeholder 鬼往四周逃
+        { speaker: '你', text: '也太多了？別跑！' }
       ],
       title: '第一關過關！', note: '鬼逃進了走廊。下一關：城堡走廊。',
       buttons: [

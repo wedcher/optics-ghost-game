@@ -150,13 +150,24 @@ async function levelFlow(profile, browser) {
   ok(s.scene && s.scene.id === 'intro' && s.scene.line === 0, '一進來是開場過場的第一句');
   const bgInfo = () => page.evaluate(() => ({ bg: Object.assign({}, window.__protoMirror.stats.sceneBg), data: getComputedStyle(document.querySelector('.story-bg')).backgroundImage.startsWith('url("data:image/jpeg') }));
   let bg = await bgInfo();
-  ok(bg.data && bg.bg.snapshot && bg.bg.id === 'intro' && bg.bg.phase === 1 && bg.bg.ghost, '開場背景是遊戲畫面的快照：兩面鏡完好、鏡子裡有鬼', JSON.stringify(bg.bg));
+  ok(bg.bg.snapshot && bg.bg.id === 'intro' && bg.bg.phase === 1 && bg.bg.ghost, '開場已備好房間快照：兩面鏡完好、鏡子裡有鬼', JSON.stringify(bg.bg));
+  ok(s.scene.bg === 'image' && !s.scene.letter, '開場第一句：古堡外觀（圖）');
   await shot('mirror-1-intro');
-  for (let i = 1; i <= 3; i++) {
+  // 劇本修訂（2026-11-17）：古堡 → 信（旁白 + 信上 3 句 + 圓盤）→ 黑畫面（怪聲）→ 房間 2 句，共 9 句
+  const INTRO_LINES = 9;
+  const expect = { 2: 'letter', 3: 'letter', 4: 'letter', 6: 'black', 7: 'room' };
+  for (let i = 1; i < INTRO_LINES; i++) {
     await t.tapAt(vp.width / 2, vp.height / 2);
     s = await info();
     ok(s.scene.line === i && !s.scene.ended, '點畫面換到第 ' + (i + 1) + ' 句');
+    if (expect[i] === 'letter') ok(s.scene.letter && await page.isHidden('.story-dialog'), '第 ' + (i + 1) + ' 句：信上的字疊在信紙上，對話框收起');
+    if (expect[i] === 'black') ok(s.scene.bg === 'black' && !s.scene.letter, '第 ' + (i + 1) + ' 句：黑畫面（半夜怪聲），信收起');
+    if (expect[i] === 'room') {
+      bg = await bgInfo();
+      ok(bg.data && s.scene.bg === 'image', '第 ' + (i + 1) + ' 句：背景換成遊戲畫面的快照');
+    }
   }
+  ok(await page.evaluate(() => document.querySelectorAll('.story-letter p').length) === 0, '進房間後信已收起');
   ok(!(await page.isVisible('#startBtn')), '最後一句時還沒有【開始抓鬼】');
   await t.tapAt(vp.width / 2, vp.height / 2);
   ok((await info()).scene.ended && await page.isVisible('#startBtn'), '台詞結束後出現【開始抓鬼】');
@@ -189,19 +200,26 @@ async function levelFlow(profile, browser) {
   ok(s.stats.mirrorTaps === 1 && s.lives === 3 && s.selected === null && s.stats.casts === 0, '點鏡中的像：不扣命、不選格、不施放');
   ok(/像/.test(s.status) && /地板/.test(s.status), '點鏡中的像：提醒那是像，要點地板', s.status);
 
-  // ---- 選格：標示不會出現在鏡子裡 ----
+  // ---- 第一次點地板：丟圓盤（劇本修訂 1-1.5）。選格標示不會出現在鏡子裡 ----
   const before = await pixels();
   const wrong1 = await t.otherCell(s.ghost, 0);
   await t.tapCell(wrong1);
   s = await info();
-  ok(s.selected === wrong1 && !s.castDisabled, '點地板選到那一格，可以施放', s.selected);
+  ok(s.selected === wrong1 && s.scene && s.scene.id === 'throw' && s.scene.line === 0, '第一次點地板：選到那一格，並播「丟圓盤」對話', s.selected + ' ' + wrong1 + ' ' + JSON.stringify(s.scene));
   px = await pixels();
   ok(px.pickOut > before.pickOut && px.pickIn === before.pickIn, '選格標示只畫在地板上，鏡子裡沒有', JSON.stringify([before, px]));
   await shot('mirror-3-selected');
+  await t.tapAt(vp.width / 2, vp.height / 3);
+  s = await info();
+  ok(s.scene.line === 1 && s.scene.image, '第 2 句「這個嗎？」對話框附圓盤小圖', JSON.stringify(s.scene));
+  await t.tapAt(vp.width / 2, vp.height / 3);
+  ok(s.stats.casts === 0, '對話還沒結束前不會施放');
 
-  // ---- 抓錯 ----
+  // ---- 抓錯（第一次是丟圓盤自動施放） ----
   const ghost0 = s.ghost;
-  await press('#castBtn');
+  await t.tapAt(vp.width / 2, vp.height / 3);
+  s = await info();
+  ok(s.scene === null && s.stats.casts === 1, '對話結束：圓盤落地，直接在那一格展開法陣');
   await page.waitForTimeout(450);
   px = await pixels();
   ok(px.ghostOut < EDGE_PX, '抓錯：法陣展開途中房間裡沒有鬼', JSON.stringify(px));
@@ -212,6 +230,11 @@ async function levelFlow(profile, browser) {
   ok(s.lives === 2 && s.hearts === 2, '抓錯扣一顆心', String(s.lives));
   ok(s.sealed === 0 && s.ghost === ghost0 && !s.revealed, '抓錯：封印數不變、鬼不換位置');
   ok(s.selected === null && s.castHidden === false && s.nextHidden, '抓錯後要重新選格');
+  await page.waitForFunction(() => window.__protoMirror.scene() && window.__protoMirror.scene().id === 'afterThrow');
+  await shot('mirror-4b-after-throw');
+  for (let i = 0; i < 3; i++) await t.tapAt(vp.width / 2, vp.height / 3);
+  s = await info();
+  ok(s.scene === null && s.lives === 2, '法陣落空後接「還真的用丟的喔」，點完回到遊戲');
   ok(!LEAK_WORDS.test(s.status), '抓錯的訊息沒有方向、距離、格號', s.status);
   px = await pixels();
   ok(px.ghostOut < EDGE_PX && px.ghostIn > 0, '抓錯之後房間裡仍然沒有鬼，鏡中的像還在');

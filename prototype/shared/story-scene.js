@@ -13,8 +13,16 @@
  *     lines: [{ speaker: '你', text: '……' }, { text: '沒有 speaker 的是旁白' }],
  *     title: '…', note: '…',               // 結尾面板的標題與說明，都可省略
  *     buttons: [{ id: 'startBtn', label: '開始抓鬼', primary: true, onClick: fn, href: '…' }],
- *     scatter: 6                           // 開場時有幾隻 placeholder 鬼往四周逃散（過關演出用）
+ *     scatter: 6,                          // 開場時有幾隻 placeholder 鬼往四周逃散（過關演出用）
+ *     overlay: true,                       // 疊在遊戲畫面上（背景透明、只壓暗一點），遊戲中途的小段對話用
+ *     onDone: fn                           // 沒有結尾面板（沒有 title／note／buttons）時：最後一句或「跳過」後自動關閉並呼叫
  *   });
+ *   每一句還可以帶：
+ *     background: 'url' 或 'black'         // 從這句起換背景（換背景時信件會收起）
+ *     letter: '……'                        // 這句是信上的字：疊在畫面中央的信紙上、逐句累加，對話框先收起
+ *     image: 'url'                         // 對話框左邊附一張小圖（例如道具）
+ *     scatter: 8                           // 這句出現時才讓 placeholder 鬼逃散
+ *     onShow: fn                           // 這句出現時呼叫（音效用）
  *   scene.close();
  *
  * 這個元件不知道任何關卡資料，畫面上不會出現和鬼的位置有關的東西。
@@ -27,7 +35,17 @@
     '.story{position:fixed;inset:0;z-index:500;overflow:hidden;background:#07080f;color:#e8ebff;' +
     'font-family:system-ui,-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;' +
     'user-select:none;-webkit-user-select:none;touch-action:manipulation;cursor:pointer}' +
-    '.story-bg{position:absolute;inset:0;background-size:cover;background-position:center}' +
+    '.story-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:background-image .35s}' +
+    '.story.overlay{background:transparent}.story.overlay .story-shade{background:linear-gradient(to bottom,rgba(6,8,18,0),rgba(6,8,18,.1) 50%,rgba(6,8,18,.6))}' +
+    '.story-letter{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) rotate(-1.2deg);width:min(86%,520px);padding:22px 24px 30px;' +
+    'background:rgba(238,226,196,.94);color:#2b1d0e;border-radius:6px;box-shadow:0 8px 30px rgba(0,0,0,.6);' +
+    'font-family:"Noto Serif TC","PMingLiU","MingLiU",serif;font-size:19px;line-height:1.7}' +
+    '.story-letter p{margin:0 0 6px;animation:storyInk .7s ease-out}' +
+    '.story-letter .story-hint{color:#7a6340}' +
+    '.story-dialog.has-img{padding-left:96px}' +
+    '.story-img{position:absolute;left:12px;top:50%;width:72px;height:72px;margin-top:-36px;object-fit:contain;' +
+    'background:rgba(255,255,255,.06);border-radius:10px}' +
+    '@keyframes storyInk{from{opacity:0;filter:blur(2px)}to{opacity:1;filter:none}}' +
     '.story-shade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(6,8,18,.25),rgba(6,8,18,.15) 45%,rgba(6,8,18,.78))}' +
     '.story.ended .story-shade{background:rgba(6,8,18,.66)}' +
     '.story-skip{position:absolute;top:10px;right:10px;min-width:72px;min-height:46px;padding:4px 14px;font:inherit;font-size:15px;' +
@@ -57,6 +75,8 @@
     '100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.5)}}' +
     '@keyframes storyBlink{0%,100%{opacity:.35}50%{opacity:1}}' +
     '@media (max-height:480px){.story-dialog{min-height:76px;padding:18px 16px 22px}.story-text{font-size:17px}' +
+    '.story-letter{top:40%;padding:14px 18px 24px;font-size:17px;line-height:1.55}.story-dialog.has-img{padding-left:84px}' +
+    '.story-img{width:60px;height:60px;margin-top:-30px}' +
     '.story-end h2{font-size:22px}.story-end p{margin-bottom:12px;font-size:14px}}' +
     '@media (prefers-reduced-motion:reduce){.story-ghost{animation-duration:.01s}.story-hint{animation:none}}' +
     '.story [hidden]{display:none !important}';
@@ -79,20 +99,27 @@
   function show(opts) {
     injectCss();
     var lines = opts.lines || [];
-    var idx = 0, ended = false, armedAt = 0, closed = false;
+    var idx = 0, ended = false, armedAt = 0, closed = false, pressed = false;
 
     var rootEl = el('div', 'story');
     rootEl.setAttribute('role', 'dialog');
     rootEl.setAttribute('aria-modal', 'true');
     if (opts.id) rootEl.setAttribute('data-scene', opts.id);
-    var bg = el('div', 'story-bg');
-    if (opts.background) bg.style.backgroundImage = 'url("' + opts.background + '")';
+    if (opts.overlay) rootEl.classList.add('overlay');
+    var bg = el('div', 'story-bg'), bgNow = null;
     rootEl.appendChild(bg);
     rootEl.appendChild(el('div', 'story-shade'));
     var fx = el('div', 'story-fx');
     rootEl.appendChild(fx);
 
+    var letter = el('div', 'story-letter');
+    letter.hidden = true;
+    rootEl.appendChild(letter);
+
     var dialog = el('div', 'story-dialog');
+    var pic = el('img', 'story-img');
+    pic.alt = ''; pic.hidden = true;
+    dialog.appendChild(pic);
     var speaker = el('span', 'story-speaker');
     var text = el('p', 'story-text');
     text.setAttribute('aria-live', 'polite');
@@ -123,43 +150,86 @@
     end.hidden = true;
     rootEl.appendChild(end);
 
+    var hasEnd = !!(opts.title || opts.note || (opts.buttons && opts.buttons.length));
+    function setBg(b) {
+      if (!b || b === bgNow) return;
+      if (bgNow) { letter.hidden = true; letter.textContent = ''; } // 換場景：信收起來
+      bgNow = b;
+      bg.style.backgroundImage = b === 'black' ? 'none' : 'url("' + b + '")';
+    }
+    function scatterGhosts(n) {
+      for (var i = 0; i < n; i++) {
+        var g = el('div', 'story-ghost'), ang = (i / n) * Math.PI * 2 + 0.4;
+        g.style.setProperty('--dx', Math.round(Math.cos(ang) * 60) + 'vw');
+        g.style.setProperty('--dy', Math.round(Math.sin(ang) * 60) + 'vh');
+        g.style.animationDelay = (i * 0.07).toFixed(2) + 's';
+        fx.appendChild(g);
+      }
+    }
     function showLine() {
       var l = lines[idx];
-      speaker.hidden = !l.speaker;
-      speaker.textContent = l.speaker || '';
-      text.textContent = l.text;
+      setBg(l.background);
+      if (l.letter != null) {
+        // 信上的字：一句一句加到信紙上，前面的字留著
+        dialog.hidden = true;
+        letter.hidden = false;
+        var old = letter.querySelector('.story-hint');
+        if (old) letter.removeChild(old);
+        letter.appendChild(el('p', null, l.letter));
+        letter.appendChild(el('span', 'story-hint', '點畫面繼續 ▼'));
+      } else {
+        var oldHint = letter.querySelector('.story-hint');
+        if (oldHint) letter.removeChild(oldHint);
+        dialog.hidden = false;
+        speaker.hidden = !l.speaker;
+        speaker.textContent = l.speaker || '';
+        text.textContent = l.text;
+        pic.hidden = !l.image;
+        if (l.image) pic.src = l.image; else pic.removeAttribute('src');
+        dialog.classList.toggle('has-img', !!l.image);
+      }
+      if (l.scatter) scatterGhosts(l.scatter);
+      if (l.onShow) { try { l.onShow(); } catch (e) { /* 音效失敗不影響過場 */ } }
+    }
+    function finish() {
+      // 沒有結尾面板：直接關掉，交回給呼叫的人
+      ended = true; closed = true;
+      if (rootEl.parentNode) rootEl.parentNode.removeChild(rootEl);
+      if (opts.onDone) opts.onDone();
     }
     function showEnd() {
       if (ended) return;
+      if (!hasEnd) { finish(); return; }
       ended = true; armedAt = performance.now() + ARM_MS;
+      if (opts.background) setBg(opts.background); // 跳過時也回到這段的主背景（結尾面板用）
+      letter.hidden = true;
       dialog.hidden = true; skip.hidden = true; end.hidden = false;
       rootEl.classList.add('ended');
       rootEl.style.cursor = 'default';
     }
     function advance() {
       if (ended || closed) return;
+      // 只算「在過場上按下去」的點擊：叫出過場的那一下（例如遊戲中點地板）放開後，瀏覽器還會送一個 click 到剛蓋上來的過場
+      if (!pressed) return;
       idx++;
       if (idx >= lines.length) showEnd(); else showLine();
     }
+    rootEl.addEventListener('pointerdown', function () { pressed = true; });
     rootEl.addEventListener('click', advance);
     skip.addEventListener('click', function (e) { e.stopPropagation(); showEnd(); });
 
-    for (var i = 0; i < (opts.scatter || 0); i++) {
-      var g = el('div', 'story-ghost'), ang = (i / opts.scatter) * Math.PI * 2 + 0.4;
-      g.style.setProperty('--dx', Math.round(Math.cos(ang) * 60) + 'vw');
-      g.style.setProperty('--dy', Math.round(Math.sin(ang) * 60) + 'vh');
-      g.style.animationDelay = (i * 0.07).toFixed(2) + 's';
-      fx.appendChild(g);
-    }
+    if (opts.scatter) scatterGhosts(opts.scatter);
 
-    if (lines.length) showLine(); else showEnd();
+    setBg((lines[0] && lines[0].background) || opts.background);
     document.body.appendChild(rootEl);
+    if (lines.length) showLine(); else showEnd();
 
     return {
       el: rootEl,
       close: function () { if (closed) return; closed = true; if (rootEl.parentNode) rootEl.parentNode.removeChild(rootEl); },
       skip: showEnd,
-      info: function () { return { id: opts.id || null, line: ended ? -1 : idx, ended: ended, armed: ended && performance.now() >= armedAt, closed: closed }; }
+      info: function () { return { id: opts.id || null, line: ended ? -1 : idx, ended: ended, armed: ended && performance.now() >= armedAt, closed: closed,
+        letter: !letter.hidden, image: !pic.hidden && !dialog.hidden, bg: bgNow === 'black' ? 'black' : bgNow ? 'image' : null }; }
     };
   }
 
