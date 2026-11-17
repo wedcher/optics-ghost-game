@@ -103,11 +103,11 @@
   PASS  [phone-landscape] 配置A·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置A·放大像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置A·放大像 光路重現：結束時標出像點  — 135 px（重現前 67）
-  PASS  [phone-landscape] 配置A·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置A·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 配置A·放大像 Debug overlay 顯示物點／焦距／目標格／清晰位置
   PASS  [phone-landscape] 配置A·放大像 關閉 Debug 後面板清空
-  PASS  [phone-landscape] 配置A·放大像 「下一組配置」不會連續出同一組  — 0→3→1→6→0→5→4→7→2→1→0→4→8→7→6→3→5→2
-  PASS  [phone-landscape] 配置A·放大像 「下一組配置」每一輪內每組各出一次、不重複  — 1,0,4,8,7,6,3,5,2
+  PASS  [phone-landscape] 配置A·放大像 「下一組配置」不會連續出同一組  — 0→8→7→0→3→6→5→1→2→6→0→7→8→4→2→5→1→3
+  PASS  [phone-landscape] 配置A·放大像 「下一組配置」每一輪內每組各出一次、不重複  — 6,0,7,8,4,2,5,1,3
   PASS  [phone-landscape] 配置A·放大像 換配置後回到觀察階段，標記與作圖線都清空
   PASS  [phone-landscape] 配置A·縮小像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置A·縮小像 開始觀察：DOM／文字／Debug 圖層沒有答案
@@ -507,7 +507,7 @@
   PASS  [phone-landscape] 配置C·縮小像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置C·縮小像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置C·縮小像 光路重現：結束時標出像點  — 133 px（重現前 66）
-  PASS  [phone-landscape] 配置C·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置C·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置D·放大像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置D·放大像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置D·放大像 開始觀察：吸附點裡沒有物點
@@ -895,7 +895,7 @@
   PASS  [phone-landscape] 配置F·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置F·放大像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置F·放大像 光路重現：結束時標出像點  — 134 px（重現前 65）
-  PASS  [phone-landscape] 配置F·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置F·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 配置F·縮小像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置F·縮小像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置F·縮小像 開始觀察：吸附點裡沒有物點
@@ -1132,7 +1132,7 @@
   PASS  [phone-landscape] 配置G·縮小像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置G·縮小像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置G·縮小像 光路重現：結束時標出像點  — 131 px（重現前 70）
-  PASS  [phone-landscape] 配置G·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置G·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置H·放大像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置H·放大像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置H·放大像 開始觀察：吸附點裡沒有物點
@@ -1443,7 +1443,7 @@
   PASS  [phone-landscape] 配置I·縮小像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置I·縮小像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置I·縮小像 光路重現：結束時標出像點  — 133 px（重現前 69）
-  PASS  [phone-landscape] 配置I·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置I·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 沒有 JS 錯誤
   PASS  [phone-portrait] 走廊背景圖與鏡片圖已載入
   PASS  [phone-portrait] 觀察：所有控制項都在畫面內  — canvas 375×597
@@ -1547,11 +1547,11 @@
   PASS  [phone-portrait] 配置A·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-portrait] 配置A·放大像 光路重現：畫面上方有說明文字框
   PASS  [phone-portrait] 配置A·放大像 光路重現：結束時標出像點  — 131 px（重現前 74）
-  PASS  [phone-portrait] 配置A·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 23 次
+  PASS  [phone-portrait] 配置A·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-portrait] 配置A·放大像 Debug overlay 顯示物點／焦距／目標格／清晰位置
   PASS  [phone-portrait] 配置A·放大像 關閉 Debug 後面板清空
-  PASS  [phone-portrait] 配置A·放大像 「下一組配置」不會連續出同一組  — 0→5→4→3→0→6→2→7→1→2→6→8→7→4→3→1→0→5
-  PASS  [phone-portrait] 配置A·放大像 「下一組配置」每一輪內每組各出一次、不重複  — 2,6,8,7,4,3,1,0,5
+  PASS  [phone-portrait] 配置A·放大像 「下一組配置」不會連續出同一組  — 0→6→2→1→5→7→8→4→3→2→4→7→5→6→0→1→8→3
+  PASS  [phone-portrait] 配置A·放大像 「下一組配置」每一輪內每組各出一次、不重複  — 2,4,7,5,6,0,1,8,3
   PASS  [phone-portrait] 配置A·放大像 換配置後回到觀察階段，標記與作圖線都清空
   PASS  [phone-portrait] 沒有 JS 錯誤
   PASS  [desktop] 走廊背景圖與鏡片圖已載入
@@ -1656,11 +1656,11 @@
   PASS  [desktop] 配置A·縮小像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [desktop] 配置A·縮小像 光路重現：畫面上方有說明文字框
   PASS  [desktop] 配置A·縮小像 光路重現：結束時標出像點  — 29 px（重現前 14）
-  PASS  [desktop] 配置A·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [desktop] 配置A·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [desktop] 配置A·縮小像 Debug overlay 顯示物點／焦距／目標格／清晰位置
   PASS  [desktop] 配置A·縮小像 關閉 Debug 後面板清空
-  PASS  [desktop] 配置A·縮小像 「下一組配置」不會連續出同一組  — 0→3→2→8→6→7→4→0→5→7→6→5→0→1→8→2→4→3
-  PASS  [desktop] 配置A·縮小像 「下一組配置」每一輪內每組各出一次、不重複  — 7,6,5,0,1,8,2,4,3
+  PASS  [desktop] 配置A·縮小像 「下一組配置」不會連續出同一組  — 0→1→0→2→4→3→6→5→8→3→6→0→1→5→7→4→2→8
+  PASS  [desktop] 配置A·縮小像 「下一組配置」每一輪內每組各出一次、不重複  — 3,6,0,1,5,7,4,2,8
   PASS  [desktop] 配置A·縮小像 換配置後回到觀察階段，標記與作圖線都清空
   PASS  [desktop] 配置C·放大像 開始觀察：畫面上沒有鬼本體
   PASS  [desktop] 配置C·放大像 開始觀察：DOM／文字／Debug 圖層沒有答案
@@ -1740,7 +1740,7 @@
   PASS  [desktop] 配置C·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [desktop] 配置C·放大像 光路重現：畫面上方有說明文字框
   PASS  [desktop] 配置C·放大像 光路重現：結束時標出像點  — 32 px（重現前 16）
-  PASS  [desktop] 配置C·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [desktop] 配置C·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [desktop] 沒有 JS 錯誤
 
 ALL PASS: 1744/1744 checks

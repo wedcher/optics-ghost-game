@@ -89,7 +89,7 @@
   PASS  [phone-landscape] 配置A 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置A 光路重現：結束時標出像點  — 129 px（重現前 71）
   PASS  [phone-landscape] 配置A 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
   PASS  [phone-landscape] 配置A 關閉 Debug 後面板清空
   PASS  [phone-landscape] 配置B 裸眼畫面沒有鬼
@@ -167,7 +167,7 @@
   PASS  [phone-landscape] 配置B 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置B 光路重現：結束時標出像點  — 134 px（重現前 64）
   PASS  [phone-landscape] 配置B 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置B 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置B 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 23 次
   PASS  [phone-landscape] 配置C 裸眼畫面沒有鬼
   PASS  [phone-landscape] 配置C 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 59% 像素改變；此方位沒有鬼
   PASS  [phone-landscape] 配置C 透鏡外畫面不變  — 0.00%
@@ -243,7 +243,7 @@
   PASS  [phone-landscape] 配置C 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置C 光路重現：結束時標出像點  — 130 px（重現前 70）
   PASS  [phone-landscape] 配置C 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置D 裸眼畫面沒有鬼
   PASS  [phone-landscape] 配置D 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 48% 像素改變；此方位沒有鬼
   PASS  [phone-landscape] 配置D 透鏡外畫面不變  — 0.00%
