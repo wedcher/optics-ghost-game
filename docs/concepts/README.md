@@ -15,12 +15,18 @@ GPT 後續會負責概念美術與視覺 refinement，目前 prototype 可以放
 | `ghost01.png` | 鬼的角色圖（本體與所有的像共用這一張）。透明背景，5:7。 | 尚未使用（原型仍是 placeholder） |
 | `mirror-room-storyboard.png` | 平面鏡關的四格流程：發現鬼影 → 顯示格線 → 錯誤示範（對鏡子丟符）→ 正確封印。 | 氛圍／流程參考 |
 | `convex-intro-corridor.webp` | 凸透鏡關開場過場的背景：透視的城堡長廊（使用者 2026-11-17 指定）。見 `docs/story-and-flow.md`。原型載入的是 `prototype/convex-lens/assets/intro-corridor.webp`（同一個檔案的複本）。 | 使用中 |
-| `Mirror1.png`、`Mirror2.png` | 平面鏡關：城堡房間的背景（使用者 2026-11-17 放入，打算當平面鏡房間的背景）。暗色木質房間、壁燈、石板地、兩面金框鏡。`Mirror1` 兩面鏡完好，`Mirror2` 右牆的鏡子被打碎。原型載入的是壓縮後的 `prototype/plane-mirror/assets/room-intact.jpg`、`room-broken.jpg`。 | 使用中（第一關）。注意見下方「平面鏡房間背景」 |
+| `Mirror1.png`、`Mirror2.png` | 平面鏡關：城堡房間的背景（使用者 2026-11-17 放入，打算當平面鏡房間的背景）。暗色木質房間、壁燈、石板地、兩面金框鏡。`Mirror1` 兩面鏡完好，`Mirror2` 右牆的鏡子被打碎。第一版用過，已由 `Mirror4`／`Mirror5` 取代。 | 不再使用。見下方「平面鏡房間背景」 |
 | `concave-lens.png` | 凹透鏡：側面看的鏡片（透明背景；使用者 2026-11-17 放入，原檔名 `凹透鏡.png`）。 | 使用中（凹透鏡側視分析） |
 
 ## 使用注意
 
-### 平面鏡房間背景（`Mirror1.png`、`Mirror2.png`）
+### 平面鏡房間背景：現在用 `Mirror4.png`、`Mirror5.png`
+
+- `Mirror4.png`（兩面落地鏡完好）、`Mirror5.png`（右鏡打碎）：使用者 2026-11-17 請美工 AI 依提示詞重畫。落地鏡、鏡面純暗色、兩張除了碎鏡以外相同。**第一關使用中**；原型載入壓縮後的 `prototype/plane-mirror/assets/room-intact.jpg`、`room-broken.jpg`。鏡中畫面與地板由程式畫；相機參數寫在 `prototype/plane-mirror/configs.js`。
+- `Mirror3.png`：同一輪的另一次嘗試，仍是有下框的掛鏡、鏡中畫死了反射。未使用。
+- `Mirror1.png`、`Mirror2.png`：第一版用的背景（下面這段是當時的說明）。使用者試玩後認為太難玩，已換掉。
+
+### 第一版的平面鏡房間背景（`Mirror1.png`、`Mirror2.png`，已不使用）
 
 - 圖中的鏡子是**掛在牆上的有框鏡**，而且鏡子裡的反射是畫死在圖上的。定案是兩面互相垂直、由地板延伸到天花板的全高鏡，鏡中的像要由程式依幾何畫出來（見下方「平面鏡四格圖」與 `PROJECT.md`）。
 - 2026-11-17 實作：只用圖裡的牆、鏡框、燈、窗、天花板；**地板與兩面鏡的鏡面由程式依幾何重畫**，鏡面畫到地板（蓋掉圖裡的下框）。相機參數對著 `Mirror1.png` 量，寫在 `prototype/plane-mirror/configs.js`；換圖要重量。細節與這張圖在玩法上的限制見 `docs/prototype-findings-mirror.md`。

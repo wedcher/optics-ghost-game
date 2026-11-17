@@ -24,25 +24,25 @@ const P = (x, y, z) => C.project(cam, { x, y, z });
 const id = (c) => C.cellId(c.col, c.row);
 
 // ---------- 1. 相機和背景圖 ----------
-console.log('1. 相機參數 vs 背景圖（影像座標，px）');
+console.log('1. 相機參數 vs 背景圖 Mirror4.png（影像座標，px）');
 [
-  ['正面牆左下角', P(0, 0, 0), { x: 245, y: 570 }, 6],
-  ['正面牆右下角', P(R.cols, 0, 0), { x: 1125, y: 549 }, 6],
-  ['正面鏡玻璃左上角', P(R.mirrors.back.glass.a, R.mirrors.back.glass.topA, 0), { x: 432, y: 150 }, 6],
-  ['正面鏡玻璃右上角', P(R.mirrors.back.glass.b, R.mirrors.back.glass.topB, 0), { x: 938, y: 172 }, 6],
-  ['右鏡玻璃遠端上角', P(R.cols, R.mirrors.right.glass.topA, R.mirrors.right.glass.a), { x: 1200, y: 165 }, 6],
-  ['右鏡玻璃近端上角', P(R.cols, R.mirrors.right.glass.topB, R.mirrors.right.glass.b), { x: 1578, y: 58 }, 6],
-  ['原圖正面鏡下框（左）', P(R.mirrors.back.glass.a, R.paintedBottom, 0), { x: 432, y: 510 }, 8],
-  ['原圖正面鏡下框（右）', P(R.mirrors.back.glass.b, R.paintedBottom, 0), { x: 938, y: 500 }, 8],
-  ['原圖右鏡下框（遠）', P(R.cols, R.paintedBottom, R.mirrors.right.glass.a), { x: 1200, y: 522 }, 8],
-  ['原圖右鏡下框（近）', P(R.cols, R.paintedBottom, R.mirrors.right.glass.b), { x: 1578, y: 668 }, 20] // 近端的下框量到的是 0.20 格，設定取 0.25（只用來畫碎鏡在鏡中的樣子）
+  ['正面牆左下角', P(0, 0, 0), { x: 258, y: 712 }, 6],
+  ['正面牆右下角', P(R.cols, 0, 0), { x: 1292, y: 712 }, 6],
+  ['正面鏡玻璃左上角', P(R.mirrors.back.glass.a, R.mirrors.back.glass.topA, 0), { x: 303, y: 150 }, 6],
+  ['正面鏡玻璃右上角', P(R.mirrors.back.glass.b, R.mirrors.back.glass.topB, 0), { x: 1262, y: 150 }, 6],
+  ['右鏡玻璃遠端上角', P(R.cols, R.mirrors.right.glass.topA, R.mirrors.right.glass.a), { x: 1310, y: 160 }, 6],
+  ['右鏡上緣在畫面右緣', P(R.cols, R.mirrors.right.glass.topA, 3.07), { x: 1672, y: 5 }, 8],
+  ['右鏡底邊在畫面右緣', P(R.cols, 0, 3.07), { x: 1672, y: 902 }, 8],
+  ['左牆腳線上的點', P(0, 0, 2.64), { x: 30, y: 862 }, 8]
 ].forEach(([label, got, want, tol]) => ok(got && dist(got, want) <= tol, label, got && `算出 (${got.x.toFixed(0)}, ${got.y.toFixed(0)})，圖上量到 (${want.x}, ${want.y})`));
-// 牆腳線：圖上量到的直線 左 y = 570 + 0.94(245 − x)、右 y = 548 + 0.43(x − 1125)
-[1, 2, 3, 4].forEach((z) => {
+// 牆腳線：圖上量到的直線 左 y = 712 + 0.659(258 − x)、右 y = 712 + 0.5(x − 1292)
+[1, 2, 3].forEach((z) => {
   const l = P(0, 0, z), r = P(R.cols, 0, z);
-  ok(Math.abs(l.y - (570 + 0.94 * (245 - l.x))) <= 8, `左牆腳線 z=${z}`, `差 ${(l.y - (570 + 0.94 * (245 - l.x))).toFixed(1)} px`);
-  ok(Math.abs(r.y - (548 + 0.43 * (r.x - 1125))) <= 8, `右牆腳線 z=${z}`, `差 ${(r.y - (548 + 0.43 * (r.x - 1125))).toFixed(1)} px`);
+  ok(Math.abs(l.y - (712 + 0.659 * (258 - l.x))) <= 8, `左牆腳線 z=${z}`, `差 ${(l.y - (712 + 0.659 * (258 - l.x))).toFixed(1)} px`);
+  ok(Math.abs(r.y - (712 + 0.5 * (r.x - 1292))) <= 8, `右牆腳線 z=${z}`, `差 ${(r.y - (712 + 0.5 * (r.x - 1292))).toFixed(1)} px`);
 });
+// 圖上地磚的格線（圖裡是 8 格寬，一格 = 這裡的 0.75 格）：y = 742、782、832
+[[0.75, 742], [1.5, 782], [2.25, 832]].forEach(([z, y]) => ok(Math.abs(P(3, 0, z).y - y) <= 8, `圖上第 ${z / 0.75} 條地磚格線`, `算出 ${P(3, 0, z).y.toFixed(0)}，圖上 ${y}`));
 // unproject 是 project 的反運算
 [[300, 600], [900, 700], [1500, 800]].forEach(([x, y]) => {
   const w = C.unproject(cam, { x, y }, { axis: 'y', value: 0 }), s = C.project(cam, w);
