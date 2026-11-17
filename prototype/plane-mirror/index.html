@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>第一關：鏡子房間 — Optics Ghost Game</title>
+<style>
+  :root { --bg:#0d1020; --panel:#171b33; --line:#2c3359; --text:#e8ebff; --dim:#9aa3cf; --accent:#ffd166; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--text);
+    font-family: system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    overscroll-behavior: none; touch-action: manipulation; }
+  /* 橫向畫面：左邊是房間（背景圖 16:9，盡量佔滿高度），右邊一條控制欄。 */
+  #app { display:grid; grid-template-columns:minmax(0,1fr) clamp(150px, 20vw, 240px); height:100vh; height:100dvh; width:100%; overflow:hidden; }
+  #stage { position:relative; min-width:0; min-height:0; overflow:hidden; background:#000; }
+  #view { position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:none; }
+  #side { display:flex; flex-direction:column; gap:8px; min-height:0; padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+    padding-right:calc(8px + env(safe-area-inset-right)); background:var(--panel); border-left:1px solid var(--line); }
+  #side h1 { margin:0; font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #side h1 small { color:var(--dim); font-weight:400; }
+  #hud { display:flex; align-items:center; flex-wrap:wrap; gap:4px 10px; font-size:15px; font-weight:600; }
+  #hearts { display:inline-flex; gap:3px; font-size:26px; line-height:1; color:#ff4d6d; text-shadow:0 0 8px rgba(255,77,109,.6); }
+  #hearts .lost { color:#3a3f5e; text-shadow:none; }
+  #hud.hit #hearts { animation:hudHit .6s ease-out; }
+  @keyframes hudHit { 0%,100% { transform:translateX(0); } 20% { transform:translateX(-5px); } 40% { transform:translateX(5px); } 60% { transform:translateX(-3px); } 80% { transform:translateX(3px); } }
+  #status { flex:1 1 auto; min-height:0; overflow:hidden; padding:8px; font-size:14px; line-height:1.45; background:#12152a; border:1px solid var(--line); border-radius:10px; }
+  select, button, a.btn { font:inherit; color:var(--text); background:#232a4d; border:1px solid #3b4478; border-radius:10px; min-height:48px; padding:4px 10px; font-size:15px; }
+  button { cursor:pointer; user-select:none; -webkit-user-select:none; touch-action:manipulation; }
+  #side button { width:100%; }
+  button:active { background:#34407a; }
+  button:disabled { opacity:.38; cursor:default; }
+  button.on { background:#4a3f12; border-color:var(--accent); color:var(--accent); }
+  button.primary { background:#5b2a86; border-color:#b980ff; font-weight:600; font-size:16px; min-height:56px; }
+  #freeTools { display:flex; flex-direction:column; gap:6px; }
+  #freeTools select { width:100%; min-height:40px; font-size:13px; }
+  #freeTools button { min-height:40px; font-size:13px; }
+  a.btn { display:flex; align-items:center; justify-content:center; min-height:44px; font-size:13px; color:var(--dim); text-decoration:none; }
+  #zoomBox { position:absolute; left:8px; top:8px; display:flex; gap:6px; }
+  #zoomBox button { width:48px; height:48px; min-height:48px; padding:0; font-size:22px; background:rgba(35,42,77,.88); }
+  #zoomBox #zoomFit { font-size:13px; }
+  #debugPanel { position:absolute; left:6px; top:62px; max-width:min(92%, 360px); font:11px/1.45 ui-monospace, Menlo, Consolas, monospace; background:rgba(0,0,0,.72); color:#9dffb0; border:1px solid #2f7a45; border-radius:6px; padding:6px 8px; pointer-events:none; white-space:pre-wrap; }
+  @media (max-height: 480px) {
+    #side { gap:6px; padding:6px 6px calc(6px + env(safe-area-inset-bottom)); }
+    #status { font-size:13px; padding:6px; line-height:1.4; }
+    #hearts { font-size:22px; }
+    a.btn { min-height:44px; }
+  }
+  /* 直向只是開發備援（?portrait=1）：控制欄放到下面 */
+  @media (orientation: portrait) {
+    #app { grid-template-columns:1fr; grid-template-rows:minmax(0,1fr) auto; }
+    #side { border-left:0; border-top:1px solid var(--line); }
+    #status { min-height:4.4em; }
+  }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<div id="app">
+  <main id="stage">
+    <canvas id="view"></canvas>
+    <div id="zoomBox">
+      <button id="zoomIn" type="button" aria-label="放大">＋</button>
+      <button id="zoomOut" type="button" aria-label="縮小">－</button>
+      <button id="zoomFit" type="button" aria-label="顯示全圖">全圖</button>
+    </div>
+    <div id="debugPanel" hidden></div>
+  </main>
+  <aside id="side">
+    <h1 id="title">第一關 <small>鏡子房間</small></h1>
+    <div id="hud">
+      <span id="hearts" role="img"><span>♥</span><span>♥</span><span>♥</span></span>
+      <span id="sealCount"></span>
+    </div>
+    <div id="status" role="status" aria-live="polite"></div>
+    <div id="freeTools" hidden>
+      <select id="phaseSel" aria-label="鏡子數量">
+        <option value="1">兩面鏡</option>
+        <option value="2">一面鏡（右邊打碎）</option>
+      </select>
+      <select id="cellSel" aria-label="鬼的位置"></select>
+      <button id="debugBtn" type="button" aria-pressed="false">Debug</button>
+    </div>
+    <button id="castBtn" type="button" class="primary" disabled>展開封印法陣</button>
+    <button id="nextBtn" type="button" class="primary" hidden>繼續 ➜</button>
+    <a id="menuLink" class="btn" href="../index.html">關卡選單</a>
+  </aside>
+</div>
+<script src="../shared/landscape.js"></script>
+<script src="../shared/mirror-core.js"></script>
+<script src="../shared/story-scene.js"></script>
+<script src="configs.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

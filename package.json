@@ -8,7 +8,9 @@
     "check:geometry:convex": "node tests/check-geometry-convex.js",
     "test:e2e:convex": "node tests/e2e-convex-lens.js",
     "test:e2e:convex:level": "node tests/e2e-convex-level.js",
-    "test": "node tests/check-geometry.js && node tests/check-geometry-convex.js && node tests/e2e-concave-lens.js && node tests/e2e-convex-lens.js && node tests/e2e-convex-level.js"
+    "test": "node tests/check-geometry.js && node tests/check-geometry-convex.js && node tests/check-geometry-mirror.js && node tests/e2e-concave-lens.js && node tests/e2e-convex-lens.js && node tests/e2e-convex-level.js && node tests/e2e-plane-mirror.js",
+    "check:geometry:mirror": "node tests/check-geometry-mirror.js",
+    "test:e2e:mirror": "node tests/e2e-plane-mirror.js"
   },
   "devDependencies": {
     "playwright": "^1.65.1"
