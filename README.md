@@ -56,6 +56,6 @@
 - `docs/decisions.md`：已確認決策與禁止重推事項。
 - `docs/visual-handoff.md`：畫面、氛圍與互動體驗的交接文件。
 - `docs/concepts/`：概念圖（非定稿，以文字規格為準）。
-- `docs/prototype-findings.md`、`docs/prototype-findings-convex.md`：各原型的實測紀錄與已知問題。
-- `prototype/index.html`：原型入口（凹透鏡、凸透鏡）。
+- `docs/prototype-findings.md`（凹透鏡）、`docs/prototype-findings-convex.md`（凸透鏡）、`docs/prototype-findings-mirror.md`（平面鏡）：各原型的實測紀錄與已知問題。
+- `prototype/index.html`：原型入口（平面鏡、凸透鏡、凹透鏡）。
 - `prompts/`：每一輪 AI 任務單。
