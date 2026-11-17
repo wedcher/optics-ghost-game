@@ -23,7 +23,9 @@
     rows: 4,          // 由正面牆往玩家數，畫面上完整看得到的排數（第 5 排已經超出畫面下緣）
     length: 10,       // 房間深度：玩家背後那面牆在 z = 10
     ceiling: 2.3,
-    ghost: { width: 0.7, height: 1.1 },
+    // 鬼：docs/concepts/ghost01.png 的女鬼。原圖裙襬收成一個尖、看起來懸空，沒辦法判斷牠站在哪一格，
+    // 所以把圖在裙子還很寬的地方（原圖 y=1390）切平，讓牠像從地板冒出來；切口中央對準格子中央。
+    ghost: { width: 0.58, height: 1.15, poolRadius: 0.30 },
     mirrors: {
       back:  { axis: 'z', value: 0, label: '正面的鏡子', glass: { a: 0.80, b: 3.09, topA: 1.84, topB: 1.77, bottom: 0 } },
       right: { axis: 'x', value: 4, label: '右邊的鏡子', glass: { a: 0.96, b: 3.75, topA: 1.75, topB: 1.83, bottom: 0 } }

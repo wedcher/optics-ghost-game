@@ -55,7 +55,7 @@ async function open(profile, browser, query) {
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   page.on('requestfailed', (r) => errors.push('request failed: ' + r.url()));
   await page.goto(BASE + '/prototype/plane-mirror/index.html' + query);
-  await page.waitForFunction(() => window.__protoMirror && window.__protoMirror.art().intact && window.__protoMirror.art().broken);
+  await page.waitForFunction(() => window.__protoMirror && window.__protoMirror.art().intact && window.__protoMirror.art().broken && window.__protoMirror.art().ghost);
   const tapAt = (x, y) => profile.touch ? page.touchscreen.tap(x, y) : page.mouse.click(x, y);
   const press = (sel) => profile.touch ? page.tap(sel) : page.click(sel);
   const info = () => page.evaluate(() => {
@@ -67,10 +67,11 @@ async function open(profile, browser, query) {
       castHidden: document.getElementById('castBtn').hidden, nextHidden: document.getElementById('nextBtn').hidden, nextText: document.getElementById('nextBtn').textContent,
       zoom: m.canvasInfo().zoom };
   });
+  // 鬼現在是圖片（女鬼），沒有固定的顏色；測試時請頁面把鬼（和牠腳下那一圈）畫成單色剪影。
   // 數畫布上「鬼的顏色」與「選格標示的顏色」的像素，分成鏡面內、鏡面外
   const pixels = () => page.evaluate(() => {
     const m = window.__protoMirror, ci = m.canvasInfo(), cv = document.getElementById('view');
-    m.render();
+    m.setMask(true); // 鬼畫成單色剪影，才能用顏色數
     const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
     const polys = m.intactMirrors().map((id) => m.glassPoly(id));
     const out = { ghostIn: 0, ghostOut: 0, pickIn: 0, pickOut: 0, magicIn: 0, magicOut: 0 };
@@ -86,6 +87,7 @@ async function open(profile, browser, query) {
       if (pick) out[inside ? 'pickIn' : 'pickOut']++;
       if (magic) out[inside ? 'magicIn' : 'magicOut']++;
     }
+    m.setMask(false);
     return out;
   });
   const cellPt = (cell) => page.evaluate((c) => { const m = window.__protoMirror; return m.cellClient(Number(c[1]), Number(c[3])); }, cell);
