@@ -162,6 +162,8 @@ async function levelFlow(profile, browser) {
   ok(s.intact.join() === 'back,right', '兩面鏡都完好');
   ok(await page.evaluate(() => window.__protoMirror.pools[1].some((c) => window.__protoMirror.core.cellId(c.col, c.row) === window.__protoMirror.core.cellId(window.__protoMirror.state.ghost.col, window.__protoMirror.state.ghost.row))), '鬼在雙鏡出題格內', s.ghost);
   ok(s.images.back && s.images.right, '兩面鏡裡都有鬼的像');
+  const vis0 = await page.evaluate(() => { const m = window.__protoMirror, g = m.state.ghost; return ['back', 'right'].map((id) => m.core.visibility(m.room, m.cam, g, id).full); });
+  ok(vis0[0] && vis0[1], '雙鏡階段：鬼站的位置兩面鏡都照得到整隻');
   const sides = await page.evaluate(() => { const m = window.__protoMirror; return [m.ghostSide([]), m.ghostSide(['back']), m.ghostSide(['right']), m.ghostSide(['back', 'right'])]; });
   ok(sides.join() === 'front,back,front,back', '鬼面向玩家：直接看與右鏡是正面，正面鏡（與穿過正面鏡的二次像）是背面', sides.join());
   let px = await pixels();
@@ -221,6 +223,9 @@ async function levelFlow(profile, browser) {
   s = await info();
   ok(s.ghost !== ghost0 && !s.revealed && s.selected === null, '按繼續後鬼換了位置', ghost0 + ' → ' + s.ghost);
   ok(s.phase === 1 && s.scene === null, '抓到 1 次還是兩面鏡');
+  const vis1 = await page.evaluate(() => { const m = window.__protoMirror, g = m.state.ghost; return ['back', 'right'].map((id) => m.core.visibility(m.room, m.cam, g, id).full); });
+  ok(vis1[0] && vis1[1], '雙鏡階段第 2 隻：兩面鏡也都照得到整隻');
+  ok(s.status === '鬼掙脫了，換了一個地方躲。', '換位置的說明是短的那一句', s.status);
   px = await pixels();
   ok(px.ghostOut < EDGE_PX, '換位置後房間裡又看不到鬼');
 

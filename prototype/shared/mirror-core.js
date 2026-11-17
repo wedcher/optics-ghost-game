@@ -145,11 +145,11 @@
   }
   // 可以出題的格子。
   // 單鏡（mirrorIds 只有一面）：那面鏡裡看得到鬼的腳、身體、頭。
-  // 雙鏡：至少一面鏡裡看得到腳、身體、頭，而且另一面鏡裡也至少看得到一部分。
+  // 雙鏡：兩面鏡裡都看得到整隻鬼（使用者 2026-11-17：打碎鏡子之前，只用兩面鏡都照得到的位置）。
   function eligibleCells(room, cam, mirrorIds) {
     return selectableCells(room, cam).filter(function (cell) {
       var v = mirrorIds.map(function (id) { return visibility(room, cam, cell, id); });
-      return v.some(function (x) { return x.core; }) && v.every(function (x) { return x.any; });
+      return mirrorIds.length > 1 ? v.every(function (x) { return x.full; }) : v[0].core;
     });
   }
 
