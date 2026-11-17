@@ -266,7 +266,18 @@
 - 已做：Apps Script 後端 `backend/leaderboard/Code.gs`、前端模組 `prototype/shared/leaderboard.js`（牆上時間計時、上傳、讀取、結算畫面「你花費＿＿把鬼趕出城堡…」）、排行榜頁 `prototype/leaderboard.html`（選單有入口）、網址設定 `prototype/shared/leaderboard-config.js`（留空＝本機排行）。
 - 測試（已併入 `npm test`，也可 `npm run test:leaderboard`）：後端規則 29/29、瀏覽器 e2e 32/32。
 - **還沒做 1：使用者部署 Apps Script**，把 `/exec` 網址填進 `leaderboard-config.js`（步驟在 `docs/leaderboard.md`）。部署後要實測一次手機上傳與讀取。
-- **還沒做 2：接進各關**——第一關開始 `startRun()`、第二關過關 `finishCastle()`、選單「重新開始遊戲」`restartRun()`、荒野狩獵結束 `recordHunt(n)`＋`showResult()`。對照表在 `docs/leaderboard.md`「接進各關」。要先確認沒有其他工作階段正在改 `plane-mirror/app.js`、`convex-lens/app.js`。
+- **還沒做 2：接進各關（給之後做第一／二／三關與選單的工作階段，請接上）。** 這輪沒有動關卡程式，避免和同時在改關卡的工作階段衝突。各頁的 `<script>` 先加（放在 `app.js` 之前）：
+  `<script src="../shared/leaderboard-config.js"></script>` 與 `<script src="../shared/leaderboard.js"></script>`。
+  **`?free=1` 自由練習、荒野練習模式一律不呼叫。** 函式都安全可重複呼叫。
+
+  | 關卡 | 要接的東西 | 位置（2026-11-17 的程式） |
+  |---|---|---|
+  | **第一關** 平面鏡 | 關卡模式一開始呼叫 `Leaderboard.startRun()`（已開始就不會歸零，失敗重來重複呼叫沒關係） | `prototype/plane-mirror/app.js` 的 `showIntro()` 開頭（只在 `!FREE` 時會被呼叫） |
+  | **第二關** 凸透鏡 | 抓滿 5 隻時呼叫 `var ms = Leaderboard.finishCastle()`；`ms` 不是 `null` 就在過關畫面的說明加「趕鬼時間：`Leaderboard.formatTime(ms)`」。`null` 代表不是從第一關玩過來的，不顯示 | `prototype/convex-lens/app.js` 的 `showCleared()` 開頭。只記第一次，按「再玩一次」不會改寫成績 |
+  | **第三關** 荒野狩獵（正式 5 分鐘） | 時間到或命用完：`Leaderboard.recordHunt(封印數)`，然後 `Leaderboard.showResult({ onClose: 回選單 })`——結算文案、暱稱輸入、上傳都在裡面，不用自己做 | 荒野狩獵尚未實作；做的人直接接。練習模式不要呼叫 |
+  | **選單** | 「重新開始遊戲」按鈕呼叫 `Leaderboard.restartRun()`（清掉計時）再進第一關；放一個連到 `leaderboard.html` 的入口（`prototype/index.html` 已有） | 三關共用選單尚未實作 |
+
+  接完要補測試：第一關 e2e 檢查進關後 `Leaderboard.getRun().startedAt` 有值、`?free=1` 沒有；第二關 e2e 檢查過關後有 `castleMs`、直接開第二關沒有。API 與規則細節見 `docs/leaderboard.md`。
 - 荒野狩獵（5 分鐘、3 條命）與三關共用選單本身**尚未實作**，排行榜第三關的成績要等它。
 - 待使用者決定：暱稱不雅字詞／冒用要不要處理（PENDING 11）。
 
