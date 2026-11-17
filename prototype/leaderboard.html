@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>排行榜 — Optics Ghost Game</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<style>
+  html, body { margin:0; min-height:100%; background:#0d1020; color:#e8ebff;
+    font-family: system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; }
+  main { max-width:900px; margin:0 auto; padding:14px 16px 24px; }
+  header { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+  h1 { font-size:22px; margin:0; flex:1; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; min-height:46px; min-width:88px; padding:4px 16px;
+    font:inherit; font-size:15px; color:#e8ebff; background:#232a4d; border:1px solid #3b4478; border-radius:12px; text-decoration:none; cursor:pointer; }
+  .mode { margin:0 0 12px; font-size:14px; color:#9aa3cf; }
+  .mode.err { color:#ff8a8a; }
+  .boards { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; }
+  section { background:#171b33; border:1px solid #3b4478; border-radius:14px; padding:12px 14px; }
+  h2 { margin:0 0 2px; font-size:18px; }
+  .sub { margin:0 0 8px; font-size:13px; color:#9aa3cf; }
+  ol { list-style:none; margin:0; padding:0; }
+  li { display:flex; align-items:center; gap:10px; min-height:38px; border-top:1px solid #262c52; font-size:16px; }
+  li:first-child { border-top:0; }
+  .rk { width:30px; text-align:center; font-weight:700; color:#9aa3cf; }
+  li:nth-child(1) .rk { color:#ffd166; } li:nth-child(2) .rk { color:#cfd5f5; } li:nth-child(3) .rk { color:#d89a6a; }
+  .nm { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .vl { font-variant-numeric:tabular-nums; color:#ffd166; }
+  li.me .nm { color:#b980ff; font-weight:600; }
+  .empty { padding:12px 0; color:#9aa3cf; font-size:15px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <a class="btn" href="index.html">← 選單</a>
+    <h1>排行榜</h1>
+    <button class="btn" id="refresh" type="button">重新整理</button>
+  </header>
+  <p class="mode" id="mode">讀取中…</p>
+  <div class="boards">
+    <section>
+      <h2>趕鬼時間</h2>
+      <p class="sub">第一關開始到第二關結束，愈短愈好</p>
+      <ol id="castle"></ol>
+    </section>
+    <section>
+      <h2>荒野封印</h2>
+      <p class="sub">5 分鐘荒野狩獵封印的鬼數（練習模式不算）</p>
+      <ol id="hunt"></ol>
+    </section>
+  </div>
+</main>
+<script src="shared/landscape.js"></script>
+<script src="shared/leaderboard-config.js"></script>
+<script src="shared/leaderboard.js"></script>
+<script>
+(function () {
+  'use strict';
+  var me = Leaderboard.getNickname();
+  function fill(id, list, fmt) {
+    var ol = document.getElementById(id);
+    ol.textContent = '';
+    if (!list || !list.length) { var e = document.createElement('li'); e.className = 'empty'; e.textContent = '還沒有人上榜'; ol.appendChild(e); return; }
+    list.forEach(function (r, i) {
+      var li = document.createElement('li');
+      if (me && r.name === me) li.className = 'me';
+      var rk = document.createElement('span'); rk.className = 'rk'; rk.textContent = String(i + 1);
+      var nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = r.name;
+      var vl = document.createElement('span'); vl.className = 'vl'; vl.textContent = fmt(r.value);
+      li.appendChild(rk); li.appendChild(nm); li.appendChild(vl); ol.appendChild(li);
+    });
+  }
+  function load() {
+    var mode = document.getElementById('mode');
+    mode.className = 'mode'; mode.textContent = '讀取中…';
+    Leaderboard.fetchTop().then(function (r) {
+      fill('castle', r.castle, Leaderboard.formatTime);
+      fill('hunt', r.hunt, function (v) { return v + ' 隻'; });
+      if (!r.ok) { mode.className = 'mode err'; mode.textContent = r.error || '讀取失敗'; return; }
+      mode.textContent = r.mode === 'remote' ? '所有玩家共用的排行榜，每個暱稱只留最好的成績，顯示前 ' + Leaderboard.TOP + ' 名。'
+        : '還沒連上共用排行榜：這裡只顯示這支手機上的成績。';
+    });
+  }
+  document.getElementById('refresh').addEventListener('click', load);
+  load();
+})();
+</script>
+</body>
+</html>
