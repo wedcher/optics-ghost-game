@@ -909,10 +909,15 @@
   // 隨機出題：把所有配置洗牌後依序出；出完再洗一次。同一組不會連續出現，也不會照固定順序讓人背答案。
   var deck = [], roundsStarted = 0;
   function nextRandomConfig() {
+    // 牌堆只剩一張、又剛好是現在這組（自由練習手動選到最後一張）：這張已經在畫面上了，丟掉直接洗新的一疊。
+    if (roundsStarted > 0 && deck.length === 1 && deck[0] === state.cfgIndex) deck = [];
     if (!deck.length) {
       deck = Cfg.all.map(function (_, i) { return i; });
       for (var i = deck.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = deck[i]; deck[i] = deck[j]; deck[j] = t; }
-      if (roundsStarted > 0 && deck.length > 1 && deck[deck.length - 1] === state.cfgIndex) deck.unshift(deck.pop());
+    }
+    // 要發的牌跟現在這組一樣就改發下一張：兩疊牌交界、或自由練習用下拉選單手動選過配置（那組還留在牌堆裡）都可能撞到。
+    if (roundsStarted > 0 && deck.length > 1 && deck[deck.length - 1] === state.cfgIndex) {
+      var top = deck.length - 1, tmp = deck[top]; deck[top] = deck[top - 1]; deck[top - 1] = tmp;
     }
     return deck.pop();
   }
