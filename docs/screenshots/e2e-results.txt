@@ -89,7 +89,7 @@
   PASS  [phone-landscape] 配置A 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置A 光路重現：結束時標出像點  — 129 px（重現前 71）
   PASS  [phone-landscape] 配置A 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
   PASS  [phone-landscape] 配置A 關閉 Debug 後面板清空
   PASS  [phone-landscape] 配置B 裸眼畫面沒有鬼
@@ -137,6 +137,8 @@
   PASS  [phone-landscape] 配置B 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
   PASS  [phone-landscape] 配置B 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
   PASS  [phone-landscape] 配置B 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置B 拖曳畫線：線經過另一個標示點（手指只到半路）→ 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置B 放開：留下通過兩個標示點的直線（手指沒有碰到第二個點）
   PASS  [phone-landscape] 配置B 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置B 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置B 封印模式下點擊不會畫線
@@ -165,7 +167,7 @@
   PASS  [phone-landscape] 配置B 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置B 光路重現：結束時標出像點  — 134 px（重現前 64）
   PASS  [phone-landscape] 配置B 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置B 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置B 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置C 裸眼畫面沒有鬼
   PASS  [phone-landscape] 配置C 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 59% 像素改變；此方位沒有鬼
   PASS  [phone-landscape] 配置C 透鏡外畫面不變  — 0.00%
@@ -211,6 +213,8 @@
   PASS  [phone-landscape] 配置C 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
   PASS  [phone-landscape] 配置C 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
   PASS  [phone-landscape] 配置C 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置C 拖曳畫線：線經過另一個標示點（手指只到半路）→ 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置C 放開：留下通過兩個標示點的直線（手指沒有碰到第二個點）
   PASS  [phone-landscape] 配置C 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置C 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置C 封印模式下點擊不會畫線
@@ -313,7 +317,7 @@
   PASS  [phone-landscape] 配置D 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置D 光路重現：結束時標出像點  — 137 px（重現前 70）
   PASS  [phone-landscape] 配置D 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置D 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 40 次
+  PASS  [phone-landscape] 配置D 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 沒有 JS 錯誤
   PASS  [phone-portrait] 背景圖已載入
   PASS  [phone-portrait] 探索：所有控制項都在畫面內  — canvas 375×597
@@ -403,7 +407,7 @@
   PASS  [phone-portrait] 配置A 光路重現：畫面上方有說明文字框
   PASS  [phone-portrait] 配置A 光路重現：結束時標出像點  — 137 px（重現前 67）
   PASS  [phone-portrait] 配置A 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-portrait] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 18 次
+  PASS  [phone-portrait] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-portrait] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
   PASS  [phone-portrait] 配置A 關閉 Debug 後面板清空
   PASS  [phone-portrait] 沒有 JS 錯誤
@@ -465,6 +469,8 @@
   PASS  [desktop] 配置A 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
   PASS  [desktop] 配置A 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
   PASS  [desktop] 配置A 「復原」可以拿掉拖出來的連線
+  PASS  [desktop] 配置A 拖曳畫線：線經過另一個標示點（手指只到半路）→ 吸附到該點，預覽變實線
+  PASS  [desktop] 配置A 放開：留下通過兩個標示點的直線（手指沒有碰到第二個點）
   PASS  [desktop] 配置A 選格封印模式下，從標示點拖曳不會畫線
   PASS  [desktop] 配置A 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [desktop] 分析／封印：所有控制項都在畫面內  — canvas 1280×591
@@ -544,6 +550,8 @@
   PASS  [desktop] 配置C 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
   PASS  [desktop] 配置C 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
   PASS  [desktop] 配置C 「復原」可以拿掉拖出來的連線
+  PASS  [desktop] 配置C 拖曳畫線：線經過另一個標示點（手指只到半路）→ 吸附到該點，預覽變實線
+  PASS  [desktop] 配置C 放開：留下通過兩個標示點的直線（手指沒有碰到第二個點）
   PASS  [desktop] 配置C 選格封印模式下，從標示點拖曳不會畫線
   PASS  [desktop] 配置C 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [desktop] 配置C 封印模式下點擊不會畫線
@@ -575,4 +583,4 @@
   PASS  [desktop] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [desktop] 沒有 JS 錯誤
 
-ALL PASS: 576/576 checks
+ALL PASS: 584/584 checks

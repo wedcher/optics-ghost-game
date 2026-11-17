@@ -151,6 +151,10 @@ async function run(profile, browser) {
       if (e.x < 8 || e.y < 8 || e.x > r.width - 8 || e.y > r.height - 8) continue;
       const el = document.elementFromPoint(r.left + e.x, r.top + e.y);
       if (!el || el.id !== 'view') continue;
+      // 從起點到終點的線也不能經過別的標示點（線經過點會吸附到那個點）
+      const ux = e.x - from.x, uy = e.y - from.y, len = Math.hypot(ux, uy);
+      const through = pts.some((q) => { const al = ((q.x - from.x) * ux + (q.y - from.y) * uy) / len, off = Math.abs((q.x - from.x) * uy - (q.y - from.y) * ux) / len; return al > 1 && off < 17; });
+      if (through) continue;
       if (pts.every((q) => Math.hypot(q.x - e.x, q.y - e.y) > H.SNAP_PX + 8)) return e;
     }
     return null;
@@ -438,6 +442,24 @@ async function run(profile, browser) {
             T('放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）'));
           await press('#undoBtn');
           ok((await peek()).n === n0, T('「復原」可以拿掉拖出來的連線'));
+        }
+      }
+
+      // 線經過另一個標示點（手指只拖到半路，沒有碰到那個點）→ 一樣吸附到該點
+      {
+        const tp = await snap('P'), tw = await worldOf('P');
+        const hx = sp0.x + (tp.x - sp0.x) * 0.55, hy = sp0.y + (tp.y - sp0.y) * 0.55;
+        const okSpot = await page.evaluate(({ x, y, cx, cy }) => {
+          const H = window.__proto, el = document.elementFromPoint(cx, cy);
+          return !H.nearestSnap(x, y) && !!el && el.id === 'view';
+        }, { x: hx, y: hy, cx: cb.x + hx, cy: cb.y + hy });
+        if (okSpot && Math.hypot(hx - sp0.x, hy - sp0.y) > 40) {
+          mid = await path([[sp0.x, sp0.y], [hx, hy]], peek);
+          after = await peek();
+          const onLine = (A, B) => !!B && Math.abs((B.x - A.x) * (tw.y - A.y) - (B.y - A.y) * (tw.x - A.x)) / Math.hypot(B.x - A.x, B.y - A.y) < 1e-6; // 共線的點吸附到哪一個都是同一條線
+          ok(mid.drag && mid.drag.snap === 'point' && onLine({ x: mid.drag.ax, y: mid.drag.ay }, mid.drag.b), T('拖曳畫線：線經過另一個標示點（手指只到半路）→ 吸附到該點，預覽變實線'));
+          ok(after.n === n0 + 1 && after.last.kind === 'line' && onLine(after.last, after.last.b), T('放開：留下通過兩個標示點的直線（手指沒有碰到第二個點）'));
+          await press('#undoBtn');
         }
       }
 

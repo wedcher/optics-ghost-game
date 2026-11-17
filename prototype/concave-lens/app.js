@@ -790,7 +790,23 @@
   // 拖曳途中符合下列任一條件就吸附、預覽變實線：碰到另一個標示點（優先）／接近水平／接近垂直。
   // 放開時是實線就留下，是虛線就消失。吸附後存的是標示點的世界座標，水平與垂直是精確的。
   // 垂直線不是主光線，沒有光學用途（使用者指定：故意放來迷惑玩家）。
-  var AXIS_MIN_PX = 30, AXIS_TOL_PX = 10, AXIS_TOL_RATIO = 0.18;
+  // 「碰到點」有兩種：手指進到點的吸附範圍；或是從起點往手指方向延伸的線經過某個點（線離點 THROUGH_PX 以內，
+  // 手指不必真的拖到那個點上）。水平／垂直和「線經過點」同時成立時，取偏差比較小的那個，
+  // 所以瞄準某個點時不會被水平吸走，刻意拉平時也不會被旁邊的點吸走。
+  var AXIS_MIN_PX = 30, AXIS_TOL_PX = 8, AXIS_TOL_RATIO = 0.12, THROUGH_PX = 14;
+  function pointOnDragRay(a, p) {
+    var a0 = w2s(a), ux = p.x - a0.x, uy = p.y - a0.y, len = Math.hypot(ux, uy), best = null;
+    if (len < AXIS_MIN_PX) return null;
+    ux /= len; uy /= len;
+    snapPoints().forEach(function (sp) {
+      if (Optics.dist(sp, a) < 0.5) return;
+      var q = w2s(sp), along = (q.x - a0.x) * ux + (q.y - a0.y) * uy, off = Math.abs((q.x - a0.x) * uy - (q.y - a0.y) * ux);
+      if (along <= 0 || off > THROUGH_PX) return; // 只看手指這一側
+      var gap = Math.abs(along - len);
+      if (!best || off < best.off - 0.5 || (Math.abs(off - best.off) <= 0.5 && gap < best.gap)) best = { sp: sp, off: off, gap: gap };
+    });
+    return best;
+  }
   function dragAsLine(dg) {
     return dg.snap === 'point' ? { kind: 'line', a: dg.a, b: dg.b } : { kind: dg.snap === 'h' ? 'parallel' : 'vertical', a: dg.a, b: null };
   }
@@ -799,8 +815,14 @@
     var dx = Math.abs(p.x - gesture.x0), dy = Math.abs(p.y - gesture.y0);
     var hit = nearestSnap(p.x, p.y), snap = null, b = null;
     if (hit && Optics.dist(hit, a) >= 0.5) { snap = 'point'; b = { x: hit.x, y: hit.y, label: hit.label }; }
-    else if (dx >= AXIS_MIN_PX && dy <= Math.max(AXIS_TOL_PX, dx * AXIS_TOL_RATIO)) snap = 'h';
-    else if (dy >= AXIS_MIN_PX && dx <= Math.max(AXIS_TOL_PX, dy * AXIS_TOL_RATIO)) snap = 'v';
+    else {
+      var axis = null, axisOff = Infinity;
+      if (dx >= AXIS_MIN_PX && dy <= Math.max(AXIS_TOL_PX, dx * AXIS_TOL_RATIO)) { axis = 'h'; axisOff = dy; }
+      else if (dy >= AXIS_MIN_PX && dx <= Math.max(AXIS_TOL_PX, dy * AXIS_TOL_RATIO)) { axis = 'v'; axisOff = dx; }
+      var thru = pointOnDragRay(a, p);
+      if (thru && thru.off <= axisOff) { snap = 'point'; b = { x: thru.sp.x, y: thru.sp.y, label: thru.sp.label }; }
+      else snap = axis;
+    }
     var was = state.drag ? state.drag.snap + (state.drag.b ? state.drag.b.label : '') : '';
     state.drag = { a: a, snap: snap, b: b, cur: { x: p.x, y: p.y } };
     var now = snap ? snap + (b ? b.label : '') : '';
