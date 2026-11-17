@@ -44,6 +44,8 @@ const PROFILES = [
   { name: 'phone-landscape', viewport: { width: 812, height: 375 }, touch: true, dsf: 2, shots: true },
   { name: 'desktop', viewport: { width: 1280, height: 800 }, touch: false, dsf: 1, shots: false }
 ];
+// 鏡面邊緣的反鋸齒會讓少數幾個像素落在鏡面多邊形外；真的鬼出現在房間裡時是上千個像素
+const EDGE_PX = 20;
 const ARM_WAIT = 420; // 過場的結尾按鈕出現後 350 ms 內不接受點擊
 const LEAK_WORDS = /[左右前後遠近]|第\s*\d|[欄排]|c\dr\d/; // 抓錯的訊息不能有方向、距離、格號
 
@@ -143,7 +145,7 @@ async function levelFlow(profile, browser) {
   const sides = await page.evaluate(() => { const m = window.__protoMirror; return [m.ghostSide([]), m.ghostSide(['back']), m.ghostSide(['right']), m.ghostSide(['back', 'right'])]; });
   ok(sides.join() === 'front,back,front,back', '鬼面向玩家：直接看與右鏡是正面，正面鏡（與穿過正面鏡的二次像）是背面', sides.join());
   let px = await pixels();
-  ok(px.ghostIn > 0 && px.ghostOut === 0, '鬼只出現在鏡子裡，房間裡看不到', JSON.stringify(px));
+  ok(px.ghostIn > 0 && px.ghostOut < EDGE_PX, '鬼只出現在鏡子裡，房間裡看不到', JSON.stringify(px));
   ok(s.castDisabled, '還沒選格時不能施放');
   await shot('mirror-2-two-mirrors');
 
@@ -174,7 +176,7 @@ async function levelFlow(profile, browser) {
   await press('#castBtn');
   await page.waitForTimeout(450);
   px = await pixels();
-  ok(px.ghostOut === 0, '抓錯：法陣展開途中房間裡沒有鬼', JSON.stringify(px));
+  ok(px.ghostOut < EDGE_PX, '抓錯：法陣展開途中房間裡沒有鬼', JSON.stringify(px));
   ok(px.magicOut > 0 && px.magicIn === 0, '法陣只畫在地板上，鏡子裡沒有', JSON.stringify(px));
   await shot('mirror-4-wrong');
   await t.waitIdle();
@@ -184,7 +186,7 @@ async function levelFlow(profile, browser) {
   ok(s.selected === null && s.castHidden === false && s.nextHidden, '抓錯後要重新選格');
   ok(!LEAK_WORDS.test(s.status), '抓錯的訊息沒有方向、距離、格號', s.status);
   px = await pixels();
-  ok(px.ghostOut === 0 && px.ghostIn > 0, '抓錯之後房間裡仍然沒有鬼，鏡中的像還在');
+  ok(px.ghostOut < EDGE_PX && px.ghostIn > 0, '抓錯之後房間裡仍然沒有鬼，鏡中的像還在');
 
   // ---- 抓對第 1 次 ----
   await t.catchGhost();
@@ -200,7 +202,7 @@ async function levelFlow(profile, browser) {
   ok(s.ghost !== ghost0 && !s.revealed && s.selected === null, '按繼續後鬼換了位置', ghost0 + ' → ' + s.ghost);
   ok(s.phase === 1 && s.scene === null, '抓到 1 次還是兩面鏡');
   px = await pixels();
-  ok(px.ghostOut === 0, '換位置後房間裡又看不到鬼');
+  ok(px.ghostOut < EDGE_PX, '換位置後房間裡又看不到鬼');
 
   // ---- 抓對第 2 次 → 打碎鏡子 ----
   await t.catchGhost();
@@ -222,7 +224,7 @@ async function levelFlow(profile, browser) {
   ok(s.images.back && !s.images.right, '只有正面鏡裡有像');
   ok(await page.evaluate(() => window.__protoMirror.pools[2].some((c) => window.__protoMirror.core.cellId(c.col, c.row) === window.__protoMirror.core.cellId(window.__protoMirror.state.ghost.col, window.__protoMirror.state.ghost.row))), '鬼在單鏡出題格內', s.ghost);
   px = await pixels();
-  ok(px.ghostIn > 0 && px.ghostOut === 0, '單鏡：鬼只出現在正面鏡裡', JSON.stringify(px));
+  ok(px.ghostIn > 0 && px.ghostOut < EDGE_PX, '單鏡：鬼只出現在正面鏡裡', JSON.stringify(px));
   await shot('mirror-7-one-mirror');
   // 點碎掉的鏡子
   const bp = await page.evaluate(() => window.__protoMirror.toClient({ x: 1400, y: 380 }));
@@ -271,7 +273,7 @@ async function levelFlow(profile, browser) {
   s = await info();
   ok(s.scene === null && s.lives === 3 && s.sealed === 0 && s.phase === 1 && !s.over, '重新挑戰：從兩面鏡重來，不再播開場');
   px = await pixels();
-  ok(px.ghostOut === 0, '重新挑戰後房間裡沒有鬼');
+  ok(px.ghostOut < EDGE_PX, '重新挑戰後房間裡沒有鬼');
 
   // ---- 版面 ----
   const lay = await page.evaluate(() => {
