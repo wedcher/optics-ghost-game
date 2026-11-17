@@ -25,18 +25,18 @@
     a.img.src = src;
     return a;
   }
-  var ART = { intact: loadArt('assets/room-intact.jpg'), broken: loadArt('assets/room-broken.jpg'), ghost: loadArt('assets/ghost.webp') };
+  var ART = { intact: loadArt('assets/room-intact.jpg'), broken: loadArt('assets/room-broken.jpg'), ghost: loadArt('assets/ghost.webp'), ghostBack: loadArt('assets/ghost-back.webp') };
   // 測試用：把鬼畫成單一顏色的剪影，測試才能用顏色數「鬼出現在哪裡」（見 __protoMirror.setMask）
-  var ghostMask = null;
-  function maskImage() {
-    if (!ghostMask && ART.ghost.ready) {
-      ghostMask = document.createElement('canvas');
-      ghostMask.width = ART.ghost.img.width; ghostMask.height = ART.ghost.img.height;
-      var m = ghostMask.getContext('2d');
-      m.drawImage(ART.ghost.img, 0, 0);
-      m.globalCompositeOperation = 'source-in'; m.fillStyle = GHOST_COLOR; m.fillRect(0, 0, ghostMask.width, ghostMask.height);
+  var ghostMask = {};
+  function maskImage(key) {
+    if (!ghostMask[key] && ART[key].ready) {
+      var cv = ghostMask[key] = document.createElement('canvas');
+      cv.width = ART[key].img.width; cv.height = ART[key].img.height;
+      var m = cv.getContext('2d');
+      m.drawImage(ART[key].img, 0, 0);
+      m.globalCompositeOperation = 'source-in'; m.fillStyle = GHOST_COLOR; m.fillRect(0, 0, cv.width, cv.height);
     }
-    return ghostMask;
+    return ghostMask[key];
   }
 
   // ---------- 狀態 ----------
@@ -52,7 +52,7 @@
     lives: R.lives, sealed: 0, over: false,
     debug: false, fx: null, forced: null, mask: false
   };
-  var stats = { casts: 0, wrong: 0, mirrorTaps: 0, pans: 0, ghostRevealed: false, images: { back: false, right: false }, lastPick: null };
+  var stats = { casts: 0, wrong: 0, mirrorTaps: 0, pans: 0, sides: {}, ghostRevealed: false, images: { back: false, right: false }, lastPick: null };
   var scene = null, history = [];
 
   function intactMirrors() { return state.phase === 1 ? ['back', 'right'] : ['back']; }
@@ -237,16 +237,25 @@
     return (tl.depth + bl.depth) / 2;
   }
   // 鬼：女鬼圖（已在裙襬切平，底邊就是地板）。圖還沒載入時先畫一個簡單的形狀。
-  function ghostPainter(alpha) {
+  // 鬼面向玩家（朝 +z）。back = true 時畫牠的背面：背面圖已經先左右翻轉過，
+  // 所以貼在同一片人形上時，牠舉起的手和正面圖在同一側（從鏡子裡看到的背影就是這樣）。
+  function ghostPainter(alpha, back) {
     return function () {
       ctx.globalAlpha *= alpha;
-      var img = state.mask ? maskImage() : (ART.ghost.ready ? ART.ghost.img : null);
+      var key = back ? 'ghostBack' : 'ghost';
+      var img = state.mask ? maskImage(key) : (ART[key].ready ? ART[key].img : null);
       if (img) { ctx.drawImage(img, 0, 0, 1, 1); return; }
       ctx.fillStyle = GHOST_COLOR;
       ctx.beginPath();
       ctx.moveTo(0.2, 1); ctx.lineTo(0.3, 0.3); ctx.bezierCurveTo(0.3, 0, 0.7, 0, 0.7, 0.3); ctx.lineTo(0.8, 1);
       ctx.closePath(); ctx.fill();
     };
+  }
+  // 從目前的視點（經過鏡射 T 之後）看到的是鬼的正面還是背面。
+  // 鬼朝 +z；鏡射後牠的朝向變成 (0, 0, T.sz)。視點在牠朝向的那一側就是正面。
+  function seesBack(T) {
+    var c = C.apply(T, C.cellCenter(state.ghost.col, state.ghost.row));
+    return (cam.eye.z - c.z) * T.sz < 0;
   }
   // 鬼從地板冒出來的地方：格子中央一圈暗色的漩渦。有了它才看得出牠站在哪一格。
   // part = 'under'：畫在鬼的後面（整圈）；'over'：只畫靠近玩家的半圈邊，蓋在裙襬上。
@@ -280,7 +289,9 @@
   }
   function drawGhost(T, alpha) {
     drawPool(T, state.ghost, 'under', alpha);
-    drawSprite(T, C.ghostQuad(R, state.ghost), ghostPainter(alpha));
+    var back = seesBack(T);
+    if (T === C.IDENTITY) stats.sides.direct = back ? 'back' : 'front';
+    drawSprite(T, C.ghostQuad(R, state.ghost), ghostPainter(alpha, back));
     drawPool(T, state.ghost, 'over', alpha);
   }
   function playerPainter() {
@@ -349,6 +360,27 @@
     }
     ctx.restore();
   }
+  // 鏡子底邊的金色門檻：一條貼在地板上、有寬度的金框，分清楚鏡內與鏡外。
+  // 畫成地板上的長條再投影，所以近的地方粗、遠的地方細；寬度以鏡面為中線、鏡內鏡外各一半。
+  var BASE_BAR = 0.11; // 半寬（格）
+  function drawBaseBar(id) {
+    var m = R.mirrors[id], g = m.glass, w = BASE_BAR, strip, mid;
+    if (m.axis === 'z') {
+      strip = [{ x: g.a, y: 0, z: m.value - w }, { x: g.b, y: 0, z: m.value - w }, { x: g.b, y: 0, z: m.value + w }, { x: g.a, y: 0, z: m.value + w }];
+      mid = [{ x: g.a, y: 0, z: m.value }, { x: g.b, y: 0, z: m.value }];
+    } else {
+      strip = [{ x: m.value - w, y: 0, z: g.a }, { x: m.value - w, y: 0, z: g.b }, { x: m.value + w, y: 0, z: g.b }, { x: m.value + w, y: 0, z: g.a }];
+      mid = [{ x: m.value, y: 0, z: g.a }, { x: m.value, y: 0, z: g.b }];
+    }
+    var p = C.projectPoly(cam, strip), c = C.projectPoly(cam, mid);
+    if (p.length < 3) return;
+    path(p); ctx.fillStyle = '#c9963f'; ctx.fill();
+    ctx.strokeStyle = '#5a3d12'; ctx.lineWidth = 1.5; ctx.lineJoin = 'round'; ctx.stroke();
+    if (c.length >= 2) { // 中間一條亮線＝鏡面的位置
+      ctx.strokeStyle = '#ffe2a0'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(c[0].x, c[0].y); ctx.lineTo(c[1].x, c[1].y); ctx.stroke();
+    }
+  }
   function glassScreen(id) { return C.projectPoly(cam, C.mirrorPoly(R.mirrors[id])); }
 
   // ---------- 法陣（畫在真的地板上；不畫進鏡子裡，理由見 findings） ----------
@@ -403,8 +435,7 @@
       var g = glassScreen(id);
       drawView([id], g);
       // 鏡面與地板相接的那條線（數格子的基準）
-      ctx.strokeStyle = 'rgba(232,186,96,.9)'; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.moveTo(g[3].x, g[3].y); ctx.lineTo(g[2].x, g[2].y); ctx.stroke();
+      drawBaseBar(id);
     });
     if (state.phase === 2 && R.brokenDarken > 0) fillPoly(R.brokenGlassPx, 'rgba(5,5,10,' + R.brokenDarken + ')'); // 圖裡碎鏡若有畫死的反射：壓暗
     ['back', 'right'].forEach(function (id) {
@@ -705,7 +736,9 @@
     state: state, stats: stats, room: R, core: C, cam: cam, FREE: FREE, pools: POOLS, selectable: SELECTABLE, GHOST_COLOR: GHOST_COLOR,
     intactMirrors: intactMirrors, render: render,
     scene: function () { return scene ? scene.info() : null; },
-    art: function () { return { intact: ART.intact.ready, broken: ART.broken.ready, ghost: ART.ghost.ready }; },
+    art: function () { return { intact: ART.intact.ready, broken: ART.broken.ready, ghost: ART.ghost.ready && ART.ghostBack.ready }; },
+    // 透過某一串鏡子看到的是鬼的正面還是背面（[] = 直接看）
+    ghostSide: function (chain) { return seesBack(C.chainT(R, chain)) ? 'back' : 'front'; },
     setMask: function (on) { state.mask = !!on; render(); },
     canvasInfo: function () { return { W: W, H: H, DPR: DPR, S: S, OX: OX, OY: OY, zoom: ZOOMS[view.zoom] }; },
     // 影像座標 → 網頁座標（測試用來算該點哪裡）
