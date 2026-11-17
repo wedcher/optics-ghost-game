@@ -293,12 +293,34 @@ async function run(profile, browser) {
   await tapAt(vw * 0.5, vh * 0.5);
   s = await st();
   ok(s.scene.endShown && /過關/.test(s.scene.endText) && /荒野/.test(s.scene.endText) && s.scene.buttons.join() === 'clearMenuBtn,againBtn', P('過關畫面：標題、下一站荒野、回選單／再玩一次'), s.scene.endText);
+  ok(!/趕鬼時間/.test(s.scene.endText) && (await page.evaluate(() => Leaderboard.getRun())) === null, P('排行榜：直接開第二關（沒從第一關開始）不顯示趕鬼時間、不記成績'));
   await page.waitForTimeout(ARM_WAIT);
   await sceneButtons('過關畫面');
   await shot('8-cleared');
   await press('#againBtn', 150);
   s = await st();
   ok(s.screen === 'play' && !s.scene && s.lives === 3 && s.sealed === 0 && s.heartsLeft === 3 && s.phase === 'observe' && !s.solved, P('再玩一次：命數與封印數重置，回到抓鬼'));
+
+  // ---------- 排行榜：從第一關依序玩過來，第二關過關顯示趕鬼時間 ----------
+  // 先模擬 ?unlock=1 跳關：本輪計時已開始、但第一關沒過 → 不算。再模擬第一關已過 → 算。為了省時間，直接把封印數設成 4、再抓最後一隻。
+  const clearOnce = async (label) => {
+    await page.evaluate(() => { window.__protoConvex.level.sealed = 4; });
+    await sealRight(label);
+    await press('#nextBtn', 200);
+    await tapAt(vw * 0.5, vh * 0.5); await tapAt(vw * 0.5, vh * 0.5);
+    return st();
+  };
+  await page.evaluate(() => localStorage.setItem('ogg.run.v1', JSON.stringify({ startedAt: Date.now() - 600000, castleMs: null, hunt: null })));
+  s = await clearOnce('跳關後抓最後一隻');
+  ok(s.screen === 'cleared' && !/趕鬼時間/.test(s.scene.endText) && (await page.evaluate(() => Leaderboard.getRun().castleMs)) == null, P('排行榜：第一關沒過（?unlock=1 跳關）第二關過關不算趕鬼時間'), s.scene.endText);
+  await page.waitForTimeout(ARM_WAIT);
+  await press('#againBtn', 150);
+  await page.evaluate(() => localStorage.setItem('ogg.run.v1', JSON.stringify({ startedAt: Date.now() - 600000, mirrorDone: true, castleMs: null, hunt: null })));
+  s = await clearOnce('依序過關後抓最後一隻');
+  const ms = await page.evaluate(() => Leaderboard.getRun().castleMs);
+  ok(s.screen === 'cleared' && /趕鬼時間：10 分 \d+ 秒/.test(s.scene.endText) && ms >= 600000 && ms < 660000, P('排行榜：依序過關，第二關過關畫面顯示趕鬼時間並記下成績'), s.scene.endText);
+  await page.waitForTimeout(ARM_WAIT);
+  await press('#againBtn', 150);
 
   // ---------- 自由練習模式不受影響 ----------
   await page.goto(URL + '?free=1');

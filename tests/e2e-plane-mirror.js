@@ -139,6 +139,10 @@ async function levelFlow(profile, browser) {
   console.log('\n===== ' + profile.name + '：關卡流程 =====');
   const t = await open(profile, browser, '');
   const { page, press, info, pixels, shot } = t;
+  {
+    const run = await t.page.evaluate(() => window.Leaderboard && window.Leaderboard.getRun());
+    ok(!!(run && run.startedAt) && !run.mirrorDone, '排行榜：進第一關（關卡模式）就開始趕鬼計時，尚未標記第一關通過');
+  }
   const vp = profile.viewport;
 
   // ---- 開場 ----
@@ -280,6 +284,7 @@ async function levelFlow(profile, browser) {
   await press('#nextBtn');
   s = await info();
   ok(s.scene && s.scene.id === 'clear', '播過關演出');
+  ok(await page.evaluate(() => !!Leaderboard.getRun().mirrorDone), '排行榜：第一關過關後本輪計時記下「第一關已通過」');
   bg = await bgInfo();
   ok(bg.data && bg.bg.id === 'clear' && bg.bg.phase === 2 && !bg.bg.ghost, '過關背景：右鏡已碎、鏡子裡沒有鬼（牠逃走了）', JSON.stringify(bg.bg));
   for (let i = 0; i < 3; i++) await t.tapAt(vp.width / 2, vp.height / 2);
@@ -331,6 +336,7 @@ async function freeMode(profile, browser) {
   const { page, press, info } = t;
   let s = await info();
   ok(s.scene === null, '?free=1 沒有過場');
+  ok(await page.evaluate(() => window.Leaderboard.getRun()) === null, '排行榜：?free=1 不開始趕鬼計時');
   ok(await page.isHidden('#hud') && await page.isVisible('#freeTools'), '?free=1 不顯示命數，顯示開發工具');
 
   // 每一格都點得到（在預設縮放下，點格子中央）

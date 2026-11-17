@@ -887,6 +887,9 @@
   function showCleared() {
     level.screen = 'cleared';
     if (window.GameProgress) window.GameProgress.markCleared('convex');
+    // 趕鬼時間：第一關開始到這裡的牆上時間。null＝這一輪沒有從第一關依序玩過來（直接開網址、?unlock=1 跳關），不顯示也不上榜。
+    var castleMs = window.Leaderboard ? window.Leaderboard.finishCastle() : null;
+    var timeNote = castleMs != null ? '趕鬼時間：' + window.Leaderboard.formatTime(castleMs) + '。' : '';
     closeScene();
     level.scene = window.StoryScene.show({
       id: 'cleared', background: INTRO_BG, scatter: 7,
@@ -895,7 +898,7 @@
         { speaker: '你', text: '想跑？追！' }
       ],
       title: '第二關過關！',
-      note: '你在走廊封印了 ' + level.sealed + ' 隻鬼。下一站：城外的荒野（已解鎖）。',
+      note: '你在走廊封印了 ' + level.sealed + ' 隻鬼。' + timeNote + '下一站：城外的荒野（已解鎖）。',
       buttons: [
         { id: 'clearMenuBtn', label: '回關卡選單', primary: true, href: MENU_URL },
         { id: 'againBtn', label: '再玩一次', onClick: startHunt }

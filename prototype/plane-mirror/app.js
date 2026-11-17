@@ -669,6 +669,7 @@
     return url;
   }
   function showIntro() {
+    if (window.Leaderboard) window.Leaderboard.startRun(); // 趕鬼計時開始（已開始就不歸零；只在關卡模式呼叫）
     scene = window.StoryScene.show({
       id: 'intro', background: snapshot('intro', { phase: 1, ghost: state.ghost }),
       lines: [
@@ -711,6 +712,7 @@
   }
   function showClear() {
     if (window.GameProgress) window.GameProgress.markCleared('mirror'); // 過關紀錄：解鎖第二關（入口頁用）
+    if (window.Leaderboard) window.Leaderboard.finishMirror(); // 本輪計時記下「第一關已通過」，第二關結束才算成績
     scene = window.StoryScene.show({
       id: 'clear', background: snapshot('clear', { phase: 2, ghost: null }),
       lines: [
