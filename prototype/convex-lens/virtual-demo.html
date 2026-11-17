@@ -35,6 +35,8 @@
   <span class="seg"><button id="viewScreen" type="button" class="on">看布幕</button><button id="viewLens" type="button">看凸透鏡</button></span>
   <button id="markBtn" class="primary" type="button">標記</button>
   <button id="rayBtn" type="button" class="on">顯示鬼和光線（示範用）</button>
+  <span class="seg"><button id="modeMove" type="button" class="on">移動透鏡</button><button id="modeDraw" type="button">畫線</button></span>
+  <button id="clearBtn" type="button">清除線</button>
 </div>
 <div id="info"></div>
 <div id="say"></div>
@@ -61,7 +63,7 @@
     { name: '虛像：第 6 格，f=200', cell: 6, f: 200, h: 30 },
     { name: '虛像：第 7 格，f=210', cell: 7, f: 210, h: -30 }
   ];
-  var st = { p: null, ox: 0, lens: -300, view: 'screen', rays: true, mark: null };
+  var st = { p: null, ox: 0, lens: -300, view: 'screen', rays: true, mark: null, mode: 'move', lines: [], pending: null, seal: null };
   var $ = function (id) { return document.getElementById(id); };
   var cv = $('cv'), ctx = cv.getContext('2d'), W = 0, H = 0, DPR = 1;
 
@@ -75,7 +77,7 @@
   function clampLens(x) { var r = lensRange(); return Math.max(r[0], Math.min(r[1], x)); }
 
   function load(i) {
-    $('preset').value = String(i); st.p = PRESETS[i]; st.ox = -(st.p.cell - 0.5) * 100; st.mark = null;
+    $('preset').value = String(i); st.p = PRESETS[i]; st.ox = -(st.p.cell - 0.5) * 100; st.mark = null; st.lines = []; st.seal = null;
     var r = lensRange(); st.lens = Math.round((r[0] + r[1]) / 2);
     say(''); update();
   }
@@ -98,6 +100,8 @@
     return out;
   }
 
+  // 角放大率：從眼睛（X=0）看，像的視角 ÷ 不用透鏡直接看鬼的視角
+  function angMag(o) { return Math.abs(o.m) * (-st.ox) / Math.abs(o.x); }
   function say(t) { var e = $('say'); e.textContent = t; e.style.display = t ? 'block' : 'none'; }
 
   function update() {
@@ -105,8 +109,9 @@
     if (o.inf) t = '物距 = 焦距：光線出透鏡後平行，不成像。';
     else {
       t = '物距 ' + Math.round(o.u) + '、焦距 ' + p.f + ' → ';
-      t += o.real ? '實像（倒立）在透鏡右邊 ' + Math.round(o.v) + ' cm' + (o.x > 0 ? '（在布幕後面，看不到）' : '') + '，放大率 ' + Math.abs(o.m).toFixed(2)
+      t += o.real ? '實像（倒立）在透鏡右邊 ' + Math.round(o.v) + ' cm' + (o.sharpOnScreen ? '（剛好落在布幕上）' : o.x > 0 ? '（在布幕後面）' : '') + '，放大率 ' + Math.abs(o.m).toFixed(2)
                   : '虛像（正立）在透鏡左邊 ' + Math.round(-o.v) + ' cm，放大率 ' + o.m.toFixed(2);
+      if (o.eye !== 'blur') t += '｜從布幕這邊看，像看起來是直接看鬼的 ' + angMag(o).toFixed(2) + ' 倍大';
       if (st.view === 'screen') t += o.sharpOnScreen ? '｜布幕上：清楚的像' : '｜布幕上：模糊的光';
       else t += o.eye === 'virtual' ? '｜透鏡裡：放大、正立的鬼' : o.eye === 'realInFront' ? '｜透鏡裡：倒立的像' : '｜透鏡裡：模糊看不清';
     }
@@ -174,25 +179,42 @@
     text('鬼', g.x, g.y - HH * k - 6, '#7dffc8'); }
 
     if (st.rays && !o.inf) {
-      var L = st.lens, h = p.h, f = p.f, Pt = w2s(L, h), Ot = w2s(L, 0);
-      // 光線 1：平行主光軸 → 折射後通過 F′
-      line(g, Pt, '#ffd36b');
-      var e1 = toX(L, h, f, -h, 0); line(Pt, w2s(e1.x, e1.y), '#ffd36b');
-      // 光線 2：通過光心
-      var e2 = toX(st.ox, h, L - st.ox, -h, 0); line(g, w2s(e2.x, e2.y), '#ffd36b');
-      if (!o.real) {
-        // 虛像：折射後的光是發散的，反向延長（虛線）交在左邊
-        var xi = Math.max(-CORRIDOR, o.x);
-        line(Pt, w2s(xi, toX(L, h, f, -h, xi).y), 'rgba(255,211,107,.8)', [6, 5], 1.5);
-        line(Ot, w2s(xi, toX(st.ox, h, L - st.ox, -h, xi).y), 'rgba(255,211,107,.8)', [6, 5], 1.5);
-      }
-      if (o.x > -CORRIDOR && o.x < 0) {
+      var L = st.lens, h = p.h, f = p.f, u = L - st.ox, RAY = '#ffd36b';
+      // 三條主光線：打到透鏡的高度、折射後的方向（走廊座標）
+      var y3 = h * f / (f - u);
+      var rays = [
+        { hit: h, dir: [f, -h] },   // 平行主光軸 → 通過 F′
+        { hit: 0, dir: [u, -h] },   // 通過光心，不偏折
+        { hit: y3, dir: [1, 0] }    // 通過 F（或從 F 的方向來）→ 平行主光軸
+      ].filter(function (r) { return Math.abs(r.hit) < R; });
+      rays.forEach(function (r) {
+        var a = w2s(L, r.hit);
+        line(g, a, RAY);
+        var e = toX(L, r.hit, r.dir[0], r.dir[1], 0); line(a, w2s(e.x, e.y), RAY);
+        if (st.view === 'screen') { var q = w2s(0, e.y); ctx.fillStyle = RAY; ctx.beginPath(); ctx.arc(q.x, q.y, 4, 0, 7); ctx.fill(); }
+        if (st.view === 'lens' && !o.real) {
+          var xi = Math.max(-CORRIDOR, o.x), bk = toX(L, r.hit, r.dir[0], r.dir[1], xi);
+          line(a, w2s(bk.x, bk.y), 'rgba(255,211,107,.8)', [6, 5], 1.5); // 反向延長（虛線）交在左邊
+        }
+      });
+      var showImg = st.view === 'screen' ? o.real : true;
+      if (o.sharpOnScreen) text('光會聚在布幕上 → 清楚的倒立實像', w2s(-250, 0).x, side.y + 20, '#ff9ad5');
+      if (showImg && o.x > -CORRIDOR && o.x < 0) {
         var ip = w2s(o.x, o.y);
         ctx.save(); ctx.globalAlpha = 0.55; ctx.fillStyle = o.real ? '#ff9ad5' : '#b7a6ff';
         var am = Math.abs(o.m); ghostPath(ip.x, ip.y, HW * am * k, HH * am * k, o.real ? -1 : 1, o.real ? -1 : 1); ctx.fill('evenodd'); ctx.restore();
         text(o.real ? '實像' : '虛像', ip.x, ip.y - HH * Math.abs(o.m) * k - 6, o.real ? '#ff9ad5' : '#b7a6ff');
-      } else if (o.x <= -CORRIDOR) text('虛像在走廊外面', side.x + 70, side.y + 20, '#b7a6ff');
+      } else if (showImg && o.x <= -CORRIDOR) text('虛像在走廊外面', side.x + 70, side.y + 20, '#b7a6ff');
+      else if (o.real && o.x >= 0 && !o.sharpOnScreen) text('光會聚在布幕後面 → 布幕上是模糊的光', w2s(-250, 0).x, side.y + 20, '#ff9ad5');
+      else if (st.view === 'screen' && !o.real) text('鬼在焦點內：光出透鏡後是發散的，布幕上不會聚成像', w2s(-400, 0).x, side.y + 20, '#ffd36b');
     }
+    // 學生畫的線（一律實線，延長到整條走廊）
+    st.lines.forEach(function (ln) {
+      var a = lineEnds(ln); line(w2s(a[0].x, a[0].y), w2s(a[1].x, a[1].y), ln.horiz ? '#5dff8f' : '#ffe14d', null, 2.5);
+    });
+    if (st.mode === 'draw') snapPoints().forEach(function (q) { var sp = w2s(q.x, q.y); ctx.strokeStyle = 'rgba(255,255,255,.75)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(sp.x, sp.y, 7, 0, 7); ctx.stroke(); if (q.name) text(q.name, sp.x + 12, sp.y - 8, '#fff', 'left'); });
+    if (st.pending) { var a0 = w2s(st.pending.from.x, st.pending.from.y); line(a0, st.pending.to, 'rgba(255,255,255,.8)', [6, 6], 2); }
+    if (st.seal) { var c0 = w2s(-st.seal.cell * 100, -AXIS), c1 = w2s(-(st.seal.cell - 1) * 100, -AXIS); ctx.fillStyle = st.seal.ok ? 'rgba(190,120,255,.5)' : 'rgba(255,80,80,.4)'; ctx.fillRect(c0.x, c0.y, c1.x - c0.x, 18); }
     if (st.mark) { var m = w2s(st.mark.x, st.mark.y); ctx.strokeStyle = '#ff4fa8'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(m.x, m.y, 12, 0, 7); ctx.moveTo(m.x - 18, m.y); ctx.lineTo(m.x + 18, m.y); ctx.moveTo(m.x, m.y - 18); ctx.lineTo(m.x, m.y + 18); ctx.stroke(); text(st.mark.label, m.x, m.y + 32, '#ff4fa8'); }
     ctx.restore();
   }
@@ -209,13 +231,19 @@
         var n = o.blur * ks < 0.4 ? 1 : 24, hw = HW * o.scaleOnScreen * ks, hh = HH * o.scaleOnScreen * ks, py = cy + p.h * o.scaleOnScreen * ks, b = Math.min(o.blur, 400) * ks;
         ctx.save(); ctx.beginPath(); ctx.rect(cx - 80 * ks, cy - AXIS * ks, 160 * ks, 2 * AXIS * ks); ctx.clip();
         ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = '#7dffc8'; ctx.globalAlpha = n === 1 ? 1 : 1 / n * (o.blur > 200 ? 0.6 : 1);
-        for (var i = 0; i < n; i++) { var rr = n === 1 ? 0 : b * Math.sqrt((i + 0.5) / n), th = i * 2.4; ghostPath(cx + rr * Math.cos(th), py + rr * Math.sin(th), hw, hh, -1, -1); ctx.fill('evenodd'); }
+        if (b > hw * 1.5) {
+          // 很模糊：只剩一片柔和的光（不再看得出鬼的形狀）
+          ctx.globalAlpha = Math.max(0.12, Math.min(0.6, 2.5 * hw * hh / ((b + hw) * (b + hh))));
+          var gr = ctx.createRadialGradient(cx, py, 0, cx, py, b + hh); gr.addColorStop(0, '#7dffc8'); gr.addColorStop(1, 'rgba(125,255,200,0)');
+          ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(cx, py, b + hh, 0, 7); ctx.fill();
+        } else for (var i = 0; i < n; i++) { var rr = n === 1 ? 0 : b * Math.sqrt((i + 0.5) / n), th = i * 2.4; ghostPath(cx + rr * Math.cos(th), py + rr * Math.sin(th), hw, hh, -1, -1); ctx.fill('evenodd'); }
         ctx.restore();
       }
     } else {
       text('隔著凸透鏡看（你站在布幕這邊）', panel.x + 8, panel.y + 16, '#aab3e6', 'left');
       // 角度換成畫面：鏡框的角半徑對到面板的 40%
-      var lensLabel = null, dLens = -st.lens, angR = R / dLens, K = Math.min(panel.w, panel.h) * 0.4 / angR;
+      // 比例：不用透鏡直接看鬼時，鬼的高度最多佔面板 30%；但鏡框要整個看得到。
+      var lensLabel = null, dLens = -st.lens, angR = R / dLens, naked = HH / (-st.ox), K = Math.min(panel.h * 0.15 / naked, Math.min(panel.w, panel.h) * 0.47 / angR);
       ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, angR * K, 0, 7); ctx.fillStyle = '#1b2036'; ctx.fill(); ctx.clip();
       if (!o.inf && o.eye !== 'blur') {
         var d = -o.x, s = 1 / d; // 像到眼睛的距離
@@ -230,20 +258,91 @@
       }
       ctx.restore();
       ctx.strokeStyle = '#8fd0ff'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(cx, cy, angR * K, 0, 7); ctx.stroke();
-      text(lensLabel ? lensLabel[0] : (o.inf ? '' : '模糊，看不清楚'), cx, cy + angR * K + 18, lensLabel ? lensLabel[1] : '#8f98c9');
+      // 對照：不用透鏡、直接看鬼時看起來的大小（灰色虛線，放在角落）
+      var rx = panel.x + 14 + HW / (-st.ox) * K * 1.6, ry = panel.y + panel.h - 26 - HH / (-st.ox) * K;
+      ctx.save(); ctx.strokeStyle = 'rgba(200,205,230,.8)'; ctx.setLineDash([4, 3]); ctx.lineWidth = 1.5;
+      ghostPath(rx, ry, HW / (-st.ox) * K, HH / (-st.ox) * K, 1, 1); ctx.stroke(); ctx.restore();
+      text('對照：不用透鏡直接看鬼的大小', panel.x + 8, panel.y + panel.h - 8, '#aab3e6', 'left');
+      text(lensLabel ? lensLabel[0] : (o.inf ? '' : '模糊，看不清楚'), cx, panel.y + 36, lensLabel ? lensLabel[1] : '#8f98c9');
     }
     ctx.restore();
   }
 
+  // 線：通過 a 點、方向 d；畫的時候延長到走廊兩端（X = -1000～0）
+  function lineEnds(ln) {
+    if (Math.abs(ln.d.x) < 1e-9) return [{ x: ln.a.x, y: -AXIS }, { x: ln.a.x, y: AXIS }];
+    var t0 = (-CORRIDOR - ln.a.x) / ln.d.x, t1 = (0 - ln.a.x) / ln.d.x;
+    return [{ x: -CORRIDOR, y: ln.a.y + ln.d.y * t0 }, { x: 0, y: ln.a.y + ln.d.y * t1 }];
+  }
+  function cross(l1, l2) {
+    var den = l1.d.x * l2.d.y - l1.d.y * l2.d.x; if (Math.abs(den) < 1e-9) return null;
+    var t = ((l2.a.x - l1.a.x) * l2.d.y - (l2.a.y - l1.a.y) * l2.d.x) / den;
+    return { x: l1.a.x + l1.d.x * t, y: l1.a.y + l1.d.y * t };
+  }
+  // 可以吸附的點：標記、光心 O、兩個焦點、線和透鏡的交點、線和線的交點
+  function snapPoints() {
+    var L = st.lens, f = st.p.f, pts = [{ x: L, y: 0, name: 'O' }, { x: L - f, y: 0, name: 'F' }, { x: L + f, y: 0, name: 'F′' }];
+    if (st.mark) pts.push({ x: st.mark.x, y: st.mark.y, name: '' });
+    var lensLine = { a: { x: L, y: 0 }, d: { x: 0, y: 1 } };
+    st.lines.forEach(function (ln, i) {
+      var q = cross(ln, lensLine); if (q && Math.abs(q.y) < R) pts.push({ x: q.x, y: q.y, name: 'P' });
+      for (var j = 0; j < i; j++) { var c = cross(ln, st.lines[j]); if (c && c.x > -CORRIDOR && c.x < 0 && Math.abs(c.y) < AXIS) pts.push({ x: c.x, y: c.y, name: '' }); }
+    });
+    return pts.filter(function (q) { return q.x >= -CORRIDOR && q.x <= 0; });
+  }
+  function nearestSnap(sx, sy) {
+    var best = null, bd = 24;
+    snapPoints().forEach(function (q) { var p = w2s(q.x, q.y), d = Math.hypot(p.x - sx, p.y - sy); if (d < bd) { bd = d; best = q; } });
+    return best;
+  }
+  function s2w(sx, sy) { return { x: (sx - side.x) / k - CORRIDOR, y: (side.y + side.h / 2 - 12 - sy) / k }; }
+
   function draw() { if (!W || !st.p) return; layout(); ctx.clearRect(0, 0, W, H); var o = optics(); drawSide(o); drawPanel(o); }
 
   // ---------- 操作 ----------
-  function moveLens(x) { var nx = clampLens(x); if (nx !== st.lens) { st.lens = nx; st.mark = null; say(''); update(); } }
+  function moveLens(x) { var nx = clampLens(x); if (nx !== st.lens) { st.lens = nx; st.mark = null; st.lines = []; st.seal = null; say(''); update(); } }
+  function local(e) { var r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+  function floorCellAt(pt) { var fy = w2s(0, -AXIS).y; if (pt.y < fy - 4 || pt.y > fy + 26) return 0; var x = s2w(pt.x, pt.y).x; return x < -CORRIDOR || x > 0 ? 0 : Math.ceil(-x / 100); }
   var drag = null;
-  cv.addEventListener('pointerdown', function (e) { drag = { x: e.clientX, lens: st.lens }; cv.setPointerCapture(e.pointerId); });
-  cv.addEventListener('pointermove', function (e) { if (drag) moveLens(drag.lens + (e.clientX - drag.x) / k); });
-  cv.addEventListener('pointerup', function () { drag = null; });
-  cv.addEventListener('pointercancel', function () { drag = null; });
+  cv.addEventListener('pointerdown', function (e) {
+    var pt = local(e); cv.setPointerCapture(e.pointerId);
+    if (st.mode === 'move') { drag = { x: e.clientX, lens: st.lens }; return; }
+    var cell = floorCellAt(pt);
+    if (cell) {
+      if (!st.mark) { say('（先找到像、按「標記」，再畫線推鬼的位置。）'); return; }
+      st.seal = { cell: cell, ok: cell === st.p.cell };
+      say(st.seal.ok ? '封印成功！鬼就在第 ' + cell + ' 格。' : '第 ' + cell + ' 格沒有鬼……再推一次。');
+      draw(); return;
+    }
+    var q = nearestSnap(pt.x, pt.y);
+    if (q) { st.pending = { from: q, to: pt }; draw(); }
+  });
+  cv.addEventListener('pointermove', function (e) {
+    if (drag) { moveLens(drag.lens + (e.clientX - drag.x) / k); return; }
+    if (st.pending) { st.pending.to = local(e); draw(); }
+  });
+  function endPointer(e, cancelled) {
+    drag = null;
+    if (!st.pending) return;
+    var pd = st.pending; st.pending = null;
+    if (!cancelled) {
+      var pt = local(e), q = nearestSnap(pt.x, pt.y), a = pd.from;
+      if (q && (q.x !== a.x || q.y !== a.y)) st.lines.push({ a: a, d: { x: q.x - a.x, y: q.y - a.y } });
+      else {
+        var p0 = w2s(a.x, a.y), dx = pt.x - p0.x, dy = pt.y - p0.y;
+        if (Math.abs(dx) > 30 && Math.abs(dy) < Math.abs(dx) * 0.12) st.lines.push({ a: a, d: { x: 1, y: 0 }, horiz: true });
+        else if (Math.abs(dy) > 30 && Math.abs(dx) < Math.abs(dy) * 0.12) st.lines.push({ a: a, d: { x: 0, y: 1 }, horiz: true });
+      }
+    }
+    draw();
+  }
+  cv.addEventListener('pointerup', function (e) { endPointer(e, false); });
+  cv.addEventListener('pointercancel', function (e) { endPointer(e, true); });
+  function setMode(m) { st.mode = m; st.pending = null; $('modeMove').classList.toggle('on', m === 'move'); $('modeDraw').classList.toggle('on', m === 'draw');
+    say(m === 'draw' ? '畫線：從白圈（標記、O、F、F′、交點）拖到另一個白圈；拉成水平或垂直也會留下。點地板的格子就是封印。' : ''); draw(); }
+  $('modeMove').addEventListener('click', function () { setMode('move'); });
+  $('modeDraw').addEventListener('click', function () { setMode('draw'); });
+  $('clearBtn').addEventListener('click', function () { st.lines = []; st.seal = null; draw(); });
   $('left').addEventListener('click', function () { moveLens(st.lens - 10); });
   $('right').addEventListener('click', function () { moveLens(st.lens + 10); });
   $('preset').addEventListener('change', function () { load(Number(this.value)); });
@@ -267,7 +366,7 @@
   });
   window.addEventListener('resize', resize);
   load(1); resize();
-  window.__virtualDemo = { st: st, optics: optics, lensRange: lensRange, load: load, moveLens: moveLens };
+  window.__virtualDemo = { st: st, optics: optics, lensRange: lensRange, load: load, moveLens: moveLens, angMag: angMag, snapPoints: snapPoints, w2s: w2s, setMode: setMode };
 })();
 </script>
 </body>
