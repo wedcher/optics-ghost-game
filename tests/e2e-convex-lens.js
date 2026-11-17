@@ -151,6 +151,19 @@ async function run(profile, browser) {
     return r;
   };
   const w2s = (pt) => page.evaluate((pt) => window.__protoConvex.w2s(pt), pt);
+  // 拖曳畫線用：從 from 往水平（h）／垂直（v）／斜向（d）找一個終點，在畫布內、而且不在任何標示點的吸附範圍裡
+  const freeEnd = (from, axis) => page.evaluate(({ from, axis, hook }) => {
+    const H = window[hook], r = document.getElementById('view').getBoundingClientRect();
+    const pts = H.snapPoints().map((p) => H.w2s(p));
+    for (const d of [80, -80, 60, -60, 110, -110, 45, -45, 140, -140]) for (const k of (axis === 'd' ? [0.6, -0.6] : [0])) {
+      const e = axis === 'h' ? { x: from.x + d, y: from.y + 4 } : axis === 'v' ? { x: from.x + 4, y: from.y + d } : { x: from.x + d, y: from.y + k * d };
+      if (e.x < 8 || e.y < 8 || e.x > r.width - 8 || e.y > r.height - 8) continue;
+      const el = document.elementFromPoint(r.left + e.x, r.top + e.y);
+      if (!el || el.id !== 'view') continue;
+      if (pts.every((q) => Math.hypot(q.x - e.x, q.y - e.y) > H.SNAP_PX + 8)) return e;
+    }
+    return null;
+  }, { from, axis, hook: '__protoConvex' });
   const snap = async (id) => {
     const pts = await page.evaluate(() => window.__protoConvex.snapPoints());
     const p = pts.find((q) => q.id === id);
@@ -340,15 +353,16 @@ async function run(profile, browser) {
     const Pp = pts.find((q) => q.id === 'P');
     ok(s.lines === 2 && Pp && Math.abs(Pp.x - sp.lensX) < 1e-9 && Math.abs(Pp.y - c.object.y) < 1e-6, T('線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）'), Pp ? 'P.y=' + Pp.y.toFixed(3) : 'no P');
     // 線 3：過 P 平行主軸
-    await press('#toolParallel');
     a = await snap('P');
-    await tap(a.x + 6, a.y + (c.h > 0 ? -7 : 7));
+    b = await freeEnd(a, 'h');
+    await drag(a.x + 3, a.y - 2, b.x, b.y);
+    if (profile.touch) { await page.waitForTimeout(40); await page.touchscreen.tap(4, 4); } // CDP 觸控拖曳後第一次點擊會被吃掉，先消耗掉
     const inter = await page.evaluate(() => {
       const H = window.__protoConvex, o = H.cfg().object;
       const best = H.studentIntersections().map((p) => ({ p, d: Math.hypot(p.x - o.x, p.y - o.y) })).sort((x, y) => x.d - y.d)[0];
       return best ? { d: best.d, cell: H.configs.floor.cellAt(best.p.x), margin: H.configs.floor.edgeMargin(best.p.x), n: H.state.lines.length } : { d: Infinity, n: H.state.lines.length };
     });
-    ok(inter.n === 3 && inter.d < 1e-6, T('線 3：過 P 的平行線；與光心線的交點 = 物點'), '誤差 ' + inter.d.toExponential(1) + ' cm');
+    ok(inter.n === 3 && inter.d < 1e-6, T('線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點'), '誤差 ' + inter.d.toExponential(1) + ' cm');
     ok(inter.cell === c.targetCell && inter.margin > 0.3, T('學生作圖的交點落在唯一一格的中央附近'), '格 ' + inter.cell + '，離格線 ' + (inter.margin || 0).toFixed(2) + ' 格');
     await leak('畫完三條線');
     if (first) await shot('5-analysis-lines');
@@ -362,7 +376,7 @@ async function run(profile, browser) {
     await press('#zoomIn');
     if (first) await layoutCheck('分析／放大後');
     s0 = await st();
-    // 平移拖曳的起點要避開標示點：從標示點橫向拖曳現在是「拉平行線」
+    // 平移拖曳的起點要避開標示點：從標示點開始的拖曳一律是畫線
     const freeY = (x) => page.evaluate(({ x, h, hook }) => {
       const H = window[hook], pts = H.snapPoints().map((p) => H.w2s(p));
       return [0.6, 0.78, 0.42, 0.3].map((f) => h * f).find((y) => pts.every((q) => Math.hypot(q.x - x, q.y - y) > H.SNAP_PX + 15)) || h * 0.6;
@@ -381,7 +395,7 @@ async function run(profile, browser) {
       await press('#toolLine');
       await drag(onO.x, onO.y, onO.x + 30, onO.y + 60);
       s = await st();
-      ok(!s.pending && s.lines === 3, T('從吸附點上開始的斜向拖曳不會被當成畫線'));
+      ok(!s.pending && s.lines === 3, T('從標示點斜向拖到空白處放開：不留線、不算點擊'));
     }
     if (profile.touch) {
       s0 = await st();
@@ -394,9 +408,10 @@ async function run(profile, browser) {
     await press('#zoomFit');
     ok((await st()).zoomIdx === 0, T('「全圖」回到預設視圖'));
 
-    // ---------- 從標示點橫向拖曳 = 拉出平行線 ----------
+    // ---------- 拖曳畫線：跟手的虛線預覽；碰到標示點／水平／垂直才吸附成實線；放開時實線留下、虛線消失 ----------
     {
-      const sp0 = await snap('O'), cb = await canvasBox(), dir = sp0.x > cb.w / 2 ? -1 : 1;
+      await press('#modeDraw');
+      const cb = await canvasBox();
       const path = async (pts, mid) => {
         let out;
         if (profile.touch) {
@@ -418,34 +433,92 @@ async function run(profile, browser) {
         await page.waitForTimeout(60);
         return out;
       };
-      const peek = () => page.evaluate(() => { const s = window.__protoConvex.state, l = s.lines[s.lines.length - 1]; return { n: s.lines.length, preview: s.dragParallel ? { x: s.dragParallel.x, y: s.dragParallel.y } : null, last: l ? { kind: l.kind, x: l.a.x, y: l.a.y } : null, tx: s.view.tx, ty: s.view.ty, pending: !!s.pending }; });
-      const world = await page.evaluate(() => window.__protoConvex.snapPoints().find((q) => q.id === 'O'));
+      const peek = () => page.evaluate(() => {
+        const H = window.__protoConvex, s = H.state, l = s.lines[s.lines.length - 1], g = s.drag;
+        const fin = (p) => isFinite(p.x) && isFinite(p.y);
+        return { n: s.lines.length, drag: g ? { snap: g.snap, ax: g.a.x, ay: g.a.y, b: g.b ? { x: g.b.x, y: g.b.y } : null } : null,
+          last: l ? { kind: l.kind, x: l.a.x, y: l.a.y, b: l.b ? { x: l.b.x, y: l.b.y } : null } : null,
+          tx: s.view.tx, ty: s.view.ty, pending: !!s.pending, finite: H.snapPoints().every(fin) && H.studentIntersections().every(fin),
+          nP: H.snapPoints().filter((p) => p.id === 'P').length };
+      });
+      const worldOf = (id) => page.evaluate((id) => window.__protoConvex.snapPoints().find((q) => q.id === id), id);
       const n0 = (await peek()).n;
-      await press('#modeDraw'); await press('#toolLine');
-      // 橫向拖曳：拖曳中有預覽、還沒有線；放開後留下平行線
-      let mid = await path([[sp0.x + 4, sp0.y - 3], [sp0.x + dir * 80, sp0.y + 6]], peek);
-      let after = await peek();
-      ok(mid.preview && Math.abs(mid.preview.y - world.y) < 1e-9 && mid.n === n0, T('從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線'));
-      ok(after.n === n0 + 1 && !after.preview && after.last.kind === 'parallel' && Math.abs(after.last.y - world.y) < 1e-9 && Math.abs(after.last.x - world.x) < 1e-9 && !after.pending,
-        T('放開手指：留下通過該點、平行主光軸的線'));
-      // 直向備援版面：狀態列文字換行會改變畫布高度、重新排版，不是平移，所以不比
-      if (profile.name !== 'phone-portrait') ok(Math.abs(after.tx - mid.tx) < 1e-9 && Math.abs(after.ty - mid.ty) < 1e-9, T('拉平行線時畫面不會跟著平移'));
-      await press('#undoBtn');
-      ok((await peek()).n === n0, T('「復原」可以拿掉拖出來的平行線'));
-      // 先橫向拉出預覽，再往下拉開 → 取消
-      mid = await path([[sp0.x, sp0.y], [sp0.x + dir * 80, sp0.y + 4], [sp0.x + dir * 90, sp0.y + 90]], peek);
-      after = await peek();
-      ok(!mid.preview && after.n === n0 && !after.preview, T('橫向拖曳後又拉到別處：平行線取消，放開不留線'));
-      // 一開始就不是橫向（斜向／直向）→ 照舊是平移，不畫線
-      await path([[sp0.x, sp0.y], [sp0.x + dir * 30, sp0.y + 70]]);
-      after = await peek();
-      ok(after.n === n0 && !after.preview && !after.pending, T('從標示點斜向拖曳不會畫線'));
+      const sp0 = await snap('F2'), world = await worldOf('F2');
+      let mid, after, e;
+      // 標示點真的有畫在畫面上（白點）
+      const dot = await page.evaluate(({ x, y }) => { const H = window.__protoConvex; H.render(); const dpr = H.canvasSize().DPR; const d = document.getElementById('view').getContext('2d').getImageData(Math.round(x * dpr), Math.round(y * dpr), 1, 1).data; return d[0] + d[1] + d[2]; }, { x: sp0.x, y: sp0.y });
+      ok(dot > 690, T('標示點有畫在畫面上（起點處是白點）'), 'rgb 總和 ' + dot);
+
+      // 水平：拖曳中是實線預覽、還沒有線；放開後留下精確的水平線
+      e = await freeEnd(sp0, 'h');
+      if (e) {
+        mid = await path([[sp0.x + 4, sp0.y - 3], [e.x, e.y]], peek);
+        after = await peek();
+        ok(mid.drag && mid.drag.snap === 'h' && mid.n === n0, T('拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線'));
+        ok(after.n === n0 + 1 && !after.drag && after.last.kind === 'parallel' && Math.abs(after.last.y - world.y) < 1e-9 && Math.abs(after.last.x - world.x) < 1e-9 && !after.pending,
+          T('放開：留下通過起點、精確水平的線（存的是標示點座標）'));
+        // 直向備援版面：狀態列文字換行會改變畫布高度、重新排版，不是平移，所以不比
+        if (profile.name !== 'phone-portrait') ok(Math.abs(after.tx - mid.tx) < 1e-9 && Math.abs(after.ty - mid.ty) < 1e-9, T('從標示點拖曳時畫面不會跟著平移'));
+        await press('#undoBtn');
+        ok((await peek()).n === n0, T('「復原」可以拿掉拖出來的水平線'));
+      }
+
+      // 垂直：吸附成通過起點、精確垂直的線；它平行透鏡平面，不會產生 P，也不會算出壞掉的交點
+      e = await freeEnd(sp0, 'v');
+      if (e) {
+        const before = await peek();
+        mid = await path([[sp0.x - 3, sp0.y + 2], [e.x, e.y]], peek);
+        after = await peek();
+        ok(mid.drag && mid.drag.snap === 'v' && mid.n === n0, T('拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線'));
+        ok(after.n === n0 + 1 && after.last.kind === 'vertical' && Math.abs(after.last.x - world.x) < 1e-9, T('放開：留下通過起點、精確垂直的線'));
+        ok(after.finite && after.nP === before.nP, T('垂直線不產生新的 P，交點與吸附點座標都正常'));
+        await press('#undoBtn');
+        ok((await peek()).n === n0, T('「復原」可以拿掉拖出來的垂直線'));
+      }
+
+      // 斜向拖到空白處：只有跟手的虛線預覽；放開後消失
+      e = await freeEnd(sp0, 'd');
+      if (e) {
+        mid = await path([[sp0.x, sp0.y], [e.x, e.y]], peek);
+        after = await peek();
+        ok(mid.drag && mid.drag.snap === null && mid.n === n0, T('拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）'));
+        ok(after.n === n0 && !after.drag && !after.pending, T('虛線時放開：線消失，不留線'));
+        if (profile.name !== 'phone-portrait') ok(Math.abs(after.tx - mid.tx) < 1e-9 && Math.abs(after.ty - mid.ty) < 1e-9, T('斜向拖曳也不會平移畫面'));
+        // 先拉成水平（實線），再拉到空白處（變回虛線）→ 放開不留線
+        const eh = await freeEnd(sp0, 'h');
+        if (eh) {
+          mid = await path([[sp0.x, sp0.y], [eh.x, eh.y], [e.x, e.y]], peek);
+          after = await peek();
+          ok(mid.drag && mid.drag.snap === null && after.n === n0, T('吸附後又拉到空白處：變回虛線，放開不留線'));
+        }
+      }
+
+      // 拖到另一個標示點：吸附到該點，放開後留下通過兩點的直線
+      {
+        const tp = await snap('I'), tw = await worldOf('I');
+        const near = await page.evaluate(({ x, y }) => { const q = window.__protoConvex.nearestSnap(x, y); return q ? q.id : null; }, { x: tp.x + 2, y: tp.y - 2 });
+        const el = await page.evaluate(({ x, y }) => { const el = document.elementFromPoint(x, y); return el && el.id; }, { x: cb.x + tp.x + 2, y: cb.y + tp.y - 2 });
+        if (near === 'I' && el === 'view') {
+          mid = await path([[sp0.x, sp0.y], [tp.x + 2, tp.y - 2]], peek);
+          after = await peek();
+          ok(mid.drag && mid.drag.snap === 'point' && Math.abs(mid.drag.b.x - tw.x) < 1e-9 && Math.abs(mid.drag.b.y - tw.y) < 1e-9 && mid.n === n0, T('拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線'));
+          ok(after.n === n0 + 1 && after.last.kind === 'line' && Math.abs(after.last.x - world.x) < 1e-9 && Math.abs(after.last.y - world.y) < 1e-9 && Math.abs(after.last.b.x - tw.x) < 1e-9 && Math.abs(after.last.b.y - tw.y) < 1e-9,
+            T('放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）'));
+          await press('#undoBtn');
+          ok((await peek()).n === n0, T('「復原」可以拿掉拖出來的連線'));
+        }
+      }
+
       // 選格封印模式下不會拉出線
       await press('#modeSeal');
-      mid = await path([[sp0.x, sp0.y], [sp0.x + dir * 80, sp0.y + 4]], peek);
-      after = await peek();
-      ok(!mid.preview && after.n === n0, T('選格封印模式下，橫向拖曳不會畫線'));
+      e = await freeEnd(sp0, 'h');
+      if (e) {
+        mid = await path([[sp0.x, sp0.y], [e.x, e.y]], peek);
+        after = await peek();
+        ok(!mid.drag && after.n === n0, T('選格封印模式下，從標示點拖曳不會畫線'));
+      }
       await press('#modeDraw');
+      ok(await page.evaluate(() => !document.getElementById('toolParallel') && !document.getElementById('styleBtn') && !!document.getElementById('toolLine')), T('畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）'));
       await press('#zoomFit');
     }
 

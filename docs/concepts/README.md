@@ -8,7 +8,7 @@ GPT 後續會負責概念美術與視覺 refinement，目前 prototype 可以放
 |---|---|---|
 | `concave-wilderness-3-moon.png` | 凹透鏡探索・北：滿月、拱門遺跡、枯樹。 | 使用中 |
 | `concave-wilderness-2-pillars.png` | 凹透鏡探索・東：石柱與石碑遺跡。 | 使用中 |
-| `concave-wilderness-1-open.png` | 凹透鏡探索・南：空曠草原、遠山、小徑。 | 使用中 |
+| `concave-wilderness-1-open.png` | 凹透鏡探索・南：空曠草原、遠山、小徑。也是側視分析（畫光路）的背景，壓暗後墊在作圖後面。 | 使用中 |
 | `concave-wilderness-4-wall.png` | 凹透鏡探索・西：有窗洞的斷牆。 | 使用中 |
 | `convex-corridor-bg.png` | 凸透鏡：石牆長廊的側視背景，拱門、火把、紅旗、石板地。 | 使用中 |
 | `convex-lens.png` | 凸透鏡：側面看的鏡片（透明背景）。 | 使用中 |

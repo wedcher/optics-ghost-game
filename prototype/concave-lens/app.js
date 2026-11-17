@@ -37,10 +37,9 @@
     lensUp: false,
     marker: null,         // { dir, tanX, tanY }
     mode: 'draw',         // 'draw' | 'seal'
-    tool: 'line',         // 'line' | 'parallel'
-    dashed: false,
     pending: null,        // 兩點連線的第一點
-    lines: [],            // { kind, a, b, dashed }
+    lines: [],            // { kind: 'line'|'parallel'|'vertical', a, b }
+    drag: null,           // 拖曳畫線中的預覽 { a, snap, b, cur }
     selectedCell: null,
     seal: null,           // { cell, t0, success, done }
     solved: false,
@@ -277,6 +276,16 @@
       bg.imgs[i] = im;
     });
   }
+  // 側視分析的美術：背景用「空曠草原」那張（我們和鬼之間沒有雜物），壓暗後墊在作圖後面；
+  // 鏡片用 docs/concepts/concave-lens.png 的壓縮版。兩者都只是氣氛，幾何仍由程式畫的線與點決定。
+  var SIDE_BG = { dir: 2, widthCm: 3600, centerX: -450 };
+  var lensArt = { img: null, ready: false };
+  if (!bgOff) {
+    lensArt.img = new Image();
+    lensArt.img.onload = function () { lensArt.ready = true; requestRender(); };
+    lensArt.img.src = 'assets/lens.png';
+  }
+
   // 選定目前方位的圖（四張都載入成功才會用圖；否則整體退回程式畫的場景）
   function bgUse(facing) { bg.img = bg.imgs[facing]; bg.horizon = BG_DIRS[facing].horizon; }
 
@@ -456,7 +465,7 @@
   }
 
   function geomLine(l) {
-    return l.kind === 'parallel' ? Optics.horizontalLine(l.a) : Optics.lineThrough(l.a, l.b);
+    return l.kind === 'parallel' ? Optics.horizontalLine(l.a) : l.kind === 'vertical' ? { p: { x: l.a.x, y: l.a.y }, d: { x: 0, y: 1 } } : Optics.lineThrough(l.a, l.b);
   }
 
   /** 可吸附點：O、F、F′、虛像標記，加上「學生自己畫的線」與透鏡平面的交點 P。 */
@@ -532,6 +541,14 @@
     var c = cfg(), v = state.view, s = v.s, i, p, q;
     var G = -WORLD.eyeHeight;
     ctx.fillStyle = '#0b0e1f'; ctx.fillRect(0, 0, W, H);
+    var sideArt = bg.ready && !bgOff;
+    if (sideArt) {
+      // 背景圖固定在世界座標上（跟著縮放／平移）：圖的地平線對齊地面
+      var bi = bg.imgs[SIDE_BG.dir], bw = SIDE_BG.widthCm, bh = (bw * bi.naturalHeight) / bi.naturalWidth;
+      var b0 = w2s({ x: SIDE_BG.centerX - bw / 2, y: G + BG_DIRS[SIDE_BG.dir].horizon * bh });
+      ctx.drawImage(bi, b0.x, b0.y, bw * s, bh * s);
+      ctx.fillStyle = 'rgba(6,8,18,.66)'; ctx.fillRect(0, 0, W, H); // 壓暗，讓光線與標示點清楚
+    }
     // 座標輔助格線
     ctx.lineWidth = 1;
     for (var gx = -1200; gx <= 300; gx += 50) {
@@ -546,7 +563,7 @@
     }
     // 地面與地板格
     var fl = w2s({ x: 0, y: G });
-    ctx.fillStyle = '#1a2018'; ctx.fillRect(0, fl.y, W, H - fl.y);
+    if (!sideArt) { ctx.fillStyle = '#1a2018'; ctx.fillRect(0, fl.y, W, H - fl.y); }
     var tileH = 34 * s;
     for (i = 1; i <= floor.count; i++) {
       var x0 = w2s({ x: -i * floor.width, y: G }).x, x1 = w2s({ x: -(i - 1) * floor.width, y: G }).x;
@@ -571,7 +588,11 @@
     label('主光軸', Math.max(34, w2s({ x: BOUNDS.minX + 60, y: 0 }).x), p.y - 11, '#7f8bc9');
     // 凹透鏡（示意符號：延伸的薄透鏡平面；端點為凹透鏡的倒箭頭）
     var lt = w2s({ x: 0, y: 160 }), lb = w2s({ x: 0, y: -148 });
-    ctx.strokeStyle = '#9fd8ff'; ctx.lineWidth = 3;
+    if (lensArt.ready) {
+      var lh = lb.y - lt.y, lw = (lh * lensArt.img.naturalWidth) / lensArt.img.naturalHeight;
+      ctx.save(); ctx.globalAlpha = 0.5; ctx.drawImage(lensArt.img, lt.x - lw / 2, lt.y, lw, lh); ctx.restore();
+    }
+    ctx.strokeStyle = '#9fd8ff'; ctx.lineWidth = lensArt.ready ? 1.5 : 3;
     ctx.beginPath(); ctx.moveTo(lt.x, lt.y); ctx.lineTo(lb.x, lb.y);
     ctx.moveTo(lt.x - 8, lt.y - 9); ctx.lineTo(lt.x, lt.y); ctx.lineTo(lt.x + 8, lt.y - 9);
     ctx.moveTo(lb.x - 8, lb.y + 9); ctx.lineTo(lb.x, lb.y); ctx.lineTo(lb.x + 8, lb.y + 9); ctx.stroke();
@@ -585,15 +606,22 @@
 
     // 學生畫的線
     state.lines.forEach(function (l) {
-      strokeInfinite(geomLine(l), state.replay ? 'rgba(255,255,255,.22)' : (l.kind === 'parallel' ? '#7dffb2' : '#ffd166'), 2, l.dashed ? [8, 6] : null);
+      strokeInfinite(geomLine(l), state.replay ? 'rgba(255,255,255,.22)' : (l.kind === 'line' ? '#ffd166' : '#7dffb2'), 2, null);
     });
-    if (state.dragParallel) {
-        // 拖曳中的平行線預覽
-        strokeInfinite(Optics.horizontalLine(state.dragParallel), 'rgba(125,255,178,.75)', 3, [5, 5]);
-        q = w2s(state.dragParallel); ctx.strokeStyle = '#7dffb2'; ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.arc(q.x, q.y, 18, 0, 7); ctx.stroke();
+    if (state.drag) {
+      // 拖曳中的預覽：沒吸附 = 跟手的虛線（放開會消失）；吸附 = 實線，和放開後留下的線同一條
+      var dg = state.drag, qa = w2s(dg.a);
+      if (dg.snap) {
+        strokeInfinite(geomLine(dragAsLine(dg)), dg.snap === 'point' ? '#ffd166' : '#7dffb2', 3, null);
+        if (dg.b) { q = w2s(dg.b); ctx.strokeStyle = '#ffd166'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(q.x, q.y, 18, 0, 7); ctx.stroke(); }
+      } else {
+        ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 2; ctx.setLineDash([6, 6]);
+        ctx.beginPath(); ctx.moveTo(qa.x, qa.y); ctx.lineTo(dg.cur.x, dg.cur.y); ctx.stroke(); ctx.restore();
       }
-      studentIntersections().forEach(function (pt) {
+      ctx.strokeStyle = dg.snap ? (dg.snap === 'point' ? '#ffd166' : '#7dffb2') : 'rgba(255,255,255,.7)'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(qa.x, qa.y, 18, 0, 7); ctx.stroke();
+    }
+    studentIntersections().forEach(function (pt) {
       q = w2s(pt); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.arc(q.x, q.y, 5, 0, 7); ctx.stroke();
     });
@@ -702,16 +730,13 @@
     var sp = nearestSnap(x, y);
     if (!sp) { setStatus('線的端點要吸附在標示點上（O、F、F′、虛像標記、P）。點在點的附近即可。'); return; }
     var pt = { x: sp.x, y: sp.y, label: sp.label };
-    if (state.tool === 'parallel') {
-      state.lines.push({ kind: 'parallel', a: pt, b: null, dashed: state.dashed });
-      setStatus('已畫出通過「' + sp.label + '」、平行主光軸的線。');
-    } else if (!state.pending) {
+    if (!state.pending) {
       state.pending = pt;
-      setStatus('起點：「' + sp.label + '」。再點另一個點完成連線（會自動延長）。');
+      setStatus('起點：「' + sp.label + '」。再點另一個點完成連線（會自動延長）。也可以直接從點上拖曳畫線。');
     } else if (Optics.dist(state.pending, pt) < 0.5) {
       state.pending = null; setStatus('已取消起點。');
     } else {
-      state.lines.push({ kind: 'line', a: state.pending, b: pt, dashed: state.dashed });
+      state.lines.push({ kind: 'line', a: state.pending, b: pt });
       setStatus('已畫出通過「' + state.pending.label + '」與「' + sp.label + '」的直線。它與透鏡的交點會成為可吸附的 P。');
       state.pending = null;
     }
@@ -761,28 +786,42 @@
   // 共用：輸入、UI、繪製排程
   // ====================================================================
 
-  // 從標示點橫向拖曳 = 拉出通過該點、平行主光軸的線（手機上比先切「平行線」工具再點快）。
-  // 拖曳中先顯示預覽；手指放開時預覽還在就留下這條線，往上／下拉開則取消。
-  // 只在畫線模式、起點落在標示點上、而且一開始就是橫向拖曳時才算；其他拖曳照舊是平移畫面。
-  var DRAG_DECIDE_PX = 18, PARALLEL_DRAG_PX = 40;
-  function updateDragParallel(p) {
-    var dx = Math.abs(p.x - gesture.x0), dy = Math.abs(p.y - gesture.y0), sp = gesture.snap;
-    var active = dx >= PARALLEL_DRAG_PX && dy <= Math.max(24, dx * 0.35);
-    var was = !!state.dragParallel;
-    state.dragParallel = active ? { x: sp.x, y: sp.y, label: sp.label } : null;
-    if (active && !was) setStatus('放開手指：畫出通過「' + sp.label + '」、平行主光軸的線。往上或往下拉開則取消。');
-    else if (!active && was) setStatus('已取消平行線。拉回水平方向可以再拉出來。');
+  // 拖曳畫線：從標示點開始拖，線從該點跟著手指延伸（虛線預覽）。
+  // 拖曳途中符合下列任一條件就吸附、預覽變實線：碰到另一個標示點（優先）／接近水平／接近垂直。
+  // 放開時是實線就留下，是虛線就消失。吸附後存的是標示點的世界座標，水平與垂直是精確的。
+  // 垂直線不是主光線，沒有光學用途（使用者指定：故意放來迷惑玩家）。
+  var AXIS_MIN_PX = 30, AXIS_TOL_PX = 10, AXIS_TOL_RATIO = 0.18;
+  function dragAsLine(dg) {
+    return dg.snap === 'point' ? { kind: 'line', a: dg.a, b: dg.b } : { kind: dg.snap === 'h' ? 'parallel' : 'vertical', a: dg.a, b: null };
   }
-  function cancelDragParallel() { if (state.dragParallel) { state.dragParallel = null; requestRender(); } }
-  function finishDragParallel(commit) {
-    var pt = state.dragParallel;
-    state.dragParallel = null;
-    if (pt && commit) {
-      state.lines.push({ kind: 'parallel', a: pt, b: null, dashed: state.dashed });
+  function updateDragLine(p) {
+    var sp0 = gesture.snap, a = { x: sp0.x, y: sp0.y, label: sp0.label };
+    var dx = Math.abs(p.x - gesture.x0), dy = Math.abs(p.y - gesture.y0);
+    var hit = nearestSnap(p.x, p.y), snap = null, b = null;
+    if (hit && Optics.dist(hit, a) >= 0.5) { snap = 'point'; b = { x: hit.x, y: hit.y, label: hit.label }; }
+    else if (dx >= AXIS_MIN_PX && dy <= Math.max(AXIS_TOL_PX, dx * AXIS_TOL_RATIO)) snap = 'h';
+    else if (dy >= AXIS_MIN_PX && dx <= Math.max(AXIS_TOL_PX, dy * AXIS_TOL_RATIO)) snap = 'v';
+    var was = state.drag ? state.drag.snap + (state.drag.b ? state.drag.b.label : '') : '';
+    state.drag = { a: a, snap: snap, b: b, cur: { x: p.x, y: p.y } };
+    var now = snap ? snap + (b ? b.label : '') : '';
+    if (now !== was) {
+      setStatus(snap === 'point' ? '放開：畫出通過「' + a.label + '」與「' + b.label + '」的直線。'
+        : snap === 'h' ? '放開：畫出通過「' + a.label + '」的水平線（平行主光軸）。'
+        : snap === 'v' ? '放開：畫出通過「' + a.label + '」的垂直線。'
+        : '虛線放開會消失。拖到另一個點上，或拉成水平／垂直，線才會留下。');
+    }
+  }
+  function cancelDragLine() { if (state.drag) { state.drag = null; requestRender(); } }
+  function finishDragLine(commit) {
+    var dg = state.drag;
+    state.drag = null;
+    if (dg && dg.snap && commit) {
+      state.lines.push(dragAsLine(dg));
       state.pending = null;
-      setStatus('已畫出通過「' + pt.label + '」、平行主光軸的線。');
+      setStatus(dg.snap === 'point' ? '已畫出通過「' + dg.a.label + '」與「' + dg.b.label + '」的直線。'
+        : dg.snap === 'h' ? '已畫出通過「' + dg.a.label + '」的水平線。' : '已畫出通過「' + dg.a.label + '」的垂直線。');
     } else {
-      setStatus('沒有畫線。從標示點往左或往右拖，可以拉出平行主光軸的線。');
+      setStatus('沒有畫線。從標示點拖到另一個點，或拉成水平／垂直再放開。');
     }
     syncUI(); requestRender();
   }
@@ -800,7 +839,7 @@
         snap: state.phase === 'analysis' && state.mode === 'draw' && !state.solved ? nearestSnap(p.x, p.y) : null };
       try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     } else if (gesture) {
-      gesture.multi = true; cancelDragParallel(); // 兩指：既不畫線也不縮放（縮放只用按鈕）
+      gesture.multi = true; cancelDragLine(); // 兩指：既不畫線也不縮放（縮放只用按鈕）
     }
   });
   canvas.addEventListener('pointermove', function (e) {
@@ -808,12 +847,9 @@
     var p = localPos(e);
     if (!gesture.moved && Math.hypot(p.x - gesture.x0, p.y - gesture.y0) > TAP_SLOP_PX) gesture.moved = true;
     if (gesture.snap) {
-      // 起點在標示點上：等拖得夠遠再判斷是「橫向拉平行線」還是「平移畫面」
-      if (!gesture.kind && Math.hypot(p.x - gesture.x0, p.y - gesture.y0) > DRAG_DECIDE_PX) {
-        gesture.kind = Math.abs(p.y - gesture.y0) <= Math.abs(p.x - gesture.x0) * 0.5 ? 'parallel' : 'pan';
-      }
-      if (gesture.kind === 'parallel') { updateDragParallel(p); requestRender(); }
-      if (gesture.kind !== 'pan') { gesture.lx = p.x; gesture.ly = p.y; return; }
+      // 起點在標示點上：一律是畫線，不平移畫面（從空白處拖才是平移）
+      if (gesture.moved) { gesture.kind = 'draw'; updateDragLine(p); requestRender(); }
+      gesture.lx = p.x; gesture.ly = p.y; return;
     }
     if (gesture.moved && state.phase === 'analysis') {
       state.view.tx += p.x - gesture.lx; state.view.ty += p.y - gesture.ly;
@@ -824,7 +860,7 @@
   function endPointer(e, cancelled) {
     delete pointers[e.pointerId];
     if (!gesture) return;
-    if (gesture.id === e.pointerId && gesture.kind === 'parallel') finishDragParallel(!cancelled && !gesture.multi);
+    if (gesture.id === e.pointerId && gesture.kind === 'draw') finishDragLine(!cancelled && !gesture.multi);
     if (gesture.id === e.pointerId && !gesture.moved && !gesture.multi && !cancelled) {
       var p = localPos(e);
       if (state.phase === 'explore') exploreTap(p.x, p.y); else analysisTap(p.x, p.y);
@@ -859,9 +895,6 @@
     $('modeSeal').classList.toggle('on', state.mode === 'seal');
     $('drawRow').hidden = state.mode !== 'draw';
     $('sealRow').hidden = state.mode !== 'seal';
-    $('toolLine').classList.toggle('on', state.tool === 'line');
-    $('toolParallel').classList.toggle('on', state.tool === 'parallel');
-    $('styleBtn').textContent = state.dashed ? '虛線' : '實線';
     $('undoBtn').disabled = !state.lines.length && !state.pending;
     $('clearBtn').disabled = !state.lines.length && !state.pending;
     $('castBtn').disabled = state.selectedCell == null || state.solved || !!(state.seal && !state.seal.done);
@@ -894,7 +927,7 @@
   function resetRound(idx) {
     state.cfgIndex = idx;
     state.phase = 'explore'; state.facing = 0; state.lensUp = false; state.marker = null;
-    state.mode = 'draw'; state.tool = 'line'; state.dashed = false; state.pending = null; state.lines = [];
+    state.mode = 'draw'; state.pending = null; state.lines = []; state.drag = null;
     state.selectedCell = null; state.seal = null; state.solved = false; state.attempts = 0; state.replay = null;
     state.zoomIdx = 0;
     $('configSel').value = String(idx);
@@ -974,9 +1007,7 @@
   });
   $('modeDraw').addEventListener('click', function () { state.mode = 'draw'; setStatus('畫線模式：點標示點來畫線。此模式下不會選到地板格。'); syncUI(); requestRender(); });
   $('modeSeal').addEventListener('click', function () { state.mode = 'seal'; state.pending = null; setStatus('封印模式：點一個地板格（整個直欄都可點），再按「施放封印法陣」。'); syncUI(); requestRender(); });
-  $('toolLine').addEventListener('click', function () { state.tool = 'line'; setStatus('兩點連線：依序點兩個標示點，會畫出通過它們並延長的直線。'); syncUI(); });
-  $('toolParallel').addEventListener('click', function () { state.tool = 'parallel'; state.pending = null; setStatus('平行主軸：點一個標示點，畫出通過它、平行主光軸的線。'); syncUI(); requestRender(); });
-  $('styleBtn').addEventListener('click', function () { state.dashed = !state.dashed; setStatus(state.dashed ? '接下來畫的線是虛線（延長線／作圖線）。' : '接下來畫的線是實線（實際光線）。'); syncUI(); });
+  $('toolLine').addEventListener('click', function () { setStatus('連線：從標示點拖到另一個點；拉成水平或垂直也會吸附。虛線放開會消失。也可以依序點兩個點。'); });
   $('undoBtn').addEventListener('click', function () { if (state.pending) state.pending = null; else state.lines.pop(); syncUI(); requestRender(); });
   $('clearBtn').addEventListener('click', function () { state.lines = []; state.pending = null; setStatus('已清除所有線。'); syncUI(); requestRender(); });
   $('castBtn').addEventListener('click', castSeal);
@@ -994,7 +1025,7 @@
   function exposeHooks() {
     window.__proto = {
       state: state, stats: stats, cfg: cfg, configs: Cfg, GHOST_COLOR: GHOST_COLOR, SNAP_PX: SNAP_PX,
-      w2s: w2s, s2w: s2w, snapPoints: snapPoints, imageScreenPos: imageScreenPos,
+      w2s: w2s, s2w: s2w, snapPoints: snapPoints, nearestSnap: nearestSnap, imageScreenPos: imageScreenPos,
       studentIntersections: studentIntersections, exploreMetrics: exploreMetrics,
       canvasSize: function () { return { W: W, H: H, DPR: DPR }; }, render: render, replaySpec: replaySpec,
       background: function () { return { ready: bg.ready, src: bgOff ? null : BG_DIRS.map(function (d) { return d.src; }) }; }

@@ -40,7 +40,7 @@
   PASS  [phone-landscape] 配置A·放大像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置A·放大像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置A·放大像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=70.000
-  PASS  [phone-landscape] 配置A·放大像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 1.4e-14 cm
+  PASS  [phone-landscape] 配置A·放大像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 1.4e-14 cm
   PASS  [phone-landscape] 配置A·放大像 學生作圖的交點落在唯一一格的中央附近  — 格 9，離格線 0.50 格
   PASS  [phone-landscape] 配置A·放大像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置A·放大像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -52,16 +52,27 @@
   PASS  [phone-landscape] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 812×242
   PASS  [phone-landscape] 配置A·放大像 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置A·放大像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
-  PASS  [phone-landscape] 配置A·放大像 從吸附點上開始的斜向拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置A·放大像 從標示點斜向拖到空白處放開：不留線、不算點擊
   PASS  [phone-landscape] 配置A·放大像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置A·放大像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置A·放大像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置A·放大像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置A·放大像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置A·放大像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置A·放大像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置A·放大像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置A·放大像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置A·放大像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置A·放大像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置A·放大像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置A·放大像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置A·放大像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置A·放大像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置A·放大像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置A·放大像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置A·放大像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置A·放大像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置A·放大像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置A·放大像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置A·放大像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置A·放大像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置A·放大像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置A·放大像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置A·放大像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置A·放大像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 分析／封印：所有控制項都在畫面內  — canvas 812×242
   PASS  [phone-landscape] 分析／封印：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-landscape] 分析／封印：頁面不需捲動
@@ -93,8 +104,8 @@
   PASS  [phone-landscape] 配置A·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 配置A·放大像 Debug overlay 顯示物點／焦距／目標格／清晰位置
   PASS  [phone-landscape] 配置A·放大像 關閉 Debug 後面板清空
-  PASS  [phone-landscape] 配置A·放大像 「下一組配置」不會連續出同一組  — 0→6→8→4→3→0→1→7→5→0→1→2→3→8→7→5→4→6
-  PASS  [phone-landscape] 配置A·放大像 「下一組配置」每一輪內每組各出一次、不重複  — 0,1,2,3,8,7,5,4,6
+  PASS  [phone-landscape] 配置A·放大像 「下一組配置」不會連續出同一組  — 0→5→4→6→1→8→3→2→7→8→3→6→5→1→7→4→2→0
+  PASS  [phone-landscape] 配置A·放大像 「下一組配置」每一輪內每組各出一次、不重複  — 8,3,6,5,1,7,4,2,0
   PASS  [phone-landscape] 配置A·放大像 換配置後回到觀察階段，標記與作圖線都清空
   PASS  [phone-landscape] 配置A·縮小像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置A·縮小像 開始觀察：DOM／文字／Debug 圖層沒有答案
@@ -120,7 +131,7 @@
   PASS  [phone-landscape] 配置A·縮小像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置A·縮小像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置A·縮小像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=70.000
-  PASS  [phone-landscape] 配置A·縮小像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
+  PASS  [phone-landscape] 配置A·縮小像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
   PASS  [phone-landscape] 配置A·縮小像 學生作圖的交點落在唯一一格的中央附近  — 格 9，離格線 0.50 格
   PASS  [phone-landscape] 配置A·縮小像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置A·縮小像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -128,16 +139,27 @@
   PASS  [phone-landscape] 配置A·縮小像 ＋ 按鈕放大  — 1.50×
   PASS  [phone-landscape] 配置A·縮小像 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置A·縮小像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
-  PASS  [phone-landscape] 配置A·縮小像 從吸附點上開始的斜向拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置A·縮小像 從標示點斜向拖到空白處放開：不留線、不算點擊
   PASS  [phone-landscape] 配置A·縮小像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置A·縮小像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置A·縮小像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置A·縮小像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置A·縮小像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置A·縮小像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置A·縮小像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置A·縮小像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置A·縮小像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置A·縮小像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置A·縮小像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置A·縮小像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置A·縮小像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置A·縮小像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置A·縮小像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置A·縮小像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置A·縮小像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置A·縮小像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置A·縮小像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置A·縮小像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置A·縮小像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置A·縮小像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置A·縮小像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置A·縮小像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置A·縮小像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置A·縮小像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置A·縮小像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置A·縮小像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置A·縮小像 點地板格可選取（透鏡所在的第 4 格）
   PASS  [phone-landscape] 配置A·縮小像 封印透鏡所在格 → 失敗
@@ -162,7 +184,7 @@
   PASS  [phone-landscape] 配置A·縮小像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置A·縮小像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置A·縮小像 光路重現：結束時標出像點  — 134 px（重現前 65）
-  PASS  [phone-landscape] 配置A·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置A·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 配置B·放大像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置B·放大像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置B·放大像 開始觀察：吸附點裡沒有物點
@@ -188,7 +210,7 @@
   PASS  [phone-landscape] 配置B·放大像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置B·放大像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置B·放大像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=-60.000
-  PASS  [phone-landscape] 配置B·放大像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
+  PASS  [phone-landscape] 配置B·放大像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
   PASS  [phone-landscape] 配置B·放大像 學生作圖的交點落在唯一一格的中央附近  — 格 7，離格線 0.50 格
   PASS  [phone-landscape] 配置B·放大像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置B·放大像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -196,16 +218,27 @@
   PASS  [phone-landscape] 配置B·放大像 ＋ 按鈕放大  — 1.50×
   PASS  [phone-landscape] 配置B·放大像 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置B·放大像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
-  PASS  [phone-landscape] 配置B·放大像 從吸附點上開始的斜向拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置B·放大像 從標示點斜向拖到空白處放開：不留線、不算點擊
   PASS  [phone-landscape] 配置B·放大像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置B·放大像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置B·放大像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置B·放大像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置B·放大像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置B·放大像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置B·放大像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置B·放大像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置B·放大像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置B·放大像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置B·放大像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置B·放大像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置B·放大像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置B·放大像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置B·放大像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置B·放大像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置B·放大像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置B·放大像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置B·放大像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置B·放大像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置B·放大像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置B·放大像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置B·放大像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置B·放大像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置B·放大像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置B·放大像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置B·放大像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置B·放大像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置B·放大像 點地板格可選取（透鏡所在的第 5 格）
   PASS  [phone-landscape] 配置B·放大像 封印透鏡所在格 → 失敗
@@ -255,7 +288,7 @@
   PASS  [phone-landscape] 配置B·縮小像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置B·縮小像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置B·縮小像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=-60.000
-  PASS  [phone-landscape] 配置B·縮小像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 1.1e-13 cm
+  PASS  [phone-landscape] 配置B·縮小像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 1.1e-13 cm
   PASS  [phone-landscape] 配置B·縮小像 學生作圖的交點落在唯一一格的中央附近  — 格 7，離格線 0.50 格
   PASS  [phone-landscape] 配置B·縮小像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置B·縮小像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -265,13 +298,24 @@
   PASS  [phone-landscape] 配置B·縮小像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
   PASS  [phone-landscape] 配置B·縮小像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置B·縮小像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置B·縮小像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置B·縮小像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置B·縮小像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置B·縮小像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置B·縮小像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置B·縮小像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置B·縮小像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置B·縮小像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置B·縮小像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置B·縮小像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置B·縮小像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置B·縮小像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置B·縮小像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置B·縮小像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置B·縮小像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置B·縮小像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置B·縮小像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置B·縮小像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置B·縮小像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置B·縮小像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置B·縮小像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置B·縮小像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置B·縮小像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置B·縮小像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置B·縮小像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置B·縮小像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置B·縮小像 點地板格可選取（透鏡所在的第 3 格）
   PASS  [phone-landscape] 配置B·縮小像 封印透鏡所在格 → 失敗
@@ -296,7 +340,7 @@
   PASS  [phone-landscape] 配置B·縮小像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置B·縮小像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置B·縮小像 光路重現：結束時標出像點  — 135 px（重現前 67）
-  PASS  [phone-landscape] 配置B·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置B·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 配置C·放大像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置C·放大像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置C·放大像 開始觀察：吸附點裡沒有物點
@@ -322,7 +366,7 @@
   PASS  [phone-landscape] 配置C·放大像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置C·放大像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置C·放大像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=65.000
-  PASS  [phone-landscape] 配置C·放大像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 1.1e-13 cm
+  PASS  [phone-landscape] 配置C·放大像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 1.1e-13 cm
   PASS  [phone-landscape] 配置C·放大像 學生作圖的交點落在唯一一格的中央附近  — 格 10，離格線 0.50 格
   PASS  [phone-landscape] 配置C·放大像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置C·放大像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -330,16 +374,27 @@
   PASS  [phone-landscape] 配置C·放大像 ＋ 按鈕放大  — 1.50×
   PASS  [phone-landscape] 配置C·放大像 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置C·放大像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
-  PASS  [phone-landscape] 配置C·放大像 從吸附點上開始的斜向拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置C·放大像 從標示點斜向拖到空白處放開：不留線、不算點擊
   PASS  [phone-landscape] 配置C·放大像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置C·放大像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置C·放大像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置C·放大像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置C·放大像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置C·放大像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置C·放大像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置C·放大像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置C·放大像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置C·放大像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置C·放大像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置C·放大像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置C·放大像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置C·放大像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置C·放大像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置C·放大像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置C·放大像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置C·放大像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置C·放大像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置C·放大像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置C·放大像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置C·放大像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置C·放大像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置C·放大像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置C·放大像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置C·放大像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置C·放大像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置C·放大像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置C·放大像 點地板格可選取（透鏡所在的第 7 格）
   PASS  [phone-landscape] 配置C·放大像 封印透鏡所在格 → 失敗
@@ -364,7 +419,7 @@
   PASS  [phone-landscape] 配置C·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置C·放大像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置C·放大像 光路重現：結束時標出像點  — 136 px（重現前 65）
-  PASS  [phone-landscape] 配置C·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置C·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 23 次
   PASS  [phone-landscape] 配置C·縮小像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置C·縮小像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置C·縮小像 開始觀察：吸附點裡沒有物點
@@ -389,7 +444,7 @@
   PASS  [phone-landscape] 配置C·縮小像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置C·縮小像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置C·縮小像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=65.000
-  PASS  [phone-landscape] 配置C·縮小像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 1.1e-13 cm
+  PASS  [phone-landscape] 配置C·縮小像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 1.1e-13 cm
   PASS  [phone-landscape] 配置C·縮小像 學生作圖的交點落在唯一一格的中央附近  — 格 10，離格線 0.50 格
   PASS  [phone-landscape] 配置C·縮小像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置C·縮小像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -397,16 +452,27 @@
   PASS  [phone-landscape] 配置C·縮小像 ＋ 按鈕放大  — 1.50×
   PASS  [phone-landscape] 配置C·縮小像 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置C·縮小像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
-  PASS  [phone-landscape] 配置C·縮小像 從吸附點上開始的斜向拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置C·縮小像 從標示點斜向拖到空白處放開：不留線、不算點擊
   PASS  [phone-landscape] 配置C·縮小像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置C·縮小像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置C·縮小像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置C·縮小像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置C·縮小像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置C·縮小像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置C·縮小像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置C·縮小像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置C·縮小像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置C·縮小像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置C·縮小像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置C·縮小像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置C·縮小像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置C·縮小像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置C·縮小像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置C·縮小像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置C·縮小像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置C·縮小像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置C·縮小像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置C·縮小像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置C·縮小像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置C·縮小像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置C·縮小像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置C·縮小像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置C·縮小像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置C·縮小像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置C·縮小像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置C·縮小像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置C·縮小像 點地板格可選取（透鏡所在的第 4 格）
   PASS  [phone-landscape] 配置C·縮小像 封印透鏡所在格 → 失敗
@@ -431,7 +497,7 @@
   PASS  [phone-landscape] 配置C·縮小像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置C·縮小像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置C·縮小像 光路重現：結束時標出像點  — 133 px（重現前 66）
-  PASS  [phone-landscape] 配置C·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置C·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 23 次
   PASS  [phone-landscape] 配置D·放大像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置D·放大像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置D·放大像 開始觀察：吸附點裡沒有物點
@@ -457,7 +523,7 @@
   PASS  [phone-landscape] 配置D·放大像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置D·放大像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置D·放大像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=-50.000
-  PASS  [phone-landscape] 配置D·放大像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 1.1e-13 cm
+  PASS  [phone-landscape] 配置D·放大像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 1.1e-13 cm
   PASS  [phone-landscape] 配置D·放大像 學生作圖的交點落在唯一一格的中央附近  — 格 8，離格線 0.50 格
   PASS  [phone-landscape] 配置D·放大像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置D·放大像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -465,16 +531,27 @@
   PASS  [phone-landscape] 配置D·放大像 ＋ 按鈕放大  — 1.50×
   PASS  [phone-landscape] 配置D·放大像 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置D·放大像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
-  PASS  [phone-landscape] 配置D·放大像 從吸附點上開始的斜向拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置D·放大像 從標示點斜向拖到空白處放開：不留線、不算點擊
   PASS  [phone-landscape] 配置D·放大像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置D·放大像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置D·放大像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置D·放大像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置D·放大像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置D·放大像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置D·放大像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置D·放大像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置D·放大像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置D·放大像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置D·放大像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置D·放大像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置D·放大像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置D·放大像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置D·放大像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置D·放大像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置D·放大像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置D·放大像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置D·放大像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置D·放大像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置D·放大像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置D·放大像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置D·放大像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置D·放大像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置D·放大像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置D·放大像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置D·放大像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置D·放大像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置D·放大像 點地板格可選取（透鏡所在的第 6 格）
   PASS  [phone-landscape] 配置D·放大像 封印透鏡所在格 → 失敗
@@ -524,7 +601,7 @@
   PASS  [phone-landscape] 配置D·縮小像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置D·縮小像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置D·縮小像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=-50.000
-  PASS  [phone-landscape] 配置D·縮小像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
+  PASS  [phone-landscape] 配置D·縮小像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
   PASS  [phone-landscape] 配置D·縮小像 學生作圖的交點落在唯一一格的中央附近  — 格 8，離格線 0.50 格
   PASS  [phone-landscape] 配置D·縮小像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置D·縮小像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -534,13 +611,24 @@
   PASS  [phone-landscape] 配置D·縮小像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
   PASS  [phone-landscape] 配置D·縮小像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置D·縮小像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置D·縮小像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置D·縮小像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置D·縮小像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置D·縮小像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置D·縮小像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置D·縮小像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置D·縮小像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置D·縮小像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置D·縮小像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置D·縮小像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置D·縮小像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置D·縮小像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置D·縮小像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置D·縮小像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置D·縮小像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置D·縮小像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置D·縮小像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置D·縮小像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置D·縮小像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置D·縮小像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置D·縮小像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置D·縮小像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置D·縮小像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置D·縮小像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置D·縮小像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置D·縮小像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置D·縮小像 點地板格可選取（透鏡所在的第 3 格）
   PASS  [phone-landscape] 配置D·縮小像 封印透鏡所在格 → 失敗
@@ -590,7 +678,7 @@
   PASS  [phone-landscape] 配置E·放大像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置E·放大像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置E·放大像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=-60.000
-  PASS  [phone-landscape] 配置E·放大像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
+  PASS  [phone-landscape] 配置E·放大像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
   PASS  [phone-landscape] 配置E·放大像 學生作圖的交點落在唯一一格的中央附近  — 格 5，離格線 0.50 格
   PASS  [phone-landscape] 配置E·放大像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置E·放大像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -600,13 +688,24 @@
   PASS  [phone-landscape] 配置E·放大像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
   PASS  [phone-landscape] 配置E·放大像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置E·放大像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置E·放大像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置E·放大像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置E·放大像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置E·放大像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置E·放大像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置E·放大像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置E·放大像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置E·放大像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置E·放大像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置E·放大像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置E·放大像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置E·放大像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置E·放大像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置E·放大像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置E·放大像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置E·放大像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置E·放大像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置E·放大像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置E·放大像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置E·放大像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置E·放大像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置E·放大像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置E·放大像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置E·放大像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置E·放大像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置E·放大像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置E·放大像 點地板格可選取（透鏡所在的第 3 格）
   PASS  [phone-landscape] 配置E·放大像 封印透鏡所在格 → 失敗
@@ -631,7 +730,7 @@
   PASS  [phone-landscape] 配置E·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置E·放大像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置E·放大像 光路重現：結束時標出像點  — 136 px（重現前 67）
-  PASS  [phone-landscape] 配置E·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置E·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 23 次
   PASS  [phone-landscape] 配置E·縮小像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置E·縮小像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置E·縮小像 開始觀察：吸附點裡沒有物點
@@ -656,7 +755,7 @@
   PASS  [phone-landscape] 配置E·縮小像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置E·縮小像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置E·縮小像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=-60.000
-  PASS  [phone-landscape] 配置E·縮小像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 7.1e-15 cm
+  PASS  [phone-landscape] 配置E·縮小像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 7.1e-15 cm
   PASS  [phone-landscape] 配置E·縮小像 學生作圖的交點落在唯一一格的中央附近  — 格 5，離格線 0.50 格
   PASS  [phone-landscape] 配置E·縮小像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置E·縮小像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -666,13 +765,24 @@
   PASS  [phone-landscape] 配置E·縮小像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
   PASS  [phone-landscape] 配置E·縮小像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置E·縮小像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置E·縮小像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置E·縮小像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置E·縮小像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置E·縮小像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置E·縮小像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置E·縮小像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置E·縮小像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置E·縮小像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置E·縮小像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置E·縮小像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置E·縮小像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置E·縮小像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置E·縮小像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置E·縮小像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置E·縮小像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置E·縮小像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置E·縮小像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置E·縮小像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置E·縮小像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置E·縮小像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置E·縮小像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置E·縮小像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置E·縮小像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置E·縮小像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置E·縮小像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置E·縮小像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置E·縮小像 點地板格可選取（透鏡所在的第 2 格）
   PASS  [phone-landscape] 配置E·縮小像 封印透鏡所在格 → 失敗
@@ -697,7 +807,7 @@
   PASS  [phone-landscape] 配置E·縮小像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置E·縮小像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置E·縮小像 光路重現：結束時標出像點  — 133 px（重現前 65）
-  PASS  [phone-landscape] 配置E·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置E·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 配置F·放大像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置F·放大像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置F·放大像 開始觀察：吸附點裡沒有物點
@@ -722,7 +832,7 @@
   PASS  [phone-landscape] 配置F·放大像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置F·放大像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置F·放大像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=50.000
-  PASS  [phone-landscape] 配置F·放大像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
+  PASS  [phone-landscape] 配置F·放大像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
   PASS  [phone-landscape] 配置F·放大像 學生作圖的交點落在唯一一格的中央附近  — 格 6，離格線 0.50 格
   PASS  [phone-landscape] 配置F·放大像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置F·放大像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -730,16 +840,27 @@
   PASS  [phone-landscape] 配置F·放大像 ＋ 按鈕放大  — 1.50×
   PASS  [phone-landscape] 配置F·放大像 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置F·放大像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
-  PASS  [phone-landscape] 配置F·放大像 從吸附點上開始的斜向拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置F·放大像 從標示點斜向拖到空白處放開：不留線、不算點擊
   PASS  [phone-landscape] 配置F·放大像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置F·放大像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置F·放大像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置F·放大像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置F·放大像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置F·放大像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置F·放大像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置F·放大像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置F·放大像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置F·放大像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置F·放大像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置F·放大像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置F·放大像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置F·放大像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置F·放大像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置F·放大像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置F·放大像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置F·放大像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置F·放大像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置F·放大像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置F·放大像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置F·放大像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置F·放大像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置F·放大像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置F·放大像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置F·放大像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置F·放大像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置F·放大像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置F·放大像 點地板格可選取（透鏡所在的第 4 格）
   PASS  [phone-landscape] 配置F·放大像 封印透鏡所在格 → 失敗
@@ -789,7 +910,7 @@
   PASS  [phone-landscape] 配置F·縮小像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置F·縮小像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置F·縮小像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=50.000
-  PASS  [phone-landscape] 配置F·縮小像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
+  PASS  [phone-landscape] 配置F·縮小像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
   PASS  [phone-landscape] 配置F·縮小像 學生作圖的交點落在唯一一格的中央附近  — 格 6，離格線 0.50 格
   PASS  [phone-landscape] 配置F·縮小像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置F·縮小像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -799,13 +920,24 @@
   PASS  [phone-landscape] 配置F·縮小像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
   PASS  [phone-landscape] 配置F·縮小像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置F·縮小像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置F·縮小像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置F·縮小像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置F·縮小像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置F·縮小像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置F·縮小像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置F·縮小像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置F·縮小像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置F·縮小像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置F·縮小像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置F·縮小像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置F·縮小像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置F·縮小像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置F·縮小像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置F·縮小像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置F·縮小像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置F·縮小像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置F·縮小像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置F·縮小像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置F·縮小像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置F·縮小像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置F·縮小像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置F·縮小像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置F·縮小像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置F·縮小像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置F·縮小像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置F·縮小像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置F·縮小像 點地板格可選取（透鏡所在的第 3 格）
   PASS  [phone-landscape] 配置F·縮小像 封印透鏡所在格 → 失敗
@@ -830,7 +962,7 @@
   PASS  [phone-landscape] 配置F·縮小像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置F·縮小像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置F·縮小像 光路重現：結束時標出像點  — 133 px（重現前 66）
-  PASS  [phone-landscape] 配置F·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置F·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 23 次
   PASS  [phone-landscape] 配置G·放大像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置G·放大像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置G·放大像 開始觀察：吸附點裡沒有物點
@@ -855,7 +987,7 @@
   PASS  [phone-landscape] 配置G·放大像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置G·放大像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置G·放大像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=55.000
-  PASS  [phone-landscape] 配置G·放大像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
+  PASS  [phone-landscape] 配置G·放大像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
   PASS  [phone-landscape] 配置G·放大像 學生作圖的交點落在唯一一格的中央附近  — 格 8，離格線 0.50 格
   PASS  [phone-landscape] 配置G·放大像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置G·放大像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -863,16 +995,27 @@
   PASS  [phone-landscape] 配置G·放大像 ＋ 按鈕放大  — 1.50×
   PASS  [phone-landscape] 配置G·放大像 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置G·放大像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
-  PASS  [phone-landscape] 配置G·放大像 從吸附點上開始的斜向拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置G·放大像 從標示點斜向拖到空白處放開：不留線、不算點擊
   PASS  [phone-landscape] 配置G·放大像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置G·放大像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置G·放大像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置G·放大像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置G·放大像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置G·放大像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置G·放大像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置G·放大像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置G·放大像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置G·放大像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置G·放大像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置G·放大像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置G·放大像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置G·放大像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置G·放大像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置G·放大像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置G·放大像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置G·放大像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置G·放大像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置G·放大像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置G·放大像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置G·放大像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置G·放大像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置G·放大像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置G·放大像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置G·放大像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置G·放大像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置G·放大像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置G·放大像 點地板格可選取（透鏡所在的第 5 格）
   PASS  [phone-landscape] 配置G·放大像 封印透鏡所在格 → 失敗
@@ -897,7 +1040,7 @@
   PASS  [phone-landscape] 配置G·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置G·放大像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置G·放大像 光路重現：結束時標出像點  — 137 px（重現前 65）
-  PASS  [phone-landscape] 配置G·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置G·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 38 次
   PASS  [phone-landscape] 配置G·縮小像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置G·縮小像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置G·縮小像 開始觀察：吸附點裡沒有物點
@@ -922,7 +1065,7 @@
   PASS  [phone-landscape] 配置G·縮小像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置G·縮小像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置G·縮小像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=55.000
-  PASS  [phone-landscape] 配置G·縮小像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 7.1e-15 cm
+  PASS  [phone-landscape] 配置G·縮小像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 7.1e-15 cm
   PASS  [phone-landscape] 配置G·縮小像 學生作圖的交點落在唯一一格的中央附近  — 格 8，離格線 0.50 格
   PASS  [phone-landscape] 配置G·縮小像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置G·縮小像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -930,16 +1073,27 @@
   PASS  [phone-landscape] 配置G·縮小像 ＋ 按鈕放大  — 1.50×
   PASS  [phone-landscape] 配置G·縮小像 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置G·縮小像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
-  PASS  [phone-landscape] 配置G·縮小像 從吸附點上開始的斜向拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置G·縮小像 從標示點斜向拖到空白處放開：不留線、不算點擊
   PASS  [phone-landscape] 配置G·縮小像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置G·縮小像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置G·縮小像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置G·縮小像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置G·縮小像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置G·縮小像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置G·縮小像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置G·縮小像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置G·縮小像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置G·縮小像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置G·縮小像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置G·縮小像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置G·縮小像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置G·縮小像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置G·縮小像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置G·縮小像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置G·縮小像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置G·縮小像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置G·縮小像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置G·縮小像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置G·縮小像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置G·縮小像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置G·縮小像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置G·縮小像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置G·縮小像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置G·縮小像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置G·縮小像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置G·縮小像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置G·縮小像 點地板格可選取（透鏡所在的第 3 格）
   PASS  [phone-landscape] 配置G·縮小像 封印透鏡所在格 → 失敗
@@ -989,7 +1143,7 @@
   PASS  [phone-landscape] 配置H·放大像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置H·放大像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置H·放大像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=45.000
-  PASS  [phone-landscape] 配置H·放大像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
+  PASS  [phone-landscape] 配置H·放大像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
   PASS  [phone-landscape] 配置H·放大像 學生作圖的交點落在唯一一格的中央附近  — 格 7，離格線 0.50 格
   PASS  [phone-landscape] 配置H·放大像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置H·放大像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -997,16 +1151,27 @@
   PASS  [phone-landscape] 配置H·放大像 ＋ 按鈕放大  — 1.50×
   PASS  [phone-landscape] 配置H·放大像 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置H·放大像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
-  PASS  [phone-landscape] 配置H·放大像 從吸附點上開始的斜向拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置H·放大像 從標示點斜向拖到空白處放開：不留線、不算點擊
   PASS  [phone-landscape] 配置H·放大像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置H·放大像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置H·放大像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置H·放大像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置H·放大像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置H·放大像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置H·放大像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置H·放大像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置H·放大像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置H·放大像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置H·放大像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置H·放大像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置H·放大像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置H·放大像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置H·放大像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置H·放大像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置H·放大像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置H·放大像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置H·放大像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置H·放大像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置H·放大像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置H·放大像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置H·放大像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置H·放大像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置H·放大像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置H·放大像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置H·放大像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置H·放大像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置H·放大像 點地板格可選取（透鏡所在的第 5 格）
   PASS  [phone-landscape] 配置H·放大像 封印透鏡所在格 → 失敗
@@ -1031,7 +1196,7 @@
   PASS  [phone-landscape] 配置H·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置H·放大像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置H·放大像 光路重現：結束時標出像點  — 135 px（重現前 65）
-  PASS  [phone-landscape] 配置H·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置H·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 23 次
   PASS  [phone-landscape] 配置H·縮小像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置H·縮小像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置H·縮小像 開始觀察：吸附點裡沒有物點
@@ -1056,7 +1221,7 @@
   PASS  [phone-landscape] 配置H·縮小像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置H·縮小像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置H·縮小像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=45.000
-  PASS  [phone-landscape] 配置H·縮小像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 2.3e-13 cm
+  PASS  [phone-landscape] 配置H·縮小像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 2.3e-13 cm
   PASS  [phone-landscape] 配置H·縮小像 學生作圖的交點落在唯一一格的中央附近  — 格 7，離格線 0.50 格
   PASS  [phone-landscape] 配置H·縮小像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置H·縮小像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -1066,13 +1231,24 @@
   PASS  [phone-landscape] 配置H·縮小像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
   PASS  [phone-landscape] 配置H·縮小像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置H·縮小像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置H·縮小像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置H·縮小像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置H·縮小像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置H·縮小像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置H·縮小像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置H·縮小像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置H·縮小像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置H·縮小像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置H·縮小像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置H·縮小像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置H·縮小像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置H·縮小像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置H·縮小像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置H·縮小像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置H·縮小像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置H·縮小像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置H·縮小像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置H·縮小像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置H·縮小像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置H·縮小像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置H·縮小像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置H·縮小像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置H·縮小像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置H·縮小像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置H·縮小像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置H·縮小像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置H·縮小像 點地板格可選取（透鏡所在的第 3 格）
   PASS  [phone-landscape] 配置H·縮小像 封印透鏡所在格 → 失敗
@@ -1122,7 +1298,7 @@
   PASS  [phone-landscape] 配置I·放大像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置I·放大像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置I·放大像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=-50.000
-  PASS  [phone-landscape] 配置I·放大像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 1.4e-14 cm
+  PASS  [phone-landscape] 配置I·放大像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 1.4e-14 cm
   PASS  [phone-landscape] 配置I·放大像 學生作圖的交點落在唯一一格的中央附近  — 格 9，離格線 0.50 格
   PASS  [phone-landscape] 配置I·放大像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置I·放大像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -1130,16 +1306,27 @@
   PASS  [phone-landscape] 配置I·放大像 ＋ 按鈕放大  — 1.50×
   PASS  [phone-landscape] 配置I·放大像 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置I·放大像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
-  PASS  [phone-landscape] 配置I·放大像 從吸附點上開始的斜向拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置I·放大像 從標示點斜向拖到空白處放開：不留線、不算點擊
   PASS  [phone-landscape] 配置I·放大像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置I·放大像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置I·放大像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置I·放大像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置I·放大像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置I·放大像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置I·放大像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置I·放大像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置I·放大像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置I·放大像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置I·放大像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置I·放大像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置I·放大像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置I·放大像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置I·放大像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置I·放大像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置I·放大像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置I·放大像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置I·放大像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置I·放大像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置I·放大像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置I·放大像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置I·放大像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置I·放大像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置I·放大像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置I·放大像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置I·放大像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置I·放大像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置I·放大像 點地板格可選取（透鏡所在的第 6 格）
   PASS  [phone-landscape] 配置I·放大像 封印透鏡所在格 → 失敗
@@ -1164,7 +1351,7 @@
   PASS  [phone-landscape] 配置I·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置I·放大像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置I·放大像 光路重現：結束時標出像點  — 132 px（重現前 70）
-  PASS  [phone-landscape] 配置I·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置I·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置I·縮小像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置I·縮小像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置I·縮小像 開始觀察：吸附點裡沒有物點
@@ -1189,7 +1376,7 @@
   PASS  [phone-landscape] 配置I·縮小像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-landscape] 配置I·縮小像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-landscape] 配置I·縮小像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=-50.000
-  PASS  [phone-landscape] 配置I·縮小像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
+  PASS  [phone-landscape] 配置I·縮小像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
   PASS  [phone-landscape] 配置I·縮小像 學生作圖的交點落在唯一一格的中央附近  — 格 9，離格線 0.50 格
   PASS  [phone-landscape] 配置I·縮小像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置I·縮小像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -1197,16 +1384,27 @@
   PASS  [phone-landscape] 配置I·縮小像 ＋ 按鈕放大  — 1.50×
   PASS  [phone-landscape] 配置I·縮小像 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-landscape] 配置I·縮小像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
-  PASS  [phone-landscape] 配置I·縮小像 從吸附點上開始的斜向拖曳不會被當成畫線
+  PASS  [phone-landscape] 配置I·縮小像 從標示點斜向拖到空白處放開：不留線、不算點擊
   PASS  [phone-landscape] 配置I·縮小像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-landscape] 配置I·縮小像 「全圖」回到預設視圖
-  PASS  [phone-landscape] 配置I·縮小像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-landscape] 配置I·縮小像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-landscape] 配置I·縮小像 拉平行線時畫面不會跟著平移
-  PASS  [phone-landscape] 配置I·縮小像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-landscape] 配置I·縮小像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-landscape] 配置I·縮小像 從標示點斜向拖曳不會畫線
-  PASS  [phone-landscape] 配置I·縮小像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-landscape] 配置I·縮小像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置I·縮小像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置I·縮小像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置I·縮小像 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置I·縮小像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置I·縮小像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置I·縮小像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置I·縮小像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置I·縮小像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置I·縮小像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置I·縮小像 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置I·縮小像 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置I·縮小像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置I·縮小像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置I·縮小像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置I·縮小像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置I·縮小像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置I·縮小像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-landscape] 配置I·縮小像 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置I·縮小像 點地板格可選取（透鏡所在的第 4 格）
   PASS  [phone-landscape] 配置I·縮小像 封印透鏡所在格 → 失敗
@@ -1274,7 +1472,7 @@
   PASS  [phone-portrait] 配置A·放大像 畫線模式下點地板格：不選格、不畫線
   PASS  [phone-portrait] 配置A·放大像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [phone-portrait] 配置A·放大像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=70.000
-  PASS  [phone-portrait] 配置A·放大像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 1.4e-14 cm
+  PASS  [phone-portrait] 配置A·放大像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 1.4e-14 cm
   PASS  [phone-portrait] 配置A·放大像 學生作圖的交點落在唯一一格的中央附近  — 格 9，離格線 0.50 格
   PASS  [phone-portrait] 配置A·放大像 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-portrait] 配置A·放大像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -1286,15 +1484,25 @@
   PASS  [phone-portrait] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 375×603
   PASS  [phone-portrait] 配置A·放大像 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-portrait] 配置A·放大像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
-  PASS  [phone-portrait] 配置A·放大像 從吸附點上開始的斜向拖曳不會被當成畫線
+  PASS  [phone-portrait] 配置A·放大像 從標示點斜向拖到空白處放開：不留線、不算點擊
   PASS  [phone-portrait] 配置A·放大像 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
   PASS  [phone-portrait] 配置A·放大像 「全圖」回到預設視圖
-  PASS  [phone-portrait] 配置A·放大像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [phone-portrait] 配置A·放大像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [phone-portrait] 配置A·放大像 「復原」可以拿掉拖出來的平行線
-  PASS  [phone-portrait] 配置A·放大像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [phone-portrait] 配置A·放大像 從標示點斜向拖曳不會畫線
-  PASS  [phone-portrait] 配置A·放大像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [phone-portrait] 配置A·放大像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-portrait] 配置A·放大像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-portrait] 配置A·放大像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-portrait] 配置A·放大像 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-portrait] 配置A·放大像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-portrait] 配置A·放大像 放開：留下通過起點、精確垂直的線
+  PASS  [phone-portrait] 配置A·放大像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-portrait] 配置A·放大像 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-portrait] 配置A·放大像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-portrait] 配置A·放大像 虛線時放開：線消失，不留線
+  PASS  [phone-portrait] 配置A·放大像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-portrait] 配置A·放大像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-portrait] 配置A·放大像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-portrait] 配置A·放大像 「復原」可以拿掉拖出來的連線
+  PASS  [phone-portrait] 配置A·放大像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-portrait] 配置A·放大像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [phone-portrait] 分析／封印：所有控制項都在畫面內  — canvas 375×597
   PASS  [phone-portrait] 分析／封印：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-portrait] 分析／封印：頁面不需捲動
@@ -1326,8 +1534,8 @@
   PASS  [phone-portrait] 配置A·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-portrait] 配置A·放大像 Debug overlay 顯示物點／焦距／目標格／清晰位置
   PASS  [phone-portrait] 配置A·放大像 關閉 Debug 後面板清空
-  PASS  [phone-portrait] 配置A·放大像 「下一組配置」不會連續出同一組  — 0→3→2→4→5→0→1→8→7→3→1→4→0→7→2→6→8→5
-  PASS  [phone-portrait] 配置A·放大像 「下一組配置」每一輪內每組各出一次、不重複  — 3,1,4,0,7,2,6,8,5
+  PASS  [phone-portrait] 配置A·放大像 「下一組配置」不會連續出同一組  — 0→1→7→8→4→5→2→6→3→6→3→1→4→5→0→7→8→2
+  PASS  [phone-portrait] 配置A·放大像 「下一組配置」每一輪內每組各出一次、不重複  — 6,3,1,4,5,0,7,8,2
   PASS  [phone-portrait] 配置A·放大像 換配置後回到觀察階段，標記與作圖線都清空
   PASS  [phone-portrait] 沒有 JS 錯誤
   PASS  [desktop] 走廊背景圖與鏡片圖已載入
@@ -1370,7 +1578,7 @@
   PASS  [desktop] 配置A·縮小像 畫線模式下點地板格：不選格、不畫線
   PASS  [desktop] 配置A·縮小像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [desktop] 配置A·縮小像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=70.000
-  PASS  [desktop] 配置A·縮小像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
+  PASS  [desktop] 配置A·縮小像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
   PASS  [desktop] 配置A·縮小像 學生作圖的交點落在唯一一格的中央附近  — 格 9，離格線 0.50 格
   PASS  [desktop] 配置A·縮小像 畫完三條線：畫面上沒有鬼本體
   PASS  [desktop] 配置A·縮小像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -1382,15 +1590,26 @@
   PASS  [desktop] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 1280×591
   PASS  [desktop] 配置A·縮小像 放大後單指拖曳可平移  — Δx=90px
   PASS  [desktop] 配置A·縮小像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
-  PASS  [desktop] 配置A·縮小像 從吸附點上開始的斜向拖曳不會被當成畫線
+  PASS  [desktop] 配置A·縮小像 從標示點斜向拖到空白處放開：不留線、不算點擊
   PASS  [desktop] 配置A·縮小像 「全圖」回到預設視圖
-  PASS  [desktop] 配置A·縮小像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [desktop] 配置A·縮小像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [desktop] 配置A·縮小像 拉平行線時畫面不會跟著平移
-  PASS  [desktop] 配置A·縮小像 「復原」可以拿掉拖出來的平行線
-  PASS  [desktop] 配置A·縮小像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [desktop] 配置A·縮小像 從標示點斜向拖曳不會畫線
-  PASS  [desktop] 配置A·縮小像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [desktop] 配置A·縮小像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [desktop] 配置A·縮小像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [desktop] 配置A·縮小像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [desktop] 配置A·縮小像 從標示點拖曳時畫面不會跟著平移
+  PASS  [desktop] 配置A·縮小像 「復原」可以拿掉拖出來的水平線
+  PASS  [desktop] 配置A·縮小像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [desktop] 配置A·縮小像 放開：留下通過起點、精確垂直的線
+  PASS  [desktop] 配置A·縮小像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [desktop] 配置A·縮小像 「復原」可以拿掉拖出來的垂直線
+  PASS  [desktop] 配置A·縮小像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [desktop] 配置A·縮小像 虛線時放開：線消失，不留線
+  PASS  [desktop] 配置A·縮小像 斜向拖曳也不會平移畫面
+  PASS  [desktop] 配置A·縮小像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [desktop] 配置A·縮小像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [desktop] 配置A·縮小像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [desktop] 配置A·縮小像 「復原」可以拿掉拖出來的連線
+  PASS  [desktop] 配置A·縮小像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [desktop] 配置A·縮小像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [desktop] 分析／封印：所有控制項都在畫面內  — canvas 1280×591
   PASS  [desktop] 分析／封印：按鈕點擊區 ≥ 40×40 px
   PASS  [desktop] 分析／封印：頁面不需捲動
@@ -1422,8 +1641,8 @@
   PASS  [desktop] 配置A·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [desktop] 配置A·縮小像 Debug overlay 顯示物點／焦距／目標格／清晰位置
   PASS  [desktop] 配置A·縮小像 關閉 Debug 後面板清空
-  PASS  [desktop] 配置A·縮小像 「下一組配置」不會連續出同一組  — 0→3→2→7→1→4→6→8→5→8→7→0→2→5→3→4→1→6
-  PASS  [desktop] 配置A·縮小像 「下一組配置」每一輪內每組各出一次、不重複  — 8,7,0,2,5,3,4,1,6
+  PASS  [desktop] 配置A·縮小像 「下一組配置」不會連續出同一組  — 0→4→2→3→7→5→0→1→8→3→6→1→7→5→0→4→2→8
+  PASS  [desktop] 配置A·縮小像 「下一組配置」每一輪內每組各出一次、不重複  — 3,6,1,7,5,0,4,2,8
   PASS  [desktop] 配置A·縮小像 換配置後回到觀察階段，標記與作圖線都清空
   PASS  [desktop] 配置C·放大像 開始觀察：畫面上沒有鬼本體
   PASS  [desktop] 配置C·放大像 開始觀察：DOM／文字／Debug 圖層沒有答案
@@ -1449,7 +1668,7 @@
   PASS  [desktop] 配置C·放大像 畫線模式下點地板格：不選格、不畫線
   PASS  [desktop] 配置C·放大像 線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）
   PASS  [desktop] 配置C·放大像 線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）  — P.y=65.000
-  PASS  [desktop] 配置C·放大像 線 3：過 P 的平行線；與光心線的交點 = 物點  — 誤差 1.1e-13 cm
+  PASS  [desktop] 配置C·放大像 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 1.1e-13 cm
   PASS  [desktop] 配置C·放大像 學生作圖的交點落在唯一一格的中央附近  — 格 10，離格線 0.50 格
   PASS  [desktop] 配置C·放大像 畫完三條線：畫面上沒有鬼本體
   PASS  [desktop] 配置C·放大像 畫完三條線：DOM／文字／Debug 圖層沒有答案
@@ -1457,15 +1676,26 @@
   PASS  [desktop] 配置C·放大像 ＋ 按鈕放大  — 1.50×
   PASS  [desktop] 配置C·放大像 放大後單指拖曳可平移  — Δx=90px
   PASS  [desktop] 配置C·放大像 拖曳平移不會畫線／選格／改變縮放／移動透鏡
-  PASS  [desktop] 配置C·放大像 從吸附點上開始的斜向拖曳不會被當成畫線
+  PASS  [desktop] 配置C·放大像 從標示點斜向拖到空白處放開：不留線、不算點擊
   PASS  [desktop] 配置C·放大像 「全圖」回到預設視圖
-  PASS  [desktop] 配置C·放大像 從標示點橫向拖曳：拖曳中出現平行線預覽，還沒有真的畫線
-  PASS  [desktop] 配置C·放大像 放開手指：留下通過該點、平行主光軸的線
-  PASS  [desktop] 配置C·放大像 拉平行線時畫面不會跟著平移
-  PASS  [desktop] 配置C·放大像 「復原」可以拿掉拖出來的平行線
-  PASS  [desktop] 配置C·放大像 橫向拖曳後又拉到別處：平行線取消，放開不留線
-  PASS  [desktop] 配置C·放大像 從標示點斜向拖曳不會畫線
-  PASS  [desktop] 配置C·放大像 選格封印模式下，橫向拖曳不會畫線
+  PASS  [desktop] 配置C·放大像 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [desktop] 配置C·放大像 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [desktop] 配置C·放大像 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [desktop] 配置C·放大像 從標示點拖曳時畫面不會跟著平移
+  PASS  [desktop] 配置C·放大像 「復原」可以拿掉拖出來的水平線
+  PASS  [desktop] 配置C·放大像 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [desktop] 配置C·放大像 放開：留下通過起點、精確垂直的線
+  PASS  [desktop] 配置C·放大像 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [desktop] 配置C·放大像 「復原」可以拿掉拖出來的垂直線
+  PASS  [desktop] 配置C·放大像 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [desktop] 配置C·放大像 虛線時放開：線消失，不留線
+  PASS  [desktop] 配置C·放大像 斜向拖曳也不會平移畫面
+  PASS  [desktop] 配置C·放大像 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [desktop] 配置C·放大像 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [desktop] 配置C·放大像 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [desktop] 配置C·放大像 「復原」可以拿掉拖出來的連線
+  PASS  [desktop] 配置C·放大像 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [desktop] 配置C·放大像 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
   PASS  [desktop] 配置C·放大像 封印模式下點擊不會畫線
   PASS  [desktop] 配置C·放大像 點地板格可選取（透鏡所在的第 7 格）
   PASS  [desktop] 配置C·放大像 封印透鏡所在格 → 失敗
@@ -1490,7 +1720,7 @@
   PASS  [desktop] 配置C·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [desktop] 配置C·放大像 光路重現：畫面上方有說明文字框
   PASS  [desktop] 配置C·放大像 光路重現：結束時標出像點  — 32 px（重現前 16）
-  PASS  [desktop] 配置C·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [desktop] 配置C·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 40 次
   PASS  [desktop] 沒有 JS 錯誤
 
-ALL PASS: 1494/1494 checks
+ALL PASS: 1724/1724 checks
