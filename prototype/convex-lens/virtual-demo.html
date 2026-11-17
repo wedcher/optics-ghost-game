@@ -27,11 +27,6 @@
 <div class="bar">
   <label>題目</label>
   <select id="preset"></select>
-  <label>透鏡範圍</label>
-  <select id="range">
-    <option value="full">整條走廊（鬼和布幕之間）</option>
-    <option value="inF">只在鬼和焦點之間</option>
-  </select>
   <span class="seg"><button id="viewScreen" type="button" class="on">看布幕</button><button id="viewLens" type="button">看凸透鏡</button></span>
   <button id="markBtn" class="primary" type="button">標記</button>
   <button id="rayBtn" type="button" class="on">顯示鬼和光線（示範用）</button>
@@ -70,21 +65,23 @@
   PRESETS.forEach(function (p, i) { var o = document.createElement('option'); o.value = i; o.textContent = p.name; $('preset').appendChild(o); });
 
   function lensRange() {
-    var p = st.p, lo = Math.max(LENS_MIN, st.ox + 20), hi = LENS_MAX;
-    if ($('range').value === 'inF') hi = Math.min(hi, st.ox + p.f - 15);
-    return [lo, hi];
+    // 每一題都一樣（和正式關卡相同）：透鏡可以越過鬼，玩家不能從「拉不過去」猜出題型
+    return [LENS_MIN, LENS_MAX];
   }
   function clampLens(x) { var r = lensRange(); return Math.max(r[0], Math.min(r[1], x)); }
 
   function load(i) {
     $('preset').value = String(i); st.p = PRESETS[i]; st.ox = -(st.p.cell - 0.5) * 100; st.mark = null; st.lines = []; st.seal = null;
-    var r = lensRange(); st.lens = Math.round((r[0] + r[1]) / 2);
+    // 起始位置：和正式關卡一樣從固定的幾個候選位置挑，挑在鬼的右邊、布幕上又不是清楚的像
+    var cands = [-350, -200, -500, -120, -600];
+    st.lens = cands.filter(function (x) { st.lens = x; var o = optics(); return x - st.ox >= 30 && !o.sharpOnScreen; })[0] || -350;
     say(''); update();
   }
 
   // 成像：u 物距、v 像距（正＝實像在透鏡右邊；負＝虛像在左邊）、m 放大率
   function optics() {
     var f = st.p.f, u = st.lens - st.ox, out = { u: u, f: f };
+    if (u <= 5) { out.inf = true; out.behind = true; return out; } // 透鏡在鬼的後面：鬼的光不會穿過透鏡到布幕這邊
     if (Math.abs(u - f) < 0.5) { out.inf = true; return out; }
     out.v = u * f / (u - f); out.m = -out.v / u; out.x = st.lens + out.v; out.y = out.m * st.p.h;
     out.real = out.v > 0;
@@ -106,7 +103,8 @@
 
   function update() {
     var o = optics(), p = st.p, t;
-    if (o.inf) t = '物距 = 焦距：光線出透鏡後平行，不成像。';
+    if (o.behind) t = '透鏡在鬼的後面（鬼在透鏡和你之間）：鬼的光不會穿過透鏡到你這邊，透鏡裡看不到鬼的像，布幕上也沒有。';
+    else if (o.inf) t = '物距 = 焦距：光線出透鏡後平行，不成像。';
     else {
       t = '物距 ' + Math.round(o.u) + '、焦距 ' + p.f + ' → ';
       t += o.real ? '實像（倒立）在透鏡右邊 ' + Math.round(o.v) + ' cm' + (o.sharpOnScreen ? '（剛好落在布幕上）' : o.x > 0 ? '（在布幕後面）' : '') + '，放大率 ' + Math.abs(o.m).toFixed(2)
@@ -263,7 +261,7 @@
       ctx.save(); ctx.strokeStyle = 'rgba(200,205,230,.8)'; ctx.setLineDash([4, 3]); ctx.lineWidth = 1.5;
       ghostPath(rx, ry, HW / (-st.ox) * K, HH / (-st.ox) * K, 1, 1); ctx.stroke(); ctx.restore();
       text('對照：不用透鏡直接看鬼的大小', panel.x + 8, panel.y + panel.h - 8, '#aab3e6', 'left');
-      text(lensLabel ? lensLabel[0] : (o.inf ? '' : '模糊，看不清楚'), cx, panel.y + 36, lensLabel ? lensLabel[1] : '#8f98c9');
+      text(lensLabel ? lensLabel[0] : (o.behind ? '看不到鬼的像' : o.inf ? '' : '模糊，看不清楚'), cx, panel.y + 36, lensLabel ? lensLabel[1] : '#8f98c9');
     }
     ctx.restore();
   }
@@ -346,7 +344,6 @@
   $('left').addEventListener('click', function () { moveLens(st.lens - 10); });
   $('right').addEventListener('click', function () { moveLens(st.lens + 10); });
   $('preset').addEventListener('change', function () { load(Number(this.value)); });
-  $('range').addEventListener('change', function () { st.lens = clampLens(st.lens); st.mark = null; say(''); update(); });
   function setView(v) { if (st.view === v) return; st.view = v; st.mark = null; say(''); update(); }
   $('viewScreen').addEventListener('click', function () { setView('screen'); });
   $('viewLens').addEventListener('click', function () { setView('lens'); });
