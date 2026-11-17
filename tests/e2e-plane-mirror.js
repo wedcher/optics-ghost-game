@@ -140,6 +140,8 @@ async function levelFlow(profile, browser) {
   ok(s.intact.join() === 'back,right', '兩面鏡都完好');
   ok(await page.evaluate(() => window.__protoMirror.pools[1].some((c) => window.__protoMirror.core.cellId(c.col, c.row) === window.__protoMirror.core.cellId(window.__protoMirror.state.ghost.col, window.__protoMirror.state.ghost.row))), '鬼在雙鏡出題格內', s.ghost);
   ok(s.images.back && s.images.right, '兩面鏡裡都有鬼的像');
+  const sides = await page.evaluate(() => { const m = window.__protoMirror; return [m.ghostSide([]), m.ghostSide(['back']), m.ghostSide(['right']), m.ghostSide(['back', 'right'])]; });
+  ok(sides.join() === 'front,back,front,back', '鬼面向玩家：直接看與右鏡是正面，正面鏡（與穿過正面鏡的二次像）是背面', sides.join());
   let px = await pixels();
   ok(px.ghostIn > 0 && px.ghostOut === 0, '鬼只出現在鏡子裡，房間裡看不到', JSON.stringify(px));
   ok(s.castDisabled, '還沒選格時不能施放');
