@@ -19,6 +19,10 @@
   a.card:active { background:#232a4d; }
   a.card strong { display:block; font-size:18px; margin-bottom:4px; }
   a.card span { color:#9aa3cf; font-size:14px; line-height:1.5; }
+  a.card.locked { opacity:.42; filter:grayscale(1); cursor:not-allowed; }
+  a.card .lock { display:none; color:#ffd166; font-size:14px; margin-top:6px; }
+  a.card.locked .lock { display:block; }
+  #resetBtn { display:block; width:100%; min-height:48px; margin-top:8px; font:inherit; font-size:15px; color:#e8ebff; background:#232a4d; border:1px solid #3b4478; border-radius:12px; cursor:pointer; }
   .todo { padding:16px; border:1px dashed #3b4478; border-radius:14px; color:#9aa3cf; font-size:14px; }
 </style>
 </head>
@@ -34,11 +38,11 @@
     <strong>平面鏡 — 自由練習（開發用）</strong>
     <span>沒有過場、不計命；可指定鏡子數與鬼的位置、開 Debug。</span>
   </a>
-  <a class="card" href="concave-lens/index.html">
+  <a class="card" href="concave-lens/index.html" data-level="concave" data-need="第二關">
     <strong>凹透鏡 — 荒野</strong>
     <span>轉向四周，舉起凹透鏡找出鬼的縮小虛像，標記後切到側視圖，用主光線反推鬼本體。</span>
   </a>
-  <a class="card" href="convex-lens/index.html">
+  <a class="card" href="convex-lens/index.html" data-level="convex" data-need="第一關">
     <strong>第二關：凸透鏡 — 走廊</strong>
     <span>3 條命內抓到 5 隻鬼。移動凸透鏡，讓布幕上出現清楚的倒立實像，標記後用主光線反推鬼本體。</span>
   </a>
@@ -46,8 +50,26 @@
     <strong>凸透鏡 — 自由練習（開發用）</strong>
     <span>沒有過場、不計命；可指定配置、開 Debug。</span>
   </a>
+  <button id="resetBtn" type="button">重新開始遊戲（清除過關紀錄）</button>
 </main>
 <script src="shared/landscape.js"></script>
 <script src="shared/install-hint.js"></script>
+<script src="shared/progress.js"></script>
+<script>
+// 關卡鎖定：前一關過關前，後面的關卡反白、不能進去。網址加 ?unlock=1 可暫時全部解鎖（老師／開發用）。
+(function () {
+  var P = window.GameProgress, all = /[?&]unlock=1/.test(location.search);
+  document.querySelectorAll('a.card[data-level]').forEach(function (a) {
+    var note = document.createElement('span'); note.className = 'lock'; note.textContent = '🔒 先通過' + a.getAttribute('data-need') + '才能進入';
+    a.appendChild(note);
+    if (all || P.isUnlocked(a.getAttribute('data-level'))) return;
+    a.classList.add('locked'); a.setAttribute('aria-disabled', 'true');
+    a.addEventListener('click', function (e) { e.preventDefault(); });
+  });
+  document.getElementById('resetBtn').addEventListener('click', function () {
+    if (window.confirm('清除這台裝置上的過關紀錄，從第一關重新開始？')) { P.reset(); location.reload(); }
+  });
+})();
+</script>
 </body>
 </html>

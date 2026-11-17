@@ -886,6 +886,7 @@
   }
   function showCleared() {
     level.screen = 'cleared';
+    if (window.GameProgress) window.GameProgress.markCleared('convex');
     closeScene();
     level.scene = window.StoryScene.show({
       id: 'cleared', background: INTRO_BG, scatter: 7,
@@ -894,7 +895,7 @@
         { speaker: '你', text: '想跑？追！' }
       ],
       title: '第二關過關！',
-      note: '你在走廊封印了 ' + level.sealed + ' 隻鬼。下一站：城外的荒野。（原型階段：關卡解鎖尚未接上）',
+      note: '你在走廊封印了 ' + level.sealed + ' 隻鬼。下一站：城外的荒野（已解鎖）。',
       buttons: [
         { id: 'clearMenuBtn', label: '回關卡選單', primary: true, href: MENU_URL },
         { id: 'againBtn', label: '再玩一次', onClick: startHunt }
@@ -1011,6 +1012,7 @@
   });
   $('modeDraw').addEventListener('click', function () { state.mode = 'draw'; setStatus('畫線模式：點標示點來畫線。此模式下不會選到地板格。'); syncUI(); requestRender(); });
   $('modeSeal').addEventListener('click', function () { state.mode = 'seal'; state.pending = null; setStatus('封印模式：點一個地板格（整個直欄都可點），再按「施放封印法陣」。'); syncUI(); requestRender(); });
+  $('menuBtn').addEventListener('click', function () { if (window.confirm('回到關卡選單？這一關目前的進度不會保留。')) location.href = '../index.html'; });
   $('toolLine').addEventListener('click', function () { setStatus('連線：從標示點拖到另一個點；拉成水平或垂直也會吸附。虛線放開會消失。也可以依序點兩個點。'); });
   $('undoBtn').addEventListener('click', function () { if (state.pending) state.pending = null; else state.lines.pop(); syncUI(); requestRender(); });
   $('clearBtn').addEventListener('click', function () { state.lines = []; state.pending = null; setStatus('已清除所有線。'); syncUI(); requestRender(); });

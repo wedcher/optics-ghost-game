@@ -521,7 +521,7 @@
   PASS  [desktop] 配置A 光路重現：畫面上方有說明文字框
   PASS  [desktop] 配置A 光路重現：結束時標出像點  — 32 px（重現前 15）
   PASS  [desktop] 配置A 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [desktop] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 23 次
+  PASS  [desktop] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [desktop] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
   PASS  [desktop] 配置A 關閉 Debug 後面板清空
   PASS  [desktop] 配置C 裸眼畫面沒有鬼

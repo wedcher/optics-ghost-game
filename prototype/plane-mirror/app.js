@@ -691,6 +691,7 @@
     });
   }
   function showClear() {
+    if (window.GameProgress) window.GameProgress.markCleared('mirror'); // 過關紀錄：解鎖第二關（入口頁用）
     scene = window.StoryScene.show({
       id: 'clear', background: 'assets/room-broken.jpg',
       lines: [
