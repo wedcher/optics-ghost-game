@@ -507,7 +507,7 @@
         var ip = w2s({ x: 0, y: state.marker.y });
         ctx.save(); ctx.globalAlpha = 0.7 * Math.min(1, (tau - spec.imageAt) / 0.5);
         ctx.fillStyle = GHOST_COLOR;
-        ghostPath(ctx, ip.x - ihw - 4, ip.y, ihw, ihh, 1, -1); // 倒立的實像
+        ghostPath(ctx, ip.x - ihw - 4, ip.y, ihw, ihh, -1, -1); // 倒立實像：上下、左右都相反（和布幕正面視圖、課本一致）
         ctx.fill('evenodd');
         ctx.restore();
       }
