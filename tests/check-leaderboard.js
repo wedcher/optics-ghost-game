@@ -55,7 +55,31 @@ ok(r.castle.rank === 14, '榜外的人也會拿到名次', r);
 g = loadGas();
 r = post(g, { name: '  <b>超級 長 的 暱稱一二三四五六七</b>  ', hunt: 1 });
 const nm = g.get().hunt[0].name;
-ok(r.ok && !/[<>]/.test(nm) && Array.from(nm).length <= 10, '暱稱去掉 <> 並截到 10 字', nm);
+const W = (x) => Array.from(x).reduce((a, c) => a + (c.charCodeAt(0) <= 0xff ? 1 : 2), 0);
+ok(r.ok && !/[<>]/.test(nm) && W(nm) <= 20, '暱稱去掉 <> 並截到寬度 20（中文 10 字）', nm);
+
+// 長度：中文 10 字、英文 20 字
+g = loadGas();
+post(g, { name: '一二三四五六七八九十十一', hunt: 1 });
+ok(g.get().hunt[0].name === '一二三四五六七八九十', '中文截到 10 字', g.get().hunt[0].name);
+g = loadGas();
+post(g, { name: 'abcdefghijklmnopqrstuvwxyz', hunt: 1 });
+ok(g.get().hunt[0].name === 'abcdefghijklmnopqrst', '英文截到 20 字', g.get().hunt[0].name);
+g = loadGas();
+post(g, { name: '小明abcdefghijklmnopq', hunt: 1 });
+ok(g.get().hunt[0].name === '小明abcdefghijklmnop', '中英混合用寬度算（中文 2、英文 1）', g.get().hunt[0].name);
+
+// 不雅字詞
+g = loadGas();
+['幹你娘', '靠北啦', '王 八 蛋', '白痴123', 'FUCK', 'Ｆｕｃｋ', 'f.u.c.k', 'sh1t', 'b!tch', '你媽的'].forEach((n) => {
+  const res = post(g, { name: n, hunt: 1 });
+  ok(!res.ok && /不能用/.test(res.error), '擋下不雅暱稱：' + n, res);
+});
+ok(g.get().hunt.length === 0, '被擋的暱稱不留紀錄');
+['能幹的小明', '幹部', '操場', 'Cassie', 'class 701', '小白', '阿智', 'Dickson', '87'].forEach((n) => {
+  ok(post(g, { name: n, hunt: 1 }).ok, '正常暱稱不誤擋：' + n);
+});
+
 ok(post(g, { name: 'ＡＢＣ', hunt: 2 }).ok && g.get().hunt.some((x) => x.name === 'ABC'), '全形英數正規化成半形');
 ok(!post(g, { name: '   ', hunt: 1 }).ok, '空白暱稱被拒');
 ok(!post(g, { hunt: 1 }).ok, '沒有暱稱被拒');

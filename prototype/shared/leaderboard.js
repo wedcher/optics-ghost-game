@@ -19,7 +19,7 @@
 (function (root) {
   'use strict';
 
-  var TOP = 10, NAME_MAX = 10;
+  var TOP = 10, NAME_MAX_W = 20;
   var RUN_KEY = 'ogg.run.v1', NAME_KEY = 'ogg.nickname.v1', LOCAL_KEY = 'ogg.leaderboard.local.v1';
   var BOARDS = {
     castle: { asc: true,  min: 30 * 1000, max: 24 * 3600 * 1000 },
@@ -77,11 +77,42 @@
   }
 
   // ---------- 暱稱 ----------
+  // 暱稱長度用「寬度」算：英數符號 1、中文等全形字 2，上限 NAME_MAX_W（＝中文 10 字或英文 20 字）。
+  // 不雅字詞：比對前轉小寫、常見替代字（0→o、1→i、@→a…）還原、去掉空白符號，再找清單中的字串。
+  // 清單刻意保守：會誤傷正常名字的（例如單字「幹」「操」、英文 ass）不放。前端（prototype/shared/leaderboard.js）與後端（backend/leaderboard/Code.gs）兩份要一致。
+  var BAD_WORDS = [
+    '幹你', '幹妳', '幹林', '幹恁', '操你', '操妳', '靠北', '靠杯', '靠夭', '機掰', '雞掰', '機八', '雞巴', '雞八', '機車人',
+    '王八蛋', '白癡', '白痴', '智障', '腦殘', '低能', '去死', '他媽', '你媽', '妳媽', '尼瑪', '塞恁', '三小', '淦',
+    '婊子', '賤人', '賤貨', '妓女', '屁眼', '傻逼', '傻b', '煞筆', '草泥馬', '支那',
+    'fuck', 'fuk', 'fck', 'shit', 'bitch', 'cunt', 'asshole', 'bastard', 'nigger', 'nigga', 'slut', 'whore',
+    'porn', 'penis', 'pussy', 'wtf', 'stfu'
+  ];
+  function nameWidth_(s) {
+    var w = 0, chars = Array.from ? Array.from(s) : s.split('');
+    for (var i = 0; i < chars.length; i++) w += chars[i].charCodeAt(0) <= 0xff ? 1 : 2;
+    return w;
+  }
+  function cutToWidth_(s, max) {
+    var out = '', w = 0, chars = Array.from ? Array.from(s) : s.split('');
+    for (var i = 0; i < chars.length; i++) {
+      var cw = chars[i].charCodeAt(0) <= 0xff ? 1 : 2;
+      if (w + cw > max) break;
+      out += chars[i]; w += cw;
+    }
+    return out;
+  }
+  function isBadName_(s) {
+    var t = String(s).toLowerCase()
+      .replace(/0/g, 'o').replace(/[1!|]/g, 'i').replace(/3/g, 'e').replace(/[4@]/g, 'a').replace(/[5$]/g, 's').replace(/7/g, 't')
+      .replace(/[^a-z㐀-鿿豈-﫿]/g, '');
+    for (var i = 0; i < BAD_WORDS.length; i++) if (t.indexOf(BAD_WORDS[i]) >= 0) return true;
+    return false;
+  }
   function cleanName(s) {
     if (typeof s !== 'string') return '';
     if (s.normalize) s = s.normalize('NFKC');
     s = s.replace(/[\u0000-\u001f\u007f<>"'`\\]/g, '').replace(/\s+/g, ' ').trim();
-    return Array.from(s).slice(0, NAME_MAX).join('').trim();
+    return cutToWidth_(s, NAME_MAX_W).trim();
   }
   function getNickname() { return load(NAME_KEY, ''); }
   function setNickname(n) { save(NAME_KEY, cleanName(n)); }
@@ -123,6 +154,7 @@
   function submit(opts) {
     var name = cleanName(opts && opts.name);
     if (!name) return Promise.resolve({ ok: false, error: '請輸入暱稱' });
+    if (isBadName_(name)) return Promise.resolve({ ok: false, error: '這個暱稱不能用，請換一個' });
     var entries = {};
     if (opts.castleMs != null) {
       var c = Math.round(opts.castleMs);
@@ -207,7 +239,7 @@
     if (castleMs == null) card.appendChild(el('p', { 'class': 'lb-note' }, '這一輪不是從第一關開始玩的，趕鬼時間不列入排行。'));
 
     var row = el('div', { 'class': 'lb-row' });
-    var input = el('input', { id: 'lbName', type: 'text', maxlength: String(NAME_MAX * 2), placeholder: '暱稱（最多 ' + NAME_MAX + ' 字）', autocomplete: 'nickname', enterkeyhint: 'send' });
+    var input = el('input', { id: 'lbName', type: 'text', maxlength: String(NAME_MAX_W), placeholder: '暱稱（中文 10 字、英文 20 字內）', autocomplete: 'nickname', enterkeyhint: 'send' });
     input.value = getNickname();
     var send = el('button', { 'class': 'lb-btn primary', id: 'lbSubmit', type: 'button' }, '留名上榜');
     row.appendChild(input); row.appendChild(send); card.appendChild(row);
@@ -240,7 +272,7 @@
   }
 
   root.Leaderboard = {
-    TOP: TOP, NAME_MAX: NAME_MAX, BOARDS: BOARDS,
+    TOP: TOP, NAME_MAX_W: NAME_MAX_W, BOARDS: BOARDS, nameWidth: nameWidth_, isBadName: isBadName_,
     isShared: function () { return !!url(); },
     startRun: startRun, restartRun: restartRun, finishMirror: finishMirror, finishCastle: finishCastle, recordHunt: recordHunt, getRun: getRun,
     formatTime: formatTime, cleanName: cleanName, getNickname: getNickname, setNickname: setNickname,

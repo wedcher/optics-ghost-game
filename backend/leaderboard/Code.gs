@@ -18,7 +18,7 @@
  */
 
 var TOP = 10;
-var NAME_MAX = 10;
+var NAME_MAX_W = 20;
 var BOARDS = {
   castle: { asc: true,  min: 30 * 1000, max: 24 * 3600 * 1000, integer: true },
   hunt:   { asc: false, min: 0,         max: 60,                integer: true }
@@ -40,6 +40,7 @@ function doPost(e) {
 function submit_(body) {
   var name = cleanName_(body && body.name);
   if (!name) return { ok: false, error: 'bad name' };
+  if (isBadName_(name)) return { ok: false, error: '這個暱稱不能用，請換一個' };
   var entries = {};
   var any = false;
   for (var key in BOARDS) {
@@ -63,12 +64,43 @@ function submit_(body) {
   }
 }
 
+// 暱稱長度用「寬度」算：英數符號 1、中文等全形字 2，上限 NAME_MAX_W（＝中文 10 字或英文 20 字）。
+// 不雅字詞：比對前轉小寫、常見替代字（0→o、1→i、@→a…）還原、去掉空白符號，再找清單中的字串。
+// 清單刻意保守：會誤傷正常名字的（例如單字「幹」「操」、英文 ass）不放。前端（prototype/shared/leaderboard.js）與後端（backend/leaderboard/Code.gs）兩份要一致。
+var BAD_WORDS = [
+  '幹你', '幹妳', '幹林', '幹恁', '操你', '操妳', '靠北', '靠杯', '靠夭', '機掰', '雞掰', '機八', '雞巴', '雞八', '機車人',
+  '王八蛋', '白癡', '白痴', '智障', '腦殘', '低能', '去死', '他媽', '你媽', '妳媽', '尼瑪', '塞恁', '三小', '淦',
+  '婊子', '賤人', '賤貨', '妓女', '屁眼', '傻逼', '傻b', '煞筆', '草泥馬', '支那',
+  'fuck', 'fuk', 'fck', 'shit', 'bitch', 'cunt', 'asshole', 'bastard', 'nigger', 'nigga', 'slut', 'whore',
+  'porn', 'penis', 'pussy', 'wtf', 'stfu'
+];
+function nameWidth_(s) {
+  var w = 0, chars = Array.from ? Array.from(s) : s.split('');
+  for (var i = 0; i < chars.length; i++) w += chars[i].charCodeAt(0) <= 0xff ? 1 : 2;
+  return w;
+}
+function cutToWidth_(s, max) {
+  var out = '', w = 0, chars = Array.from ? Array.from(s) : s.split('');
+  for (var i = 0; i < chars.length; i++) {
+    var cw = chars[i].charCodeAt(0) <= 0xff ? 1 : 2;
+    if (w + cw > max) break;
+    out += chars[i]; w += cw;
+  }
+  return out;
+}
+function isBadName_(s) {
+  var t = String(s).toLowerCase()
+    .replace(/0/g, 'o').replace(/[1!|]/g, 'i').replace(/3/g, 'e').replace(/[4@]/g, 'a').replace(/[5$]/g, 's').replace(/7/g, 't')
+    .replace(/[^a-z㐀-鿿豈-﫿]/g, '');
+  for (var i = 0; i < BAD_WORDS.length; i++) if (t.indexOf(BAD_WORDS[i]) >= 0) return true;
+  return false;
+}
+
 function cleanName_(s) {
   if (typeof s !== 'string') return '';
   if (s.normalize) s = s.normalize('NFKC');
   s = s.replace(/[\u0000-\u001f\u007f<>"'`\\]/g, '').replace(/\s+/g, ' ').trim();
-  var chars = Array.from ? Array.from(s) : s.split('');
-  return chars.slice(0, NAME_MAX).join('').trim();
+  return cutToWidth_(s, NAME_MAX_W).trim();
 }
 
 function validValue_(key, v) {
