@@ -25,7 +25,19 @@
     a.img.src = src;
     return a;
   }
-  var ART = { intact: loadArt('assets/room-intact.jpg'), broken: loadArt('assets/room-broken.jpg') };
+  var ART = { intact: loadArt('assets/room-intact.jpg'), broken: loadArt('assets/room-broken.jpg'), ghost: loadArt('assets/ghost.webp') };
+  // 測試用：把鬼畫成單一顏色的剪影，測試才能用顏色數「鬼出現在哪裡」（見 __protoMirror.setMask）
+  var ghostMask = null;
+  function maskImage() {
+    if (!ghostMask && ART.ghost.ready) {
+      ghostMask = document.createElement('canvas');
+      ghostMask.width = ART.ghost.img.width; ghostMask.height = ART.ghost.img.height;
+      var m = ghostMask.getContext('2d');
+      m.drawImage(ART.ghost.img, 0, 0);
+      m.globalCompositeOperation = 'source-in'; m.fillStyle = GHOST_COLOR; m.fillRect(0, 0, ghostMask.width, ghostMask.height);
+    }
+    return ghostMask;
+  }
 
   // ---------- 狀態 ----------
   var POOLS = { 1: C.eligibleCells(R, cam, ['back', 'right']), 2: C.eligibleCells(R, cam, ['back']) };
@@ -38,7 +50,7 @@
     cast: null,        // 進行中的法陣 {cell, t0, ok}
     busy: false,
     lives: R.lives, sealed: 0, over: false,
-    debug: false, fx: null, forced: null
+    debug: false, fx: null, forced: null, mask: false
   };
   var stats = { casts: 0, wrong: 0, mirrorTaps: 0, pans: 0, ghostRevealed: false, images: { back: false, right: false }, lastPick: null };
   var scene = null, history = [];
@@ -221,21 +233,52 @@
     ctx.restore();
     return (tl.depth + bl.depth) / 2;
   }
-  // 鬼的 placeholder：單位方格內的形狀，左右不對稱（一隻小手在牠自己的一側）
+  // 鬼：女鬼圖（已在裙襬切平，底邊就是地板）。圖還沒載入時先畫一個簡單的形狀。
   function ghostPainter(alpha) {
     return function () {
       ctx.globalAlpha *= alpha;
-      ctx.shadowColor = 'rgba(120,255,200,.9)'; ctx.shadowBlur = 14 * S * DPR;
+      var img = state.mask ? maskImage() : (ART.ghost.ready ? ART.ghost.img : null);
+      if (img) { ctx.drawImage(img, 0, 0, 1, 1); return; }
       ctx.fillStyle = GHOST_COLOR;
       ctx.beginPath();
-      ctx.moveTo(0.14, 0.97); ctx.lineTo(0.14, 0.33); ctx.bezierCurveTo(0.14, -0.03, 0.76, -0.03, 0.76, 0.33); ctx.lineTo(0.76, 0.97);
-      ctx.lineTo(0.655, 0.88); ctx.lineTo(0.55, 0.97); ctx.lineTo(0.45, 0.88); ctx.lineTo(0.35, 0.97); ctx.lineTo(0.245, 0.88);
-      ctx.closePath();
-      var e = function (x, y, rx, ry) { ctx.moveTo(x + rx, y); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); };
-      e(0.34, 0.30, 0.055, 0.06); e(0.56, 0.30, 0.055, 0.06); e(0.45, 0.46, 0.07, 0.04);
-      e(0.90, 0.40, 0.095, 0.062);
-      ctx.fill('evenodd');
+      ctx.moveTo(0.2, 1); ctx.lineTo(0.3, 0.3); ctx.bezierCurveTo(0.3, 0, 0.7, 0, 0.7, 0.3); ctx.lineTo(0.8, 1);
+      ctx.closePath(); ctx.fill();
     };
+  }
+  // 鬼從地板冒出來的地方：格子中央一圈暗色的漩渦。有了它才看得出牠站在哪一格。
+  // part = 'under'：畫在鬼的後面（整圈）；'over'：只畫靠近玩家的半圈邊，蓋在裙襬上。
+  function drawPool(T, cell, part, alpha) {
+    var c = C.cellCenter(cell.col, cell.row), r = R.ghost.poolRadius, pts = [], i, s, n = 36;
+    var mid = proj(T, c);
+    if (!mid) return;
+    for (i = 0; i < n; i++) {
+      s = proj(T, { x: c.x + Math.cos(i / n * 6.2832) * r, y: 0, z: c.z + Math.sin(i / n * 6.2832) * r });
+      if (!s) return;
+      pts.push(s);
+    }
+    ctx.save();
+    ctx.globalAlpha *= alpha;
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.strokeStyle = state.mask ? GHOST_COLOR : 'rgba(214,228,255,.95)';
+    ctx.lineWidth = Math.max(2, Math.min(7, 34 / mid.depth));
+    if (part === 'under') {
+      path(pts); ctx.fillStyle = state.mask ? GHOST_COLOR : 'rgba(6,8,20,.82)'; ctx.fill(); ctx.stroke();
+    } else {
+      ctx.beginPath();
+      var started = false;
+      for (i = 0; i <= n; i++) {
+        s = pts[i % n];
+        if (s.depth < mid.depth) { if (started) ctx.lineTo(s.x, s.y); else { ctx.moveTo(s.x, s.y); started = true; } }
+        else started = false;
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function drawGhost(T, alpha) {
+    drawPool(T, state.ghost, 'under', alpha);
+    drawSprite(T, C.ghostQuad(R, state.ghost), ghostPainter(alpha));
+    drawPool(T, state.ghost, 'over', alpha);
   }
   function playerPainter() {
     ctx.fillStyle = 'rgba(14,12,18,.9)';
@@ -274,11 +317,11 @@
       path(p); ctx.strokeStyle = '#b8873a'; ctx.lineWidth = Math.max(2, 26 / avgDepth(p) * 2.2); ctx.lineJoin = 'round'; ctx.stroke();
     });
     // 人形：遠的先畫
-    var sprites = [{ quad: playerQuad(), painter: playerPainter }];
-    if (state.ghost) sprites.push({ quad: C.ghostQuad(R, state.ghost), painter: ghostPainter(state.revealed ? 1 : 0.93) });
+    var sprites = [{ quad: playerQuad(), draw: function () { drawSprite(T, playerQuad(), playerPainter); } }];
+    if (state.ghost) sprites.push({ quad: C.ghostQuad(R, state.ghost), draw: function () { drawGhost(T, state.revealed ? 1 : 0.95); } });
     sprites.forEach(function (s) { var q = proj(T, s.quad.bl); s.d = q ? q.depth : -1; });
     sprites.sort(function (a, b) { return b.d - a.d; });
-    sprites.forEach(function (s) { if (s.d > 0) drawSprite(T, s.quad, s.painter); });
+    sprites.forEach(function (s) { if (s.d > 0) s.draw(); });
     // 玻璃的一點反光（第一層才加）
     if (chain.length === 1) {
       var bb = bounds(clip), gr = ctx.createLinearGradient(bb.x0, bb.y0, bb.x1, bb.y1);
@@ -377,7 +420,7 @@
       drawMagicCircle(state.cast.cell, alpha, 1 - Math.pow(1 - grow, 3), now / 900);
       if (state.cast.ok || t < CAST_GROW + CAST_FADE) animating = true;
     }
-    if (state.revealed && state.ghost) drawSprite(C.IDENTITY, C.ghostQuad(R, state.ghost), ghostPainter(1));
+    if (state.revealed && state.ghost) drawGhost(C.IDENTITY, 1);
 
     if (state.debug) drawDebug();
     if (flash > 0) { ctx.fillStyle = 'rgba(255,255,255,' + flash.toFixed(3) + ')'; ctx.fillRect(0, 0, IW, IH); }
@@ -609,7 +652,7 @@
   }
   function showClear() {
     scene = window.StoryScene.show({
-      id: 'clear', background: 'assets/room-broken.jpg', scatter: 1,
+      id: 'clear', background: 'assets/room-broken.jpg',
       lines: [
         { text: '鬼被抓了五次，再也待不住了——' },
         { text: '牠尖叫著衝出房門，逃進了走廊！' },
@@ -659,7 +702,8 @@
     state: state, stats: stats, room: R, core: C, cam: cam, FREE: FREE, pools: POOLS, selectable: SELECTABLE, GHOST_COLOR: GHOST_COLOR,
     intactMirrors: intactMirrors, render: render,
     scene: function () { return scene ? scene.info() : null; },
-    art: function () { return { intact: ART.intact.ready, broken: ART.broken.ready }; },
+    art: function () { return { intact: ART.intact.ready, broken: ART.broken.ready, ghost: ART.ghost.ready }; },
+    setMask: function (on) { state.mask = !!on; render(); },
     canvasInfo: function () { return { W: W, H: H, DPR: DPR, S: S, OX: OX, OY: OY, zoom: ZOOMS[view.zoom] }; },
     // 影像座標 → 網頁座標（測試用來算該點哪裡）
     toClient: function (p) { var r = canvas.getBoundingClientRect(); return { x: r.left + OX + p.x * S, y: r.top + OY + p.y * S }; },
