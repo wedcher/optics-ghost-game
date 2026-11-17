@@ -14,7 +14,7 @@
   #topbar { display:flex; align-items:center; gap:8px; padding:6px 8px; background:var(--panel); border-bottom:1px solid var(--line); }
   #topbar h1 { font-size:14px; margin:0; flex:1 1 auto; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:600; }
   #topbar h1 small { color:var(--dim); font-weight:400; }
-  select, button { font:inherit; color:var(--text); background:#232a4d; border:1px solid #3b4478; border-radius:10px; min-height:46px; padding:4px 10px; font-size:15px; }
+  select, button { font:inherit; color:var(--text); background:#232a4d; border:1px solid #3b4478; border-radius:10px; min-height:46px; padding:4px 10px; font-size:16px; }
   button { cursor:pointer; user-select:none; -webkit-user-select:none; touch-action: manipulation; }
   button:active { background:#34407a; }
   button:disabled { opacity:.38; cursor:default; }
@@ -27,32 +27,40 @@
   @keyframes hudHit { 0%,100% { transform:translateX(0); } 20% { transform:translateX(-5px); } 40% { transform:translateX(5px); } 60% { transform:translateX(-3px); } 80% { transform:translateX(3px); } }
   #debugBtn { min-height:40px; font-size:13px; padding:2px 8px; }
   #configSel { min-height:40px; font-size:14px; }
-  #status { padding:6px 10px; font-size:14px; line-height:1.35; min-height:3.2em; background:#12152a; border-bottom:1px solid var(--line); display:flex; align-items:center; }
+  #status { padding:6px 10px; font-size:15px; line-height:1.35; min-height:3.2em; background:#12152a; border-bottom:1px solid var(--line); display:flex; align-items:center; }
   #stage { position:relative; min-height:0; overflow:hidden; background:#000; }
   #view { position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:none; }
   #zoomBox { position:absolute; right:8px; bottom:8px; display:flex; flex-direction:column; gap:6px; }
   #zoomBox button { width:50px; height:50px; min-height:50px; padding:0; font-size:22px; background:rgba(35,42,77,.92); }
   #zoomBox #zoomFit { font-size:13px; }
   #debugPanel { position:absolute; left:6px; top:6px; max-width:min(92%, 330px); font:11px/1.45 ui-monospace, Menlo, Consolas, monospace; background:rgba(0,0,0,.72); color:#9dffb0; border:1px solid #2f7a45; border-radius:6px; padding:6px 8px; pointer-events:none; white-space:pre-wrap; }
-  #banner { position:absolute; left:50%; top:10px; transform:translateX(-50%); width:min(92%, 430px); background:rgba(20,16,40,.94); border:1px solid #b980ff; border-radius:12px; padding:10px 12px; font-size:14px; line-height:1.45; pointer-events:none; text-align:center; transition:opacity .4s; }
+  #banner { position:absolute; left:50%; top:10px; transform:translateX(-50%); width:min(92%, 430px); background:rgba(20,16,40,.94); border:1px solid #b980ff; border-radius:12px; padding:10px 12px; font-size:15px; line-height:1.45; pointer-events:none; text-align:center; transition:opacity .4s; }
   #controls { background:var(--panel); border-top:1px solid var(--line); padding:6px 6px calc(6px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:6px; }
   .row { display:flex; gap:6px; flex-wrap:wrap; }
   .row > button { flex:1 1 0; min-width:60px; padding:4px 6px; }
   /* 橫放的手機：高度很少，把兩排控制項併成一排、狀態列縮成一行 */
   @media (max-height: 480px) {
     #topbar { padding:3px 8px; }
-    #status { min-height:0; padding:4px 10px; font-size:13px; }
+    #status { min-height:0; padding:4px 10px; font-size:15px; }
     #exploreControls, #analysisControls { display:flex; gap:6px; }
     #exploreControls > .row, #analysisControls > .row { flex:1 1 0; margin-top:0 !important; flex-wrap:nowrap; }
     #exploreControls > .row:last-child { flex:0 0 190px; }
-    .row > button { min-width:44px; padding:4px 2px; font-size:14px; }
+    .row > button { min-width:44px; padding:4px 2px; font-size:15px; }
     #zoomBox { flex-direction:row; }
-    #banner { font-size:12px; padding:6px 10px; width:min(70%, 520px); }
+    #banner { font-size:14px; padding:6px 10px; width:min(70%, 520px); }
   }
   /* 凸透鏡：布幕與實像標記在畫面右側。標記在下半部時縮放鈕放右上；
      標記在上半部（鬼在主光軸下方的配置）時改放右下（app.js 加上 .low），才不會蓋住標記。 */
   #zoomBox { top:8px; bottom:auto; }
   #zoomBox.low { top:auto; bottom:8px; }
+  /* 關卡模式、畫面夠寬時：說明文字併到愛心右邊，同一列（原本愛心後面整列空著），省下一列高度給畫面 */
+  @media (min-width: 560px) {
+    #app.lvl { grid-template-columns:auto minmax(0,1fr); grid-template-rows:auto minmax(0,1fr) auto; }
+    #app.lvl #topbar { grid-column:1; grid-row:1; padding-right:4px; }
+    #app.lvl #hud { flex:0 0 auto; white-space:nowrap; }
+    #app.lvl #status { grid-column:2; grid-row:1; min-height:0; background:var(--panel); padding:4px 12px 4px 8px; }
+    #app.lvl #stage, #app.lvl #controls { grid-column:1 / -1; }
+  }
   [hidden] { display:none !important; }
 </style>
 </head>

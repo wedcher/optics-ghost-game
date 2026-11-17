@@ -53,6 +53,7 @@
   };
   var stats = { frame: 0, ghostRevealed: false, debugDrawn: false, blur: null };
   var W = 300, H = 300, DPR = 1;
+  var FS = 1; // 畫布文字的放大倍率：畫布短邊小（手機）時放大，見 resize
 
   function cfg() { return Cfg.all[state.cfgIndex]; }
 
@@ -133,7 +134,7 @@
   // ====================================================================
 
   function label(text, x, y, color, align) {
-    ctx.save(); ctx.font = '600 13px system-ui, sans-serif'; ctx.textAlign = align || 'center'; ctx.textBaseline = 'middle';
+    ctx.save(); ctx.font = '600 ' + Math.round(13 * FS) + 'px system-ui, sans-serif'; ctx.textAlign = align || 'center'; ctx.textBaseline = 'middle';
     ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(8,10,24,.9)'; ctx.strokeText(text, x, y);
     ctx.fillStyle = color; ctx.fillText(text, x, y); ctx.restore();
   }
@@ -367,7 +368,7 @@
         }
         ctx.strokeStyle = '#8b98d8'; ctx.lineWidth = 1.5; ctx.strokeRect(x0, b.y, x1 - x0, tileH);
         if (x1 - x0 >= 18) {
-          ctx.font = (x1 - x0 >= 30 ? '12px' : '10px') + ' system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.font = Math.round((x1 - x0 >= 30 ? 12 : 10) * FS) + 'px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
           ctx.fillStyle = state.selectedCell === i ? '#201500' : '#aab3e6';
           ctx.fillText(String(i), (x0 + x1) / 2, b.y + tileH / 2);
         }
@@ -432,7 +433,7 @@
         ctx.beginPath(); ctx.ellipse(L.x, L.y, Math.max(3, 9 * s), WORLD.lensRadius * s, 0, 0, 7); ctx.fill(); ctx.stroke();
       }
       // 拖曳提示
-      ctx.fillStyle = '#9fd8ff'; ctx.font = '600 13px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#9fd8ff'; ctx.font = '600 ' + Math.round(13 * FS) + 'px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText('◀ 凸透鏡 ▶', L.x, b.y + tileH + 10 * s + 12);
     }
 
@@ -564,18 +565,22 @@
   function replaySpec() {
     var c = cfg(), o = c.object, lx = state.lensX;
     var P = { x: lx, y: o.y }, O = { x: lx, y: 0 }, I = { x: 0, y: state.marker ? state.marker.y : 0 };
+    // 第三條主光線：通過物側焦點 F，打在透鏡上的 Q，折射後平行主光軸（Q 的高度 = 像高）
+    var Fo = { x: lx - c.f, y: 0 }, Q = { x: lx, y: o.y + ((Fo.y - o.y) / (Fo.x - o.x)) * (lx - o.x) };
     return {
       duration: 3.2, imageAt: 2.2,
       segments: [
         { a: o, b: P, start: 0, end: 1.0, kind: 'ray' },
         { a: o, b: O, start: 0, end: 1.0, kind: 'ray' },
         { a: P, b: I, start: 1.0, end: 2.2, kind: 'ray' },
-        { a: O, b: I, start: 1.0, end: 2.2, kind: 'ray' }
+        { a: O, b: I, start: 1.0, end: 2.2, kind: 'ray' },
+        { a: o, b: Q, start: 0, end: 1.0, kind: 'ray' },
+        { a: Q, b: { x: 0, y: Q.y }, start: 1.0, end: 2.2, kind: 'ray' }
       ],
       points: [{ p: I, start: 2.2 }],
       captions: [
-        { start: 0, text: '鬼身上發出兩條光線' },
-        { start: 1.0, text: '經過凸透鏡：平行的那條折向焦點 F′，過光心的直走' },
+        { start: 0, text: '鬼身上發出三條光線' },
+        { start: 1.0, text: '經過凸透鏡：平行的折向焦點 F′，過光心的直走，過焦點 F 的變平行' },
         { start: 2.2, text: '實際光路 → 光線會聚 → 實像位置' }
       ]
     };
@@ -807,6 +812,7 @@
     // 關卡模式：左上角是愛心與封印數；配置選單與 Debug 是開發工具，只在 ?free=1 出現
     $('title').hidden = level.on; $('configSel').hidden = level.on; $('debugBtn').hidden = level.on;
     $('hud').hidden = !level.on;
+    $('app').classList.toggle('lvl', level.on);
     if (level.on) {
       var hearts = $('hearts').children;
       for (var hi = 0; hi < hearts.length; hi++) hearts[hi].classList.toggle('lost', hi >= level.lives);
@@ -943,6 +949,7 @@
     var r = $('stage').getBoundingClientRect();
     W = Math.max(50, Math.round(r.width)); H = Math.max(50, Math.round(r.height));
     DPR = Math.min(window.devicePixelRatio || 1, 3);
+    FS = Math.min(W, H) < 420 ? 1.25 : 1;
     canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
     if (state.phase === 'analysis') {
       var center = state.view.s ? s2w({ x: W / 2, y: H / 2 }) : { x: 0, y: 0 };

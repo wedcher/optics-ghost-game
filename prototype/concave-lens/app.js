@@ -51,6 +51,7 @@
   };
   var stats = { frame: 0, ghostInLens: false, ghostRevealed: false, debugDrawn: false };
   var W = 300, H = 300, DPR = 1;
+  var FS = 1; // 畫布文字的放大倍率：畫布短邊小（手機）時放大，見 resize
 
   function cfg() { return Cfg.all[state.cfgIndex]; }
 
@@ -414,7 +415,7 @@
     ctx.moveTo(x, y - 19); ctx.lineTo(x, y - 7); ctx.moveTo(x, y + 7); ctx.lineTo(x, y + 19); ctx.stroke();
     ctx.fillStyle = MARK_COLOR; ctx.beginPath(); ctx.arc(x, y, 2.5, 0, 7); ctx.fill();
     if (withLabel) {
-      ctx.font = '600 12px system-ui, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.font = '600 ' + Math.round(12 * FS) + 'px system-ui, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
       ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,.8)'; ctx.strokeText('虛像標記', x + 22, y - 16);
       ctx.fillText('虛像標記', x + 22, y - 16);
     }
@@ -513,7 +514,7 @@
   }
 
   function label(text, x, y, color, align) {
-    ctx.save(); ctx.font = '600 13px system-ui, sans-serif'; ctx.textAlign = align || 'center'; ctx.textBaseline = 'middle';
+    ctx.save(); ctx.font = '600 ' + Math.round(13 * FS) + 'px system-ui, sans-serif'; ctx.textAlign = align || 'center'; ctx.textBaseline = 'middle';
     ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(8,10,24,.9)'; ctx.strokeText(text, x, y);
     ctx.fillStyle = color; ctx.fillText(text, x, y); ctx.restore();
   }
@@ -575,7 +576,7 @@
       }
       ctx.strokeStyle = '#8b98d8'; ctx.lineWidth = 1.5; ctx.strokeRect(x0, fl.y, x1 - x0, tileH);
       if (x1 - x0 >= 18) {
-        ctx.font = (x1 - x0 >= 30 ? '12px' : '10px') + ' system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = Math.round((x1 - x0 >= 30 ? 12 : 10) * FS) + 'px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillStyle = state.selectedCell === i ? '#201500' : '#aab3e6';
         ctx.fillText(String(i), (x0 + x1) / 2, fl.y + tileH / 2);
       }
@@ -695,6 +696,8 @@
   function replaySpec() {
     var c = cfg(), o = c.object, F = c.focal.objectSide, R = 105;
     var P = { x: 0, y: o.y }, O = { x: 0, y: 0 };
+    // 第三條主光線：對準另一側的焦點 F′ 射向透鏡，打在 Q，折射後平行主光軸；反向延長（水平）通過虛像
+    var fa = Math.abs(c.f), Q = { x: 0, y: (o.y * fa) / (fa - o.x) };
     return {
       duration: 3.8, imageAt: 2.9,
       segments: [
@@ -703,12 +706,15 @@
         { a: P, b: { x: R, y: o.y + (o.y * R) / Math.abs(c.f) }, start: 1.0, end: 1.8, kind: 'ray' },
         { a: O, b: { x: R, y: (o.y * R) / o.x }, start: 1.0, end: 1.8, kind: 'ray' },
         { a: P, b: F, start: 1.9, end: 2.9, kind: 'extension' },
-        { a: O, b: c.image, start: 1.9, end: 2.9, kind: 'extension' }
+        { a: O, b: c.image, start: 1.9, end: 2.9, kind: 'extension' },
+        { a: o, b: Q, start: 0, end: 1.0, kind: 'ray' },
+        { a: Q, b: { x: R, y: Q.y }, start: 1.0, end: 1.8, kind: 'ray' },
+        { a: Q, b: { x: c.image.x, y: Q.y }, start: 1.9, end: 2.9, kind: 'extension' }
       ],
       points: [{ p: c.image, start: 2.9 }],
       captions: [
-        { start: 0, text: '鬼身上發出兩條光線' },
-        { start: 1.0, text: '經過凹透鏡：平行的那條發散，過光心的直走' },
+        { start: 0, text: '鬼身上發出三條光線' },
+        { start: 1.0, text: '經過凹透鏡：平行的發散，過光心的直走，對準 F′ 的變平行' },
         { start: 1.9, text: '把折射後的光線反向延長（虛線）' },
         { start: 2.9, text: '實際光路 → 反向延長 → 虛像位置' }
       ]
@@ -972,6 +978,7 @@
     var r = $('stage').getBoundingClientRect();
     W = Math.max(50, Math.round(r.width)); H = Math.max(50, Math.round(r.height));
     DPR = Math.min(window.devicePixelRatio || 1, 3);
+    FS = Math.min(W, H) < 420 ? 1.25 : 1;
     canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
     if (state.phase === 'analysis') {
       // 保持目前的視圖中心

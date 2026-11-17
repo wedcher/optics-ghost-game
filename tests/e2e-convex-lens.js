@@ -585,12 +585,14 @@ async function run(profile, browser) {
         const o = c.object, O = { x: sp.lensX, y: 0 }, F2 = { x: sp.lensX + c.f, y: 0 }, I = { x: 0, y: sp.imageY }, sg = spec.segments;
         const same = (p, q) => Math.hypot(p.x - q.x, p.y - q.y) < 1e-6;
         return [
-          { ok: sg.length === 4 && sg.every((x) => x.kind === 'ray'), label: '四段都是實際光線（實像沒有延長線）' },
-          { ok: same(sg[0].a, o) && same(sg[1].a, o), label: '兩條光線都從鬼本體出發' },
+          { ok: sg.length === 6 && sg.every((x) => x.kind === 'ray'), label: '六段都是實際光線（三條主光線，實像沒有延長線）' },
+          { ok: same(sg[0].a, o) && same(sg[1].a, o) && same(sg[4].a, o), label: '三條光線都從鬼本體出發' },
           { ok: same(sg[0].b, { x: sp.lensX, y: o.y }) && same(sg[2].a, sg[0].b), label: '光線 1 平行主軸射到透鏡上的 P' },
           { ok: collinear(sg[2].a, sg[2].b, F2) < 1e-6, label: '光線 1 折射後通過像側焦點 F′', detail: '偏離 ' + collinear(sg[2].a, sg[2].b, F2).toExponential(1) + ' cm' },
           { ok: same(sg[1].b, O) && same(sg[3].a, O) && collinear(o, sg[3].b, O) < 1e-6, label: '光線 2 通過光心 O 不偏折' },
-          { ok: same(sg[2].b, I) && same(sg[3].b, I) && same(spec.points[0].p, I), label: '兩條光線在布幕上會聚於實像', detail: '(0, ' + sp.imageY.toFixed(2) + ')' }
+          { ok: Math.abs(sg[4].b.x - sp.lensX) < 1e-9 && collinear(o, sg[4].b, { x: sp.lensX - c.f, y: 0 }) < 1e-6 && same(sg[5].a, sg[4].b), label: '光線 3 通過物側焦點 F 射到透鏡', detail: '偏離 ' + collinear(o, sg[4].b, { x: sp.lensX - c.f, y: 0 }).toExponential(1) + ' cm' },
+          { ok: Math.abs(sg[5].b.y - sg[5].a.y) < 1e-9 && Math.abs(sg[4].b.y) < c.world.lensRadius, label: '光線 3 折射後平行主光軸，而且打在鏡片範圍內', detail: '高 ' + sg[4].b.y.toFixed(1) + ' cm' },
+          { ok: same(sg[2].b, I) && same(sg[3].b, I) && same(sg[5].b, I) && same(spec.points[0].p, I), label: '三條光線在布幕上會聚於實像', detail: '(0, ' + sp.imageY.toFixed(2) + ')' }
         ];
       }
     });

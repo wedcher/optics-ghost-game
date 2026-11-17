@@ -520,13 +520,16 @@ async function run(profile, browser) {
         const same = (p, q) => Math.hypot(p.x - q.x, p.y - q.y) < 1e-6;
         const col = (a, b, p) => Math.abs((b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x)) / (Math.hypot(b.x - a.x, b.y - a.y) || 1);
         return [
-          { ok: sg.length === 6 && sg.slice(0, 4).every((x) => x.kind === 'ray') && sg.slice(4).every((x) => x.kind === 'extension'), label: '四段實際光線＋兩段反向延長線' },
-          { ok: same(sg[0].a, o) && same(sg[1].a, o), label: '兩條光線都從鬼本體出發' },
+          { ok: sg.length === 9 && [0, 1, 2, 3, 6, 7].every((i) => sg[i].kind === 'ray') && [4, 5, 8].every((i) => sg[i].kind === 'extension'), label: '六段實際光線＋三段反向延長線（三條主光線）' },
+          { ok: same(sg[0].a, o) && same(sg[1].a, o) && same(sg[6].a, o), label: '三條光線都從鬼本體出發' },
           { ok: same(sg[0].b, Pt) && same(sg[2].a, Pt), label: '光線 1 平行主軸射到透鏡上的 P' },
           { ok: sg[2].b.x > 0 && col(F, Pt, sg[2].b) < 1e-6 && Math.abs(sg[2].b.y) > Math.abs(o.y), label: '光線 1 折射後發散，方向像是從物側焦點 F 射出', detail: '偏離 ' + col(F, Pt, sg[2].b).toExponential(1) + ' cm' },
           { ok: same(sg[1].b, O) && same(sg[3].a, O) && sg[3].b.x > 0 && col(o, O, sg[3].b) < 1e-6, label: '光線 2 通過光心 O 不偏折' },
           { ok: same(sg[4].a, Pt) && same(sg[4].b, F) && same(sg[5].a, O) && same(sg[5].b, c.image), label: '反向延長線：P → F、O → 虛像' },
-          { ok: col(Pt, F, c.image) < 1e-6 && col(O, o, c.image) < 1e-6 && same(spec.points[0].p, c.image), label: '兩條反向延長線交於虛像', detail: '(' + c.image.x.toFixed(2) + ', ' + c.image.y.toFixed(2) + ')' }
+          { ok: Math.abs(sg[6].b.x) < 1e-9 && col(o, sg[6].b, { x: Math.abs(c.f), y: 0 }) < 1e-6 && same(sg[7].a, sg[6].b), label: '光線 3 對準另一側焦點 F′ 射到透鏡', detail: '偏離 ' + col(o, sg[6].b, { x: Math.abs(c.f), y: 0 }).toExponential(1) + ' cm' },
+          { ok: sg[7].b.x > 0 && Math.abs(sg[7].b.y - sg[7].a.y) < 1e-9, label: '光線 3 折射後平行主光軸' },
+          { ok: same(sg[8].a, sg[6].b) && same(sg[8].b, c.image), label: '光線 3 的反向延長線（水平）通過虛像' },
+          { ok: col(Pt, F, c.image) < 1e-6 && col(O, o, c.image) < 1e-6 && same(spec.points[0].p, c.image), label: '三條反向延長線交於虛像', detail: '(' + c.image.x.toFixed(2) + ', ' + c.image.y.toFixed(2) + ')' }
         ];
       }
     });
