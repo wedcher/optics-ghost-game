@@ -390,6 +390,7 @@
   - ✅ **第三關任務卡完成（2026-11-18）**：❤️／扣命／失敗畫面、`?practice=1`、上面的 bug、封印後鬼本體是吸附點、「☰ 回關卡」。凹 e2e 742/742。細節在 `docs/prototype-findings.md` 最後一節。**還沒在實體手機上試。** 仍未做：正式荒野狩獵（5 分鐘、台詞，等 PENDING 15）、`GameProgress.markCleared('concave')`（何時算完成未定）。
 - **檔案分工（2026-11-18）**：
   - 第二關任務卡：`prototype/convex-lens/*`、`tests/e2e-convex-*.js`、`tests/check-geometry-convex.js`、`docs/prototype-findings-convex.md`。
+  - 部署排行榜後端（2026-11-18，雲端工作階段）：`prototype/shared/leaderboard-config.js`、`docs/leaderboard.md`、`PROJECT.md` 排行榜交接點。不動 `leaderboard.js`、`Code.gs`、三關程式。
   - 第二、三波開工時自己在這裡加一行。做完的把自己那行拿掉。
   - `PROJECT.md` 和 `docs/playtest-feedback-2026-11-18.md` 大家都會改：只改自己那段，收工前先 `git pull`。
 
