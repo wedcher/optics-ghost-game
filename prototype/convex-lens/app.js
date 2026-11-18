@@ -35,6 +35,9 @@
   // 第二關：3 條命內抓到 5 隻鬼（docs/story-and-flow.md）。
   // 網址加 ?free=1 是自由練習／開發模式：沒有過場、不計命，並顯示配置選單與 Debug。
   var FREE = /[?&]free=1/.test(location.search);
+  // ?practice=1 練習模式（選單「第二關：練習模式」，回饋 G4／Q2）：照關卡規則、扣命，但不計時、不上排行榜、不跑開場過場。
+  var PRACTICE = !FREE && /[?&]practice=1/.test(location.search);
+  var LB = PRACTICE ? null : window.Leaderboard;
   var LEVEL_LIVES = 3, LEVEL_GOAL = 5;
   var INTRO_BG = 'assets/intro-corridor.webp', MENU_URL = '../index.html';
   var level = { on: !FREE, screen: FREE ? 'play' : 'intro', lives: LEVEL_LIVES, sealed: 0, goal: LEVEL_GOAL, scene: null };
@@ -264,12 +267,26 @@
   }
 
   // ====================================================================
-  // 「看凸透鏡」：眼睛站在布幕這邊（X = 0），隔著透鏡往鬼的方向看。
+  // 「看透鏡」（看凸透鏡）：眼睛站在布幕這邊（X = 0），隔著透鏡往鬼的方向看。
   // 佔原本布幕那一格；鏡框最大和布幕一樣寬。畫的是鬼的「像」（不是鬼本體），
   // 位置與大小按從眼睛看的視角（y ÷ 到眼睛的距離）計算。
   // ====================================================================
 
   var VIRTUAL_COLOR = '#b7a6ff', REAL_IMG_COLOR = '#ff9ad5';
+  var VIRTUAL_CAPTION = '虛像（正立、放大）';
+  // 鏡框裡的「虛像（正立、放大）」字樣（使用者 2026-11-18 答虛像題 V2）。放在鏡片裡、和像相反的那一半，
+  // 字放不下一行就拆兩行、再不夠就縮小字（最小 11 px）。只說明像的性質，不含任何位置資訊。
+  function lensCaption(cx, cy, rad, imgUp) {
+    var lines = [VIRTUAL_CAPTION], size = Math.round(14 * FS), maxW = rad * 1.55;
+    ctx.save();
+    var fit = function () { ctx.font = '700 ' + size + 'px system-ui, sans-serif'; return lines.every(function (t) { return ctx.measureText(t).width <= maxW; }); };
+    if (!fit()) { lines = ['虛像', '（正立、放大）']; while (!fit() && size > 11) size--; }
+    var lh = size * 1.2, y0 = cy + (imgUp > 0 ? 1 : -1) * rad * 0.62 - (lines.length - 1) * lh / 2;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(8,10,24,.92)'; ctx.fillStyle = '#e7e0ff';
+    lines.forEach(function (t, i) { ctx.strokeText(t, cx, y0 + i * lh); ctx.fillText(t, cx, y0 + i * lh); });
+    ctx.restore();
+    stats.lensCaption = lines.join('');
+  }
   function renderLensView(r) {
     var c = cfg(), pad = 10;
     ctx.save();
@@ -295,6 +312,7 @@
       ctx.save(); ctx.globalAlpha = 0.78; ctx.fillStyle = virt ? VIRTUAL_COLOR : REAL_IMG_COLOR;
       ghostPath(ctx, cx, cy - (lv.y / d) * K, WORLD.ghostHalfWidth * am / d * K, WORLD.ghostHalfHeight * am / d * K, virt ? 1 : -1, virt ? 1 : -1);
       ctx.fill('evenodd'); ctx.restore();
+      if (virt) lensCaption(cx, cy, rad, lv.y / d * K); // 回饋「虛像題 V2」：鏡框裡寫出像的性質
     } else if (!state.solved && lv.eye === 'blur') {
       var gr = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
       gr.addColorStop(0, 'rgba(157,255,216,.30)'); gr.addColorStop(1, 'rgba(157,255,216,.04)');
@@ -609,8 +627,8 @@
     var sp = nearestSharp();
     var w = wallNow();
     if (!sp || !w || !(w.blurRatio <= WORLD.lockBlurRatio)) {
-      setStatus(!w ? '布幕上看不到鬼的光。移動透鏡，或改「看凸透鏡」。'
-        : w.blurRatio < 0.5 ? '快清楚了，但輪廓還有點糊。再微調一下透鏡。' : '牆上的光還是一團模糊。移動透鏡，或改「看凸透鏡」。');
+      setStatus(!w ? '布幕上看不到鬼的光。移動透鏡，或改「看透鏡」。'
+        : w.blurRatio < 0.5 ? '快清楚了，但輪廓還有點糊。再微調一下透鏡。' : '牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。');
       return;
     }
     state.lensX = sp.lensX; // 對準清晰位置（相當於自動對焦的最後一小步）
@@ -619,7 +637,9 @@
     syncUI(); requestRender();
   }
 
-  // 「看凸透鏡」時的標記：只有看到正立、放大的虛像才能標記；標記打在虛像的位置（透鏡左邊）。不自動移動透鏡。
+  // 「看透鏡」時的標記：只有看到正立、放大的虛像才能標記；標記打在虛像的位置（透鏡左邊）。不自動移動透鏡。
+  // 回饋 V4：任何看得清楚的虛像都能標記——實像題把透鏡移到鬼和焦點之間也一樣（反推都回得到鬼，check-geometry-convex 驗證）。
+  // 不能標記的只有：虛像落在走廊外，或像高超出鏡片口徑（放大太多，鏡片裡看不到整隻）。
   function markVirtual() {
     var lv = lensViewNow();
     if (lv.eye === 'virtual' && lv.markable) {
@@ -783,6 +803,8 @@
     } catch (e) { /* 沒有音效也不影響玩法 */ }
   }
 
+  // 畫線模式（「畫線」按鈕；原本的「連線」按鈕和它重複，回饋 V2 拿掉）：兩種畫法都可以——
+  //   依序點兩個標示點連線（analysisTap），或從標示點拖曳（下面）。
   // 拖曳畫線：從標示點開始拖，線從該點跟著手指延伸（虛線預覽）。
   // 拖曳途中符合下列任一條件就吸附、預覽變實線：碰到另一個標示點（優先）／接近水平／接近垂直。
   // 放開時是實線就留下，是虛線就消失。吸附後存的是標示點的世界座標，水平與垂直是精確的。
@@ -923,12 +945,11 @@
     $('lookLens').setAttribute('aria-pressed', String(state.look === 'lens'));
     $('modeDraw').classList.toggle('on', state.mode === 'draw');
     $('modeSeal').classList.toggle('on', state.mode === 'seal');
-    $('drawRow').hidden = state.mode !== 'draw';
-    $('sealRow').hidden = state.mode !== 'seal';
+    // 一排：重新對焦｜選格封印｜畫線｜復原｜清除，再加上該階段的動作鈕（封印模式：施放；封印成功後：光路重現、下一隻）
+    $('castBtn').hidden = state.mode !== 'seal' || state.solved;
     $('undoBtn').disabled = !state.lines.length && !state.pending;
     $('clearBtn').disabled = !state.lines.length && !state.pending;
     $('castBtn').disabled = state.selectedCell == null || state.solved || !!(state.seal && !state.seal.done);
-    $('castBtn').hidden = state.solved;
     $('toExplore').hidden = state.solved; // 破關後不能回去重新對焦：那會把法陣和現身的鬼清掉，而且觀察畫面沒有「下一組配置」
     $('nextBtn').hidden = !state.solved;
     var cleared = level.on && level.sealed >= level.goal;
@@ -943,7 +964,7 @@
       var hearts = $('hearts').children;
       for (var hi = 0; hi < hearts.length; hi++) hearts[hi].classList.toggle('lost', hi >= level.lives);
       $('hearts').setAttribute('aria-label', '剩下 ' + level.lives + ' 條命');
-      $('sealCount').textContent = '封印 ' + level.sealed + '／' + level.goal;
+      $('sealCount').textContent = (PRACTICE ? '練習　' : '') + '封印 ' + level.sealed + '／' + level.goal;
     }
     $('zoomIn').disabled = state.zoomIdx >= ZOOM_STEPS.length - 1;
     $('zoomOut').disabled = state.zoomIdx <= 0;
@@ -1016,8 +1037,9 @@
     level.screen = 'cleared';
     if (window.GameProgress) window.GameProgress.markCleared('convex');
     // 趕鬼時間：第一關開始到這裡的牆上時間。null＝這一輪沒有從第一關依序玩過來（直接開網址、?unlock=1 跳關），不顯示也不上榜。
-    var castleMs = window.Leaderboard ? window.Leaderboard.finishCastle() : null;
-    var timeNote = castleMs != null ? '趕鬼時間：' + window.Leaderboard.formatTime(castleMs) + '。' : '';
+    // 練習模式不計時、不上榜（LB = null）。
+    var castleMs = LB ? LB.finishCastle() : null;
+    var timeNote = castleMs != null ? '趕鬼時間：' + LB.formatTime(castleMs) + '。' : '';
     closeScene();
     level.scene = window.StoryScene.show({
       id: 'cleared', background: INTRO_BG, scatter: 7,
@@ -1026,11 +1048,9 @@
         { speaker: '你', text: '想跑？追！' }
       ],
       title: '第二關過關！',
-      note: '你在走廊封印了 ' + level.sealed + ' 隻鬼。' + timeNote + '下一站：城外的荒野（已解鎖）。',
-      buttons: [
-        { id: 'clearMenuBtn', label: '回關卡選單', primary: true, href: MENU_URL },
-        { id: 'againBtn', label: '再玩一次', onClick: startHunt }
-      ]
+      note: '你在走廊封印了 ' + level.sealed + ' 隻鬼。' + timeNote + (PRACTICE ? '' : '回到關卡選單，就能進入下一站：城外的荒野。'),
+      // 過關後只留「回選單」，由選單進下一關（回饋 Q3／G5；換頁一定會離開全螢幕）
+      buttons: [{ id: 'clearMenuBtn', label: '回關卡選單', primary: true, href: MENU_URL }]
     });
   }
 
@@ -1120,7 +1140,7 @@
     })();
   }
   function render() {
-    stats.frame++; stats.debugDrawn = false; stats.ghostRevealed = false;
+    stats.frame++; stats.debugDrawn = false; stats.ghostRevealed = false; stats.lensCaption = null;
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.clearRect(0, 0, W, H);
     if (state.phase === 'analysis') {
@@ -1154,10 +1174,9 @@
     setStatus(state.solved ? '已封印。可以換下一組配置。' : '回到觀察。畫過的線已清除；移動透鏡會取消標記。');
     layout();
   });
-  $('modeDraw').addEventListener('click', function () { state.mode = 'draw'; setStatus('畫線模式：點標示點來畫線。此模式下不會選到地板格。'); syncUI(); requestRender(); });
+  $('modeDraw').addEventListener('click', function () { state.mode = 'draw'; setStatus('畫線：從標示點拖曳，或依序點兩個點連線。'); syncUI(); requestRender(); });
   $('modeSeal').addEventListener('click', function () { state.mode = 'seal'; state.pending = null; setStatus('封印模式：點一個地板格（整個直欄都可點），再按「施放封印法陣」。'); syncUI(); requestRender(); });
   $('menuBtn').addEventListener('click', function () { if (window.confirm('回到關卡選單？這一關目前的進度不會保留。')) location.href = '../index.html'; });
-  $('toolLine').addEventListener('click', function () { setStatus('連線：從標示點拖到另一個點；拉成水平或垂直也會吸附。虛線放開會消失。也可以依序點兩個點。'); });
   $('undoBtn').addEventListener('click', function () { if (state.pending) state.pending = null; else state.lines.pop(); syncUI(); requestRender(); });
   $('clearBtn').addEventListener('click', function () { state.lines = []; state.pending = null; setStatus('已清除所有線。'); syncUI(); requestRender(); });
   $('castBtn').addEventListener('click', castSeal);
@@ -1177,10 +1196,11 @@
     state: state, stats: stats, cfg: cfg, configs: Cfg, GHOST_COLOR: GHOST_COLOR, SNAP_PX: SNAP_PX,
     w2s: w2s, s2w: s2w, snapPoints: snapPoints, nearestSnap: nearestSnap, studentIntersections: studentIntersections, wallNow: wallNow, lensViewNow: lensViewNow,
     regions: regions, canvasSize: function () { return { W: W, H: H, DPR: DPR }; }, render: render,
-    replaySpec: replaySpec, level: level,
+    replaySpec: replaySpec, level: level, FREE: FREE, PRACTICE: PRACTICE,
     art: function () { return { pending: artPending, corridor: ART.corridor.ready, lens: ART.lens.ready }; }
   };
 
   resetRound(nextRandomConfig()); // 一開始也隨機，不固定從配置 A 開始
-  if (level.on) showIntro();
+  if (PRACTICE) startHunt(); // 練習模式：不跑開場過場，直接開始抓鬼
+  else if (level.on) showIntro();
 })();

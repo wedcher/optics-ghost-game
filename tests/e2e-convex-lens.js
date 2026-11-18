@@ -53,9 +53,11 @@ const ALL_CFGS = require('../prototype/convex-lens/configs.js').all;
 const CONFIG_COUNT = ALL_CFGS.length;
 // 實像題跑兩個清晰位置；虛像題（D < 4f，沒有清晰位置）另外跑「看凸透鏡 → 標記虛像」的流程
 ALL_CFGS.forEach((c, i) => { if (c.kind === 'virtual') VIRTUAL_RUNS.push(i); else for (let s = 0; s < 2; s++) ALL_RUNS.push([i, s]); });
+// 回饋 V4：實像題把透鏡移到鬼和焦點之間時看到的虛像也能標記、推得出答案。挑實像題裡有虛像範圍的，橫向手機全部跑一次
+const REAL_VIRTUAL_RUNS = ALL_CFGS.map((c, i) => (c.kind !== 'virtual' && c.virtualWindow ? i : -1)).filter((i) => i >= 0);
 const PROFILES = [
   // 遊戲一律橫向（docs/decisions.md）。橫向手機是主要情境：所有配置全跑。
-  { name: 'phone-landscape', viewport: { width: 812, height: 375 }, touch: true, dsf: 2, runs: ALL_RUNS, virtualRuns: VIRTUAL_RUNS, shots: /./ },
+  { name: 'phone-landscape', viewport: { width: 812, height: 375 }, touch: true, dsf: 2, runs: ALL_RUNS, virtualRuns: VIRTUAL_RUNS.concat(REAL_VIRTUAL_RUNS), shots: /./ },
   // 直向只當備援版面檢查：用 ?portrait=1 關掉「請橫放」提示。
   { name: 'phone-portrait', viewport: { width: 375, height: 812 }, touch: true, dsf: 2, runs: [[0, 0]], virtualRuns: VIRTUAL_RUNS.slice(0, 1), shots: /^[258]-/, query: '&portrait=1' },
   { name: 'desktop', viewport: { width: 1280, height: 800 }, touch: false, dsf: 1, runs: [[0, 1], [2, 0]], virtualRuns: VIRTUAL_RUNS.slice(-1), shots: /^[258]-/ }
@@ -399,7 +401,7 @@ async function run(profile, browser) {
     ok(s.lines === 3 && !s.pending && s.selectedCell === null && s.zoomIdx === s0.zoomIdx && Math.abs(s.lensX - sp.lensX) < 1e-9, T('拖曳平移不會畫線／選格／改變縮放／移動透鏡'));
     const onO = await snap('O');
     if (onO.x > 20 && onO.x < cs.w - 100 && onO.y > 70 && onO.y < cs.h - 10) {
-      await press('#toolLine');
+      await press('#modeDraw');
       await drag(onO.x, onO.y, onO.x + 30, onO.y + 60);
       s = await st();
       ok(!s.pending && s.lines === 3, T('從標示點斜向拖到空白處放開：不留線、不算點擊'));
@@ -543,7 +545,7 @@ async function run(profile, browser) {
         ok(!mid.drag && after.n === n0, T('選格封印模式下，從標示點拖曳不會畫線'));
       }
       await press('#modeDraw');
-      ok(await page.evaluate(() => !document.getElementById('toolParallel') && !document.getElementById('styleBtn') && !!document.getElementById('toolLine')), T('畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）'));
+      ok(await page.evaluate(() => !document.getElementById('toolParallel') && !document.getElementById('styleBtn') && !document.getElementById('toolLine')), T('沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）'));
       await press('#zoomFit');
     }
 
@@ -645,7 +647,8 @@ async function run(profile, browser) {
     await page.selectOption('#configSel', String(ci));
     await page.waitForTimeout(60);
     const c = await cfgInfo();
-    const T = (label) => P('配置' + c.id + '·虛像題 ' + label);
+    const realQ = c.kind !== 'virtual'; // 實像題，但這一輪改用虛像作答（V4）
+    const T = (label) => P('配置' + c.id + (realQ ? '·實像題改標虛像 ' : '·虛像題 ') + label);
     const shotV = profile.name === 'phone-landscape' && ci === profile.virtualRuns[0] ? (n) => shot('v' + n) : async () => {};
     const noLeak = async (when) => {
       const info = await page.evaluate(() => {
@@ -665,21 +668,23 @@ async function run(profile, browser) {
       s.lensX = keep; H.render();
       return { minR, min: W.lensMinX, max: W.lensMaxX };
     });
-    ok(scan.min === -620 && scan.max === -80 && scan.minR > c.lock, T('透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光'), '最小模糊比 ' + scan.minR.toFixed(2));
+    if (!realQ) ok(scan.min === -620 && scan.max === -80 && scan.minR > c.lock, T('透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光'), '最小模糊比 ' + scan.minR.toFixed(2));
     await nudgeTo(c.virtualLensX);
     await press('#markBtn');
     s = await st();
     ok(!s.marker && s.toAnalysisDisabled && /模糊|看不到/.test(s.status), T('看布幕時按「標記」被拒絕（布幕上沒有清楚的像）'), '「' + s.status + '」');
     ok(await countVirtual() === 0, T('看布幕時沒有畫虛像'));
-    // 切到「看凸透鏡」
+    // 切到「看透鏡」
     await press('#lookLens');
     const look = await page.evaluate(() => ({ look: window.__protoConvex.state.look, a: document.getElementById('lookLens').getAttribute('aria-pressed'), b: document.getElementById('lookScreen').getAttribute('aria-pressed') }));
-    ok(look.look === 'lens' && look.a === 'true' && look.b === 'false', T('按「看凸透鏡」切換畫面（兩個並排按鈕，狀態正確）'));
+    ok(look.look === 'lens' && look.a === 'true' && look.b === 'false', T('按「看透鏡」切換畫面（兩個並排按鈕，狀態正確）'));
     const lvInfo = await page.evaluate(() => { const H = window.__protoConvex, r = H.regions(); return { lv: H.lensViewNow(), wall: r.wall }; });
     const purple = await countVirtual();
     ok(lvInfo.lv.eye === 'virtual' && lvInfo.lv.m > 1 && lvInfo.lv.angMag > 1 && purple > 20, T('透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大'),
       'm=' + lvInfo.lv.m.toFixed(2) + '，視角放大 ' + lvInfo.lv.angMag.toFixed(2) + ' 倍，' + purple + ' px');
-    await noLeak('看凸透鏡');
+    const cap = await page.evaluate(() => { const H = window.__protoConvex; H.render(); return H.stats.lensCaption; });
+    ok(cap === '虛像（正立、放大）', T('鏡框裡寫「虛像（正立、放大）」（使用者答虛像題 V2）'), String(cap));
+    await noLeak('看透鏡');
     await shotV('1-lens-view');
     // 透鏡越過鬼：透鏡裡和布幕上都沒有像
     if (c.object.x - 15 >= c.world.lensMinX) {
@@ -704,10 +709,11 @@ async function run(profile, browser) {
     // 切回布幕：標記取消
     await press('#lookScreen');
     ok(!(await st()).marker, T('切到「看布幕」：虛像標記取消'));
+    ok(await page.evaluate(() => { const H = window.__protoConvex; H.render(); return H.stats.lensCaption; }) === null, T('看布幕時沒有「虛像」字樣'));
     await press('#lookLens');
     await press('#markBtn');
-    ok(!!(await st()).marker, T('切回「看凸透鏡」可以重新標記'));
-    await layoutCheck('虛像題／看凸透鏡已標記');
+    ok(!!(await st()).marker, T('切回「看透鏡」可以重新標記'));
+    await layoutCheck('虛像題／看透鏡已標記');
     // 直向只是備援版面：側視圖太窄（標記離鏡片只有十幾 px），作圖流程只在橫向與桌機測
     if (profile.name === 'phone-portrait') continue;
 
