@@ -54,9 +54,9 @@ const MIN = 60 * 1000;
   async function newPage(remote) {
     const ctx = await browser.newContext(ctxOpts);
     const page = await ctx.newPage();
-    if (remote) {
-      await page.route('**/shared/leaderboard-config.js', (r) => r.fulfill({ contentType: 'text/javascript', body: "window.LEADERBOARD_URL = '" + BASE + "/mock-exec';" }));
-    }
+    // 一律蓋掉 config：本機模式用空網址；共用模式用假伺服器。絕不打真的部署網址（會寫進正式試算表）。
+    const testUrl = remote ? BASE + '/mock-exec' : '';
+    await page.route('**/shared/leaderboard-config.js', (r) => r.fulfill({ contentType: 'text/javascript', body: "window.LEADERBOARD_URL = '" + testUrl + "';" }));
     page.on('pageerror', (e) => ok(false, 'page error', String(e)));
     await page.goto(BASE + '/prototype/leaderboard.html');
     await page.waitForFunction(() => document.getElementById('mode').textContent !== '讀取中…');
@@ -198,6 +198,7 @@ const MIN = 60 * 1000;
   {
     const ctx = await browser.newContext({ viewport: { width: 375, height: 740 }, hasTouch: true, isMobile: true });
     const page = await ctx.newPage();
+    await page.route('**/shared/leaderboard-config.js', (r) => r.fulfill({ contentType: 'text/javascript', body: "window.LEADERBOARD_URL = '';" }));
     await page.goto(BASE + '/prototype/leaderboard.html');
     await page.waitForFunction(() => document.getElementById('mode').textContent !== '讀取中…');
     ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), '窄螢幕沒有橫向捲動');
