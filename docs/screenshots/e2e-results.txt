@@ -3,6 +3,8 @@
   PASS  [phone-landscape] 探索：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-landscape] 探索：頁面不需捲動
   PASS  [phone-landscape] 探索：畫布仍有足夠空間（≥300×150）  — 812×240
+  PASS  [phone-landscape] 配置A C1 探索按鈕：◀ 左轉／舉起凹透鏡／右轉 ▶／光路分析，只排一排  — ◀ 左轉、舉起凹透鏡、右轉 ▶、光路分析
+  PASS  [phone-landscape] 配置A 「☰ 關卡」在右上角  — 離右邊 8px、離上面 3px
   PASS  [phone-landscape] 配置A 裸眼畫面沒有鬼
   PASS  [phone-landscape] 配置A 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 49% 像素改變；此方位沒有鬼
   PASS  [phone-landscape] 配置A 透鏡外畫面不變  — 0.00%
@@ -12,9 +14,11 @@
   PASS  [phone-landscape] 配置A 透鏡外沒有鬼的像素
   PASS  [phone-landscape] 配置A 點在沒有鬼像的地方不會產生標記
   PASS  [phone-landscape] 配置A 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-landscape] 配置A 舉起後按鈕變成「放下凹透鏡」
   PASS  [phone-landscape] 配置A 放下透鏡後鬼像消失
   PASS  [phone-landscape] 配置A 放下透鏡後標記保留
-  PASS  [phone-landscape] 配置A 切到側視分析
+  PASS  [phone-landscape] 配置A 按「光路分析」切到側視分析
+  PASS  [phone-landscape] 配置A C2 光路分析按鈕：回探索／選格封印／畫線／復原／清除，只排一排  — 回探索、選格封印、畫線、復原、清除
   PASS  [phone-landscape] 分析／畫線：所有控制項都在畫面內  — canvas 812×240
   PASS  [phone-landscape] 分析／畫線：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-landscape] 分析／畫線：頁面不需捲動
@@ -58,13 +62,16 @@
   PASS  [phone-landscape] 配置A 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
   PASS  [phone-landscape] 配置A 「復原」可以拿掉拖出來的連線
   PASS  [phone-landscape] 配置A 選格封印模式下，從標示點拖曳不會畫線
-  PASS  [phone-landscape] 配置A 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
+  PASS  [phone-landscape] 配置A C2 沒有「連線」「平行線」「實線／虛線」按鈕（點兩個點連線在「畫線」模式裡）
   PASS  [phone-landscape] 分析／封印：所有控制項都在畫面內  — canvas 812×240
   PASS  [phone-landscape] 分析／封印：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-landscape] 分析／封印：頁面不需捲動
   PASS  [phone-landscape] 分析／封印：畫布仍有足夠空間（≥300×150）  — 812×240
   PASS  [phone-landscape] 配置A 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置A 點地板格可選取（虛像所在的第 2 格）
+  PASS  [phone-landscape] 配置A 選格封印模式：「施放封印法陣」接在同一排最後  — 回探索、選格封印、畫線、復原、清除、施放封印法陣
+  PASS  [phone-landscape] 配置A C3 封印前再點同一格 → 取消選取（施放鈕變不能按）
+  PASS  [phone-landscape] 配置A C3 取消後再點一次 → 重新選取
   PASS  [phone-landscape] 配置A 封印虛像所在格 → 失敗
   PASS  [phone-landscape] 配置A 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置A 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -73,6 +80,10 @@
   PASS  [phone-landscape] 配置A 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置A 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置A 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置A C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
+  PASS  [phone-landscape] 配置A C4 封印成功後自動回到畫線模式
+  PASS  [phone-landscape] 配置A C4 封印後依序點兩個點 → 畫出連線
+  PASS  [phone-landscape] 配置A C4 封印後「復原」也能用
   PASS  [phone-landscape] 配置A 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [phone-landscape] 配置A 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
   PASS  [phone-landscape] 配置A 光路重現：六段實際光線＋三段反向延長線（三條主光線）
@@ -92,7 +103,7 @@
   PASS  [phone-landscape] 配置A 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置A 光路重現：結束時標出像點  — 139 px（重現前 64）
   PASS  [phone-landscape] 配置A 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
   PASS  [phone-landscape] 配置A 關閉 Debug 後面板清空
   PASS  [phone-landscape] 配置B 裸眼畫面沒有鬼
@@ -104,9 +115,10 @@
   PASS  [phone-landscape] 配置B 透鏡外沒有鬼的像素
   PASS  [phone-landscape] 配置B 點在沒有鬼像的地方不會產生標記
   PASS  [phone-landscape] 配置B 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-landscape] 配置B 舉起後按鈕變成「放下凹透鏡」
   PASS  [phone-landscape] 配置B 放下透鏡後鬼像消失
   PASS  [phone-landscape] 配置B 放下透鏡後標記保留
-  PASS  [phone-landscape] 配置B 切到側視分析
+  PASS  [phone-landscape] 配置B 按「光路分析」切到側視分析
   PASS  [phone-landscape] 配置B 分析開始：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置B 分析開始：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置B 分析開始：吸附點裡沒有物點
@@ -143,9 +155,11 @@
   PASS  [phone-landscape] 配置B 拖曳畫線：線經過另一個標示點（手指只到半路）→ 吸附到該點，預覽變實線
   PASS  [phone-landscape] 配置B 放開：留下通過兩個標示點的直線（手指沒有碰到第二個點）
   PASS  [phone-landscape] 配置B 選格封印模式下，從標示點拖曳不會畫線
-  PASS  [phone-landscape] 配置B 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
+  PASS  [phone-landscape] 配置B C2 沒有「連線」「平行線」「實線／虛線」按鈕（點兩個點連線在「畫線」模式裡）
   PASS  [phone-landscape] 配置B 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置B 點地板格可選取（虛像所在的第 2 格）
+  PASS  [phone-landscape] 配置B C3 封印前再點同一格 → 取消選取（施放鈕變不能按）
+  PASS  [phone-landscape] 配置B C3 取消後再點一次 → 重新選取
   PASS  [phone-landscape] 配置B 封印虛像所在格 → 失敗
   PASS  [phone-landscape] 配置B 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置B 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -154,6 +168,10 @@
   PASS  [phone-landscape] 配置B 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置B 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置B 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置B C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
+  PASS  [phone-landscape] 配置B C4 封印成功後自動回到畫線模式
+  PASS  [phone-landscape] 配置B C4 封印後依序點兩個點 → 畫出連線
+  PASS  [phone-landscape] 配置B C4 封印後「復原」也能用
   PASS  [phone-landscape] 配置B 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [phone-landscape] 配置B 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
   PASS  [phone-landscape] 配置B 光路重現：六段實際光線＋三段反向延長線（三條主光線）
@@ -173,7 +191,7 @@
   PASS  [phone-landscape] 配置B 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置B 光路重現：結束時標出像點  — 137 px（重現前 66）
   PASS  [phone-landscape] 配置B 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置B 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置B 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置C 裸眼畫面沒有鬼
   PASS  [phone-landscape] 配置C 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 59% 像素改變；此方位沒有鬼
   PASS  [phone-landscape] 配置C 透鏡外畫面不變  — 0.00%
@@ -183,9 +201,10 @@
   PASS  [phone-landscape] 配置C 透鏡外沒有鬼的像素
   PASS  [phone-landscape] 配置C 點在沒有鬼像的地方不會產生標記
   PASS  [phone-landscape] 配置C 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-landscape] 配置C 舉起後按鈕變成「放下凹透鏡」
   PASS  [phone-landscape] 配置C 放下透鏡後鬼像消失
   PASS  [phone-landscape] 配置C 放下透鏡後標記保留
-  PASS  [phone-landscape] 配置C 切到側視分析
+  PASS  [phone-landscape] 配置C 按「光路分析」切到側視分析
   PASS  [phone-landscape] 配置C 分析開始：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置C 分析開始：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置C 分析開始：吸附點裡沒有物點
@@ -222,9 +241,11 @@
   PASS  [phone-landscape] 配置C 拖曳畫線：線經過另一個標示點（手指只到半路）→ 吸附到該點，預覽變實線
   PASS  [phone-landscape] 配置C 放開：留下通過兩個標示點的直線（手指沒有碰到第二個點）
   PASS  [phone-landscape] 配置C 選格封印模式下，從標示點拖曳不會畫線
-  PASS  [phone-landscape] 配置C 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
+  PASS  [phone-landscape] 配置C C2 沒有「連線」「平行線」「實線／虛線」按鈕（點兩個點連線在「畫線」模式裡）
   PASS  [phone-landscape] 配置C 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置C 點地板格可選取（虛像所在的第 3 格）
+  PASS  [phone-landscape] 配置C C3 封印前再點同一格 → 取消選取（施放鈕變不能按）
+  PASS  [phone-landscape] 配置C C3 取消後再點一次 → 重新選取
   PASS  [phone-landscape] 配置C 封印虛像所在格 → 失敗
   PASS  [phone-landscape] 配置C 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置C 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -233,6 +254,10 @@
   PASS  [phone-landscape] 配置C 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置C 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置C 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置C C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
+  PASS  [phone-landscape] 配置C C4 封印成功後自動回到畫線模式
+  PASS  [phone-landscape] 配置C C4 封印後依序點兩個點 → 畫出連線
+  PASS  [phone-landscape] 配置C C4 封印後「復原」也能用
   PASS  [phone-landscape] 配置C 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [phone-landscape] 配置C 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
   PASS  [phone-landscape] 配置C 光路重現：六段實際光線＋三段反向延長線（三條主光線）
@@ -252,7 +277,7 @@
   PASS  [phone-landscape] 配置C 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置C 光路重現：結束時標出像點  — 136 px（重現前 64）
   PASS  [phone-landscape] 配置C 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置D 裸眼畫面沒有鬼
   PASS  [phone-landscape] 配置D 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 47% 像素改變；此方位沒有鬼
   PASS  [phone-landscape] 配置D 透鏡外畫面不變  — 0.00%
@@ -262,9 +287,10 @@
   PASS  [phone-landscape] 配置D 透鏡外沒有鬼的像素
   PASS  [phone-landscape] 配置D 點在沒有鬼像的地方不會產生標記
   PASS  [phone-landscape] 配置D 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-landscape] 配置D 舉起後按鈕變成「放下凹透鏡」
   PASS  [phone-landscape] 配置D 放下透鏡後鬼像消失
   PASS  [phone-landscape] 配置D 放下透鏡後標記保留
-  PASS  [phone-landscape] 配置D 切到側視分析
+  PASS  [phone-landscape] 配置D 按「光路分析」切到側視分析
   PASS  [phone-landscape] 配置D 分析開始：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置D 分析開始：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置D 分析開始：吸附點裡沒有物點
@@ -299,9 +325,11 @@
   PASS  [phone-landscape] 配置D 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
   PASS  [phone-landscape] 配置D 「復原」可以拿掉拖出來的連線
   PASS  [phone-landscape] 配置D 選格封印模式下，從標示點拖曳不會畫線
-  PASS  [phone-landscape] 配置D 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
+  PASS  [phone-landscape] 配置D C2 沒有「連線」「平行線」「實線／虛線」按鈕（點兩個點連線在「畫線」模式裡）
   PASS  [phone-landscape] 配置D 封印模式下點擊不會畫線
   PASS  [phone-landscape] 配置D 點地板格可選取（虛像所在的第 2 格）
+  PASS  [phone-landscape] 配置D C3 封印前再點同一格 → 取消選取（施放鈕變不能按）
+  PASS  [phone-landscape] 配置D C3 取消後再點一次 → 重新選取
   PASS  [phone-landscape] 配置D 封印虛像所在格 → 失敗
   PASS  [phone-landscape] 配置D 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置D 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -310,6 +338,10 @@
   PASS  [phone-landscape] 配置D 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置D 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置D 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置D C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
+  PASS  [phone-landscape] 配置D C4 封印成功後自動回到畫線模式
+  PASS  [phone-landscape] 配置D C4 封印後依序點兩個點 → 畫出連線
+  PASS  [phone-landscape] 配置D C4 封印後「復原」也能用
   PASS  [phone-landscape] 配置D 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [phone-landscape] 配置D 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
   PASS  [phone-landscape] 配置D 光路重現：六段實際光線＋三段反向延長線（三條主光線）
@@ -332,10 +364,12 @@
   PASS  [phone-landscape] 配置D 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 沒有 JS 錯誤
   PASS  [phone-portrait] 背景圖已載入
-  PASS  [phone-portrait] 探索：所有控制項都在畫面內  — canvas 375×595
+  PASS  [phone-portrait] 探索：所有控制項都在畫面內  — canvas 375×639
   PASS  [phone-portrait] 探索：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-portrait] 探索：頁面不需捲動
-  PASS  [phone-portrait] 探索：畫布仍有足夠空間（≥300×150）  — 375×595
+  PASS  [phone-portrait] 探索：畫布仍有足夠空間（≥300×150）  — 375×639
+  PASS  [phone-portrait] 配置A C1 探索按鈕：◀ 左轉／舉起凹透鏡／右轉 ▶／光路分析  — ◀ 左轉、舉起凹透鏡、右轉 ▶、光路分析
+  PASS  [phone-portrait] 配置A 「☰ 關卡」在右上角  — 離右邊 8px、離上面 6px
   PASS  [phone-portrait] 配置A 裸眼畫面沒有鬼
   PASS  [phone-portrait] 配置A 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 49% 像素改變；此方位沒有鬼
   PASS  [phone-portrait] 配置A 透鏡外畫面不變  — 0.00%
@@ -345,14 +379,16 @@
   PASS  [phone-portrait] 配置A 透鏡外沒有鬼的像素
   PASS  [phone-portrait] 配置A 點在沒有鬼像的地方不會產生標記
   PASS  [phone-portrait] 配置A 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-portrait] 配置A 舉起後按鈕變成「放下凹透鏡」
   PASS  [phone-portrait] 配置A 放下透鏡後鬼像消失
   PASS  [phone-portrait] 配置A 放下透鏡後標記保留
-  PASS  [phone-portrait] 配置A 切到側視分析
-  PASS  [phone-portrait] 分析／畫線：所有控制項都在畫面內  — canvas 375×595
+  PASS  [phone-portrait] 配置A 按「光路分析」切到側視分析
+  PASS  [phone-portrait] 配置A C2 光路分析按鈕：回探索／選格封印／畫線／復原／清除  — 回探索、選格封印、畫線、復原、清除
+  PASS  [phone-portrait] 分析／畫線：所有控制項都在畫面內  — canvas 375×639
   PASS  [phone-portrait] 分析／畫線：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-portrait] 分析／畫線：頁面不需捲動
-  PASS  [phone-portrait] 分析／畫線：畫布仍有足夠空間（≥300×150）  — 375×595
-  PASS  [phone-portrait] （資訊）預設縮放下一格寬 43.9 px，畫布 375×595
+  PASS  [phone-portrait] 分析／畫線：畫布仍有足夠空間（≥300×150）  — 375×639
+  PASS  [phone-portrait] （資訊）預設縮放下一格寬 43.9 px，畫布 375×639
   PASS  [phone-portrait] 配置A 分析開始：畫面上沒有鬼本體
   PASS  [phone-portrait] 配置A 分析開始：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-portrait] 配置A 分析開始：吸附點裡沒有物點
@@ -365,10 +401,10 @@
   PASS  [phone-portrait] 配置A 畫完三條線：畫面上沒有鬼本體
   PASS  [phone-portrait] 配置A 畫完三條線：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-portrait] 配置A ＋ 按鈕放大  — 1.50×
-  PASS  [phone-portrait] 分析／放大後：所有控制項都在畫面內  — canvas 375×600
+  PASS  [phone-portrait] 分析／放大後：所有控制項都在畫面內  — canvas 375×644
   PASS  [phone-portrait] 分析／放大後：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-portrait] 分析／放大後：頁面不需捲動
-  PASS  [phone-portrait] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 375×600
+  PASS  [phone-portrait] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 375×644
   PASS  [phone-portrait] 配置A 放大後單指拖曳可平移  — Δx=90px
   PASS  [phone-portrait] 配置A 拖曳平移不會畫線／選格／改變縮放
   PASS  [phone-portrait] 配置A 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
@@ -388,13 +424,16 @@
   PASS  [phone-portrait] 配置A 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
   PASS  [phone-portrait] 配置A 「復原」可以拿掉拖出來的連線
   PASS  [phone-portrait] 配置A 選格封印模式下，從標示點拖曳不會畫線
-  PASS  [phone-portrait] 配置A 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
-  PASS  [phone-portrait] 分析／封印：所有控制項都在畫面內  — canvas 375×595
+  PASS  [phone-portrait] 配置A C2 沒有「連線」「平行線」「實線／虛線」按鈕（點兩個點連線在「畫線」模式裡）
+  PASS  [phone-portrait] 分析／封印：所有控制項都在畫面內  — canvas 375×587
   PASS  [phone-portrait] 分析／封印：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-portrait] 分析／封印：頁面不需捲動
-  PASS  [phone-portrait] 分析／封印：畫布仍有足夠空間（≥300×150）  — 375×595
+  PASS  [phone-portrait] 分析／封印：畫布仍有足夠空間（≥300×150）  — 375×587
   PASS  [phone-portrait] 配置A 封印模式下點擊不會畫線
   PASS  [phone-portrait] 配置A 點地板格可選取（虛像所在的第 2 格）
+  PASS  [phone-portrait] 配置A 選格封印模式：「施放封印法陣」接在同一排最後  — 回探索、選格封印、畫線、復原、清除、施放封印法陣
+  PASS  [phone-portrait] 配置A C3 封印前再點同一格 → 取消選取（施放鈕變不能按）
+  PASS  [phone-portrait] 配置A C3 取消後再點一次 → 重新選取
   PASS  [phone-portrait] 配置A 封印虛像所在格 → 失敗
   PASS  [phone-portrait] 配置A 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-portrait] 配置A 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -403,6 +442,10 @@
   PASS  [phone-portrait] 配置A 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-portrait] 配置A 整個直欄都是該格的點擊區
   PASS  [phone-portrait] 配置A 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-portrait] 配置A C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
+  PASS  [phone-portrait] 配置A C4 封印成功後自動回到畫線模式
+  PASS  [phone-portrait] 配置A C4 封印後依序點兩個點 → 畫出連線
+  PASS  [phone-portrait] 配置A C4 封印後「復原」也能用
   PASS  [phone-portrait] 配置A 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [phone-portrait] 配置A 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
   PASS  [phone-portrait] 配置A 光路重現：六段實際光線＋三段反向延長線（三條主光線）
@@ -422,15 +465,17 @@
   PASS  [phone-portrait] 配置A 光路重現：畫面上方有說明文字框
   PASS  [phone-portrait] 配置A 光路重現：結束時標出像點  — 137 px（重現前 67）
   PASS  [phone-portrait] 配置A 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-portrait] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-portrait] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-portrait] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
   PASS  [phone-portrait] 配置A 關閉 Debug 後面板清空
   PASS  [phone-portrait] 沒有 JS 錯誤
   PASS  [desktop] 背景圖已載入
-  PASS  [desktop] 探索：所有控制項都在畫面內  — canvas 1280×588
+  PASS  [desktop] 探索：所有控制項都在畫面內  — canvas 1280×640
   PASS  [desktop] 探索：按鈕點擊區 ≥ 40×40 px
   PASS  [desktop] 探索：頁面不需捲動
-  PASS  [desktop] 探索：畫布仍有足夠空間（≥300×150）  — 1280×588
+  PASS  [desktop] 探索：畫布仍有足夠空間（≥300×150）  — 1280×640
+  PASS  [desktop] 配置A C1 探索按鈕：◀ 左轉／舉起凹透鏡／右轉 ▶／光路分析，只排一排  — ◀ 左轉、舉起凹透鏡、右轉 ▶、光路分析
+  PASS  [desktop] 配置A 「☰ 關卡」在右上角  — 離右邊 8px、離上面 6px
   PASS  [desktop] 配置A 裸眼畫面沒有鬼
   PASS  [desktop] 配置A 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 52% 像素改變；此方位沒有鬼
   PASS  [desktop] 配置A 透鏡外畫面不變  — 0.00%
@@ -440,14 +485,16 @@
   PASS  [desktop] 配置A 透鏡外沒有鬼的像素
   PASS  [desktop] 配置A 點在沒有鬼像的地方不會產生標記
   PASS  [desktop] 配置A 點鬼像（偏 11px）可標記虛像
+  PASS  [desktop] 配置A 舉起後按鈕變成「放下凹透鏡」
   PASS  [desktop] 配置A 放下透鏡後鬼像消失
   PASS  [desktop] 配置A 放下透鏡後標記保留
-  PASS  [desktop] 配置A 切到側視分析
-  PASS  [desktop] 分析／畫線：所有控制項都在畫面內  — canvas 1280×588
+  PASS  [desktop] 配置A 按「光路分析」切到側視分析
+  PASS  [desktop] 配置A C2 光路分析按鈕：回探索／選格封印／畫線／復原／清除，只排一排  — 回探索、選格封印、畫線、復原、清除
+  PASS  [desktop] 分析／畫線：所有控制項都在畫面內  — canvas 1280×640
   PASS  [desktop] 分析／畫線：按鈕點擊區 ≥ 40×40 px
   PASS  [desktop] 分析／畫線：頁面不需捲動
-  PASS  [desktop] 分析／畫線：畫布仍有足夠空間（≥300×150）  — 1280×588
-  PASS  [desktop] （資訊）預設縮放下一格寬 149.7 px，畫布 1280×588
+  PASS  [desktop] 分析／畫線：畫布仍有足夠空間（≥300×150）  — 1280×640
+  PASS  [desktop] （資訊）預設縮放下一格寬 149.7 px，畫布 1280×640
   PASS  [desktop] 配置A 分析開始：畫面上沒有鬼本體
   PASS  [desktop] 配置A 分析開始：DOM／文字／Debug 圖層沒有答案
   PASS  [desktop] 配置A 分析開始：吸附點裡沒有物點
@@ -460,10 +507,10 @@
   PASS  [desktop] 配置A 畫完三條線：畫面上沒有鬼本體
   PASS  [desktop] 配置A 畫完三條線：DOM／文字／Debug 圖層沒有答案
   PASS  [desktop] 配置A ＋ 按鈕放大  — 1.50×
-  PASS  [desktop] 分析／放大後：所有控制項都在畫面內  — canvas 1280×588
+  PASS  [desktop] 分析／放大後：所有控制項都在畫面內  — canvas 1280×640
   PASS  [desktop] 分析／放大後：按鈕點擊區 ≥ 40×40 px
   PASS  [desktop] 分析／放大後：頁面不需捲動
-  PASS  [desktop] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 1280×588
+  PASS  [desktop] 分析／放大後：畫布仍有足夠空間（≥300×150）  — 1280×640
   PASS  [desktop] 配置A 放大後單指拖曳可平移  — Δx=90px
   PASS  [desktop] 配置A 拖曳平移不會畫線／選格／改變縮放
   PASS  [desktop] 配置A 從標示點斜向拖到空白處放開：不留線、不算點擊
@@ -487,13 +534,16 @@
   PASS  [desktop] 配置A 拖曳畫線：線經過另一個標示點（手指只到半路）→ 吸附到該點，預覽變實線
   PASS  [desktop] 配置A 放開：留下通過兩個標示點的直線（手指沒有碰到第二個點）
   PASS  [desktop] 配置A 選格封印模式下，從標示點拖曳不會畫線
-  PASS  [desktop] 配置A 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
-  PASS  [desktop] 分析／封印：所有控制項都在畫面內  — canvas 1280×588
+  PASS  [desktop] 配置A C2 沒有「連線」「平行線」「實線／虛線」按鈕（點兩個點連線在「畫線」模式裡）
+  PASS  [desktop] 分析／封印：所有控制項都在畫面內  — canvas 1280×640
   PASS  [desktop] 分析／封印：按鈕點擊區 ≥ 40×40 px
   PASS  [desktop] 分析／封印：頁面不需捲動
-  PASS  [desktop] 分析／封印：畫布仍有足夠空間（≥300×150）  — 1280×588
+  PASS  [desktop] 分析／封印：畫布仍有足夠空間（≥300×150）  — 1280×640
   PASS  [desktop] 配置A 封印模式下點擊不會畫線
   PASS  [desktop] 配置A 點地板格可選取（虛像所在的第 2 格）
+  PASS  [desktop] 配置A 選格封印模式：「施放封印法陣」接在同一排最後  — 回探索、選格封印、畫線、復原、清除、施放封印法陣
+  PASS  [desktop] 配置A C3 封印前再點同一格 → 取消選取（施放鈕變不能按）
+  PASS  [desktop] 配置A C3 取消後再點一次 → 重新選取
   PASS  [desktop] 配置A 封印虛像所在格 → 失敗
   PASS  [desktop] 配置A 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [desktop] 配置A 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -502,6 +552,11 @@
   PASS  [desktop] 配置A 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [desktop] 配置A 整個直欄都是該格的點擊區
   PASS  [desktop] 配置A 封印作圖交點所在格 → 成功並顯形
+  PASS  [desktop] 配置A C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
+  PASS  [desktop] 配置A C4 封印成功後自動回到畫線模式
+  PASS  [desktop] 配置A C4 封印後依序點兩個點 → 畫出連線
+  PASS  [desktop] 配置A C4 封印後從標示點拖曳 → 畫出水平線
+  PASS  [desktop] 配置A C4 封印後「復原」也能用
   PASS  [desktop] 配置A 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [desktop] 配置A 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
   PASS  [desktop] 配置A 光路重現：六段實際光線＋三段反向延長線（三條主光線）
@@ -521,7 +576,7 @@
   PASS  [desktop] 配置A 光路重現：畫面上方有說明文字框
   PASS  [desktop] 配置A 光路重現：結束時標出像點  — 32 px（重現前 15）
   PASS  [desktop] 配置A 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [desktop] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [desktop] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [desktop] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
   PASS  [desktop] 配置A 關閉 Debug 後面板清空
   PASS  [desktop] 配置C 裸眼畫面沒有鬼
@@ -533,9 +588,10 @@
   PASS  [desktop] 配置C 透鏡外沒有鬼的像素
   PASS  [desktop] 配置C 點在沒有鬼像的地方不會產生標記
   PASS  [desktop] 配置C 點鬼像（偏 11px）可標記虛像
+  PASS  [desktop] 配置C 舉起後按鈕變成「放下凹透鏡」
   PASS  [desktop] 配置C 放下透鏡後鬼像消失
   PASS  [desktop] 配置C 放下透鏡後標記保留
-  PASS  [desktop] 配置C 切到側視分析
+  PASS  [desktop] 配置C 按「光路分析」切到側視分析
   PASS  [desktop] 配置C 分析開始：畫面上沒有鬼本體
   PASS  [desktop] 配置C 分析開始：DOM／文字／Debug 圖層沒有答案
   PASS  [desktop] 配置C 分析開始：吸附點裡沒有物點
@@ -571,9 +627,11 @@
   PASS  [desktop] 配置C 拖曳畫線：線經過另一個標示點（手指只到半路）→ 吸附到該點，預覽變實線
   PASS  [desktop] 配置C 放開：留下通過兩個標示點的直線（手指沒有碰到第二個點）
   PASS  [desktop] 配置C 選格封印模式下，從標示點拖曳不會畫線
-  PASS  [desktop] 配置C 畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）
+  PASS  [desktop] 配置C C2 沒有「連線」「平行線」「實線／虛線」按鈕（點兩個點連線在「畫線」模式裡）
   PASS  [desktop] 配置C 封印模式下點擊不會畫線
   PASS  [desktop] 配置C 點地板格可選取（虛像所在的第 3 格）
+  PASS  [desktop] 配置C C3 封印前再點同一格 → 取消選取（施放鈕變不能按）
+  PASS  [desktop] 配置C C3 取消後再點一次 → 重新選取
   PASS  [desktop] 配置C 封印虛像所在格 → 失敗
   PASS  [desktop] 配置C 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [desktop] 配置C 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -582,6 +640,11 @@
   PASS  [desktop] 配置C 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [desktop] 配置C 整個直欄都是該格的點擊區
   PASS  [desktop] 配置C 封印作圖交點所在格 → 成功並顯形
+  PASS  [desktop] 配置C C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
+  PASS  [desktop] 配置C C4 封印成功後自動回到畫線模式
+  PASS  [desktop] 配置C C4 封印後依序點兩個點 → 畫出連線
+  PASS  [desktop] 配置C C4 封印後從標示點拖曳 → 畫出水平線
+  PASS  [desktop] 配置C C4 封印後「復原」也能用
   PASS  [desktop] 配置C 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [desktop] 配置C 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
   PASS  [desktop] 配置C 光路重現：六段實際光線＋三段反向延長線（三條主光線）
@@ -601,7 +664,7 @@
   PASS  [desktop] 配置C 光路重現：畫面上方有說明文字框
   PASS  [desktop] 配置C 光路重現：結束時標出像點  — 27 px（重現前 16）
   PASS  [desktop] 配置C 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [desktop] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [desktop] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [desktop] 沒有 JS 錯誤
 
-ALL PASS: 605/605 checks
+ALL PASS: 668/668 checks

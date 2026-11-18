@@ -429,7 +429,7 @@
     var ip = imageScreenPos();
     if (state.facing === c.direction && Math.hypot(x - ip.x, y - ip.y) <= Math.max(36, ip.r + 18)) {
       state.marker = { dir: state.facing, tanX: 0, tanY: ip.tan };
-      setStatus('已標記「虛像」——這是鬼看起來在的位置，不是鬼本體。可放下透鏡確認，再切到側視分析。');
+      setStatus('已標記「虛像」——這是鬼看起來在的位置，不是鬼本體。可放下透鏡確認，再按「光路分析」。');
     } else {
       setStatus('這裡沒有異象。找到透鏡裡發光的鬼像再點它。');
     }
@@ -728,8 +728,14 @@
       if (state.solved || (state.seal && !state.seal.done)) return;
       var k = floor.cellAt(s2w({ x: x, y: y }).x);
       if (k == null) { setStatus('請點一個地板格（整個直欄都可以點）。'); return; }
-      state.selectedCell = k; state.seal = null;
-      setStatus('已選第 ' + k + ' 格。確定的話按「施放封印法陣」。');
+      // 還沒抓到鬼之前，再點一次已選的格就取消選取（回饋 C3）；抓到之後上面已經 return，不能取消
+      if (state.selectedCell === k) {
+        state.selectedCell = null; state.seal = null;
+        setStatus('已取消選取。再點一個地板格，然後按「施放封印法陣」。');
+      } else {
+        state.selectedCell = k; state.seal = null;
+        setStatus('已選第 ' + k + ' 格。確定的話按「施放封印法陣」；再點一次同一格可以取消。');
+      }
       syncUI(); requestRender();
       return;
     }
@@ -762,6 +768,7 @@
       state.seal.done = true;
       if (success) {
         state.solved = true;
+        state.mode = 'draw'; // 封印後仍可以畫線（回饋 C4）；選格已經不能改
         setStatus('封印成功！鬼被迫顯形——牠的本體不在你標記的虛像位置。看看光是怎麼走的。');
         startReplay();
       } else {
@@ -864,7 +871,7 @@
     if (pointerCount() === 1) {
       var p = localPos(e);
       gesture = { id: e.pointerId, x0: p.x, y0: p.y, lx: p.x, ly: p.y, moved: false, multi: false, kind: null,
-        snap: state.phase === 'analysis' && state.mode === 'draw' && !state.solved ? nearestSnap(p.x, p.y) : null };
+        snap: state.phase === 'analysis' && state.mode === 'draw' ? nearestSnap(p.x, p.y) : null }; // 封印前後都能畫線（C4）
       try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     } else if (gesture) {
       gesture.multi = true; cancelDragLine(); // 兩指：既不畫線也不縮放（縮放只用按鈕）
@@ -921,12 +928,11 @@
     $('toAnalysis').classList.toggle('primary', !!state.marker);
     $('modeDraw').classList.toggle('on', state.mode === 'draw');
     $('modeSeal').classList.toggle('on', state.mode === 'seal');
-    $('drawRow').hidden = state.mode !== 'draw';
-    $('sealRow').hidden = state.mode !== 'seal';
     $('undoBtn').disabled = !state.lines.length && !state.pending;
     $('clearBtn').disabled = !state.lines.length && !state.pending;
     $('castBtn').disabled = state.selectedCell == null || state.solved || !!(state.seal && !state.seal.done);
-    $('castBtn').hidden = state.solved;
+    $('castBtn').hidden = state.solved || state.mode !== 'seal';
+    $('modeSeal').hidden = state.solved; // 抓到鬼之後選格不能再改（C3），只留畫線
     $('toExplore').hidden = state.solved; // 破關後不能回探索：那會把法陣和現身的鬼清掉，而且探索畫面沒有「下一組配置」
     $('nextBtn').hidden = !state.solved;
     $('replayBtn').hidden = !state.solved;
@@ -1025,7 +1031,7 @@
     state.lensUp = !state.lensUp;
     setStatus(state.lensUp
       ? '透鏡裡整個視野都被縮小了。看到發光的鬼像就點它標記；沒有就轉向再找。'
-      : (state.marker ? '放下透鏡後鬼像消失了，但虛像標記還在。可以切到側視分析。' : '裸眼看不到鬼。舉起凹透鏡再找。'));
+      : (state.marker ? '放下透鏡後鬼像消失了，但虛像標記還在。可以按「光路分析」。' : '裸眼看不到鬼。舉起凹透鏡再找。'));
     syncUI(); requestRender();
   });
   $('toAnalysis').addEventListener('click', enterAnalysis);
@@ -1034,10 +1040,9 @@
     setStatus('回到探索視角。虛像標記仍保留。');
     syncUI(); layout();
   });
-  $('modeDraw').addEventListener('click', function () { state.mode = 'draw'; setStatus('畫線模式：點標示點來畫線。此模式下不會選到地板格。'); syncUI(); requestRender(); });
-  $('modeSeal').addEventListener('click', function () { state.mode = 'seal'; state.pending = null; setStatus('封印模式：點一個地板格（整個直欄都可點），再按「施放封印法陣」。'); syncUI(); requestRender(); });
+  $('modeDraw').addEventListener('click', function () { state.mode = 'draw'; setStatus('畫線：從標示點拖曳，或依序點兩個點。不會選到地板格。'); syncUI(); requestRender(); });
+  $('modeSeal').addEventListener('click', function () { if (state.solved) return; state.mode = 'seal'; state.pending = null; setStatus('封印模式：點一個地板格（整個直欄都可點），再按「施放封印法陣」；再點同一格可取消。'); syncUI(); requestRender(); });
   $('menuBtn').addEventListener('click', function () { if (window.confirm('回到關卡選單？這一關目前的進度不會保留。')) location.href = '../index.html'; });
-  $('toolLine').addEventListener('click', function () { setStatus('連線：從標示點拖到另一個點；拉成水平或垂直也會吸附。虛線放開會消失。也可以依序點兩個點。'); });
   $('undoBtn').addEventListener('click', function () { if (state.pending) state.pending = null; else state.lines.pop(); syncUI(); requestRender(); });
   $('clearBtn').addEventListener('click', function () { state.lines = []; state.pending = null; setStatus('已清除所有線。'); syncUI(); requestRender(); });
   $('castBtn').addEventListener('click', castSeal);
