@@ -339,6 +339,8 @@
   - 已知小問題：右側欄變窄，標題「第一關 鏡子房間」在手機上被截成「第一關 …」。
   - M10 立體鏡框已做，使用者選框高 0.06 格（見 PENDING 18）。
   - **待辦：把「有一天……」寫進 Google 劇本**《光學抓鬼遊戲 劇本初稿》第一關開場第一句（使用者 2026-11-18 要求；要用有 Google Drive／Docs 連接器的工作階段做，雲端這個沒有）。
+- **第三關（凹透鏡原型）已照回饋改完 C1～C4（2026-11-18，分支 `claude/amazing-hawking-c29fj4`）**：探索一排 `◀ 左轉／舉起·放下凹透鏡／右轉 ▶／光路分析`；光路分析一排 `回探索／選格封印／畫線／復原／清除`（選格時「施放封印法陣」接在最後），拿掉「連線」鈕（點兩點連線併進畫線模式）；封印前再點同一格取消選取、封印後不能改；封印後自動回畫線模式、可繼續畫線。「☰ 關卡」本來就在右上角。這個原型沒有過關畫面，「下一組配置」是開發用的循環，照舊。凹透鏡 e2e 668/668。細節與新發現的風險（狀態列換行會讓畫布在拖曳中移動）在 `docs/prototype-findings.md` 最後一節。**還沒在實體手機上試**。
+  - 第三關接下來：正式的「荒野狩獵」（5 分鐘、3 條命、荒野練習模式 `?practice=1`、開場台詞）還沒做，台詞等 PENDING 15。
 - **共用約定（各分頁都照這個做，免得互等）**：
   - **練習模式網址 `?practice=1`**：照關卡規則玩、**扣命**，但**不計時、不呼叫 `Leaderboard`**、不跑開場過場（Claude 假設，待使用者確認要不要過場）。`?free=1` 維持開發用的自由練習，不放進選單。
   - **過關後只留「回選單」**（Q3），不再直接跳下一關。過關紀錄 `GameProgress.markCleared(...)` 照舊。
@@ -346,7 +348,6 @@
   - G3「直拿就把畫面轉 90°」會影響三關的觸控座標，**等三關分頁都做完再做**（由選單＋共用分頁做，做時要動三關的座標換算就先通知使用者）。
 - **檔案分工（2026-11-18）**：
   - 第二關分頁：`prototype/convex-lens/*`、`tests/e2e-convex-*.js`、`tests/check-geometry-convex.js`。
-  - 第三關分頁：`prototype/concave-lens/*`、`tests/e2e-concave-lens.js`、`tests/check-geometry.js`。
   - 選單＋共用分頁：`prototype/index.html`、`prototype/shared/*`、`prototype/manifest.webmanifest`、`tests/e2e-leaderboard.js`。
   - `PROJECT.md` 和 `docs/playtest-feedback-2026-11-18.md` 大家都會改：只改自己那段，收工前先 `git pull`。
 

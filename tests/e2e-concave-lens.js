@@ -142,6 +142,13 @@ async function run(profile, browser) {
     return r;
   };
   const w2s = (pt) => page.evaluate((pt) => window.__proto.w2s(pt), pt);
+  // 某個控制列裡看得見的按鈕：文字（依畫面由左到右）＋是不是排在同一排（回饋 C1、C2）
+  const rowButtons = (sel) => page.evaluate((sel) => {
+    const bs = Array.from(document.querySelectorAll(sel + ' button')).map((el) => ({ t: el.textContent.trim(), r: el.getBoundingClientRect() })).filter((b) => b.r.width && b.r.height);
+    bs.sort((a, b) => (Math.abs(a.r.top - b.r.top) > 4 ? a.r.top - b.r.top : a.r.left - b.r.left)); // 由上而下、由左而右
+    const tops = bs.map((b) => Math.round(b.r.top));
+    return { labels: bs.map((b) => b.t), oneRow: tops.every((t) => Math.abs(t - tops[0]) <= 1) };
+  }, sel);
   // 拖曳畫線用：從 from 往水平（h）／垂直（v）／斜向（d）找一個終點，在畫布內、而且不在任何標示點的吸附範圍裡
   const freeEnd = (from, axis) => page.evaluate(({ from, axis, hook }) => {
     const H = window[hook], r = document.getElementById('view').getBoundingClientRect();
@@ -176,6 +183,14 @@ async function run(profile, browser) {
 
     // ---------- 探索 ----------
     if (first) { await layoutCheck('探索'); await shot('1-explore-naked'); }
+    if (first) {
+      const rb = await rowButtons('#exploreControls');
+      ok(rb.labels.join('|') === '◀ 左轉|舉起凹透鏡|右轉 ▶|光路分析' && (rb.oneRow || profile.name === 'phone-portrait'),
+        T('C1 探索按鈕：◀ 左轉／舉起凹透鏡／右轉 ▶／光路分析' + (profile.name === 'phone-portrait' ? '' : '，只排一排')), rb.labels.join('、'));
+      // 共用約定 G1：「☰ 關卡」在右上角
+      const mb = await page.evaluate(() => { const r = document.getElementById('menuBtn').getBoundingClientRect(); return { right: window.innerWidth - r.right, top: r.top, t: document.getElementById('menuBtn').textContent.trim() }; });
+      ok(mb.t === '☰ 關卡' && mb.right < 16 && mb.top < 16, T('「☰ 關卡」在右上角'), '離右邊 ' + mb.right.toFixed(0) + 'px、離上面 ' + mb.top.toFixed(0) + 'px');
+    }
     ok(await countColor(GHOST) === 0, T('裸眼畫面沒有鬼'));
 
     // 透鏡內場景重映射：同一方位，舉起透鏡前後，透鏡圓內（不含邊框）的像素應大量不同
@@ -223,6 +238,7 @@ async function run(profile, browser) {
     await tap(ip.x + 9, ip.y - 7); // 故意偏一點，模擬手指
     s = await st();
     ok(s.marker && s.marker.dir === c.direction, T('點鬼像（偏 11px）可標記虛像'));
+    ok(await page.evaluate(() => document.getElementById('lensBtn').textContent.trim()) === '放下凹透鏡', T('舉起後按鈕變成「放下凹透鏡」'));
     await press('#lensBtn');
     s = await st();
     ok(!s.lensUp && await countColor(GHOST) === 0, T('放下透鏡後鬼像消失'));
@@ -233,7 +249,12 @@ async function run(profile, browser) {
     await press('#toAnalysis');
     await page.waitForTimeout(120);
     s = await st();
-    ok(s.phase === 'analysis', T('切到側視分析'));
+    ok(s.phase === 'analysis', T('按「光路分析」切到側視分析'));
+    if (first) {
+      const rb = await rowButtons('#analysisControls');
+      ok(rb.labels.join('|') === '回探索|選格封印|畫線|復原|清除' && (rb.oneRow || profile.name === 'phone-portrait'),
+        T('C2 光路分析按鈕：回探索／選格封印／畫線／復原／清除' + (profile.name === 'phone-portrait' ? '' : '，只排一排')), rb.labels.join('、'));
+    }
     if (first) { const lr = await layoutCheck('分析／畫線'); await shot('4-analysis-start');
       const cell = await page.evaluate(() => window.__proto.configs.floor.width * window.__proto.state.view.s);
       ok(true, P('（資訊）預設縮放下一格寬 ' + cell.toFixed(1) + ' px，畫布 ' + lr.canvas));
@@ -328,7 +349,7 @@ async function run(profile, browser) {
     // 從吸附點上開始拖曳也不算點擊
     const onF = await snap('F');
     if (onF.x > 20 && onF.x < cs.w - 100 && onF.y > 10 && onF.y < cs.h - 10) {
-      await press('#toolLine');
+      await press('#modeDraw');
       await drag(onF.x, onF.y, onF.x + 30, onF.y + 60);
       s = await st();
       ok(!s.pending && s.lines === 3, T('從標示點斜向拖到空白處放開：不留線、不算點擊'));
@@ -472,7 +493,7 @@ async function run(profile, browser) {
         ok(!mid.drag && after.n === n0, T('選格封印模式下，從標示點拖曳不會畫線'));
       }
       await press('#modeDraw');
-      ok(await page.evaluate(() => !document.getElementById('toolParallel') && !document.getElementById('styleBtn') && !!document.getElementById('toolLine')), T('畫線按鈕只剩「連線」（沒有「平行線」「實線／虛線」）'));
+      ok(await page.evaluate(() => !document.getElementById('toolParallel') && !document.getElementById('styleBtn') && !document.getElementById('toolLine')), T('C2 沒有「連線」「平行線」「實線／虛線」按鈕（點兩個點連線在「畫線」模式裡）'));
       await press('#zoomFit');
     }
 
@@ -488,6 +509,16 @@ async function run(profile, browser) {
     let wp = await w2s({ x: -(wrongCell - 0.5) * 100, y: -175 });
     await tap(wp.x, wp.y);
     ok((await st()).selectedCell === wrongCell, T('點地板格可選取（虛像所在的第 ' + wrongCell + ' 格）'));
+    if (first) {
+      const rb = await rowButtons('#analysisControls');
+      ok(rb.labels.join('|') === '回探索|選格封印|畫線|復原|清除|施放封印法陣' && (rb.oneRow || profile.name === 'phone-portrait'), T('選格封印模式：「施放封印法陣」接在同一排最後'), rb.labels.join('、'));
+    }
+    // C3：還沒抓到鬼之前，再點一次同一格取消選取
+    await tap(wp.x, wp.y);
+    s = await st();
+    ok(s.selectedCell === null && await page.evaluate(() => document.getElementById('castBtn').disabled), T('C3 封印前再點同一格 → 取消選取（施放鈕變不能按）'));
+    await tap(wp.x, wp.y);
+    ok((await st()).selectedCell === wrongCell, T('C3 取消後再點一次 → 重新選取'));
     await press('#castBtn');
     const during = [];
     for (const t of [250, 450, 500]) { await page.waitForTimeout(t); during.push(await countColor(GHOST)); if (t === 450 && first) await shot('7-seal-wrong'); }
@@ -509,6 +540,35 @@ async function run(profile, browser) {
     s = await st();
     ok(s.solved && await countColor(GHOST) > 20, T('封印作圖交點所在格 → 成功並顯形'));
     if (first) await shot('8-seal-success');
+
+    // C3：抓到鬼之後不能取消、也不能改選別格
+    {
+      const otherCell = c.targetCell === 1 ? 2 : c.targetCell - 1;
+      wp = await w2s({ x: -(c.targetCell - 0.5) * 100, y: -175 });
+      await tap(wp.x, wp.y);
+      const op = await w2s({ x: -(otherCell - 0.5) * 100, y: -175 });
+      await tap(op.x, op.y);
+      s = await st();
+      const vis = await page.evaluate(() => ({ seal: !document.getElementById('modeSeal').hidden, cast: !document.getElementById('castBtn').hidden }));
+      ok(s.solved && s.selectedCell === c.targetCell && !vis.seal && !vis.cast, T('C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起'));
+    }
+    // C4：封印後仍可以畫線（點兩個點、拖曳都可以）
+    {
+      ok((await st()).mode === 'draw', T('C4 封印成功後自動回到畫線模式'));
+      const n0 = (await st()).lines;
+      const a2 = await snap('I'), b2 = await snap('F');
+      await tap(a2.x, a2.y); await tap(b2.x, b2.y);
+      s = await st();
+      ok(s.lines === n0 + 1 && !s.pending, T('C4 封印後依序點兩個點 → 畫出連線'));
+      const o2 = await snap('O'), e2 = await freeEnd(o2, 'h');
+      if (e2) {
+        await drag(o2.x, o2.y, e2.x, e2.y);
+        ok((await st()).lines === n0 + 2, T('C4 封印後從標示點拖曳 → 畫出水平線'));
+      }
+      if (first) await shot('8b-draw-after-seal');
+      await press('#undoBtn'); if (e2) await press('#undoBtn');
+      ok((await st()).lines === n0, T('C4 封印後「復原」也能用'));
+    }
 
     // ---------- 光路重現 ----------
     await checkReplay({

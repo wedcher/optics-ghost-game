@@ -43,9 +43,7 @@
   @media (max-height: 480px) {
     #topbar { padding:3px 8px; }
     #status { min-height:0; padding:4px 10px; font-size:15px; }
-    #exploreControls, #analysisControls { display:flex; gap:6px; }
-    #exploreControls > .row, #analysisControls > .row { flex:1 1 0; margin-top:0 !important; flex-wrap:nowrap; }
-    #exploreControls > .row:last-child { flex:0 0 190px; }
+    .row { flex-wrap:nowrap; }
     .row > button { min-width:44px; padding:4px 2px; font-size:15px; }
     #zoomBox { flex-direction:row; }
     #banner { font-size:14px; padding:6px 10px; width:min(70%, 520px); }
@@ -73,32 +71,22 @@
     <div id="banner" hidden></div>
   </main>
   <footer id="controls">
-    <div id="exploreControls">
-      <div class="row">
-        <button id="turnLeft" type="button">◀ 左轉</button>
-        <button id="lensBtn" type="button" class="primary">舉起凹透鏡</button>
-        <button id="turnRight" type="button">右轉 ▶</button>
-      </div>
-      <div class="row" style="margin-top:6px">
-        <button id="toAnalysis" type="button" disabled>切到側視分析 ➜</button>
-      </div>
+    <!-- 探索與光路分析各只排一排（使用者 2026-11-18 回饋 C1、C2，排法和第二關一致） -->
+    <div id="exploreControls" class="row">
+      <button id="turnLeft" type="button">◀ 左轉</button>
+      <button id="lensBtn" type="button" class="primary">舉起凹透鏡</button>
+      <button id="turnRight" type="button">右轉 ▶</button>
+      <button id="toAnalysis" type="button" disabled>光路分析</button>
     </div>
-    <div id="analysisControls" hidden>
-      <div class="row">
-        <button id="modeDraw" type="button" class="on">畫線</button>
-        <button id="modeSeal" type="button">選格封印</button>
-        <button id="toExplore" type="button">回探索</button>
-      </div>
-      <div class="row" id="drawRow" style="margin-top:6px">
-        <button id="toolLine" type="button" class="on">連線</button>
-        <button id="undoBtn" type="button">復原</button>
-        <button id="clearBtn" type="button">清除</button>
-      </div>
-      <div class="row" id="sealRow" style="margin-top:6px" hidden>
-        <button id="castBtn" type="button" class="primary" disabled>施放封印法陣</button>
-        <button id="replayBtn" type="button" hidden>光路重現</button>
-        <button id="nextBtn" type="button" hidden>下一組配置</button>
-      </div>
+    <div id="analysisControls" class="row" hidden>
+      <button id="toExplore" type="button">回探索</button>
+      <button id="replayBtn" type="button" hidden>光路重現</button>
+      <button id="modeSeal" type="button">選格封印</button>
+      <button id="modeDraw" type="button" class="on">畫線</button>
+      <button id="undoBtn" type="button">復原</button>
+      <button id="clearBtn" type="button">清除</button>
+      <button id="castBtn" type="button" class="primary" hidden disabled>施放封印法陣</button>
+      <button id="nextBtn" type="button" hidden>下一組配置</button>
     </div>
   </footer>
 </div>
