@@ -30,6 +30,16 @@
   var canvas = $('view');
   var ctx = canvas.getContext('2d');
 
+  // 第三關（PROJECT.md「2026-11-18 試玩回饋後定案」）：上方和第二關一樣顯示 3 顆 ❤️，抓錯扣一顆，用完出現失敗畫面。
+  // 正式的「荒野狩獵」（5 分鐘、台詞）還沒做（PENDING 15），所以這裡沒有計時、沒有開場過場、不呼叫 Leaderboard。
+  // ?free=1 自由練習／開發模式：不計命，顯示配置選單與 Debug。
+  // ?practice=1 練習模式：照規則扣命、不計時、不上排行榜（這一頁目前本來就不計時、不上榜，只在命數旁標「練習」）。
+  var FREE = /[?&]free=1/.test(location.search);
+  var PRACTICE = !FREE && /[?&]practice=1/.test(location.search);
+  var LEVEL_LIVES = 3;
+  var MENU_URL = '../index.html', FAIL_BG = 'assets/wilderness-1-open.jpg';
+  var level = { on: !FREE, screen: 'play', lives: LEVEL_LIVES, sealed: 0, scene: null };
+
   var state = {
     cfgIndex: 0,
     phase: 'explore',     // 'explore' | 'analysis'
@@ -44,7 +54,7 @@
     seal: null,           // { cell, t0, success, done }
     solved: false,
     attempts: 0,
-    debug: /[?&]debug=1/.test(location.search),
+    debug: FREE && /[?&]debug=1/.test(location.search), // 關卡模式不能開 Debug（會洩漏答案）
     zoomIdx: 0,
     view: { s: 1, tx: 0, ty: 0 },
     seenAnalysisIntro: false
@@ -478,6 +488,8 @@
       { id: 'F2', label: 'F′', x: c.focal.imageSide.x, y: 0 },
       { id: 'I', label: '虛像', x: c.image.x, y: c.image.y }
     ];
+    // 封印成功、鬼現身後，鬼本體也是吸附點（2026-11-18 定案）。封印前絕對不能加：那會洩漏位置。
+    if (state.solved) pts.push({ id: 'G', label: '鬼本體', x: c.object.x, y: c.object.y });
     state.lines.forEach(function (l) {
       var p = Optics.intersectVertical(geomLine(l), 0);
       if (!p || Math.abs(p.y) > 400) return;
@@ -606,8 +618,13 @@
     label('你', eye.x + 12, eye.y + 24, '#fff');
 
     // 學生畫的線
+    // 修 bug（使用者 2026-11-18）：原本只要 state.replay 存在（封印成功後一直存在）就把學生的線畫成 22% 白、
+    // 而且畫在光路重現底下，封印後畫的線放開後幾乎看不見、只看得到多出來的 P。
+    // 改成：只有重現動畫正在播的那幾秒壓淡（讓長出來的光線看得清楚）；播完就恢復原色。
+    // 這一層仍畫在光路重現底下：學生的線和重現的光線重疊的那一段，看到的是重現的光線（同一條線）。
+    var dim = replayRunning();
     state.lines.forEach(function (l) {
-      strokeInfinite(geomLine(l), state.replay ? 'rgba(255,255,255,.22)' : (l.kind === 'line' ? '#ffd166' : '#7dffb2'), 2, null);
+      strokeInfinite(geomLine(l), dim ? 'rgba(255,255,255,.22)' : (l.kind === 'line' ? '#ffd166' : '#7dffb2'), 2, null);
     });
     if (state.drag) {
       // 拖曳中的預覽：沒吸附 = 跟手的虛線（放開會消失）；吸附 = 實線，和放開後留下的線同一條
@@ -630,9 +647,10 @@
     snapPoints().forEach(function (sp) {
       q = w2s(sp);
       if (sp.id === 'I') { drawMarker(q.x, q.y, false); label('虛像標記', q.x, q.y + (sp.y >= 0 ? -29 : 29), MARK_COLOR); return; }
-      ctx.fillStyle = sp.id === 'P' ? '#7dffb2' : '#fff';
+      ctx.fillStyle = sp.id === 'P' ? '#7dffb2' : sp.id === 'G' ? GHOST_COLOR : '#fff';
       ctx.beginPath(); ctx.arc(q.x, q.y, 5, 0, 7); ctx.fill();
       if (state.mode === 'draw') { ctx.strokeStyle = 'rgba(255,255,255,.22)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(q.x, q.y, 14, 0, 7); ctx.stroke(); }
+      if (sp.id === 'G') return; // 「鬼本體」字樣已經畫在現身的鬼上方
       if (sp.id === 'P') label('P', q.x + 14, q.y - 12, '#7dffb2');
       else label(sp.label, q.x + (sp.id === 'O' ? -11 : 0), q.y + (sp.id === 'O' ? 15 : 18) * (sp.id !== 'O' && c.image.y < 0 ? -1 : 1), '#fff');
     });
@@ -740,7 +758,7 @@
       return;
     }
     var sp = nearestSnap(x, y);
-    if (!sp) { setStatus('線的端點要吸附在標示點上（O、F、F′、虛像標記、P）。點在點的附近即可。'); return; }
+    if (!sp) { setStatus('線的端點要吸附在標示點上（O、F、F′、虛像標記、P' + (state.solved ? '、鬼本體' : '') + '）。點在點的附近即可。'); return; }
     var pt = { x: sp.x, y: sp.y, label: sp.label };
     if (!state.pending) {
       state.pending = pt;
@@ -768,13 +786,22 @@
       state.seal.done = true;
       if (success) {
         state.solved = true;
+        if (level.on) level.sealed++;
         state.mode = 'draw'; // 封印後仍可以畫線（回饋 C4）；選格已經不能改
         setStatus('封印成功！鬼被迫顯形——牠的本體不在你標記的虛像位置。看看光是怎麼走的。');
         startReplay();
       } else {
         state.selectedCell = null;
         giggle();
-        setStatus('法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。');
+        if (level.on) {
+          // 扣命只看「抓錯」這件事本身，訊息與畫面都不帶任何位置線索
+          level.lives--;
+          flashHud();
+          setStatus('法陣落空，裡面什麼也沒有……（嘻）　失去一顆心。再檢查你的光線作圖。');
+          if (level.lives <= 0) failLevel();
+        } else {
+          setStatus('法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。');
+        }
       }
       syncUI(); requestRender();
     }, 1500);
@@ -935,7 +962,19 @@
     $('modeSeal').hidden = state.solved; // 抓到鬼之後選格不能再改（C3），只留畫線
     $('toExplore').hidden = state.solved; // 破關後不能回探索：那會把法陣和現身的鬼清掉，而且探索畫面沒有「下一組配置」
     $('nextBtn').hidden = !state.solved;
+    $('nextBtn').textContent = level.on ? '下一隻鬼 ➜' : '下一組配置';
+    $('nextBtn').classList.toggle('primary', level.on);
     $('replayBtn').hidden = !state.solved;
+    // 關卡模式：左上角是愛心與封印數（和第二關一樣）；配置選單與 Debug 是開發工具，只在 ?free=1 出現
+    $('title').hidden = level.on; $('configSel').hidden = level.on; $('debugBtn').hidden = level.on;
+    $('hud').hidden = !level.on;
+    $('app').classList.toggle('lvl', level.on);
+    if (level.on) {
+      var hearts = $('hearts').children;
+      for (var hi = 0; hi < hearts.length; hi++) hearts[hi].classList.toggle('lost', hi >= level.lives);
+      $('hearts').setAttribute('aria-label', '剩下 ' + level.lives + ' 條命');
+      $('sealCount').textContent = (PRACTICE ? '練習　' : '') + '封印 ' + level.sealed + ' 隻';
+    }
     $('zoomIn').disabled = state.zoomIdx >= ZOOM_STEPS.length - 1;
     $('zoomOut').disabled = state.zoomIdx <= 0;
     $('debugBtn').classList.toggle('on', state.debug);
@@ -956,6 +995,48 @@
       '理論交點 = (' + f2(r.object.x) + ', ' + f2(r.object.y) + ')\n' +
       '目標格 = ' + c.targetCell + '   鬼方位 = ' + WORLD.directions[c.direction] + '\n' +
       '封印次數 = ' + state.attempts + '   線 = ' + state.lines.length;
+  }
+
+  // ====================================================================
+  // 關卡流程：抓錯扣命 → 命用完出現失敗畫面（畫面用 ../shared/story-scene.js）
+  // ====================================================================
+
+  var hudTimer = null;
+  function flashHud() {
+    var h = $('hud'); h.classList.remove('hit'); void h.offsetWidth; h.classList.add('hit');
+    clearTimeout(hudTimer); hudTimer = setTimeout(function () { h.classList.remove('hit'); }, 700);
+  }
+  function closeScene() { if (level.scene) { level.scene.close(); level.scene = null; } }
+  function failLevel() {
+    level.screen = 'failed';
+    closeScene();
+    // 說明只講結果，不提鬼在哪裡（不能洩漏位置）
+    level.scene = window.StoryScene.show({
+      id: 'failed', background: FAIL_BG,
+      title: '三顆心都用完了……',
+      note: '鬼還躲在荒野裡。這次封印了 ' + level.sealed + ' 隻。重新挑戰會從頭算起。',
+      buttons: [
+        { id: 'retryBtn', label: '重新挑戰', primary: true, onClick: startHunt },
+        { id: 'failMenuBtn', label: '回關卡選單', href: MENU_URL }
+      ]
+    });
+  }
+  /** 重新挑戰：命數與封印數重置，換一隻鬼。 */
+  function startHunt() {
+    closeScene();
+    level.screen = 'play'; level.lives = LEVEL_LIVES; level.sealed = 0;
+    resetRound(nextConfig());
+  }
+  // 關卡模式出題：配置洗牌後依序出，出完再洗；不會連續兩次同一組。自由練習照舊依序循環。
+  var deck = [];
+  function nextConfig() {
+    if (!level.on) return (state.cfgIndex + 1) % Cfg.all.length;
+    if (!deck.length) {
+      deck = Cfg.all.map(function (c, i) { return i; });
+      for (var i = deck.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = deck[i]; deck[i] = deck[j]; deck[j] = t; }
+      if (deck.length > 1 && deck[deck.length - 1] === state.cfgIndex) { var k = deck.pop(); deck.unshift(k); }
+    }
+    return deck.pop();
   }
 
   function resetRound(idx) {
@@ -1046,7 +1127,7 @@
   $('undoBtn').addEventListener('click', function () { if (state.pending) state.pending = null; else state.lines.pop(); syncUI(); requestRender(); });
   $('clearBtn').addEventListener('click', function () { state.lines = []; state.pending = null; setStatus('已清除所有線。'); syncUI(); requestRender(); });
   $('castBtn').addEventListener('click', castSeal);
-  $('nextBtn').addEventListener('click', function () { resetRound((state.cfgIndex + 1) % Cfg.all.length); });
+  $('nextBtn').addEventListener('click', function () { resetRound(nextConfig()); });
   $('replayBtn').addEventListener('click', function () { if (state.solved) startReplay(); });
   $('zoomIn').addEventListener('click', function () { setZoom(state.zoomIdx + 1); });
   $('zoomOut').addEventListener('click', function () { setZoom(state.zoomIdx - 1); });
@@ -1059,7 +1140,7 @@
   // 背景圖載入（或失敗）之後才掛上，測試才不會在換圖前後各取一次畫面。
   function exposeHooks() {
     window.__proto = {
-      state: state, stats: stats, cfg: cfg, configs: Cfg, GHOST_COLOR: GHOST_COLOR, SNAP_PX: SNAP_PX,
+      state: state, stats: stats, level: level, FREE: FREE, PRACTICE: PRACTICE, cfg: cfg, configs: Cfg, GHOST_COLOR: GHOST_COLOR, SNAP_PX: SNAP_PX,
       w2s: w2s, s2w: s2w, snapPoints: snapPoints, nearestSnap: nearestSnap, imageScreenPos: imageScreenPos,
       studentIntersections: studentIntersections, exploreMetrics: exploreMetrics,
       canvasSize: function () { return { W: W, H: H, DPR: DPR }; }, render: render, replaySpec: replaySpec,
@@ -1067,7 +1148,8 @@
     };
   }
 
-  resetRound(0);
+  state.cfgIndex = -1; // 讓第一副牌不會因為「和上一組相同」被調換
+  resetRound(level.on ? nextConfig() : 0);
   if (bg.settled) exposeHooks();
   else bgWaiters.push(function () { render(); exposeHooks(); });
 })();

@@ -84,7 +84,7 @@
 - 三關右上角按鈕字樣「☰ 回關卡」。
 - 第二、三關操作一致：選格封印在抓到鬼前再點同一格可取消、抓到後不能改；封印前後都能畫線；封印後**鬼本體**也是畫線的吸附點。
 - 第二關每輪（抓 5 隻）**保證至少一題虛像題**（J、K、L 其中之一）。
-- 第三關上方和第二關一樣顯示 ❤️ 命數，說明文字放在 ❤️ 後面。
+- 第三關上方和第二關一樣顯示 ❤️ 命數，說明文字放在 ❤️ 後面。（已實作 2026-11-18：抓錯扣一顆、用完出現失敗畫面「重新挑戰／回關卡選單」；`?free=1` 不計命；`?practice=1` 扣命、不計時、不上榜。**標題**在正式荒野狩獵做好前用「第三關：荒野（凹透鏡）」（網頁標題）／「第三關 荒野」（`?free=1` 畫面標題）；關卡模式和第二關一樣不顯示標題。細節見 `docs/prototype-findings.md` 最後一節。）
 - 手機直拿時整個遊戲轉 90°（G3 後半），使用者同意開始做。
 - 劇本 Google 文件：https://docs.google.com/document/d/1ddmuu3FZN_3SS0G1ePN16ItOrqwyrJxO1rSXOOFzA7A/edit （台詞以這份為準；2026-11-18 已加「有一天……」並同步第一關改過的台詞）。
 
@@ -386,10 +386,10 @@
   - **第一波（可同時做）**：任務卡「第二關：一致性、保證虛像題、劇本待辦」（`convex-lens/*`）；任務卡「第三關：❤️、吸附鬼本體、畫線修正」（`concave-lens/*`）。
   - **第二波**：任務卡「趕鬼時間改成兩關最後一次過關成績相加」（`shared/leaderboard.js`、`plane-mirror/app.js` 與 `convex-lens/app.js` 的計時呼叫、`docs/leaderboard.md`）。**要等第二關任務卡併進 main 才開始**。
   - **第三波**：任務卡「手機直拿時整個遊戲轉 90°」（`shared/landscape.js` 與三關的座標換算）。**要等前面三張都併進 main 才開始**。
-  - 使用者回報的 bug（第三關）：封印後畫線，放開後看不到線條，但多了交點 P → 線有存進去、可能沒畫出來。交給第三關任務卡查。
+  - 使用者回報的 bug（第三關）：封印後畫線，放開後看不到線條，但多了交點 P → 線有存進去、可能沒畫出來。交給第三關任務卡查。→ ✅ 已修（2026-11-18）：原因是 `state.replay` 存在時學生的線一律畫成 22% 白，封印後 `state.replay` 一直存在；改成只在重現動畫播放的那幾秒壓淡。e2e 加了像素檢查（改回舊判斷式會失敗）。
+  - ✅ **第三關任務卡完成（2026-11-18）**：❤️／扣命／失敗畫面、`?practice=1`、上面的 bug、封印後鬼本體是吸附點、「☰ 回關卡」。凹 e2e 742/742。細節在 `docs/prototype-findings.md` 最後一節。**還沒在實體手機上試。** 仍未做：正式荒野狩獵（5 分鐘、台詞，等 PENDING 15）、`GameProgress.markCleared('concave')`（何時算完成未定）。
 - **檔案分工（2026-11-18）**：
   - 第二關任務卡：`prototype/convex-lens/*`、`tests/e2e-convex-*.js`、`tests/check-geometry-convex.js`、`docs/prototype-findings-convex.md`。
-  - 第三關任務卡：`prototype/concave-lens/*`、`tests/e2e-concave-lens.js`、`tests/check-geometry.js`、`docs/prototype-findings.md`。
   - 第二、三波開工時自己在這裡加一行。做完的把自己那行拿掉。
   - `PROJECT.md` 和 `docs/playtest-feedback-2026-11-18.md` 大家都會改：只改自己那段，收工前先 `git pull`。
 

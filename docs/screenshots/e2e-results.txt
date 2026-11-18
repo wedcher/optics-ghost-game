@@ -4,7 +4,7 @@
   PASS  [phone-landscape] 探索：頁面不需捲動
   PASS  [phone-landscape] 探索：畫布仍有足夠空間（≥300×150）  — 812×240
   PASS  [phone-landscape] 配置A C1 探索按鈕：◀ 左轉／舉起凹透鏡／右轉 ▶／光路分析，只排一排  — ◀ 左轉、舉起凹透鏡、右轉 ▶、光路分析
-  PASS  [phone-landscape] 配置A 「☰ 關卡」在右上角  — 離右邊 8px、離上面 3px
+  PASS  [phone-landscape] 配置A 「☰ 回關卡」在右上角  — 離右邊 8px、離上面 3px
   PASS  [phone-landscape] 配置A 裸眼畫面沒有鬼
   PASS  [phone-landscape] 配置A 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 49% 像素改變；此方位沒有鬼
   PASS  [phone-landscape] 配置A 透鏡外畫面不變  — 0.00%
@@ -104,6 +104,11 @@
   PASS  [phone-landscape] 配置A 光路重現：結束時標出像點  — 139 px（重現前 64）
   PASS  [phone-landscape] 配置A 光路重現：反向延長線用另一種顏色的虛線
   PASS  [phone-landscape] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置A 封印後鬼本體成為吸附點（座標 = 物點）
+  PASS  [phone-landscape] 配置A 封印後點「鬼本體」再點 F → 畫出連線
+  PASS  [phone-landscape] 配置A 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 80 個像素
+  PASS  [phone-landscape] 配置A 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 68 個像素
+  PASS  [phone-landscape] 配置A 封印後畫的線可以復原
   PASS  [phone-landscape] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
   PASS  [phone-landscape] 配置A 關閉 Debug 後面板清空
   PASS  [phone-landscape] 配置B 裸眼畫面沒有鬼
@@ -191,7 +196,12 @@
   PASS  [phone-landscape] 配置B 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置B 光路重現：結束時標出像點  — 137 px（重現前 66）
   PASS  [phone-landscape] 配置B 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置B 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置B 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置B 封印後鬼本體成為吸附點（座標 = 物點）
+  PASS  [phone-landscape] 配置B 封印後點「鬼本體」再點 F → 畫出連線
+  PASS  [phone-landscape] 配置B 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 70 個像素
+  PASS  [phone-landscape] 配置B 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 49 個像素
+  PASS  [phone-landscape] 配置B 封印後畫的線可以復原
   PASS  [phone-landscape] 配置C 裸眼畫面沒有鬼
   PASS  [phone-landscape] 配置C 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 59% 像素改變；此方位沒有鬼
   PASS  [phone-landscape] 配置C 透鏡外畫面不變  — 0.00%
@@ -277,7 +287,12 @@
   PASS  [phone-landscape] 配置C 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置C 光路重現：結束時標出像點  — 136 px（重現前 64）
   PASS  [phone-landscape] 配置C 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置C 封印後鬼本體成為吸附點（座標 = 物點）
+  PASS  [phone-landscape] 配置C 封印後點「鬼本體」再點 F → 畫出連線
+  PASS  [phone-landscape] 配置C 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 69 個像素
+  PASS  [phone-landscape] 配置C 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 85 個像素
+  PASS  [phone-landscape] 配置C 封印後畫的線可以復原
   PASS  [phone-landscape] 配置D 裸眼畫面沒有鬼
   PASS  [phone-landscape] 配置D 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 47% 像素改變；此方位沒有鬼
   PASS  [phone-landscape] 配置D 透鏡外畫面不變  — 0.00%
@@ -362,6 +377,11 @@
   PASS  [phone-landscape] 配置D 光路重現：結束時標出像點  — 130 px（重現前 70）
   PASS  [phone-landscape] 配置D 光路重現：反向延長線用另一種顏色的虛線
   PASS  [phone-landscape] 配置D 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置D 封印後鬼本體成為吸附點（座標 = 物點）
+  PASS  [phone-landscape] 配置D 封印後點「鬼本體」再點 F → 畫出連線
+  PASS  [phone-landscape] 配置D 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 78 個像素
+  PASS  [phone-landscape] 配置D 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 41 個像素
+  PASS  [phone-landscape] 配置D 封印後畫的線可以復原
   PASS  [phone-landscape] 沒有 JS 錯誤
   PASS  [phone-portrait] 背景圖已載入
   PASS  [phone-portrait] 探索：所有控制項都在畫面內  — canvas 375×639
@@ -369,7 +389,7 @@
   PASS  [phone-portrait] 探索：頁面不需捲動
   PASS  [phone-portrait] 探索：畫布仍有足夠空間（≥300×150）  — 375×639
   PASS  [phone-portrait] 配置A C1 探索按鈕：◀ 左轉／舉起凹透鏡／右轉 ▶／光路分析  — ◀ 左轉、舉起凹透鏡、右轉 ▶、光路分析
-  PASS  [phone-portrait] 配置A 「☰ 關卡」在右上角  — 離右邊 8px、離上面 6px
+  PASS  [phone-portrait] 配置A 「☰ 回關卡」在右上角  — 離右邊 8px、離上面 6px
   PASS  [phone-portrait] 配置A 裸眼畫面沒有鬼
   PASS  [phone-portrait] 配置A 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 49% 像素改變；此方位沒有鬼
   PASS  [phone-portrait] 配置A 透鏡外畫面不變  — 0.00%
@@ -465,7 +485,12 @@
   PASS  [phone-portrait] 配置A 光路重現：畫面上方有說明文字框
   PASS  [phone-portrait] 配置A 光路重現：結束時標出像點  — 137 px（重現前 67）
   PASS  [phone-portrait] 配置A 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-portrait] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-portrait] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-portrait] 配置A 封印後鬼本體成為吸附點（座標 = 物點）
+  PASS  [phone-portrait] 配置A 封印後點「鬼本體」再點 F → 畫出連線
+  PASS  [phone-portrait] 配置A 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 79 個像素
+  PASS  [phone-portrait] 配置A 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 68 個像素
+  PASS  [phone-portrait] 配置A 封印後畫的線可以復原
   PASS  [phone-portrait] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
   PASS  [phone-portrait] 配置A 關閉 Debug 後面板清空
   PASS  [phone-portrait] 沒有 JS 錯誤
@@ -475,7 +500,7 @@
   PASS  [desktop] 探索：頁面不需捲動
   PASS  [desktop] 探索：畫布仍有足夠空間（≥300×150）  — 1280×640
   PASS  [desktop] 配置A C1 探索按鈕：◀ 左轉／舉起凹透鏡／右轉 ▶／光路分析，只排一排  — ◀ 左轉、舉起凹透鏡、右轉 ▶、光路分析
-  PASS  [desktop] 配置A 「☰ 關卡」在右上角  — 離右邊 8px、離上面 6px
+  PASS  [desktop] 配置A 「☰ 回關卡」在右上角  — 離右邊 8px、離上面 6px
   PASS  [desktop] 配置A 裸眼畫面沒有鬼
   PASS  [desktop] 配置A 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 52% 像素改變；此方位沒有鬼
   PASS  [desktop] 配置A 透鏡外畫面不變  — 0.00%
@@ -577,6 +602,11 @@
   PASS  [desktop] 配置A 光路重現：結束時標出像點  — 32 px（重現前 15）
   PASS  [desktop] 配置A 光路重現：反向延長線用另一種顏色的虛線
   PASS  [desktop] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [desktop] 配置A 封印後鬼本體成為吸附點（座標 = 物點）
+  PASS  [desktop] 配置A 封印後點「鬼本體」再點 F → 畫出連線
+  PASS  [desktop] 配置A 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 21 個像素
+  PASS  [desktop] 配置A 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 27 個像素
+  PASS  [desktop] 配置A 封印後畫的線可以復原
   PASS  [desktop] 配置A Debug overlay 顯示物點／虛像／焦距／目標格／理論光線
   PASS  [desktop] 配置A 關閉 Debug 後面板清空
   PASS  [desktop] 配置C 裸眼畫面沒有鬼
@@ -665,6 +695,50 @@
   PASS  [desktop] 配置C 光路重現：結束時標出像點  — 27 px（重現前 16）
   PASS  [desktop] 配置C 光路重現：反向延長線用另一種顏色的虛線
   PASS  [desktop] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [desktop] 配置C 封印後鬼本體成為吸附點（座標 = 物點）
+  PASS  [desktop] 配置C 封印後點「鬼本體」再點 F → 畫出連線
+  PASS  [desktop] 配置C 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 17 個像素
+  PASS  [desktop] 配置C 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 18 個像素
+  PASS  [desktop] 配置C 封印後畫的線可以復原
   PASS  [desktop] 沒有 JS 錯誤
+  PASS  [level] 上方顯示 3 顆 ❤️
+  PASS  [level] 關卡模式不顯示標題、配置選單與 Debug（和第二關一樣）
+  PASS  [level] 右上角按鈕字樣「☰ 回關卡」  — ☰ 回關卡
+  PASS  [level] 命數旁顯示封印數  — 封印 0 隻
+  PASS  [level] 這一頁沒有載入 Leaderboard（不計時、不上榜）
+  PASS  [level] 說明文字在 ❤️ 後面、同一列（照第二關的排法）  — hud 右緣 176、說明 180～718
+  PASS  [level] 第 1 次抓錯：扣一顆 ❤️（剩 2）
+  PASS  [level] 第 1 次抓錯：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　失去一顆心。再檢查你的光線作圖。」
+  PASS  [level] 第 2 次抓錯：扣一顆 ❤️（剩 1）
+  PASS  [level] 第 2 次抓錯：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　失去一顆心。再檢查你的光線作圖。」
+  PASS  [level] 抓對：封印數 +1、不扣命  — 封印 1 隻
+  PASS  [level] 封印後按鈕是「下一隻鬼 ➜」  — 下一隻鬼 ➜
+  PASS  [level] 下一隻鬼：回到探索，命數與封印數保留
+  PASS  [level] 命用完：出現失敗畫面
+  PASS  [level] 失敗畫面有「重新挑戰」與「回關卡選單」  — retryBtn,failMenuBtn
+  PASS  [level] 失敗畫面的文字不洩漏位置  — 三顆心都用完了…… 鬼還躲在荒野裡。這次封印了 1 隻。重新挑戰會從頭算起。 重新挑戰 回關卡選單
+  PASS  [level] 重新挑戰：3 顆 ❤️、封印數歸零、回到探索
+  PASS  [level] 關卡模式下 ?debug=1 不會打開 Debug
+  PASS  [level] ?free=1：不顯示 ❤️，標題「第三關」、配置選單與 Debug 照舊
+  PASS  [level] ?free=1：抓錯不扣命
+  PASS  [level] 沒有 JS 錯誤
+  PASS  [level-practice] 上方顯示 3 顆 ❤️
+  PASS  [level-practice] 關卡模式不顯示標題、配置選單與 Debug（和第二關一樣）
+  PASS  [level-practice] 右上角按鈕字樣「☰ 回關卡」  — ☰ 回關卡
+  PASS  [level-practice] 練習模式：命數旁標「練習」  — 練習　封印 0 隻
+  PASS  [level-practice] 這一頁沒有載入 Leaderboard（不計時、不上榜）
+  PASS  [level-practice] 說明文字在 ❤️ 後面、同一列（照第二關的排法）  — hud 右緣 224、說明 228～718
+  PASS  [level-practice] 第 1 次抓錯：扣一顆 ❤️（剩 2）
+  PASS  [level-practice] 第 1 次抓錯：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　失去一顆心。再檢查你的光線作圖。」
+  PASS  [level-practice] 第 2 次抓錯：扣一顆 ❤️（剩 1）
+  PASS  [level-practice] 第 2 次抓錯：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　失去一顆心。再檢查你的光線作圖。」
+  PASS  [level-practice] 抓對：封印數 +1、不扣命  — 練習　封印 1 隻
+  PASS  [level-practice] 封印後按鈕是「下一隻鬼 ➜」  — 下一隻鬼 ➜
+  PASS  [level-practice] 下一隻鬼：回到探索，命數與封印數保留
+  PASS  [level-practice] 命用完：出現失敗畫面
+  PASS  [level-practice] 失敗畫面有「重新挑戰」與「回關卡選單」  — retryBtn,failMenuBtn
+  PASS  [level-practice] 失敗畫面的文字不洩漏位置  — 三顆心都用完了…… 鬼還躲在荒野裡。這次封印了 1 隻。重新挑戰會從頭算起。 重新挑戰 回關卡選單
+  PASS  [level-practice] 重新挑戰：3 顆 ❤️、封印數歸零、回到探索
+  PASS  [level-practice] 沒有 JS 錯誤
 
-ALL PASS: 668/668 checks
+ALL PASS: 742/742 checks

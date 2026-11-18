@@ -10,6 +10,9 @@
  *   - 畫線不會誤觸選格／縮放；拖曳與雙指不會畫線
  *   - 沒開 Debug 時畫面與 DOM 不洩漏答案
  *   - 錯誤封印不揭露鬼；正確封印才顯形
+ *   - 封印後畫的線真的畫在畫面上（使用者 2026-11-18 回報的 bug）；鬼本體封印後才成為吸附點
+ *   - 關卡模式（不帶 ?free=1）：3 顆 ❤️、抓錯扣命、命用完出現失敗畫面；?practice=1 練習模式
+ * 原本的完整流程用 ?free=1（自由練習／開發模式：有配置選單與 Debug、不計命）跑；關卡模式另外在 runLevel 測。
  * 截圖輸出到 docs/screenshots/。
  */
 'use strict';
@@ -48,10 +51,10 @@ function ok(cond, label, detail) {
 
 const PROFILES = [
   // 遊戲一律橫向（docs/decisions.md）。橫向手機是主要情境，跑完全部配置。
-  { name: 'phone-landscape', viewport: { width: 812, height: 375 }, touch: true, dsf: 2, configs: [0, 1, 2, 3], shots: /./ },
+  { name: 'phone-landscape', viewport: { width: 812, height: 375 }, touch: true, dsf: 2, configs: [0, 1, 2, 3], shots: /./, query: '?free=1' },
   // 直向只當備援版面檢查：用 ?portrait=1 關掉「請橫放」提示。
-  { name: 'phone-portrait', viewport: { width: 375, height: 812 }, touch: true, dsf: 2, configs: [0], shots: /^[258]-/, query: '?portrait=1' },
-  { name: 'desktop', viewport: { width: 1280, height: 800 }, touch: false, dsf: 1, configs: [0, 2], shots: /^[258]-/ }
+  { name: 'phone-portrait', viewport: { width: 375, height: 812 }, touch: true, dsf: 2, configs: [0], shots: /^[258]-/, query: '?portrait=1&free=1' },
+  { name: 'desktop', viewport: { width: 1280, height: 800 }, touch: false, dsf: 1, configs: [0, 2], shots: /^[258]-/, query: '?free=1' }
 ];
 
 async function run(profile, browser) {
@@ -187,9 +190,9 @@ async function run(profile, browser) {
       const rb = await rowButtons('#exploreControls');
       ok(rb.labels.join('|') === '◀ 左轉|舉起凹透鏡|右轉 ▶|光路分析' && (rb.oneRow || profile.name === 'phone-portrait'),
         T('C1 探索按鈕：◀ 左轉／舉起凹透鏡／右轉 ▶／光路分析' + (profile.name === 'phone-portrait' ? '' : '，只排一排')), rb.labels.join('、'));
-      // 共用約定 G1：「☰ 關卡」在右上角
+      // 共用約定 G1：「☰ 回關卡」在右上角（2026-11-18 改字）
       const mb = await page.evaluate(() => { const r = document.getElementById('menuBtn').getBoundingClientRect(); return { right: window.innerWidth - r.right, top: r.top, t: document.getElementById('menuBtn').textContent.trim() }; });
-      ok(mb.t === '☰ 關卡' && mb.right < 16 && mb.top < 16, T('「☰ 關卡」在右上角'), '離右邊 ' + mb.right.toFixed(0) + 'px、離上面 ' + mb.top.toFixed(0) + 'px');
+      ok(mb.t === '☰ 回關卡' && mb.right < 16 && mb.top < 16, T('「☰ 回關卡」在右上角'), '離右邊 ' + mb.right.toFixed(0) + 'px、離上面 ' + mb.top.toFixed(0) + 'px');
     }
     ok(await countColor(GHOST) === 0, T('裸眼畫面沒有鬼'));
 
@@ -594,6 +597,49 @@ async function run(profile, browser) {
       }
     });
 
+    // ---------- 封印後畫線看得到（使用者 2026-11-18 回報：放開後看不到線，但多了交點 P）＋ 鬼本體是吸附點 ----------
+    {
+      // 等光路重現播完（播的那幾秒線會壓淡，那是刻意的）；之後畫的線一定要用原本的顏色畫在最上層
+      await page.evaluate(() => { const s = window.__proto.state; if (s.replay) s.replay.t0 = performance.now() - 60000; window.__proto.render(); });
+      await press('#modeDraw');
+      const pts2 = await page.evaluate(() => window.__proto.snapPoints());
+      const G = pts2.find((q) => q.id === 'G');
+      ok(!!G && Math.abs(G.x - c.object.x) < 1e-9 && Math.abs(G.y - c.object.y) < 1e-9, T('封印後鬼本體成為吸附點（座標 = 物點）'));
+      // 像素：在線經過、但不靠近任何標示點的地方取樣，比較畫線前後有幾個像素變了（不比顏色：線寬 2 會被反鋸齒混色）
+      const region = (at) => page.evaluate((at) => {
+        const H = window.__proto; H.render();
+        const dpr = H.canvasSize().DPR, R = Math.ceil(4 * dpr), x0 = Math.round(at.x * dpr) - R, y0 = Math.round(at.y * dpr) - R;
+        return Array.from(document.getElementById('view').getContext('2d').getImageData(x0, y0, 2 * R + 1, 2 * R + 1).data);
+      }, at);
+      // 變了、而且是線的顏色（黃 #ffd166／綠 #7dffb2，容許反鋸齒混色）才算；原本的 bug 是畫成 22% 白，色相不對，不算
+      const hue = { y: (r, g, b) => r > 140 && r - b > 70, g: (r, g, b) => g > 110 && g - r > 45 };
+      const changed = (a, b, kind) => { let n = 0; for (let i = 0; i < a.length; i += 4) if (Math.abs(a[i] - b[i]) + Math.abs(a[i + 1] - b[i + 1]) + Math.abs(a[i + 2] - b[i + 2]) > 60 && hue[kind](b[i], b[i + 1], b[i + 2])) n++; return n; };
+      const n0 = (await st()).lines;
+      // ① 鬼本體 → F（不和重現的光線重疊）
+      const g = await snap('G'), o = await snap('F');
+      const midGO = { x: g.x + (o.x - g.x) * 0.45, y: g.y + (o.y - g.y) * 0.45 };
+      const yb = await region(midGO);
+      await tap(g.x, g.y); await tap(o.x, o.y);
+      s = await st();
+      const ya = changed(yb, await region(midGO), 'y');
+      ok(s.lines === n0 + 1 && !s.pending, T('封印後點「鬼本體」再點 F → 畫出連線'));
+      ok(ya >= 3, T('封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）'), ya + ' 個像素');
+      // ② 從 F 拖出垂直線（拖曳畫線、放開後）
+      const f = await snap('F'), e3 = await freeEnd(f, 'v');
+      if (e3) {
+        const at = { x: f.x + (e3.x - f.x) * 0.6, y: f.y + (e3.y - f.y) * 0.6 };
+        const gb = await region(at);
+        await drag(f.x, f.y, e3.x, e3.y);
+        if (profile.touch) { await page.waitForTimeout(40); await page.touchscreen.tap(4, 4); }
+        const ga = changed(gb, await region(at), 'g');
+        ok((await st()).lines === n0 + 2 && ga >= 3, T('封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）'), ga + ' 個像素');
+        if (first) await shot('8c-line-visible-after-seal');
+        await press('#undoBtn');
+      }
+      await press('#undoBtn');
+      ok((await st()).lines === n0, T('封印後畫的線可以復原'));
+    }
+
     // ---------- Debug ----------
     if (first) {
       await press('#debugBtn');
@@ -609,12 +655,124 @@ async function run(profile, browser) {
   await context.close();
 }
 
+// ---------- 關卡模式（不帶 ?free=1）：❤️、扣命、失敗畫面、練習模式 ----------
+async function runLevel(browser, query) {
+  const practice = /practice=1/.test(query);
+  const name = practice ? 'level-practice' : 'level';
+  console.log('\n===== ' + name + ' 812×375 touch ' + query + ' =====');
+  const context = await browser.newContext({ viewport: { width: 812, height: 375 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
+  const page = await context.newPage();
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+  page.on('dialog', (d) => d.dismiss());
+  await page.goto(URL + query);
+  await page.waitForFunction(() => window.__proto);
+  const P = (label) => '[' + name + '] ' + label;
+  const press = async (sel, wait) => { await page.tap(sel); await page.waitForTimeout(wait || 40); };
+  const tapCanvas = async (x, y) => { const b = await page.evaluate(() => { const r = document.getElementById('view').getBoundingClientRect(); return { x: r.left, y: r.top }; }); await page.touchscreen.tap(b.x + x, b.y + y); await page.waitForTimeout(40); };
+  const info = () => page.evaluate(() => {
+    const H = window.__proto, lv = H.level, vis = (id) => { const el = document.getElementById(id); return !!el && !el.hidden && el.getBoundingClientRect().width > 0; };
+    const sc = document.querySelector('.story');
+    return { lives: lv.lives, sealed: lv.sealed, screen: lv.screen, on: lv.on,
+      heartsLeft: Array.from(document.querySelectorAll('#hearts > span')).filter((h) => !h.classList.contains('lost')).length,
+      hearts: document.querySelectorAll('#hearts > span').length,
+      count: document.getElementById('sealCount').textContent, status: document.getElementById('status').textContent,
+      hud: vis('hud'), title: vis('title'), configSel: vis('configSel'), debugBtn: vis('debugBtn'), debug: H.state.debug,
+      menu: document.getElementById('menuBtn').textContent.trim(), next: document.getElementById('nextBtn').textContent.trim(),
+      phase: H.state.phase, solved: H.state.solved, lines: H.state.lines.length,
+      scene: sc ? { id: sc.getAttribute('data-scene'), text: sc.innerText, buttons: Array.from(sc.querySelectorAll('.story-btn')).map((b) => b.id), menuHref: (sc.querySelector('#failMenuBtn') || {}).getAttribute ? sc.querySelector('#failMenuBtn').getAttribute('href') : null } : null,
+      lb: typeof window.Leaderboard };
+  });
+  // 標記虛像、進入光路分析（探索流程在 ?free=1 的測試裡已經用真的點擊測過，這裡直接設定標記）
+  const toAnalysis = async () => {
+    await page.evaluate(() => { const H = window.__proto, c = H.cfg(); H.state.marker = { dir: c.direction, tanX: 0, tanY: H.imageScreenPos().tan }; });
+    await page.evaluate(() => window.__proto.render());
+    await press('#lensBtn'); await press('#lensBtn'); // 讓 syncUI 更新「光路分析」按鈕
+    await press('#toAnalysis', 150);
+  };
+  const sealCell = async (cell) => {
+    await press('#modeSeal');
+    const p = await page.evaluate((cell) => window.__proto.w2s({ x: -(cell - 0.5) * 100, y: 60 }), cell);
+    await tapCanvas(p.x, p.y);
+    await press('#castBtn');
+    await page.waitForTimeout(1700);
+  };
+  const wrongCell = () => page.evaluate(() => { const c = window.__proto.cfg(); return c.targetCell === 1 ? 2 : c.targetCell - 1; });
+
+  let s = await info();
+  ok(s.on && s.hud && s.hearts === 3 && s.heartsLeft === 3, P('上方顯示 3 顆 ❤️'));
+  ok(!s.title && !s.configSel && !s.debugBtn, P('關卡模式不顯示標題、配置選單與 Debug（和第二關一樣）'));
+  ok(s.menu === '☰ 回關卡', P('右上角按鈕字樣「☰ 回關卡」'), s.menu);
+  ok(practice ? /^練習/.test(s.count) : s.count === '封印 0 隻', P(practice ? '練習模式：命數旁標「練習」' : '命數旁顯示封印數'), s.count);
+  ok(s.lb === 'undefined', P('這一頁沒有載入 Leaderboard（不計時、不上榜）'));
+  {
+    // 說明文字放在 ❤️ 後面：同一列、在愛心右邊、在「☰ 回關卡」左邊
+    const r = await page.evaluate(() => { const b = (id) => document.getElementById(id).getBoundingClientRect(); return { hud: b('hud'), st: b('status'), menu: b('menuBtn') }; });
+    ok(r.st.left >= r.hud.right - 1 && r.st.right <= r.menu.left + 1 && Math.abs((r.st.top + r.st.bottom) / 2 - (r.hud.top + r.hud.bottom) / 2) < 12,
+      P('說明文字在 ❤️ 後面、同一列（照第二關的排法）'), 'hud 右緣 ' + r.hud.right.toFixed(0) + '、說明 ' + r.st.left.toFixed(0) + '～' + r.st.right.toFixed(0));
+  }
+  await page.screenshot({ path: path.join(SHOTS, 'concave-' + name + '-1-hud.png') });
+
+  // 抓錯 → 扣一顆，訊息不帶位置
+  await toAnalysis();
+  for (let k = 1; k <= 2; k++) {
+    await sealCell(await wrongCell());
+    s = await info();
+    ok(s.lives === 3 - k && s.heartsLeft === 3 - k && !s.solved && s.screen === 'play', P('第 ' + k + ' 次抓錯：扣一顆 ❤️（剩 ' + (3 - k) + '）'));
+    ok(!/[左右前後遠近]|太|靠|第\s*\d|格子?\s*\d|\d/.test(s.status), P('第 ' + k + ' 次抓錯：訊息不含方向／距離／格號線索'), '「' + s.status + '」');
+  }
+  if (!practice) await page.screenshot({ path: path.join(SHOTS, 'concave-level-2-hit.png') });
+  // 抓對 → 封印數 +1，可以換下一隻
+  await sealCell(await page.evaluate(() => window.__proto.cfg().targetCell));
+  s = await info();
+  ok(s.solved && s.sealed === 1 && s.lives === 1 && (practice ? /封印 1 隻/.test(s.count) : s.count === '封印 1 隻'), P('抓對：封印數 +1、不扣命'), s.count);
+  ok(s.next === '下一隻鬼 ➜', P('封印後按鈕是「下一隻鬼 ➜」'), s.next);
+  await press('#nextBtn', 100);
+  s = await info();
+  ok(s.phase === 'explore' && !s.solved && s.lives === 1 && s.sealed === 1, P('下一隻鬼：回到探索，命數與封印數保留'));
+  // 第 3 次抓錯 → 命用完 → 失敗畫面
+  await toAnalysis();
+  await sealCell(await wrongCell());
+  s = await info();
+  ok(s.lives === 0 && s.heartsLeft === 0 && s.screen === 'failed' && s.scene && s.scene.id === 'failed', P('命用完：出現失敗畫面'));
+  ok(s.scene && s.scene.buttons.join() === 'retryBtn,failMenuBtn' && s.scene.menuHref === '../index.html', P('失敗畫面有「重新挑戰」與「回關卡選單」'), s.scene && s.scene.buttons.join());
+  const cellsHidden = await page.evaluate(() => { const c = window.__proto.cfg(); return c.targetCell; });
+  ok(s.scene && !/[左右前後遠近]|格/.test(s.scene.text) && !s.scene.text.includes('第 ' + cellsHidden), P('失敗畫面的文字不洩漏位置'), s.scene && s.scene.text.replace(/\s+/g, ' '));
+  if (!practice) await page.screenshot({ path: path.join(SHOTS, 'concave-level-3-failed.png') });
+  await page.waitForTimeout(400); // 結尾按鈕出現後 350ms 內不接受點擊
+  await press('#retryBtn', 150);
+  s = await info();
+  ok(!s.scene && s.screen === 'play' && s.lives === 3 && s.heartsLeft === 3 && s.sealed === 0 && s.phase === 'explore', P('重新挑戰：3 顆 ❤️、封印數歸零、回到探索'));
+  if (!practice) {
+    // ?debug=1 在關卡模式不能打開 Debug（會洩漏答案）
+    await page.goto(URL + '?debug=1');
+    await page.waitForFunction(() => window.__proto);
+    s = await info();
+    ok(!s.debug && !s.debugBtn && await page.evaluate(() => document.getElementById('debugPanel').hidden), P('關卡模式下 ?debug=1 不會打開 Debug'));
+    // ?free=1：不計命，照舊顯示標題、配置選單與 Debug
+    await page.goto(URL + '?free=1');
+    await page.waitForFunction(() => window.__proto);
+    s = await info();
+    ok(!s.on && !s.hud && s.title && s.configSel && s.debugBtn && /第三關/.test(await page.evaluate(() => document.getElementById('title').textContent)), P('?free=1：不顯示 ❤️，標題「第三關」、配置選單與 Debug 照舊'));
+    await toAnalysis();
+    await sealCell(await wrongCell());
+    s = await info();
+    ok(s.lives === 3 && s.screen === 'play', P('?free=1：抓錯不扣命'));
+  }
+  ok(errors.length === 0, P('沒有 JS 錯誤'), errors.join(' | ') || undefined);
+  await context.close();
+}
+
 (async () => {
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   URL = 'http://127.0.0.1:' + server.address().port + '/prototype/concave-lens/index.html';
   const browser = await chromium.launch();
   for (const p of PROFILES) {
     try { await run(p, browser); } catch (e) { ok(false, '[' + p.name + '] 測試腳本例外', e.message); }
+  }
+  for (const q of ['', '?practice=1']) {
+    try { await runLevel(browser, q); } catch (e) { ok(false, '[level ' + q + '] 測試腳本例外', e.message); }
   }
   await browser.close();
   server.close();
