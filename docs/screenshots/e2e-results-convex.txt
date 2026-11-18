@@ -80,7 +80,11 @@
   PASS  [phone-landscape] 分析／封印：頁面不需捲動
   PASS  [phone-landscape] 分析／封印：畫布仍有足夠空間（≥300×150）  — 812×240
   PASS  [phone-landscape] 配置A·放大像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置A·放大像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置A·放大像 點地板格可選取（透鏡所在的第 6 格）
+  PASS  [phone-landscape] 配置A·放大像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置A·放大像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置A·放大像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置A·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置A·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置A·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -105,11 +109,18 @@
   PASS  [phone-landscape] 配置A·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
   PASS  [phone-landscape] 配置A·放大像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置A·放大像 光路重現：結束時標出像點  — 139 px（重現前 66）
-  PASS  [phone-landscape] 配置A·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置A·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置A·放大像 封印後：「選格封印」收起、回到畫線模式
+  PASS  [phone-landscape] 配置A·放大像 封印後：鬼本體（物點）成為吸附點
+  PASS  [phone-landscape] 配置A·放大像 封印後：從鬼本體拖到 O 可以畫線
+  PASS  [phone-landscape] 配置A·放大像 封印後畫的線：重現播完後是原色黃線、畫在重現光線上面（看得見）  — 5/5 個取樣點是黃色
+  PASS  [phone-landscape] 配置A·放大像 光路重現播放中，學生的線暫時壓淡  — replay age 115 ms
+  PASS  [phone-landscape] 配置A·放大像 重現播完，學生的線恢復原色
+  PASS  [phone-landscape] 配置A·放大像 封印後點別的格：選格不變
   PASS  [phone-landscape] 配置A·放大像 Debug overlay 顯示物點／焦距／目標格／清晰位置
   PASS  [phone-landscape] 配置A·放大像 關閉 Debug 後面板清空
-  PASS  [phone-landscape] 配置A·放大像 「下一組配置」不會連續出同一組  — 0→2→10→5→1→3→8→9→11→7→4→0→6→11→8→10→1→7→2→4→5→9→0→3
-  PASS  [phone-landscape] 配置A·放大像 「下一組配置」每一輪內每組各出一次、不重複  — 6,11,8,10,1,7,2,4,5,9,0,3
+  PASS  [phone-landscape] 配置A·放大像 「下一組配置」不會連續出同一組  — 0→5→6→9→8→2→4→3→7→11→10→1→4→9→3→0→10→2→5→1→6→7→11→8
+  PASS  [phone-landscape] 配置A·放大像 「下一組配置」每一輪內每組各出一次、不重複  — 4,9,3,0,10,2,5,1,6,7,11,8
   PASS  [phone-landscape] 配置A·放大像 換配置後回到觀察階段，標記與作圖線都清空
   PASS  [phone-landscape] 配置A·縮小像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置A·縮小像 開始觀察：DOM／文字／Debug 圖層沒有答案
@@ -167,7 +178,11 @@
   PASS  [phone-landscape] 配置A·縮小像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置A·縮小像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置A·縮小像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置A·縮小像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置A·縮小像 點地板格可選取（透鏡所在的第 4 格）
+  PASS  [phone-landscape] 配置A·縮小像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置A·縮小像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置A·縮小像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置A·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置A·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置A·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -192,7 +207,7 @@
   PASS  [phone-landscape] 配置A·縮小像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置A·縮小像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置A·縮小像 光路重現：結束時標出像點  — 140 px（重現前 68）
-  PASS  [phone-landscape] 配置A·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置A·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置B·放大像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置B·放大像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置B·放大像 開始觀察：吸附點裡沒有物點
@@ -250,7 +265,11 @@
   PASS  [phone-landscape] 配置B·放大像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置B·放大像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置B·放大像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置B·放大像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置B·放大像 點地板格可選取（透鏡所在的第 5 格）
+  PASS  [phone-landscape] 配置B·放大像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置B·放大像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置B·放大像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置B·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置B·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置B·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -329,7 +348,11 @@
   PASS  [phone-landscape] 配置B·縮小像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置B·縮小像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置B·縮小像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置B·縮小像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置B·縮小像 點地板格可選取（透鏡所在的第 3 格）
+  PASS  [phone-landscape] 配置B·縮小像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置B·縮小像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置B·縮小像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置B·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置B·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置B·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -412,7 +435,11 @@
   PASS  [phone-landscape] 配置C·放大像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置C·放大像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置C·放大像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置C·放大像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置C·放大像 點地板格可選取（透鏡所在的第 7 格）
+  PASS  [phone-landscape] 配置C·放大像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置C·放大像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置C·放大像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置C·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置C·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置C·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -494,7 +521,11 @@
   PASS  [phone-landscape] 配置C·縮小像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置C·縮小像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置C·縮小像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置C·縮小像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置C·縮小像 點地板格可選取（透鏡所在的第 4 格）
+  PASS  [phone-landscape] 配置C·縮小像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置C·縮小像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置C·縮小像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置C·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置C·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置C·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -577,7 +608,11 @@
   PASS  [phone-landscape] 配置D·放大像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置D·放大像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置D·放大像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置D·放大像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置D·放大像 點地板格可選取（透鏡所在的第 6 格）
+  PASS  [phone-landscape] 配置D·放大像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置D·放大像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置D·放大像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置D·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置D·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置D·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -650,7 +685,11 @@
   PASS  [phone-landscape] 配置D·縮小像 「復原」可以拿掉拖出來的連線
   PASS  [phone-landscape] 配置D·縮小像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置D·縮小像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置D·縮小像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置D·縮小像 點地板格可選取（透鏡所在的第 3 格）
+  PASS  [phone-landscape] 配置D·縮小像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置D·縮小像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置D·縮小像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置D·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置D·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置D·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -731,7 +770,11 @@
   PASS  [phone-landscape] 配置E·放大像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置E·放大像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置E·放大像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置E·放大像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置E·放大像 點地板格可選取（透鏡所在的第 3 格）
+  PASS  [phone-landscape] 配置E·放大像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置E·放大像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置E·放大像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置E·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置E·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置E·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -810,7 +853,11 @@
   PASS  [phone-landscape] 配置E·縮小像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置E·縮小像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置E·縮小像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置E·縮小像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置E·縮小像 點地板格可選取（透鏡所在的第 2 格）
+  PASS  [phone-landscape] 配置E·縮小像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置E·縮小像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置E·縮小像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置E·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置E·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置E·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -892,7 +939,11 @@
   PASS  [phone-landscape] 配置F·放大像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置F·放大像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置F·放大像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置F·放大像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置F·放大像 點地板格可選取（透鏡所在的第 4 格）
+  PASS  [phone-landscape] 配置F·放大像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置F·放大像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置F·放大像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置F·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置F·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置F·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -971,7 +1022,11 @@
   PASS  [phone-landscape] 配置F·縮小像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置F·縮小像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置F·縮小像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置F·縮小像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置F·縮小像 點地板格可選取（透鏡所在的第 3 格）
+  PASS  [phone-landscape] 配置F·縮小像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置F·縮小像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置F·縮小像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置F·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置F·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置F·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -1053,7 +1108,11 @@
   PASS  [phone-landscape] 配置G·放大像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置G·放大像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置G·放大像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置G·放大像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置G·放大像 點地板格可選取（透鏡所在的第 5 格）
+  PASS  [phone-landscape] 配置G·放大像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置G·放大像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置G·放大像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置G·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置G·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置G·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -1135,7 +1194,11 @@
   PASS  [phone-landscape] 配置G·縮小像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置G·縮小像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置G·縮小像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置G·縮小像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置G·縮小像 點地板格可選取（透鏡所在的第 3 格）
+  PASS  [phone-landscape] 配置G·縮小像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置G·縮小像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置G·縮小像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置G·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置G·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置G·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -1217,7 +1280,11 @@
   PASS  [phone-landscape] 配置H·放大像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置H·放大像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置H·放大像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置H·放大像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置H·放大像 點地板格可選取（透鏡所在的第 5 格）
+  PASS  [phone-landscape] 配置H·放大像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置H·放大像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置H·放大像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置H·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置H·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置H·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -1290,7 +1357,11 @@
   PASS  [phone-landscape] 配置H·縮小像 「復原」可以拿掉拖出來的連線
   PASS  [phone-landscape] 配置H·縮小像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置H·縮小像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置H·縮小像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置H·縮小像 點地板格可選取（透鏡所在的第 3 格）
+  PASS  [phone-landscape] 配置H·縮小像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置H·縮小像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置H·縮小像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置H·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置H·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置H·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -1315,7 +1386,7 @@
   PASS  [phone-landscape] 配置H·縮小像 光路重現 t=3.20s：全部光線都畫出來了  — 6/6 個取樣點在畫面內
   PASS  [phone-landscape] 配置H·縮小像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置H·縮小像 光路重現：結束時標出像點  — 138 px（重現前 66）
-  PASS  [phone-landscape] 配置H·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置H·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置I·放大像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置I·放大像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置I·放大像 開始觀察：吸附點裡沒有物點
@@ -1372,7 +1443,11 @@
   PASS  [phone-landscape] 配置I·放大像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置I·放大像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置I·放大像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置I·放大像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置I·放大像 點地板格可選取（透鏡所在的第 6 格）
+  PASS  [phone-landscape] 配置I·放大像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置I·放大像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置I·放大像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置I·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置I·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置I·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -1454,7 +1529,11 @@
   PASS  [phone-landscape] 配置I·縮小像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-landscape] 配置I·縮小像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [phone-landscape] 配置I·縮小像 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置I·縮小像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-landscape] 配置I·縮小像 點地板格可選取（透鏡所在的第 4 格）
+  PASS  [phone-landscape] 配置I·縮小像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-landscape] 配置I·縮小像 取消後再點一次：重新選取
+  PASS  [phone-landscape] 配置I·縮小像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-landscape] 配置I·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置I·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 配置I·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -1479,7 +1558,7 @@
   PASS  [phone-landscape] 配置I·縮小像 光路重現 t=3.20s：全部光線都畫出來了  — 6/6 個取樣點在畫面內
   PASS  [phone-landscape] 配置I·縮小像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置I·縮小像 光路重現：結束時標出像點  — 138 px（重現前 66）
-  PASS  [phone-landscape] 配置I·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置I·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置J·虛像題 開場：看布幕、沒有標記
   PASS  [phone-landscape] 配置J·虛像題 開始觀察：畫面、文字、Debug 都沒有鬼本體或答案
   PASS  [phone-landscape] 配置J·虛像題 透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光  — 最小模糊比 4.30
@@ -1527,7 +1606,7 @@
   PASS  [phone-landscape] 配置J·虛像題 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置J·虛像題 光路重現：結束時標出像點  — 132 px（重現前 70）
   PASS  [phone-landscape] 配置J·虛像題 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置J·虛像題 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置J·虛像題 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置K·虛像題 開場：看布幕、沒有標記
   PASS  [phone-landscape] 配置K·虛像題 開始觀察：畫面、文字、Debug 都沒有鬼本體或答案
   PASS  [phone-landscape] 配置K·虛像題 透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光  — 最小模糊比 3.91
@@ -1889,7 +1968,11 @@
   PASS  [phone-portrait] 分析／封印：頁面不需捲動
   PASS  [phone-portrait] 分析／封印：畫布仍有足夠空間（≥300×150）  — 375×595
   PASS  [phone-portrait] 配置A·放大像 封印模式下點擊不會畫線
+  PASS  [phone-portrait] 配置A·放大像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-portrait] 配置A·放大像 點地板格可選取（透鏡所在的第 6 格）
+  PASS  [phone-portrait] 配置A·放大像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [phone-portrait] 配置A·放大像 取消後再點一次：重新選取
+  PASS  [phone-portrait] 配置A·放大像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [phone-portrait] 配置A·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-portrait] 配置A·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-portrait] 配置A·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -1914,11 +1997,18 @@
   PASS  [phone-portrait] 配置A·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 6/6 個取樣點在畫面內
   PASS  [phone-portrait] 配置A·放大像 光路重現：畫面上方有說明文字框
   PASS  [phone-portrait] 配置A·放大像 光路重現：結束時標出像點  — 131 px（重現前 74）
-  PASS  [phone-portrait] 配置A·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-portrait] 配置A·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-portrait] 配置A·放大像 封印後：「選格封印」收起、回到畫線模式
+  PASS  [phone-portrait] 配置A·放大像 封印後：鬼本體（物點）成為吸附點
+  PASS  [phone-portrait] 配置A·放大像 封印後：從鬼本體拖到 O 可以畫線
+  PASS  [phone-portrait] 配置A·放大像 封印後畫的線：重現播完後是原色黃線、畫在重現光線上面（看得見）  — 5/5 個取樣點是黃色
+  PASS  [phone-portrait] 配置A·放大像 光路重現播放中，學生的線暫時壓淡  — replay age 113 ms
+  PASS  [phone-portrait] 配置A·放大像 重現播完，學生的線恢復原色
+  PASS  [phone-portrait] 配置A·放大像 封印後點別的格：選格不變
   PASS  [phone-portrait] 配置A·放大像 Debug overlay 顯示物點／焦距／目標格／清晰位置
   PASS  [phone-portrait] 配置A·放大像 關閉 Debug 後面板清空
-  PASS  [phone-portrait] 配置A·放大像 「下一組配置」不會連續出同一組  — 0→11→7→8→9→3→4→0→5→10→2→1→11→4→8→5→6→9→7→0→3→10→1→2
-  PASS  [phone-portrait] 配置A·放大像 「下一組配置」每一輪內每組各出一次、不重複  — 11,4,8,5,6,9,7,0,3,10,1,2
+  PASS  [phone-portrait] 配置A·放大像 「下一組配置」不會連續出同一組  — 0→6→0→7→2→8→5→10→1→4→9→11→1→10→11→4→8→7→3→2→5→0→6→9
+  PASS  [phone-portrait] 配置A·放大像 「下一組配置」每一輪內每組各出一次、不重複  — 1,10,11,4,8,7,3,2,5,0,6,9
   PASS  [phone-portrait] 配置A·放大像 換配置後回到觀察階段，標記與作圖線都清空
   PASS  [phone-portrait] 配置J·虛像題 開場：看布幕、沒有標記
   PASS  [phone-portrait] 配置J·虛像題 開始觀察：畫面、文字、Debug 都沒有鬼本體或答案
@@ -2020,7 +2110,11 @@
   PASS  [desktop] 分析／封印：頁面不需捲動
   PASS  [desktop] 分析／封印：畫布仍有足夠空間（≥300×150）  — 1280×640
   PASS  [desktop] 配置A·縮小像 封印模式下點擊不會畫線
+  PASS  [desktop] 配置A·縮小像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [desktop] 配置A·縮小像 點地板格可選取（透鏡所在的第 4 格）
+  PASS  [desktop] 配置A·縮小像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [desktop] 配置A·縮小像 取消後再點一次：重新選取
+  PASS  [desktop] 配置A·縮小像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [desktop] 配置A·縮小像 封印透鏡所在格 → 失敗
   PASS  [desktop] 配置A·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [desktop] 配置A·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -2046,10 +2140,17 @@
   PASS  [desktop] 配置A·縮小像 光路重現：畫面上方有說明文字框
   PASS  [desktop] 配置A·縮小像 光路重現：結束時標出像點  — 32 px（重現前 16）
   PASS  [desktop] 配置A·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [desktop] 配置A·縮小像 封印後：「選格封印」收起、回到畫線模式
+  PASS  [desktop] 配置A·縮小像 封印後：鬼本體（物點）成為吸附點
+  PASS  [desktop] 配置A·縮小像 封印後：從鬼本體拖到 O 可以畫線
+  PASS  [desktop] 配置A·縮小像 封印後畫的線：重現播完後是原色黃線、畫在重現光線上面（看得見）  — 5/5 個取樣點是黃色
+  PASS  [desktop] 配置A·縮小像 光路重現播放中，學生的線暫時壓淡  — replay age 109 ms
+  PASS  [desktop] 配置A·縮小像 重現播完，學生的線恢復原色
+  PASS  [desktop] 配置A·縮小像 封印後點別的格：選格不變
   PASS  [desktop] 配置A·縮小像 Debug overlay 顯示物點／焦距／目標格／清晰位置
   PASS  [desktop] 配置A·縮小像 關閉 Debug 後面板清空
-  PASS  [desktop] 配置A·縮小像 「下一組配置」不會連續出同一組  — 0→6→7→10→2→4→0→3→8→11→1→5→10→6→7→11→2→0→5→4→3→9→1→8
-  PASS  [desktop] 配置A·縮小像 「下一組配置」每一輪內每組各出一次、不重複  — 10,6,7,11,2,0,5,4,3,9,1,8
+  PASS  [desktop] 配置A·縮小像 「下一組配置」不會連續出同一組  — 0→11→3→8→7→5→6→2→9→10→4→0→10→7→9→5→8→4→0→6→3→2→11→1
+  PASS  [desktop] 配置A·縮小像 「下一組配置」每一輪內每組各出一次、不重複  — 10,7,9,5,8,4,0,6,3,2,11,1
   PASS  [desktop] 配置A·縮小像 換配置後回到觀察階段，標記與作圖線都清空
   PASS  [desktop] 配置C·放大像 開始觀察：畫面上沒有鬼本體
   PASS  [desktop] 配置C·放大像 開始觀察：DOM／文字／Debug 圖層沒有答案
@@ -2106,7 +2207,11 @@
   PASS  [desktop] 配置C·放大像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [desktop] 配置C·放大像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
   PASS  [desktop] 配置C·放大像 封印模式下點擊不會畫線
+  PASS  [desktop] 配置C·放大像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [desktop] 配置C·放大像 點地板格可選取（透鏡所在的第 7 格）
+  PASS  [desktop] 配置C·放大像 封印前再點同一格：取消選取，「施放」變不能按
+  PASS  [desktop] 配置C·放大像 取消後再點一次：重新選取
+  PASS  [desktop] 配置C·放大像 封印前：鬼本體不是吸附點（不洩漏位置）
   PASS  [desktop] 配置C·放大像 封印透鏡所在格 → 失敗
   PASS  [desktop] 配置C·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [desktop] 配置C·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
@@ -2181,4 +2286,4 @@
   PASS  [desktop] 配置L·虛像題 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [desktop] 沒有 JS 錯誤
 
-ALL PASS: 2182/2182 checks
+ALL PASS: 2287/2287 checks

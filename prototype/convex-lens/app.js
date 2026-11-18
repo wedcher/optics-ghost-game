@@ -342,7 +342,7 @@
 
   function geomLine(l) { return l.kind === 'parallel' ? Optics.horizontalLine(l.a) : l.kind === 'vertical' ? { p: { x: l.a.x, y: l.a.y }, d: { x: 0, y: 1 } } : Optics.lineThrough(l.a, l.b); }
 
-  /** 可吸附點：O、F、F′、實像標記，以及學生畫的線與透鏡平面的交點 P。 */
+  /** 可吸附點：O、F、F′、實像／虛像標記、（封印後）鬼本體，以及學生畫的線與透鏡平面的交點 P。 */
   function snapPoints() {
     var c = cfg(), lx = state.lensX;
     var pts = [
@@ -351,6 +351,9 @@
       { id: 'F2', label: 'F′', x: lx + c.f, y: 0 }
     ].filter(function (p) { return p.x <= 0; }); // 虛像題的 F′ 可能落在布幕後面：那裡畫不到，不給吸附
     if (state.marker) pts.push({ id: 'I', label: state.marker.virtual ? '虛像' : '實像', x: state.marker.x, y: state.marker.y });
+    // 封印成功、鬼現身之後，鬼本體（物點）也能吸附，方便學生畫出正推的光路（2026-11-18 定案）。
+    // 只在 state.solved 之後才加：封印前加進來就等於把鬼的位置洩漏給吸附。
+    if (state.solved) pts.push({ id: 'G', label: '鬼本體', x: c.object.x, y: c.object.y });
     state.lines.forEach(function (l) {
       var p = Optics.intersectVertical(geomLine(l), lx);
       if (!p || Math.abs(p.y) > 400) return;
@@ -374,6 +377,13 @@
       if (p && p.x > BOUNDS.minX - 200 && p.x < BOUNDS.maxX + 200 && Math.abs(p.y) < 500) out.push(p);
     }
     return out;
+  }
+
+  function drawStudentLines(dim) {
+    state.lines.forEach(function (l) {
+      strokeInfinite(geomLine(l), dim ? 'rgba(255,255,255,.22)' : (l.kind === 'line' ? '#ffd166' : '#7dffb2'), 2, null);
+    });
+    if (state.lines.length) stats.linesDimmed = dim;
   }
 
   function renderSide(clipRect) {
@@ -513,10 +523,11 @@
       ctx.fillText('◀ 凸透鏡 ▶', L.x, b.y + tileH + 10 * s + 12);
     }
 
+    // 學生的線：光路重現播放中畫在重現底下、壓淡（讓重現的光線看得清楚）；
+    // 沒有重現、或重現播完，就用原色畫——播完的情況改到重現圖層之後才畫（見下方），否則會被重現的光線蓋住。
+    var replayDone = analysis && state.replay && state.solved && state.marker && !replayRunning();
     if (analysis) {
-      state.lines.forEach(function (l) {
-        strokeInfinite(geomLine(l), state.replay ? 'rgba(255,255,255,.22)' : (l.kind === 'line' ? '#ffd166' : '#7dffb2'), 2, null);
-      });
+      if (!replayDone) drawStudentLines(!!(state.replay && replayRunning()));
       if (state.drag) {
         // 拖曳中的預覽：沒吸附 = 跟手的虛線（放開會消失）；吸附 = 實線，和放開後留下的線同一條
         var dg = state.drag, qa = w2s(dg.a);
@@ -537,6 +548,13 @@
       snapPoints().forEach(function (sp) {
         q = w2s(sp);
         if (sp.id === 'I') { drawMarker(q.x, q.y); label(sp.label + '標記', q.x - 22, q.y + (sp.y >= 0 ? -24 : 24), MARK_COLOR, 'right'); return; }
+        if (sp.id === 'G') {
+          // 鬼本體的吸附點：畫在現身的鬼身上（「鬼本體」字樣由封印圖層畫）
+          ctx.fillStyle = '#fff'; ctx.strokeStyle = '#0b2a20'; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(q.x, q.y, 5, 0, 7); ctx.fill(); ctx.stroke();
+          if (state.mode === 'draw') { ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(q.x, q.y, 14, 0, 7); ctx.stroke(); }
+          return;
+        }
         ctx.fillStyle = sp.id === 'P' ? '#7dffb2' : '#fff';
         ctx.beginPath(); ctx.arc(q.x, q.y, 5, 0, 7); ctx.fill();
         if (state.mode === 'draw') { ctx.strokeStyle = 'rgba(255,255,255,.22)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(q.x, q.y, 14, 0, 7); ctx.stroke(); }
@@ -591,6 +609,10 @@
       }
       window.RayReplay.draw(ctx, w2s, spec, tau, clipRect);
     }
+    // 重現播完：學生的線畫在重現圖層上面、恢復原色。
+    // 原本線一律畫在重現底下，而且只要 state.replay 存在就一直壓淡——封印後畫的線幾乎看不見、
+    // 只看得到新的交點 P（2026-11-18 第三關回報的同類 bug；第二關開放封印後畫線後也會發生）。
+    if (replayDone) drawStudentLines(false);
 
     // Debug overlay
     if (state.debug) {
@@ -733,13 +755,19 @@
       if (state.solved || (state.seal && !state.seal.done)) return;
       var k = floor.cellAt(s2w({ x: x, y: y }).x);
       if (k == null) { setStatus('請點一個地板格（整個直欄都可以點）。'); return; }
-      state.selectedCell = k; state.seal = null;
-      setStatus('已選第 ' + k + ' 格。確定的話按「施放封印法陣」。');
+      // 還沒抓到鬼之前，再點一次已選的格就取消選取（和第三關一致）；抓到之後上面已經 return，不能改
+      if (state.selectedCell === k) {
+        state.selectedCell = null; state.seal = null;
+        setStatus('已取消選取。再點一個地板格，然後按「施放封印法陣」。');
+      } else {
+        state.selectedCell = k; state.seal = null;
+        setStatus('已選第 ' + k + ' 格。確定的話按「施放封印法陣」；再點一次同一格可以取消。');
+      }
       syncUI(); requestRender();
       return;
     }
     var sp = nearestSnap(x, y);
-    if (!sp) { setStatus('線的端點要吸附在標示點上（O、F、F′、實像標記、P）。點在點的附近即可。'); return; }
+    if (!sp) { setStatus('線的端點要吸附在標示點上（O、F、F′、' + (state.marker && state.marker.virtual ? '虛像' : '實像') + '標記、P' + (state.solved ? '、鬼本體' : '') + '）。點在點的附近即可。'); return; }
     var pt = { x: sp.x, y: sp.y, label: sp.label };
     if (!state.pending) {
       state.pending = pt;
@@ -767,6 +795,7 @@
       state.seal.done = true;
       if (success) {
         state.solved = true;
+        state.mode = 'draw'; // 封印後仍可以畫線；選格已經不能改
         if (level.on) level.sealed++;
         setStatus(state.marker && state.marker.virtual
           ? '封印成功！鬼被迫顯形——透鏡裡看到的只是牠的虛像，本體和虛像都在透鏡的另一邊。看看光是怎麼走的。'
@@ -779,7 +808,7 @@
           // 扣命只看「抓錯」這件事本身，訊息與畫面都不帶任何位置線索
           level.lives--;
           flashHud();
-          setStatus('法陣落空，裡面什麼也沒有……（嘻）　失去一顆心。再檢查你的光線作圖。');
+          setStatus('法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。');
           if (level.lives <= 0) failLevel();
         } else {
           setStatus('法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。');
@@ -877,7 +906,7 @@
     if (pointerCount() === 1) {
       var p = localPos(e);
       gesture = { id: e.pointerId, x0: p.x, y0: p.y, lx: p.x, ly: p.y, moved: false, multi: false, kind: null,
-        snap: state.phase === 'analysis' && state.mode === 'draw' && !state.solved ? nearestSnap(p.x, p.y) : null };
+        snap: state.phase === 'analysis' && state.mode === 'draw' ? nearestSnap(p.x, p.y) : null }; // 封印前後都能畫線
       try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     } else if (gesture) {
       gesture.multi = true; cancelDragLine(); // 兩指：不做任何事（縮放只用按鈕）
@@ -947,6 +976,7 @@
     $('modeSeal').classList.toggle('on', state.mode === 'seal');
     // 一排：重新對焦｜選格封印｜畫線｜復原｜清除，再加上該階段的動作鈕（封印模式：施放；封印成功後：光路重現、下一隻）
     $('castBtn').hidden = state.mode !== 'seal' || state.solved;
+    $('modeSeal').hidden = state.solved; // 抓到鬼之後選格不能再改，只留畫線
     $('undoBtn').disabled = !state.lines.length && !state.pending;
     $('clearBtn').disabled = !state.lines.length && !state.pending;
     $('castBtn').disabled = state.selectedCell == null || state.solved || !!(state.seal && !state.seal.done);
@@ -1006,10 +1036,10 @@
       id: 'intro', background: INTRO_BG,
       lines: [
         { speaker: '你', text: '看不到鬼了……' },
-        { speaker: '你', text: '這鬼似乎只能用鏡子看到。' },
+        { speaker: '你', text: '可是這裡沒有鏡子。' },
         { speaker: '你', text: '咦？這裡怎麼有一個這麼大的凸透鏡？' }
       ],
-      note: '走廊裡鬼影重重。' + LEVEL_LIVES + ' 條命內抓到 ' + LEVEL_GOAL + ' 隻鬼；抓錯會失去一顆心。',
+      note: '走廊裡鬼影重重。請抓到 ' + LEVEL_GOAL + ' 隻鬼；抓錯會失去一顆心。',
       buttons: [{ id: 'startHuntBtn', label: '開始抓鬼', primary: true, onClick: startHunt }]
     });
   }
@@ -1018,6 +1048,7 @@
     closeScene();
     level.screen = 'play'; level.lives = LEVEL_LIVES; level.sealed = 0;
     state.seenAnalysisIntro = false; state.seenVirtualIntro = false;
+    dealLevelDeck();
     resetRound(nextRandomConfig());
   }
   function failLevel() {
@@ -1025,7 +1056,7 @@
     closeScene();
     level.scene = window.StoryScene.show({
       id: 'failed', background: INTRO_BG,
-      title: '三顆心都用完了……',
+      title: '❤️用完了……', // 命用完的文字統一用 ❤️（CONFIRMED 劇本修訂）
       note: '鬼還躲在走廊裡。這次封印了 ' + level.sealed + ' 隻。重新挑戰會從頭算起。',
       buttons: [
         { id: 'retryBtn', label: '重新挑戰', primary: true, onClick: startHunt },
@@ -1036,21 +1067,33 @@
   function showCleared() {
     level.screen = 'cleared';
     if (window.GameProgress) window.GameProgress.markCleared('convex');
-    // 趕鬼時間：第一關開始到這裡的牆上時間。null＝這一輪沒有從第一關依序玩過來（直接開網址、?unlock=1 跳關），不顯示也不上榜。
-    // 練習模式不計時、不上榜（LB = null）。
+    // 趕鬼時間（計時規則由「趕鬼時間」任務卡改，這裡照舊呼叫 Leaderboard）。null＝這一輪沒有從第一關依序玩過來
+    // （直接開網址、?unlock=1 跳關），不顯示也不上榜。練習模式不計時、不上榜（LB = null）。
     var castleMs = LB ? LB.finishCastle() : null;
-    var timeNote = castleMs != null ? '趕鬼時間：' + LB.formatTime(castleMs) + '。' : '';
+    // 過關說明照劇本 2-3：有趕鬼時間就顯示「你花費＿＿，把鬼趕出城堡。」；沒有成績時退回劇本舊版的封印數說法。
+    var note = castleMs != null
+      ? '你花費' + LB.formatTime(castleMs) + '，把鬼趕出城堡。'
+      : '你在走廊封印了 ' + level.sealed + ' 隻鬼。';
+    if (!PRACTICE) note += '下一站：城外的荒野（已解鎖）。';
     closeScene();
     level.scene = window.StoryScene.show({
       id: 'cleared', background: INTRO_BG, scatter: 7,
+      // 劇本 2-3（Google 文件《光學抓鬼遊戲 劇本初稿》）。小透鏡是地上另外一片，不是大凸透鏡的碎片
+      // （凸透鏡的碎片仍是會聚的，不會變成第三關的凹透鏡；CONFIRMED「劇本修訂」物理）。
       lines: [
         { text: '剩下的鬼一哄而散，逃出了城堡！' },
-        { speaker: '你', text: '想跑？追！' }
+        { speaker: '你', text: '但凸透鏡太大了，帶不走阿。' },
+        { text: '你撿起地上的一片小透鏡。' },
+        { speaker: '你', text: '咦，這個……' },
+        { speaker: '你', text: '也可以吧。' }
       ],
       title: '第二關過關！',
-      note: '你在走廊封印了 ' + level.sealed + ' 隻鬼。' + timeNote + (PRACTICE ? '' : '回到關卡選單，就能進入下一站：城外的荒野。'),
-      // 過關後只留「回選單」，由選單進下一關（回饋 Q3／G5；換頁一定會離開全螢幕）
-      buttons: [{ id: 'clearMenuBtn', label: '回關卡選單', primary: true, href: MENU_URL }]
+      note: note,
+      // 過關後回選單，由選單進下一關；或「再玩一次」整關重來（命、封印數、牌堆都重置）。和第一關一致（2026-11-18 定案）
+      buttons: [
+        { id: 'clearMenuBtn', label: '回關卡選單', primary: true, href: MENU_URL },
+        { id: 'againBtn', label: '再玩一次', onClick: startHunt }
+      ]
     });
   }
 
@@ -1068,6 +1111,22 @@
       var top = deck.length - 1, tmp = deck[top]; deck[top] = deck[top - 1]; deck[top - 1] = tmp;
     }
     return deck.pop();
+  }
+
+  // 關卡模式每輪（抓 LEVEL_GOAL 隻）保證至少一題虛像題（2026-11-18 定案）：開始抓鬼／重新挑戰／再玩一次時重洗整疊，
+  // 前 LEVEL_GOAL 張（從尾端發）沒有虛像題，就把其中隨機一張換成牌堆其他位置的一張虛像題。
+  // 虛像題出現在第幾隻是隨機的（不固定第一或最後一題，免得學生背）。抓錯不換鬼，所以發出的前 5 張就是這一輪的 5 隻。
+  function isVirtualCfg(i) { return Cfg.all[i].kind === 'virtual'; }
+  function dealLevelDeck() {
+    deck = Cfg.all.map(function (_, i) { return i; });
+    for (var i = deck.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = deck[i]; deck[i] = deck[j]; deck[j] = t; }
+    var n = Math.min(LEVEL_GOAL, deck.length), first = deck.length - n;
+    if (deck.slice(first).some(isVirtualCfg)) return;
+    var rest = [];
+    for (var r = 0; r < first; r++) if (isVirtualCfg(deck[r])) rest.push(r);
+    if (!rest.length) return; // 沒有虛像題配置（不會發生；check-geometry-convex 驗證有 J、K、L）
+    var from = rest[Math.floor(Math.random() * rest.length)], to = first + Math.floor(Math.random() * n), tmp = deck[to];
+    deck[to] = deck[from]; deck[from] = tmp;
   }
 
   // 透鏡的起始位置：離兩個清晰位置都夠遠，否則一開場布幕上就幾乎是清楚的像（等於不用對焦）。
@@ -1136,11 +1195,12 @@
     animating = true;
     (function tick() {
       render();
-      if ((state.seal && performance.now() - state.seal.t0 < 2200) || replayRunning()) requestAnimationFrame(tick); else animating = false;
+      if ((state.seal && performance.now() - state.seal.t0 < 2200) || replayRunning()) requestAnimationFrame(tick);
+      else { animating = false; requestRender(); } // 再畫一張：重現剛結束，學生的線恢復原色
     })();
   }
   function render() {
-    stats.frame++; stats.debugDrawn = false; stats.ghostRevealed = false; stats.lensCaption = null;
+    stats.frame++; stats.debugDrawn = false; stats.ghostRevealed = false; stats.lensCaption = null; stats.linesDimmed = false;
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.clearRect(0, 0, W, H);
     if (state.phase === 'analysis') {
@@ -1175,7 +1235,7 @@
     layout();
   });
   $('modeDraw').addEventListener('click', function () { state.mode = 'draw'; setStatus('畫線：從標示點拖曳，或依序點兩個點連線。'); syncUI(); requestRender(); });
-  $('modeSeal').addEventListener('click', function () { state.mode = 'seal'; state.pending = null; setStatus('封印模式：點一個地板格（整個直欄都可點），再按「施放封印法陣」。'); syncUI(); requestRender(); });
+  $('modeSeal').addEventListener('click', function () { if (state.solved) return; state.mode = 'seal'; state.pending = null; setStatus('封印模式：點一個地板格（整個直欄都可點），再按「施放封印法陣」。'); syncUI(); requestRender(); });
   $('menuBtn').addEventListener('click', function () { if (window.confirm('回到關卡選單？這一關目前的進度不會保留。')) location.href = '../index.html'; });
   $('undoBtn').addEventListener('click', function () { if (state.pending) state.pending = null; else state.lines.pop(); syncUI(); requestRender(); });
   $('clearBtn').addEventListener('click', function () { state.lines = []; state.pending = null; setStatus('已清除所有線。'); syncUI(); requestRender(); });
@@ -1197,6 +1257,7 @@
     w2s: w2s, s2w: s2w, snapPoints: snapPoints, nearestSnap: nearestSnap, studentIntersections: studentIntersections, wallNow: wallNow, lensViewNow: lensViewNow,
     regions: regions, canvasSize: function () { return { W: W, H: H, DPR: DPR }; }, render: render,
     replaySpec: replaySpec, level: level, FREE: FREE, PRACTICE: PRACTICE,
+    deck: function () { return deck.slice(); }, dealLevelDeck: dealLevelDeck,
     art: function () { return { pending: artPending, corridor: ART.corridor.ready, lens: ART.lens.ready }; }
   };
 

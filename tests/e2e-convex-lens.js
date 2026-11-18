@@ -556,10 +556,21 @@ async function run(profile, browser) {
     await tap(a.x, a.y + 30);
     s = await st();
     ok(s.lines === 3 && !s.pending, T('封印模式下點擊不會畫線'));
+    // 上面那一下點在透鏡下方，會選到透鏡所在的格；再點一次同一格 → 取消選取（2026-11-18 定案）
+    if (s.selectedCell !== null) {
+      await tap(a.x, a.y + 30);
+      ok((await st()).selectedCell === null, T('封印前再點同一格（透鏡下方）：取消選取'));
+    }
     const wrongCell = Math.ceil(-sp.lensX / 100); // 很自然的錯誤：封印透鏡所在的格
     let wp = await w2s({ x: -(wrongCell - 0.5) * 100, y: -165 });
     await tap(wp.x, wp.y);
     ok(wrongCell !== c.targetCell && (await st()).selectedCell === wrongCell, T('點地板格可選取（透鏡所在的第 ' + wrongCell + ' 格）'));
+    // 封印前再點同一格可以取消選取（2026-11-18 定案，和第三關一致）
+    await tap(wp.x, wp.y);
+    ok((await st()).selectedCell === null && await page.evaluate(() => document.getElementById('castBtn').disabled), T('封印前再點同一格：取消選取，「施放」變不能按'));
+    await tap(wp.x, wp.y);
+    ok((await st()).selectedCell === wrongCell, T('取消後再點一次：重新選取'));
+    ok(!(await page.evaluate(() => window.__protoConvex.snapPoints().some((p) => p.id === 'G'))), T('封印前：鬼本體不是吸附點（不洩漏位置）'));
     await press('#castBtn');
     const during = [];
     for (const t of [250, 450, 500]) { await page.waitForTimeout(t); during.push(await countColor(GHOST)); if (t === 450 && first) await shot('7-seal-wrong'); }
@@ -601,6 +612,48 @@ async function run(profile, browser) {
         ];
       }
     });
+
+    // ---------- 封印後：選格不能改、仍可畫線、鬼本體是吸附點、線不被光路重現蓋住 ----------
+    if (first) {
+      const sv = await page.evaluate(() => ({ seal: document.getElementById('modeSeal').hidden, mode: window.__protoConvex.state.mode }));
+      ok(sv.seal && sv.mode === 'draw', T('封印後：「選格封印」收起、回到畫線模式'));
+      const g = await page.evaluate(() => { const H = window.__protoConvex, p = H.snapPoints().find((q) => q.id === 'G'), o = H.cfg().object; return p && { ok: Math.abs(p.x - o.x) < 1e-9 && Math.abs(p.y - o.y) < 1e-9 }; });
+      ok(g && g.ok, T('封印後：鬼本體（物點）成為吸附點'));
+      // 播放中線會壓淡；先讓重現播完（把重現時鐘撥到結束之後，只改測試時鐘）
+      await page.evaluate(() => { const s = window.__protoConvex.state; s.replay = { t0: performance.now() - 60000 }; window.__protoConvex.render(); });
+      const before = (await st()).lines;
+      const pO = await snap('O'), pG = await snap('G');
+      await drag(pG.x, pG.y, pO.x, pO.y);
+      const lineColor = (a, b) => page.evaluate(({ a, b }) => {
+        const H = window.__protoConvex; H.render();
+        const dpr = H.canvasSize().DPR, g = document.getElementById('view').getContext('2d');
+        let hit = 0, n = 0;
+        for (const f of [0.3, 0.4, 0.5, 0.6, 0.7]) {
+          const x = a.x + (b.x - a.x) * f, y = a.y + (b.y - a.y) * f;
+          const d = g.getImageData(Math.round(x * dpr) - 2, Math.round(y * dpr) - 2, 5, 5).data;
+          n++;
+          for (let i = 0; i < d.length; i += 4) if (d[i] > 230 && d[i + 1] > 185 && d[i + 1] < 230 && d[i + 2] > 70 && d[i + 2] < 130) { hit++; break; } // #ffd166
+        }
+        return { hit, n, dimmed: H.stats.linesDimmed };
+      }, { a, b });
+      let lc = await lineColor(pG, pO);
+      ok((await st()).lines === before + 1, T('封印後：從鬼本體拖到 O 可以畫線'));
+      ok(lc.hit >= 4 && lc.dimmed === false, T('封印後畫的線：重現播完後是原色黃線、畫在重現光線上面（看得見）'), lc.hit + '/' + lc.n + ' 個取樣點是黃色');
+      await shot('11-draw-after-seal');
+      await page.evaluate(() => document.getElementById('replayBtn').click()); // 按鈕本身由 replay-checks 測；這裡只看線的顏色
+      await page.waitForTimeout(100);
+      lc = await lineColor(pG, pO);
+      const rpAge = await page.evaluate(() => { const s = window.__protoConvex.state; return s.replay ? Math.round(performance.now() - s.replay.t0) : null; });
+      ok(lc.dimmed === true, T('光路重現播放中，學生的線暫時壓淡'), 'replay age ' + rpAge + ' ms');
+      await page.evaluate(() => { const s = window.__protoConvex.state; s.replay = { t0: performance.now() - 60000 }; });
+      await page.waitForTimeout(80);
+      lc = await lineColor(pG, pO);
+      ok(lc.dimmed === false && lc.hit >= 4, T('重現播完，學生的線恢復原色'));
+      // 封印後點地板格：不能改選格
+      const cellPt = await w2s({ x: -(wrongCell - 0.5) * 100, y: -165 });
+      await tap(cellPt.x, cellPt.y);
+      ok((await st()).selectedCell === c.targetCell && (await st()).solved, T('封印後點別的格：選格不變'));
+    }
 
     // ---------- Debug ----------
     if (first) {
