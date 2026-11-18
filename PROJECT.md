@@ -333,10 +333,22 @@
 
 - 使用者玩過一輪後的回饋已整理在 `docs/playtest-feedback-2026-11-18.md`：每條有編號（G 共用、M 第一關、V 第二關、C 第三關），另外標了類別（A 劇情演出、B 介面操作、C 玩法規則、D 畫面）。Q1～Q8 使用者已回答（2026-11-18），答案寫在該文件「使用者回答」。重點：進遊戲一律橫向（直拿就整個畫面轉 90°）、過關後一律回選單再選下一關、第一二關練習模式扣命不計時。**V3「超清楚」卡在物理問題（PENDING 17），先不做。**
 - 預定由不同分頁照**關卡／檔案**分工處理，分頁表在該文件最後面。
+- **虛像題實驗分支已併進 main（2026-11-18）**，`npm test` 全過。
+- **共用約定（各分頁都照這個做，免得互等）**：
+  - **練習模式網址 `?practice=1`**：照關卡規則玩、**扣命**，但**不計時、不呼叫 `Leaderboard`**、不跑開場過場（Claude 假設，待使用者確認要不要過場）。`?free=1` 維持開發用的自由練習，不放進選單。
+  - **過關後只留「回選單」**（Q3），不再直接跳下一關。過關紀錄 `GameProgress.markCleared(...)` 照舊。
+  - 「☰ 關卡」按鈕各關自己移到**右上角**（G1）。
+  - G3「直拿就把畫面轉 90°」會影響三關的觸控座標，**等三關分頁都做完再做**（由選單＋共用分頁做，做時要動三關的座標換算就先通知使用者）。
+- **檔案分工（2026-11-18）**：
+  - 這個工作階段（`claude/peaceful-curie-idqktk`）：**第一關** `prototype/plane-mirror/*`、`tests/e2e-plane-mirror.js`、`tests/check-geometry-mirror.js`。
+  - 第二關分頁：`prototype/convex-lens/*`、`tests/e2e-convex-*.js`、`tests/check-geometry-convex.js`。
+  - 第三關分頁：`prototype/concave-lens/*`、`tests/e2e-concave-lens.js`、`tests/check-geometry.js`。
+  - 選單＋共用分頁：`prototype/index.html`、`prototype/shared/*`、`prototype/manifest.webmanifest`、`tests/e2e-leaderboard.js`。
+  - `PROJECT.md` 和 `docs/playtest-feedback-2026-11-18.md` 大家都會改：只改自己那段，收工前先 `git pull`。
 
 ### 交接點（凸透鏡虛像題實驗，2026-11-18）
 
-- **在哪裡**：分支 `experiment/convex-virtual-demo`（GitHub 上有，最新 commit `5090f0f`；從 `6844fc1` 分出，**沒有包含 main 之後的 `1ac30a8` 劇本修訂**）。原電腦的 worktree 在 `D:\MyApp\optics-ghost-virtual`。**不要併進 main，等使用者試玩後說。**
+- **在哪裡**：分支 `experiment/convex-virtual-demo`（GitHub 上有，最新 commit `5090f0f`；從 `6844fc1` 分出，**沒有包含 main 之後的 `1ac30a8` 劇本修訂**）。原電腦的 worktree 在 `D:\MyApp\optics-ghost-virtual`。**2026-11-18 使用者同意，已併進 main**（V1～V3 的答案見下方）。
 - **換電腦接手**：`git fetch` → `git worktree add ../optics-ghost-virtual experiment/convex-virtual-demo`（或 `git switch experiment/convex-virtual-demo`，但別在別的工作階段正在用的資料夾切分支）→ 在那個資料夾 `npm install`（或設 `NODE_PATH` 指到主資料夾的 `node_modules`）。
 - **試玩**：在該資料夾 `PORT=8131 node .claude/serve.js`，開 `http://localhost:8131/prototype/convex-lens/index.html`（關卡模式，12 題隨機）或加 `?free=1`（右上選單直接選配置 J、K、L）。
 - **改了什麼**：`prototype/convex-lens/app.js`、`configs.js`、`index.html`、`tests/e2e-convex-lens.js`、`tests/e2e-convex-level.js`、`docs/prototype-findings-convex.md`（最後一節「實驗：正立、放大、虛像題接進正式關卡」有完整說明、實測與風險）。`npm test` 全過（凸幾何 364、凸 e2e 1986、第二關 156）。
