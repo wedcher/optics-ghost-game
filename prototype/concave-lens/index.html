@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>凹透鏡原型 — Optics Ghost Game (Sprint 01)</title>
+<title>第三關：荒野（凹透鏡） — Optics Ghost Game</title>
 <link rel="manifest" href="../manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,7 +15,11 @@
   html, body { margin:0; height:100%; background:var(--bg); color:var(--text);
     font-family: system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
     overscroll-behavior: none; touch-action: manipulation; }
-  #app { display:grid; grid-template-rows:auto auto minmax(0,1fr) auto; height:100vh; height:100dvh; width:100%; overflow:hidden; }
+  /* 版面和第二關一致（使用者 2026-11-18）：「☰ 回關卡」是 #app 的直接子項，佔第一列最右邊一格 */
+  #app { display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-rows:auto auto minmax(0,1fr) auto;
+    grid-template-areas:"top menu" "status status" "stage stage" "ctrl ctrl"; height:100vh; height:100dvh; width:100%; overflow:hidden; }
+  #topbar { grid-area:top; } #status { grid-area:status; } #stage { grid-area:stage; } #controls { grid-area:ctrl; }
+  #menuBox { grid-area:menu; display:flex; align-items:center; padding:3px 8px 3px 4px; background:var(--panel); border-bottom:1px solid var(--line); }
   #topbar { display:flex; align-items:center; gap:8px; padding:6px 8px; background:var(--panel); border-bottom:1px solid var(--line); }
   #topbar h1 { font-size:14px; margin:0; flex:1 1 auto; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:600; }
   #topbar h1 small { color:var(--dim); font-weight:400; }
@@ -25,6 +29,11 @@
   button:disabled { opacity:.38; cursor:default; }
   button.on { background:#4a3f12; border-color:var(--accent); color:var(--accent); }
   button.primary { background:#5b2a86; border-color:#b980ff; font-weight:600; }
+  #hud { flex:1 1 auto; display:flex; align-items:center; gap:14px; min-height:40px; font-size:16px; font-weight:600; }
+  #hearts { display:inline-flex; gap:4px; font-size:26px; line-height:1; color:#ff4d6d; text-shadow:0 0 8px rgba(255,77,109,.6); }
+  #hearts .lost { color:#3a3f5e; text-shadow:none; }
+  #hud.hit #hearts { animation:hudHit .6s ease-out; }
+  @keyframes hudHit { 0%,100% { transform:translateX(0); } 20% { transform:translateX(-5px); } 40% { transform:translateX(5px); } 60% { transform:translateX(-3px); } 80% { transform:translateX(3px); } }
   #debugBtn { min-height:40px; font-size:13px; padding:2px 8px; }
   #configSel { min-height:40px; font-size:14px; }
   #status { padding:6px 10px; font-size:15px; line-height:1.35; min-height:3.2em; background:#12152a; border-bottom:1px solid var(--line); display:flex; align-items:center; }
@@ -43,10 +52,19 @@
   @media (max-height: 480px) {
     #topbar { padding:3px 8px; }
     #status { min-height:0; padding:4px 10px; font-size:15px; }
+    #menuBox { padding:2px 8px 2px 4px; }
     .row { flex-wrap:nowrap; }
     .row > button { min-width:44px; padding:4px 2px; font-size:15px; }
     #zoomBox { flex-direction:row; }
     #banner { font-size:14px; padding:6px 10px; width:min(70%, 520px); }
+  }
+  /* 關卡模式、畫面夠寬時：說明文字併到愛心右邊，同一列（和第二關相同） */
+  @media (min-width: 560px) {
+    #app.lvl { grid-template-columns:auto minmax(0,1fr) auto; grid-template-rows:auto minmax(0,1fr) auto;
+      grid-template-areas:"top status menu" "stage stage stage" "ctrl ctrl ctrl"; }
+    #app.lvl #topbar { padding-right:4px; }
+    #app.lvl #hud { flex:0 0 auto; white-space:nowrap; }
+    #app.lvl #status { min-height:0; background:var(--panel); padding:4px 8px; }
   }
   [hidden] { display:none !important; }
 </style>
@@ -54,11 +72,15 @@
 <body>
 <div id="app">
   <header id="topbar">
-    <h1>凹透鏡原型 <small>Sprint 01</small></h1>
+    <h1 id="title">第三關 荒野 <small>自由練習</small></h1>
+    <div id="hud" hidden>
+      <span id="hearts" role="img"><span>♥</span><span>♥</span><span>♥</span></span>
+      <span id="sealCount"></span>
+    </div>
     <select id="configSel" aria-label="測試配置"></select>
     <button id="debugBtn" type="button" aria-pressed="false">Debug</button>
-    <button id="menuBtn" type="button" aria-label="回關卡選單">☰ 關卡</button>
   </header>
+  <div id="menuBox"><button id="menuBtn" type="button" aria-label="回關卡選單">☰ 回關卡</button></div>
   <div id="status" role="status" aria-live="polite"></div>
   <main id="stage">
     <canvas id="view"></canvas>
@@ -92,6 +114,7 @@
 </div>
 <script src="../shared/fullscreen.js"></script>
 <script src="../shared/progress.js"></script>
+<script src="../shared/story-scene.js"></script>
 <script src="../shared/landscape.js"></script>
 <script src="../shared/optics-core.js"></script>
 <script src="../shared/ray-replay.js"></script>
