@@ -87,6 +87,6 @@ https://script.google.com/macros/s/AKfycbwLRDiuQAThbMIY_tVEARySyCkIzKc6mFyKCi54T
 - **不雅字詞過濾只擋常見的**：清單小而保守，諧音、新造字擋不到，漏網的由老師刪列（使用者 2026-11-17 定案，見上方「暱稱」規則）。
 - Apps Script 免費額度對一個班級綽綽有餘；同時大量送出時用 `LockService` 排隊，最多等 10 秒。
 - 真的部署已實測（2026-11-18，雲端工作階段）：curl `GET ?action=top` → `{"ok":true,...}`；照 `Code.gs` 格式 POST（text/plain JSON）→ 回傳名次、試算表自動建立 `castle`／`hunt` 並多一列；不雅暱稱 `sh1t` 被擋；GET 與 302 轉址後的回應都有 `access-control-allow-origin: *`；Playwright 開 `leaderboard.html`（用正式網址）兩個榜都讀到測試資料。測試資料已請使用者在試算表刪除。
-- **還沒實測**：真的手機從遊戲過關 → 結算畫面輸入暱稱 → 上傳 → 排行榜頁看到（要等使用者玩到第二關過關）。
+- **還沒實測**：真的手機從遊戲過關 → 結算畫面輸入暱稱 → 上傳 → 排行榜頁看到。目前結算畫面只在荒野狩獵結束時出現，荒野狩獵還沒做，所以**現在遊戲裡沒有路徑會上傳成績**（使用者 2026-11-18 手機玩到第二關過關確認沒有跳出暱稱）；何時讓玩家上傳見 PROJECT.md PENDING 22。
 - `Code.gs` 小問題（未修，改了要重新部署，記在 PROJECT.md PENDING）：`lock.waitLock(10000)` 等不到鎖時會丟例外，Apps Script 回 HTML 錯誤頁而不是 `{ok:false}` JSON；前端會當成連線失敗。一個班級同時送出不太會碰到。
 - 計時存在 `localStorage`：換瀏覽器／無痕模式等於沒有開始紀錄；清除網站資料會讓計時消失（只會讓那一輪沒有成績，不會變快）。
