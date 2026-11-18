@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Optics Ghost Game — 原型入口</title>
+<title>Optics Ghost Game — 選單</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,49 +12,35 @@
 <style>
   html, body { margin:0; min-height:100%; background:#0d1020; color:#e8ebff;
     font-family: system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; }
-  main { max-width:560px; margin:0 auto; padding:24px 16px 40px; }
-  h1 { font-size:22px; margin:0 0 4px; }
-  p.lead { color:#9aa3cf; margin:0 0 20px; line-height:1.6; }
-  a.card { display:block; padding:16px; margin:0 0 12px; border:1px solid #3b4478; border-radius:14px; background:#171b33; color:inherit; text-decoration:none; }
+  main { max-width:900px; margin:0 auto; padding:20px 16px 40px; }
+  h1 { font-size:22px; margin:0 0 14px; }
+  #menu { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:12px; }
+  a.card, button { -webkit-tap-highlight-color:transparent; }
+  a.card { display:block; padding:16px; border:1px solid #3b4478; border-radius:14px; background:#171b33; color:inherit; text-decoration:none; min-height:48px; }
   a.card:active { background:#232a4d; }
+  a.card.main { border-color:#b980ff; background:#1d1436; }
   a.card strong { display:block; font-size:18px; margin-bottom:4px; }
   a.card span { color:#9aa3cf; font-size:14px; line-height:1.5; }
-  a.card.locked { opacity:.42; filter:grayscale(1); cursor:not-allowed; }
-  a.card .lock { display:none; color:#ffd166; font-size:14px; margin-top:6px; }
-  a.card.locked .lock { display:block; }
-  #resetBtn { display:block; width:100%; min-height:48px; margin-top:8px; font:inherit; font-size:15px; color:#e8ebff; background:#232a4d; border:1px solid #3b4478; border-radius:12px; cursor:pointer; }
-  .todo { padding:16px; border:1px dashed #3b4478; border-radius:14px; color:#9aa3cf; font-size:14px; }
+  a.card em { display:block; font-style:normal; color:#ffd166; font-size:13px; margin-top:6px; }
+  a.card.dev { border-style:dashed; }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
+  .row a.card { text-align:center; }
+  #resetBtn { min-height:48px; font:inherit; font-size:15px; color:#e8ebff; background:#232a4d; border:1px solid #3b4478; border-radius:12px; cursor:pointer; }
+  #fsTip { position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(5,6,14,.86); }
+  #fsTip .box { max-width:520px; width:100%; padding:20px; border:1px solid #b980ff; border-radius:16px; background:#1d1436; line-height:1.65; font-size:16px; }
+  #fsTip h2 { margin:0 0 8px; font-size:20px; }
+  #fsTip ul { margin:8px 0 16px; padding-left:22px; }
+  #fsTip button { display:block; width:100%; min-height:52px; font:inherit; font-size:17px; font-weight:600; color:#e8ebff; background:#5b2a86; border:1px solid #b980ff; border-radius:12px; cursor:pointer; }
 </style>
 </head>
 <body>
 <main>
   <h1>Optics Ghost Game</h1>
-  <p class="lead">玩法原型入口。完整遊戲包含平面鏡、凸透鏡、凹透鏡三套玩法；這裡的每一個原型只驗證其中一套。</p>
-  <a class="card" href="plane-mirror/index.html">
-    <strong>第一關：平面鏡 — 鏡子房間</strong>
-    <span>3 條命內抓到鬼 5 次。鬼只在鏡子裡看得到：從鏡中的像推出牠真正站的格子。抓到 2 次後牠會打碎一面鏡。</span>
-  </a>
-  <a class="card" href="plane-mirror/index.html?free=1">
-    <strong>平面鏡 — 自由練習（開發用）</strong>
-    <span>沒有過場、不計命；可指定鏡子數與鬼的位置、開 Debug。</span>
-  </a>
-  <a class="card" href="concave-lens/index.html" data-level="concave" data-need="第二關">
-    <strong>凹透鏡 — 荒野</strong>
-    <span>轉向四周，舉起凹透鏡找出鬼的縮小虛像，標記後切到側視圖，用主光線反推鬼本體。</span>
-  </a>
-  <a class="card" href="convex-lens/index.html" data-level="convex" data-need="第一關">
-    <strong>第二關：凸透鏡 — 走廊</strong>
-    <span>3 條命內抓到 5 隻鬼。移動凸透鏡，讓布幕上出現清楚的倒立實像，標記後用主光線反推鬼本體。</span>
-  </a>
-  <a class="card" href="convex-lens/index.html?free=1">
-    <strong>凸透鏡 — 自由練習（開發用）</strong>
-    <span>沒有過場、不計命；可指定配置、開 Debug。</span>
-  </a>
-  <a class="card" href="leaderboard.html">
-    <strong>排行榜</strong>
-    <span>趕鬼時間（第一關＋第二關）與荒野封印數。趕鬼時間要從第一關開始玩、依序過關才算。</span>
-  </a>
-  <button id="resetBtn" type="button">重新開始遊戲（清除過關紀錄）</button>
+  <div id="menu"></div>
+  <div class="row">
+    <a class="card" id="lbLink" href="leaderboard.html"><strong>排行榜</strong></a>
+    <button id="resetBtn" type="button">重新開始遊戲<br>（清除過關紀錄）</button>
+  </div>
 </main>
 <script src="shared/landscape.js"></script>
 <script src="shared/install-hint.js"></script>
@@ -62,16 +48,74 @@
 <script src="shared/leaderboard-config.js"></script>
 <script src="shared/leaderboard.js"></script>
 <script>
-// 關卡鎖定：前一關過關前，後面的關卡反白、不能進去。網址加 ?unlock=1 可暫時全部解鎖（老師／開發用）。
+/*
+ * 選單逐步解鎖（使用者試玩回饋 G4，2026-11-18）：
+ *   - 第 N 關的入口：前一關過關後出現（第一關一開始就有；第一關沒過之前叫「開始遊戲」）。
+ *   - 第 N 關的練習模式（?practice=1：扣命、不計時、不計排行）：第 N 關過關後出現。
+ *   - 第三關「荒野狩獵」還沒做，入口先連凹透鏡原型（concave-lens/），標「製作中」。
+ * 網址加 ?unlock=1：全部顯示（老師／開發用），並多出開發用的自由練習入口。
+ * G2：第一次從選單按「開始遊戲」時，先教怎麼離開全螢幕（只出現這一次）。
+ */
 (function () {
+  'use strict';
   var P = window.GameProgress, all = /[?&]unlock=1/.test(location.search);
-  document.querySelectorAll('a.card[data-level]').forEach(function (a) {
-    var note = document.createElement('span'); note.className = 'lock'; note.textContent = '🔒 先通過' + a.getAttribute('data-need') + '才能進入';
-    a.appendChild(note);
-    if (all || P.isUnlocked(a.getAttribute('data-level'))) return;
-    a.classList.add('locked'); a.setAttribute('aria-disabled', 'true');
-    a.addEventListener('click', function (e) { e.preventDefault(); });
+  var FS_TIP_KEY = 'opticsGhost.fsTip.v1';
+  function cleared(id) { return all || P.isCleared(id); }
+  function unlocked(id) { return all || P.isUnlocked(id); }
+
+  var items = [];
+  if (!cleared('mirror')) items.push({ id: 'start', href: 'plane-mirror/index.html', title: '開始遊戲', sub: '古堡邀請，充滿鏡子的房間', main: true });
+  else items.push({ id: 'mirror', href: 'plane-mirror/index.html', title: '第一關：充滿鏡子的房間', sub: '鏡子中，有一個女鬼' });
+  if (cleared('mirror')) items.push({ id: 'mirror-practice', href: 'plane-mirror/index.html?practice=1', title: '第一關：練習模式', sub: '扣命、不計時、不列入排行' });
+  if (unlocked('convex')) items.push({ id: 'convex', href: 'convex-lens/index.html', title: '第二關：走廊的凸透鏡', sub: '城堡裡到處都是鬼，請趕走他們', main: !cleared('convex') });
+  if (cleared('convex')) items.push({ id: 'convex-practice', href: 'convex-lens/index.html?practice=1', title: '第二關：練習模式', sub: '扣命、不計時、不列入排行' });
+  if (unlocked('concave')) items.push({ id: 'concave', href: 'concave-lens/index.html', title: '第三關：荒野狩獵，小凹透鏡派上用場', sub: '趁天亮前，多封印幾隻', note: '荒野狩獵製作中：目前先玩凹透鏡原型', main: !cleared('concave') });
+  if (cleared('concave')) items.push({ id: 'concave-practice', href: 'concave-lens/index.html?practice=1', title: '第三關：練習模式（不計時）', sub: '不列入排行' });
+  if (all) {
+    items.push({ id: 'mirror-free', href: 'plane-mirror/index.html?free=1', title: '平面鏡 — 自由練習（開發用）', sub: '沒有過場、不計命；可指定鏡子數與鬼的位置、開 Debug。', dev: true });
+    items.push({ id: 'convex-free', href: 'convex-lens/index.html?free=1', title: '凸透鏡 — 自由練習（開發用）', sub: '沒有過場、不計命；可指定配置、開 Debug。', dev: true });
+  }
+  // 只有一個「主要」入口（下一步該玩的那一關）
+  var mains = items.filter(function (it) { return it.main; });
+  mains.slice(0, -1).forEach(function (it) { it.main = false; });
+
+  var menu = document.getElementById('menu');
+  items.forEach(function (it) {
+    var a = document.createElement('a');
+    a.className = 'card' + (it.main ? ' main' : '') + (it.dev ? ' dev' : '');
+    a.href = it.href; a.setAttribute('data-item', it.id);
+    var s = document.createElement('strong'); s.textContent = it.title; a.appendChild(s);
+    var sp = document.createElement('span'); sp.textContent = it.sub; a.appendChild(sp);
+    if (it.note) { var em = document.createElement('em'); em.textContent = it.note; a.appendChild(em); }
+    menu.appendChild(a);
   });
+
+  // ---- G2 全螢幕教學：只在第一次按「開始遊戲」時跳出 ----
+  // 只在關卡會切全螢幕的裝置上教（條件同 shared/fullscreen.js）；?fstip=1 強制顯示（測試用）。
+  function willFullscreen() {
+    if (/[?&]fstip=1/.test(location.search)) return true;
+    if (navigator.webdriver) return false;
+    var el = document.documentElement, mm = function (q) { return !!(window.matchMedia && window.matchMedia(q).matches); };
+    return !!(el.requestFullscreen || el.webkitRequestFullscreen) && !navigator.standalone &&
+      !mm('(display-mode: standalone)') && !mm('(display-mode: fullscreen)') && mm('(pointer: coarse)');
+  }
+  function tipSeen() { try { return !!localStorage.getItem(FS_TIP_KEY); } catch (e) { return false; } }
+  var start = menu.querySelector('a[data-item="start"]');
+  if (start) start.addEventListener('click', function (e) {
+    if (tipSeen() || !willFullscreen()) return;
+    e.preventDefault();
+    try { localStorage.setItem(FS_TIP_KEY, '1'); } catch (err) { /* 無痕模式：下次可能再出現，沒關係 */ }
+    var tip = document.createElement('div');
+    tip.id = 'fsTip'; tip.setAttribute('role', 'dialog'); tip.setAttribute('aria-label', '全螢幕說明');
+    tip.innerHTML = '<div class="box"><h2>遊戲會切成全螢幕</h2>' +
+      '進關卡後碰一下畫面，就會變成全螢幕。想離開全螢幕：' +
+      '<ul><li>按手機的「返回」：下方的 ◁，或從螢幕左邊／右邊邊緣往內滑。</li>' +
+      '<li>想換關卡，按右上角的「☰ 關卡」回到這個選單。</li></ul>' +
+      '<button type="button" id="fsTipGo">知道了，開始遊戲</button></div>';
+    document.body.appendChild(tip);
+    document.getElementById('fsTipGo').addEventListener('click', function () { location.href = start.href; });
+  });
+
   document.getElementById('resetBtn').addEventListener('click', function () {
     if (window.confirm('清除這台裝置上的過關紀錄，從第一關重新開始？（趕鬼時間也會重新計算）')) {
       P.reset(); if (window.Leaderboard) window.Leaderboard.restartRun(); location.reload();
