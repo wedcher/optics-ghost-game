@@ -46,6 +46,9 @@
     window: { z0: 1.57, z1: 2.64, y0: 1.18, y1: 3.3 },
     door: { x0: 2.3, x1: 3.7, y1: 3.0 },
     // 關卡規則
-    lives: 3, catchesTwoMirrors: 2, catchesTotal: 5
+    lives: 3, catchesTwoMirrors: 2, catchesTotal: 5,
+    // 兩面鏡（第 1、2 次）只出這三格；單面鏡（第 3～5 次）避開這三格（使用者 2026-11-18 回饋 M8、M9）。
+    // 使用者的說法：(右1,上1)(右2,上1)(右1,上2) = 從右邊數第幾欄、從上面（正面牆那邊）數第幾列。
+    twoMirrorCells: [{ col: 6, row: 1 }, { col: 5, row: 1 }, { col: 6, row: 2 }]
   };
 });

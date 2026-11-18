@@ -15,6 +15,9 @@
   var C = window.MirrorCore, R = window.MirrorRoom, cam = C.makeCamera(R.camera);
   var $ = function (id) { return document.getElementById(id); };
   var FREE = /[?&]free=1/.test(location.search);
+  // ?practice=1 練習模式（選單「第一關：練習模式」）：照關卡規則、扣命，但不計時、不上排行、不播開場與丟圓盤過場。
+  var PRACTICE = !FREE && /[?&]practice=1/.test(location.search);
+  var LB = PRACTICE ? null : window.Leaderboard;
   var GHOST_COLOR = '#9dffd8';
   var IW = R.image.w, IH = R.image.h;
 
@@ -45,7 +48,15 @@
   }
 
   // ---------- 狀態 ----------
-  var POOLS = { 1: C.eligibleCells(R, cam, ['back', 'right']), 2: C.eligibleCells(R, cam, ['back']) };
+  // 出題格（使用者 2026-11-18 試玩回饋 M8、M9）：關卡模式第 1、2 次（兩面鏡）只出在 R.twoMirrorCells 那三格，
+  // 第 3～5 次（單面鏡）避開那三格。兩組都還要通過幾何檢查（鏡中看得到），tests/check-geometry-mirror.js 驗證。
+  // 自由練習（?free=1）不受這個限制，方便看所有格子。
+  function inList(list, c) { return list.some(function (d) { return sameCell(d, c); }); }
+  var GEO_POOLS = { 1: C.eligibleCells(R, cam, ['back', 'right']), 2: C.eligibleCells(R, cam, ['back']) };
+  var POOLS = FREE ? GEO_POOLS : {
+    1: GEO_POOLS[1].filter(function (c) { return inList(R.twoMirrorCells, c); }),
+    2: GEO_POOLS[2].filter(function (c) { return !inList(R.twoMirrorCells, c); })
+  };
   var SELECTABLE = C.selectableCells(R, cam);
   var state = {
     phase: 1,          // 1 = 兩面鏡；2 = 右邊的鏡子被打碎，只剩正面那面
@@ -59,7 +70,7 @@
   };
   var stats = { casts: 0, wrong: 0, mirrorTaps: 0, pans: 0, sides: {}, ghostRevealed: false, images: { back: false, right: false }, lastPick: null };
   var scene = null, history = [];
-  var discTaught = FREE; // 「丟圓盤」那段只播一次（重新挑戰、再玩一次都不再播）；自由練習不播
+  var discTaught = FREE || PRACTICE; // 「丟圓盤」那段只播一次（重新挑戰、再玩一次都不再播）；自由練習不播
   var throwing = false;  // 這次施放是第一次丟圓盤：結果出來後要接後段對話
 
   function intactMirrors() { return state.phase === 1 ? ['back', 'right'] : ['back']; }
@@ -568,6 +579,7 @@
     mirrorTap: '鏡子裡的是像，封印不到。你看到的是鬼，還是鬼的像？請點地板的格子。',
     brokenTap: '這面鏡子已經碎了，照不出東西。',
     casting: '法陣展開中……',
+    firstCast: '展開封印法陣！', // 第一次丟圓盤（M4）
     wrong: '法陣裡沒有東西……扣一❤️，請重新推算鬼的位置。',
     wrongFree: '法陣裡沒有東西。鬼還躲在原地，再看一次鏡子。',
     moved: '鬼掙脫了，換了一個地方躲。'
@@ -579,7 +591,7 @@
     var ok = sameCell(state.selected, state.ghost);
     state.busy = true; stats.casts++;
     state.cast = { cell: state.selected, t0: performance.now(), ok: ok };
-    setStatus(MSG.casting);
+    setStatus(throwing ? MSG.firstCast : MSG.casting);
     syncUI(); requestRender();
     setTimeout(function () {
       if (ok) {
@@ -614,8 +626,8 @@
     scene = window.StoryScene.show({
       id: 'throw', overlay: true,
       lines: [
-        { speaker: '你', text: '我找到了！……然後咧？怎麼辦啊？' },
-        { speaker: '你', text: '（拿起圓盤）這個嗎？', image: window.StoryArt.get('disc') },
+        { speaker: '你', text: '我找到鬼了！……然後咧？怎麼辦啊？' },
+        { speaker: '你', text: '（拿起圓盤）用這個嗎？', image: window.StoryArt.get('disc') },
         { speaker: '你', text: '丟出去嗎？阿阿阿？' }
       ],
       onDone: function () {
@@ -650,6 +662,24 @@
   }
 
   var audioCtx = null;
+  // 鏡子碎裂聲：一聲重擊＋一串高頻碎片聲。單聲道、沒有方向（和抓錯笑聲一樣不能拿來定位）
+  function shatter() {
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      var a = audioCtx, t0 = a.currentTime, len = Math.floor(a.sampleRate * 0.9), buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0), i;
+      for (i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+      var src = a.createBufferSource(), hp = a.createBiquadFilter(), g = a.createGain();
+      src.buffer = buf; hp.type = 'highpass'; hp.frequency.value = 1800;
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.5, t0 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.9);
+      src.connect(hp); hp.connect(g); g.connect(a.destination); src.start(t0);
+      for (i = 0; i < 9; i++) {
+        var o = a.createOscillator(), og = a.createGain(), t = t0 + 0.04 + Math.random() * 0.6;
+        o.type = 'sine'; o.frequency.value = 2600 + Math.random() * 3400;
+        og.gain.setValueAtTime(0.0001, t); og.gain.exponentialRampToValueAtTime(0.12, t + 0.004); og.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+        o.connect(og); og.connect(a.destination); o.start(t); o.stop(t + 0.14);
+      }
+    } catch (e) { /* 沒有聲音也照常 */ }
+  }
   // 抓錯時的短笑聲：單聲道、沒有方向，不能拿來定位
   function giggle() {
     try {
@@ -708,12 +738,13 @@
     return url;
   }
   function showIntro() {
-    if (window.Leaderboard) window.Leaderboard.startRun(); // 趕鬼計時開始（已開始就不歸零；只在關卡模式呼叫）
+    if (LB) LB.startRun(); // 趕鬼計時開始（已開始就不歸零；只在關卡模式呼叫）
     var A = window.StoryArt, room = snapshot('intro', { phase: 1, ghost: state.ghost });
     scene = window.StoryScene.show({
       id: 'intro', background: room,
       lines: [
-        { background: A.get('castle'), text: '你受邀到一座古老的城堡過夜。' },
+        { background: A.get('castle'), text: '有一天……' },
+        { text: '你受邀到一座古老的城堡過夜。' },
         { background: A.get('letter'), text: '晚餐後，你回到房間，發現桌上有一封奇怪的信：' },
         { letter: '如果你能看見牠們，代表牠們也已經發現你了。' },
         { letter: '別相信眼睛看到的位置。' },
@@ -728,19 +759,26 @@
       buttons: [{ id: 'startBtn', label: '開始抓鬼', primary: true, onClick: function () { closeScene(); syncUI(); requestRender(); } }]
     });
   }
+  // 「匡啷！」那一句：碎玻璃聲＋過場畫面震動（使用者 2026-11-18 回饋 M5）
+  function breakFx() {
+    shatter();
+    var bg = document.querySelector('.story-bg');
+    if (!bg) return;
+    bg.classList.remove('mirror-shake'); void bg.offsetWidth; bg.classList.add('mirror-shake');
+  }
   function showBreak() {
     scene = window.StoryScene.show({
       id: 'break', background: snapshot('break', { phase: 2, ghost: null }),
       lines: [
         { text: '鬼被抓了兩次，氣得撞向右邊的鏡子——' },
-        { text: '匡啷！鏡子碎了一地。' },
+        { text: '匡啷！鏡子碎了一地。', onShow: breakFx },
         { speaker: '你', text: '只剩一面鏡子了……' }
       ],
       title: '鏡子被打碎了',
       note: '只剩正面那面鏡子。再抓到牠 ' + (R.catchesTotal - R.catchesTwoMirrors) + ' 次。',
       buttons: [{ id: 'resumeBtn', label: '繼續抓鬼', primary: true, onClick: function () {
         closeScene();
-        state.phase = 2; state.fx = { t0: performance.now() };
+        state.phase = 2; // 震動與碎裂聲在「匡啷！」那句（M5）；按「繼續抓鬼」後不再震（M6）
         newGhost(); setStatus(MSG.startOne); syncUI(); requestRender();
       } }]
     });
@@ -757,19 +795,19 @@
   }
   function showClear() {
     if (window.GameProgress) window.GameProgress.markCleared('mirror'); // 過關紀錄：解鎖第二關（入口頁用）
-    if (window.Leaderboard) window.Leaderboard.finishMirror(); // 本輪計時記下「第一關已通過」，第二關結束才算成績
+    if (LB) LB.finishMirror(); // 本輪計時記下「第一關已通過」，第二關結束才算成績
     scene = window.StoryScene.show({
       id: 'clear', background: snapshot('clear', { phase: 2, ghost: null }),
       lines: [
         { text: '女鬼終於被封印了，房間響起騷動——' },
         { text: '大量的鬼衝出房間，逃進走廊。', scatter: 14 }, // 小怪的圖還沒生，先用 placeholder 鬼往四周逃
-        { speaker: '你', text: '也太多了？別跑！' }
+        { speaker: '你', text: '也太多鬼了？別跑！' }
       ],
-      title: '第一關過關！', note: '鬼逃進了走廊。下一關：城堡走廊。',
+      title: '第一關過關！', note: '鬼逃進了走廊。回到關卡選單，就能進入第二關：城堡走廊。',
       buttons: [
-        { id: 'toLevel2Btn', label: '前往第二關 ➜', primary: true, href: '../convex-lens/index.html' },
-        { id: 'againBtn', label: '再玩一次', onClick: function () { closeScene(); resetLevel(); } },
-        { id: 'clearMenuBtn', label: '回關卡選單', href: '../index.html' }
+        // 過關後一律回選單、由選單進下一關（使用者 2026-11-18 回饋 Q3：換頁一定會離開全螢幕，不從這裡直接跳第二關）
+        { id: 'clearMenuBtn', label: '回關卡選單', primary: true, href: '../index.html' },
+        { id: 'againBtn', label: '再玩一次', onClick: function () { closeScene(); resetLevel(); } }
       ]
     });
   }
@@ -806,7 +844,7 @@
 
   // 測試／開發用掛鉤（不是學生 UI）
   window.__protoMirror = {
-    state: state, stats: stats, room: R, core: C, cam: cam, FREE: FREE, pools: POOLS, selectable: SELECTABLE, GHOST_COLOR: GHOST_COLOR,
+    state: state, stats: stats, room: R, core: C, cam: cam, FREE: FREE, PRACTICE: PRACTICE, pools: POOLS, selectable: SELECTABLE, GHOST_COLOR: GHOST_COLOR,
     intactMirrors: intactMirrors, render: render, messages: MSG, setStatus: setStatus,
     scene: function () { return scene ? scene.info() : null; },
     art: function () { return { intact: ART.intact.ready, broken: ART.broken.ready, ghost: ART.ghost.ready && ART.ghostBack.ready }; },
@@ -824,5 +862,6 @@
   if (FREE) { $('title').innerHTML = '平面鏡原型 <small>自由練習</small>'; fillCellSel(); }
   layout();
   resetLevel();
-  if (!FREE) { if (artReady()) showIntro(); else pendingIntro = true; }
+  if (PRACTICE) $('title').innerHTML = '第一關 <small>練習模式</small>';
+  if (!FREE && !PRACTICE) { if (artReady()) showIntro(); else pendingIntro = true; }
 })();

@@ -152,15 +152,17 @@ async function levelFlow(profile, browser) {
   let bg = await bgInfo();
   ok(bg.bg.snapshot && bg.bg.id === 'intro' && bg.bg.phase === 1 && bg.bg.ghost, '開場已備好房間快照：兩面鏡完好、鏡子裡有鬼', JSON.stringify(bg.bg));
   ok(s.scene.bg === 'image' && !s.scene.letter, '開場第一句：古堡外觀（圖）');
+  ok(await page.evaluate(() => document.querySelector('.story-text').textContent.indexOf('有一天') >= 0), '開場第一句是「有一天……」');
   await shot('mirror-1-intro');
-  // 劇本修訂（2026-11-17）：古堡 → 信（旁白 + 信上 3 句 + 圓盤）→ 黑畫面（怪聲）→ 房間 2 句，共 9 句
-  const INTRO_LINES = 9;
-  const expect = { 2: 'letter', 3: 'letter', 4: 'letter', 6: 'black', 7: 'room' };
+  // 劇本修訂（2026-11-17）：古堡（「有一天……」＋受邀，2026-11-18 加第一句）→ 信（旁白 + 信上 3 句 + 圓盤）→ 黑畫面（怪聲）→ 房間 2 句，共 10 句
+  const INTRO_LINES = 10;
+  const expect = { 1: 'castle', 3: 'letter', 4: 'letter', 5: 'letter', 7: 'black', 8: 'room' };
   for (let i = 1; i < INTRO_LINES; i++) {
     await t.tapAt(vp.width / 2, vp.height / 2);
     s = await info();
     ok(s.scene.line === i && !s.scene.ended, '點畫面換到第 ' + (i + 1) + ' 句');
     if (expect[i] === 'letter') ok(s.scene.letter && await page.isHidden('.story-dialog'), '第 ' + (i + 1) + ' 句：信上的字疊在信紙上，對話框收起');
+    if (expect[i] === 'castle') ok(s.scene.bg === 'image' && !s.scene.letter, '第 ' + (i + 1) + ' 句：還是古堡外觀');
     if (expect[i] === 'black') ok(s.scene.bg === 'black' && !s.scene.letter, '第 ' + (i + 1) + ' 句：黑畫面（半夜怪聲），信收起');
     if (expect[i] === 'room') {
       bg = await bgInfo();
@@ -178,6 +180,7 @@ async function levelFlow(profile, browser) {
   ok(s.lives === 3 && s.hearts === 3 && s.sealed === 0 && s.phase === 1, '3 條命、封印 0、兩面鏡', JSON.stringify([s.lives, s.sealed, s.phase]));
   ok(s.intact.join() === 'back,right', '兩面鏡都完好');
   ok(await page.evaluate(() => window.__protoMirror.pools[1].some((c) => window.__protoMirror.core.cellId(c.col, c.row) === window.__protoMirror.core.cellId(window.__protoMirror.state.ghost.col, window.__protoMirror.state.ghost.row))), '鬼在雙鏡出題格內', s.ghost);
+  ok(['c6r1', 'c5r1', 'c6r2'].indexOf(s.ghost) >= 0, '雙鏡第 1 隻只出在 (右1,上1)(右2,上1)(右1,上2) 三格', s.ghost);
   ok(s.images.back && s.images.right, '兩面鏡裡都有鬼的像');
   const vis0 = await page.evaluate(() => { const m = window.__protoMirror, g = m.state.ghost; return ['back', 'right'].map((id) => m.core.visibility(m.room, m.cam, g, id).full); });
   ok(vis0[0] && vis0[1], '雙鏡階段：鬼站的位置兩面鏡都照得到整隻');
@@ -254,6 +257,7 @@ async function levelFlow(profile, browser) {
   ok(s.phase === 1 && s.scene === null, '抓到 1 次還是兩面鏡');
   const vis1 = await page.evaluate(() => { const m = window.__protoMirror, g = m.state.ghost; return ['back', 'right'].map((id) => m.core.visibility(m.room, m.cam, g, id).full); });
   ok(vis1[0] && vis1[1], '雙鏡階段第 2 隻：兩面鏡也都照得到整隻');
+  ok(['c6r1', 'c5r1', 'c6r2'].indexOf((await info()).ghost) >= 0, '雙鏡第 2 隻也只出在那三格');
   ok(s.status === '鬼掙脫了，換了一個地方躲。', '換位置的說明是短的那一句', s.status);
   px = await pixels();
   ok(px.ghostOut < EDGE_PX, '換位置後房間裡又看不到鬼');
@@ -268,16 +272,20 @@ async function levelFlow(profile, browser) {
   bg = await bgInfo();
   ok(bg.data && bg.bg.id === 'break' && bg.bg.phase === 2 && !bg.bg.ghost, '過場背景是右鏡打碎的房間（鬼躲起來了）', JSON.stringify(bg.bg));
   await shot('mirror-6-break-scene');
-  for (let i = 0; i < 3; i++) await t.tapAt(vp.width / 2, vp.height / 2);
+  ok(!(await page.evaluate(() => document.querySelector('.story-bg').classList.contains('mirror-shake'))), '第 1 句（鬼撞鏡子）還沒震');
+  await t.tapAt(vp.width / 2, vp.height / 2);
+  ok(await page.evaluate(() => /匡啷/.test(document.querySelector('.story-text').textContent) && document.querySelector('.story-bg').classList.contains('mirror-shake')), '「匡啷！」那一句畫面震動');
+  for (let i = 0; i < 2; i++) await t.tapAt(vp.width / 2, vp.height / 2);
   ok(await page.isVisible('#resumeBtn'), '過場最後出現【繼續抓鬼】');
   await page.waitForTimeout(ARM_WAIT);
   await press('#resumeBtn');
-  await page.waitForTimeout(750); // 等震動與閃光結束
   s = await info();
+  ok(await page.evaluate(() => window.__protoMirror.state.fx === null), '按【繼續抓鬼】後不再震動（2026-11-18 回饋 M6）');
   ok(s.phase === 2 && s.intact.join() === 'back', '只剩正面那面鏡子');
   ok(s.lives === 2 && s.sealed === 2, '打碎鏡子不補命、封印數保留', JSON.stringify([s.lives, s.sealed]));
   ok(s.images.back && !s.images.right, '只有正面鏡裡有像');
   ok(await page.evaluate(() => window.__protoMirror.pools[2].some((c) => window.__protoMirror.core.cellId(c.col, c.row) === window.__protoMirror.core.cellId(window.__protoMirror.state.ghost.col, window.__protoMirror.state.ghost.row))), '鬼在單鏡出題格內', s.ghost);
+  ok(['c6r1', 'c5r1', 'c6r2'].indexOf(s.ghost) < 0, '單鏡第 3 隻避開雙鏡那三格', s.ghost);
   px = await pixels();
   ok(px.ghostIn > 0 && px.ghostOut < EDGE_PX, '單鏡：鬼只出現在正面鏡裡', JSON.stringify(px));
   await shot('mirror-7-one-mirror');
@@ -292,6 +300,7 @@ async function levelFlow(profile, browser) {
   for (let n = 3; n <= 5; n++) {
     const prev = (await info()).ghost;
     seen.push(prev);
+    ok(['c6r1', 'c5r1', 'c6r2'].indexOf(prev) < 0, '單鏡第 ' + n + ' 隻避開雙鏡那三格', prev);
     await t.catchGhost();
     s = await info();
     ok(s.sealed === n, '抓到第 ' + n + ' 次');
@@ -312,8 +321,8 @@ async function levelFlow(profile, browser) {
   ok(bg.data && bg.bg.id === 'clear' && bg.bg.phase === 2 && !bg.bg.ghost, '過關背景：右鏡已碎、鏡子裡沒有鬼（牠逃走了）', JSON.stringify(bg.bg));
   for (let i = 0; i < 3; i++) await t.tapAt(vp.width / 2, vp.height / 2);
   await page.waitForTimeout(ARM_WAIT);
-  ok(await page.isVisible('#toLevel2Btn'), '過關畫面有【前往第二關】');
-  ok(/convex-lens\/index\.html$/.test(await page.getAttribute('#toLevel2Btn', 'href')), '【前往第二關】連到凸透鏡關卡');
+  ok(!(await page.isVisible('#toLevel2Btn')), '過關畫面沒有【前往第二關】（一律回選單，2026-11-18 回饋 Q3）');
+  ok(await page.isVisible('#clearMenuBtn') && /\.\.\/index\.html$/.test(await page.getAttribute('#clearMenuBtn', 'href')), '過關畫面有【回關卡選單】');
   await shot('mirror-8-clear');
   await press('#againBtn');
   s = await info();
@@ -351,6 +360,25 @@ async function levelFlow(profile, browser) {
   console.log('   房間畫面 ' + Math.round(lay.stage.w) + '×' + Math.round(lay.stage.h) + '，背景圖縮放 ' + lay.info.S.toFixed(3));
   ok(t.errors.length === 0, '沒有 JS 錯誤或載入失敗', t.errors.join(' | '));
   await t.context.close();
+}
+
+async function practiceMode(profile, browser) {
+  console.log('\n===== ' + profile.name + '：練習模式 ?practice=1 =====');
+  const t = await open(profile, browser, '?practice=1');
+  const { page, info } = t;
+  let s = await info();
+  ok(s.scene === null, '?practice=1 沒有開場過場，直接開始');
+  ok(await page.evaluate(() => window.Leaderboard.getRun()) === null, '排行榜：練習模式不開始趕鬼計時');
+  ok(await page.isVisible('#hud') && s.lives === 3 && await page.isHidden('#freeTools'), '練習模式照樣有 3 條命、沒有開發工具');
+  ok(/練習/.test(await page.textContent('#title')), '標題寫「練習模式」');
+  ok(['c6r1', 'c5r1', 'c6r2'].indexOf(s.ghost) >= 0, '練習模式出題規則和關卡相同（雙鏡只出那三格）', s.ghost);
+  await t.castWrong(0); await t.waitIdle();
+  s = await info();
+  ok(s.lives === 2 && (s.scene === null), '練習模式抓錯會扣命，第一次點地板不播丟圓盤過場', JSON.stringify([s.lives, s.scene]));
+  const mb = await page.evaluate(() => { const r = document.getElementById('menuLink').getBoundingClientRect(); return { right: innerWidth - r.right, top: r.top, w: r.width, h: r.height }; });
+  ok(mb.right < 16 && mb.top < 16 && mb.h >= 44, '「☰ 關卡」在右上角、高度 ≥ 44', JSON.stringify(mb));
+  ok(t.errors.length === 0, '沒有 JS 錯誤或載入失敗', t.errors.join(' | '));
+  await page.context().close();
 }
 
 async function freeMode(profile, browser) {
@@ -450,7 +478,7 @@ async function freeMode(profile, browser) {
   BASE = 'http://127.0.0.1:' + server.address().port;
   const browser = await chromium.launch();
   try {
-    for (const p of PROFILES) { await levelFlow(p, browser); await freeMode(p, browser); }
+    for (const p of PROFILES) { await levelFlow(p, browser); await practiceMode(p, browser); await freeMode(p, browser); }
   } finally {
     await browser.close(); server.close();
   }

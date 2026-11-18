@@ -63,6 +63,14 @@
     #status { min-height:4.4em; }
   }
   [hidden] { display:none !important; }
+  /* 「☰ 關卡」放在右上角（使用者 2026-11-18 回饋 G1，三關統一） */
+  #sideTop { display:flex; align-items:center; gap:6px; }
+  #sideTop h1 { flex:1 1 auto; min-width:0; }
+  #side #menuLink { flex:0 0 auto; width:auto; min-height:44px; font-size:15px; padding:2px 10px; white-space:nowrap; }
+  /* 「匡啷！」那一句：過場畫面震一下（M5） */
+  .story-bg.mirror-shake { animation:mirrorShake .65s ease-out; }
+  @keyframes mirrorShake { 0%,100% { transform:translate(0,0); } 12% { transform:translate(-14px,6px); } 25% { transform:translate(12px,-8px); } 38% { transform:translate(-9px,5px); } 52% { transform:translate(7px,-4px); } 68% { transform:translate(-4px,2px); } 84% { transform:translate(2px,-1px); } }
+  @media (prefers-reduced-motion: reduce) { .story-bg.mirror-shake { animation:none; } }
 </style>
 </head>
 <body>
@@ -85,7 +93,10 @@
     <div id="debugPanel" hidden></div>
   </main>
   <aside id="side">
-    <h1 id="title">第一關 <small>鏡子房間</small></h1>
+    <div id="sideTop">
+      <h1 id="title">第一關 <small>鏡子房間</small></h1>
+      <a id="menuLink" class="btn" href="../index.html" aria-label="回關卡選單">☰ 關卡</a>
+    </div>
     <div id="hud">
       <span id="hearts" role="img"><span>♥</span><span>♥</span><span>♥</span></span>
       <span id="sealCount"></span>
@@ -93,7 +104,6 @@
     <div id="status" role="status" aria-live="polite"></div>
     <button id="castBtn" type="button" class="primary" disabled>展開封印法陣</button>
     <button id="nextBtn" type="button" class="primary" hidden>繼續 ➜</button>
-    <a id="menuLink" class="btn" href="../index.html">關卡選單</a>
   </aside>
 </div>
 <script src="../shared/fullscreen.js"></script>
