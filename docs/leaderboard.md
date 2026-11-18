@@ -29,20 +29,33 @@
 | `tests/check-leaderboard.js` | 用假的試算表跑真的 `Code.gs`（29 項） |
 | `tests/e2e-leaderboard.js` | 瀏覽器實測：計時、結算畫面、本機模式、共用模式（假伺服器跑 `Code.gs`）、斷線（32 項） |
 
-## 部署共用排行榜（使用者做一次，約 5 分鐘）
+## 部署共用排行榜
 
-1. 開 Google 試算表，新增一份空白試算表，命名例如「光學抓鬼排行榜」。
-2. 選單【擴充功能】→【Apps Script】。
-3. 把編輯器裡的 `Code.gs` 內容全部刪掉，貼上 repo 的 `backend/leaderboard/Code.gs`，按儲存。
-4. 右上【部署】→【新增部署作業】→ 齒輪選【網頁應用程式】：
+**已部署（2026-11-18，使用者自己的 Google 帳號）**。試算表「光學抓鬼排行榜」，網址已填進 `prototype/shared/leaderboard-config.js`：
+
+```
+https://script.google.com/macros/s/AKfycbwLRDiuQAThbMIY_tVEARySyCkIzKc6mFyKCi54TfmX4Rx_6wuovMFtz-LzSfBNj6Zg/exec
+```
+
+這個網址不是密碼（前端本來就公開它）。之後重新部署請用「管理部署作業 → 新版本」，**網址不變**；若改用「新增部署作業」會得到新網址，要再改 config。
+
+### 步驟（照 2026-11-18 實際畫面校正過）
+
+1. 開 https://sheets.google.com →【空白試算表】，命名「光學抓鬼排行榜」。
+2. 選單【擴充功能】→【Apps Script】。新分頁左邊是 `程式碼.gs`，右邊是預設的 `function myFunction() { }`。
+3. 開 https://raw.githubusercontent.com/wedcher/optics-ghost-game/main/backend/leaderboard/Code.gs ，Ctrl+A、Ctrl+C；回 Apps Script 點右邊程式區，Ctrl+A、Ctrl+V 取代，按磁碟片圖示【儲存專案】。可順便把「未命名的專案」改成「光學抓鬼排行榜」。
+4. 右上【部署】→【新增部署作業】→ 左邊「選取類型」旁的齒輪 →【網頁應用程式】：
    - 執行身分：**我**
-   - 誰可以存取：**所有人**
-5. 按【部署】，第一次會要求授權（選自己的帳號 →「進階」→「前往（不安全）」→ 允許；這是自己寫的腳本，Google 才這樣提示）。
-6. 複製「網頁應用程式網址」（結尾是 `/exec`），貼給 Claude，或自己填進 `prototype/shared/leaderboard-config.js`：
-   ```js
-   window.LEADERBOARD_URL = 'https://script.google.com/macros/s/……/exec';
-   ```
-7. 推到 `main`，GitHub Pages 更新後就是共用排行。
+   - 誰可以存取：**所有人**（不是「所有已登入 Google 帳戶的使用者」，否則沒登入的學生上傳不了）
+5. 按【部署】→ 第一次會跳「需要授權存取權」→【授予存取權】→ 選自己的帳號 →「Google 尚未驗證這個應用程式」→ 左下【進階】→【前往「光學抓鬼排行榜」（不安全）】→【允許】。
+   - 為什麼可以放心：程式是自己貼的，Google 沒審核過才警告；它只要求讀寫**這份**試算表。
+   - 實際畫面差異：授權完回到 Apps Script，原本的部署框可能還在；再點一次會出現**英文**頁「光學抓鬼排行榜 wants access… already has some access」，代表授權其實已成功，捲到最下面按【Continue】／【Allow】即可。
+6. 出現「已成功更新部署作業」，複製「網頁應用程式 網址」（結尾 `/exec`）。找不到時：【部署】→【管理部署作業】→ 點那一筆。
+7. 填進 `prototype/shared/leaderboard-config.js` 的 `window.LEADERBOARD_URL`，推到 `main`，GitHub Pages 更新後就是共用排行。
+
+**雲端 Claude 工作階段要實測時**：預設環境的網路擋 `script.google.com`。2026-11-18 建了個人環境 `optics-ghost-game`，只多開 `script.google.com`、`script.googleusercontent.com`（Apps Script 回應會 302 轉址到後者）。
+
+**測試不會打正式網址**：`tests/e2e-leaderboard.js` 一律用 `page.route` 蓋掉 `leaderboard-config.js`（本機模式＝空字串、共用模式＝假伺服器）。新寫的測試若會走到上傳（結算畫面輸入暱稱），也要蓋掉 config，否則會把假成績寫進正式試算表。
 
 之後若改了 `Code.gs`：【部署】→【管理部署作業】→ 鉛筆 → 版本選「新版本」→ 部署（網址不變）。
 
@@ -73,5 +86,7 @@
 - **暱稱可冒用**：任何人輸入同一個暱稱，較好的成績就會蓋過去。沒有帳號系統（CLAUDE.md 不做帳號）。
 - **不雅字詞過濾只擋常見的**：清單小而保守，諧音、新造字擋不到，漏網的由老師刪列（使用者 2026-11-17 定案，見上方「暱稱」規則）。
 - Apps Script 免費額度對一個班級綽綽有餘；同時大量送出時用 `LockService` 排隊，最多等 10 秒。
-- 共用模式在手機上的實際連線（Apps Script 的跨網域轉址）**還沒用真的部署測過**；e2e 用的是跑同一份 `Code.gs` 的本機假伺服器。部署後第一次要實測一次上傳與讀取。
+- 真的部署已實測（2026-11-18，雲端工作階段）：curl `GET ?action=top` → `{"ok":true,...}`；照 `Code.gs` 格式 POST（text/plain JSON）→ 回傳名次、試算表自動建立 `castle`／`hunt` 並多一列；不雅暱稱 `sh1t` 被擋；GET 與 302 轉址後的回應都有 `access-control-allow-origin: *`；Playwright 開 `leaderboard.html`（用正式網址）兩個榜都讀到測試資料。測試資料已請使用者在試算表刪除。
+- **還沒實測**：真的手機從遊戲過關 → 結算畫面輸入暱稱 → 上傳 → 排行榜頁看到（要等使用者玩到第二關過關）。
+- `Code.gs` 小問題（未修，改了要重新部署，記在 PROJECT.md PENDING）：`lock.waitLock(10000)` 等不到鎖時會丟例外，Apps Script 回 HTML 錯誤頁而不是 `{ok:false}` JSON；前端會當成連線失敗。一個班級同時送出不太會碰到。
 - 計時存在 `localStorage`：換瀏覽器／無痕模式等於沒有開始紀錄；清除網站資料會讓計時消失（只會讓那一輪沒有成績，不會變快）。
