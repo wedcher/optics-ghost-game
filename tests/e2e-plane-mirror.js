@@ -279,6 +279,7 @@ async function levelFlow(profile, browser) {
   ok(await page.isVisible('#resumeBtn'), '過場最後出現【繼續抓鬼】');
   await page.waitForTimeout(ARM_WAIT);
   await press('#resumeBtn');
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))); // 等新的鬼畫出來（stats.images 在 render 裡更新）
   s = await info();
   ok(await page.evaluate(() => window.__protoMirror.state.fx === null), '按【繼續抓鬼】後不再震動（2026-11-18 回饋 M6）');
   ok(s.phase === 2 && s.intact.join() === 'back', '只剩正面那面鏡子');

@@ -363,14 +363,14 @@
   - **G5**：從選單點第二關／練習模式進得去（e2e 有測）；過關回選單由各關分頁做（第一關已做）。
   - 新增 `tests/e2e-menu.js`（41 項，已接進 `npm test`；`npm run test:menu` 單跑），截圖 `docs/screenshots/menu-*.png`。`tests/e2e-leaderboard.js` 的選單段落改成新的選單結構。
   - **還沒在實體手機上試**（全螢幕教學、鎖橫向都只能在實機驗）。
-  - `npm test`（2026-11-18）：選單 41/41、排行榜 40/40 與其他各支都過，**只有第一關 e2e 偶爾 1 項失敗**「只有正面鏡裡有像」（`tests/e2e-plane-mirror.js:286`）：單鏡出題格是隨機的，抽到 c2r3 等格時 `images.back` 為 false，3 次重跑失敗 1 次。和選單／共用無關，沒動；留給第一關分頁查（是單鏡出題格含了正面鏡照不到整隻的格子，還是測試條件太嚴）。
+  - `npm test`（2026-11-18）：選單 41/41、排行榜 40/40 與其他各支都過，~~只有第一關 e2e 偶爾 1 項失敗~~（已修：第一關分頁拿掉「繼續抓鬼」後的等待，測試在新的鬼畫出來前就讀狀態；改成等兩個 frame）「只有正面鏡裡有像」（`tests/e2e-plane-mirror.js:286`）：單鏡出題格是隨機的，抽到 c2r3 等格時 `images.back` 為 false，3 次重跑失敗 1 次。和選單／共用無關，沒動；留給第一關分頁查（是單鏡出題格含了正面鏡照不到整隻的格子，還是測試條件太嚴）。
 - **下一步：G3 後半「手機直拿時整個遊戲轉 90°」還沒做**，等第二關、第三關分頁收工（下面「檔案分工」那兩行拿掉）再做。評估（Claude 2026-11-18）：做得到，但**一定要改三關的 `app.js`**，做之前先告訴使用者：
   - 做法：`landscape.js` 在「觸控＋直向＋沒有 `?portrait=1`」時，把 `body` 設成寬 = 螢幕高、高 = 螢幕寬，`transform: rotate(90deg)` 轉過來；轉向的方向先固定（順時針），看試玩反應。
   - 要改的地方：三關都用 `getBoundingClientRect()` 和 `clientX/clientY` 算觸控位置（`convex-lens/app.js` 的 `localPos`、`layout`；`concave-lens/app.js` 的 `localPos`、`layout`；`plane-mirror/app.js` 的 `layout`、`toImage`、拖曳平移的 dx/dy、`toClient`）。轉 90° 後這些都會錯（拿到的是轉過的外框、x/y 對調），要改成呼叫共用的 `GameLandscape.toLocal(e, el)`／`GameLandscape.size(el)`。`window.innerWidth/innerHeight` 與 `resize` 也要換成轉向後的尺寸。
   - 測試：各關 e2e 的直向情境都帶 `?portrait=1`，轉向會照這個參數關掉，所以原本的測試不受影響；要另外加一組「直向不帶參數」的點擊測試。
   - 風險：系統彈出的東西（鍵盤、`confirm()`、排行榜暱稱輸入框）不會跟著轉；iOS Safari 直拿時網址列在側邊、可用高度會跳動。
 - **檔案分工（2026-11-18）**：
-  - 第二關分頁：`prototype/convex-lens/*`、`tests/e2e-convex-*.js`、`tests/check-geometry-convex.js`。
+  - （2026-11-18 第一、二、三關與選單＋共用四個分頁都已收工，目前沒有人佔用檔案。）
   - `PROJECT.md` 和 `docs/playtest-feedback-2026-11-18.md` 大家都會改：只改自己那段，收工前先 `git pull`。
 
 ### 交接點（凸透鏡虛像題實驗，2026-11-18）
