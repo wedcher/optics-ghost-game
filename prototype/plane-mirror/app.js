@@ -381,23 +381,39 @@
   }
   // 鏡子底邊的金色門檻：一條貼在地板上、有寬度的金框，分清楚鏡內與鏡外。
   // 畫成地板上的長條再投影，所以近的地方粗、遠的地方細；寬度以鏡面為中線、鏡內鏡外各一半。
-  var BASE_BAR = 0.11; // 半寬（格）
+  // 鏡子底下的金色底框：立體的（有高度、有厚度），立在鏡面前緣，會擋住鏡中最下面一小段。
+  // 使用者 2026-11-18 回饋 M10：原本的細黃線太細，要粗一點的鏡框；因為框往上立起一點，
+  // 鏡子裡最靠牆那半格可能被擋到一點點，使用者接受（出題格是固定的，不重算）。
+  // 只是畫面上的遮擋，鏡面範圍（configs.js 的 glass.bottom）與答案都不變。
+  var FRAME_H = 0.12, FRAME_D = 0.12; // 底框高度、厚度（格）
   function drawBaseBar(id) {
-    var m = R.mirrors[id], g = m.glass, w = BASE_BAR, strip, mid;
-    if (m.axis === 'z') {
-      strip = [{ x: g.a, y: 0, z: m.value - w }, { x: g.b, y: 0, z: m.value - w }, { x: g.b, y: 0, z: m.value + w }, { x: g.a, y: 0, z: m.value + w }];
-      mid = [{ x: g.a, y: 0, z: m.value }, { x: g.b, y: 0, z: m.value }];
-    } else {
-      strip = [{ x: m.value - w, y: 0, z: g.a }, { x: m.value - w, y: 0, z: g.b }, { x: m.value + w, y: 0, z: g.b }, { x: m.value + w, y: 0, z: g.a }];
-      mid = [{ x: m.value, y: 0, z: g.a }, { x: m.value, y: 0, z: g.b }];
+    var m = R.mirrors[id], g = m.glass, inward = m.axis === 'z' ? 1 : -1; // 房間在鏡面哪一側：正面鏡 +z、右鏡 -x
+    function pt(t, y, d) { // t：沿鏡面方向；y：高度；d：離鏡面往房間的距離
+      return m.axis === 'z' ? { x: t, y: y, z: m.value + inward * d } : { x: m.value + inward * d, y: y, z: t };
     }
-    var p = C.projectPoly(cam, strip), c = C.projectPoly(cam, mid);
-    if (p.length < 3) return;
-    path(p); ctx.fillStyle = '#c9963f'; ctx.fill();
-    ctx.strokeStyle = '#5a3d12'; ctx.lineWidth = 1.5; ctx.lineJoin = 'round'; ctx.stroke();
-    if (c.length >= 2) { // 中間一條亮線＝鏡面的位置
+    var top = C.projectPoly(cam, [pt(g.a, FRAME_H, 0), pt(g.b, FRAME_H, 0), pt(g.b, FRAME_H, FRAME_D), pt(g.a, FRAME_H, FRAME_D)]);
+    var front = C.projectPoly(cam, [pt(g.a, FRAME_H, FRAME_D), pt(g.b, FRAME_H, FRAME_D), pt(g.b, 0, FRAME_D), pt(g.a, 0, FRAME_D)]);
+    var edge = C.projectPoly(cam, [pt(g.a, FRAME_H, FRAME_D), pt(g.b, FRAME_H, FRAME_D)]);
+    var groove = C.projectPoly(cam, [pt(g.a, FRAME_H * 0.5, FRAME_D), pt(g.b, FRAME_H * 0.5, FRAME_D)]);
+    ctx.lineJoin = 'round';
+    if (front.length >= 3) { // 正面（面向玩家，較暗）
+      path(front);
+      var ys = front.map(function (q) { return q.y; }), grad = ctx.createLinearGradient(0, Math.min.apply(null, ys), 0, Math.max.apply(null, ys));
+      grad.addColorStop(0, '#c99a45'); grad.addColorStop(1, '#6e4a17');
+      ctx.fillStyle = grad; ctx.fill();
+      ctx.strokeStyle = '#3e280a'; ctx.lineWidth = 1.5; ctx.stroke();
+    }
+    if (top.length >= 3) { // 頂面（受光，較亮）
+      path(top); ctx.fillStyle = '#e6bb62'; ctx.fill();
+      ctx.strokeStyle = '#5a3d12'; ctx.lineWidth = 1.2; ctx.stroke();
+    }
+    if (groove.length >= 2) { // 正面的一道雕刻線
+      ctx.strokeStyle = 'rgba(255,226,160,.45)'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(groove[0].x, groove[0].y); ctx.lineTo(groove[1].x, groove[1].y); ctx.stroke();
+    }
+    if (edge.length >= 2) { // 稜線高光
       ctx.strokeStyle = '#ffe2a0'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(c[0].x, c[0].y); ctx.lineTo(c[1].x, c[1].y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(edge[0].x, edge[0].y); ctx.lineTo(edge[1].x, edge[1].y); ctx.stroke();
     }
   }
   function glassScreen(id) { return C.projectPoly(cam, C.mirrorPoly(R.mirrors[id])); }
