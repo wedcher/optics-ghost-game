@@ -377,7 +377,8 @@ async function practiceMode(profile, browser) {
   s = await info();
   ok(s.lives === 2 && (s.scene === null), '練習模式抓錯會扣命，第一次點地板不播丟圓盤過場', JSON.stringify([s.lives, s.scene]));
   const mb = await page.evaluate(() => { const r = document.getElementById('menuLink').getBoundingClientRect(); return { right: innerWidth - r.right, top: r.top, w: r.width, h: r.height }; });
-  ok(mb.right < 16 && mb.top < 16 && mb.h >= 44, '「☰ 關卡」在右上角、高度 ≥ 44', JSON.stringify(mb));
+  ok(mb.right < 16 && mb.top < 16 && mb.h >= 44, '「☰ 回關卡」在右上角、高度 ≥ 44', JSON.stringify(mb));
+  ok((await page.textContent('#menuLink')).trim() === '☰ 回關卡', '按鈕字樣是「☰ 回關卡」');
   ok(t.errors.length === 0, '沒有 JS 錯誤或載入失敗', t.errors.join(' | '));
   await page.context().close();
 }
