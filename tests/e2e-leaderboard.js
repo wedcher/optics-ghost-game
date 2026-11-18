@@ -176,7 +176,7 @@ const MIN = 60 * 1000;
     await ctx.close();
   }
 
-  // ---------- 5. 入口選單：重新開始遊戲同時清掉過關紀錄與計時；?unlock=1 仍可用 ----------
+  // ---------- 5. 入口選單：重新開始遊戲同時清掉過關紀錄與計時（逐步解鎖細節見 tests/e2e-menu.js） ----------
   {
     const ctx = await browser.newContext({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true });
     const page = await ctx.newPage();
@@ -184,15 +184,13 @@ const MIN = 60 * 1000;
     await page.goto(BASE + '/prototype/index.html');
     await page.evaluate(() => { localStorage.setItem('opticsGhost.progress.v1', JSON.stringify({ mirror: true })); Leaderboard.startRun(); Leaderboard.finishMirror(); });
     await page.reload();
-    ok(!(await page.$('a.card[data-level="convex"].locked')) && !!(await page.$('a.card[data-level="concave"].locked')), '選單：過了第一關，第二關解鎖、凹透鏡仍鎖住');
+    ok(!!(await page.$('a.card[data-item="convex"]')) && !(await page.$('a.card[data-item="concave"]')), '選單：過了第一關，第二關出現、第三關還沒出現');
     ok(!!(await page.$('a.card[href="leaderboard.html"]')) && !!(await page.$('#resetBtn')), '選單：排行榜入口與「重新開始遊戲」都在');
     page.once('dialog', (d) => d.accept());
     await Promise.all([page.waitForNavigation(), page.tap('#resetBtn')]);
     const after = await page.evaluate(() => ({ p: localStorage.getItem('opticsGhost.progress.v1'), run: Leaderboard.getRun() }));
     ok(after.p === null && after.run === null, '重新開始遊戲：過關紀錄與趕鬼計時都清掉', JSON.stringify(after));
-    ok(!!(await page.$('a.card[data-level="convex"].locked')), '重新開始後第二關又鎖住');
-    await page.goto(BASE + '/prototype/index.html?unlock=1');
-    ok(!(await page.$('a.card.locked')), '?unlock=1 全部解鎖');
+    ok(!(await page.$('a.card[data-item="convex"]')) && !!(await page.$('a.card[data-item="start"]')), '重新開始後回到只有「開始遊戲」');
     await ctx.close();
   }
 

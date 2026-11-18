@@ -126,6 +126,7 @@
 16. 第二關遊戲中的提示台詞：使用者要等凸透鏡虛像題型（PENDING 14）做完，再請 Claude 補台詞。
 17. **第二關「超清楚」**（使用者 2026-11-18：先不做，也許之後改別的方向）（使用者 2026-11-18 試玩回饋 V3，`docs/playtest-feedback-2026-11-18.md`）：使用者想在「鬼在焦點上、虛像最大」時描線、標「超清楚」。物理上鬼剛好在焦點時不成像（像在無限遠），虛像也沒有對焦問題、永遠清楚。等使用者決定改成什麼（例如：實像剛好對焦時標「超清楚」；或虛像放大率超過某值時給提示；或不做）。
 18. ~~第一關鏡框（回饋 M10）~~ 已釐清並實作（2026-11-18）：使用者要的是較粗的**立體**底框：框立起一點，鏡子裡最靠牆那半格可能被擋到一點點，可以接受、出題格不重算。已實作；使用者看了框高 0.06～0.35 格五種比較圖，**選 A：高 0.06 格**、厚 0.08 格（之後要改調（`plane-mirror/app.js` 的 `FRAME_H`、`FRAME_D`）。
+19. **手機直拿時整個遊戲轉 90°（回饋 G3 後半、Q1）**：還沒做，等第二、三關分頁收工後由選單＋共用分頁做，會改三關 `app.js` 的座標換算（做法與風險見交接點「使用者試玩回饋」）。直拿時轉向左還是向右先固定順時針，待試玩。
 13. ~~第一關等使用者試玩後決定~~（2026-11-17 使用者都已回覆，見 CONFIRMED；以下保留原題目）（`docs/prototype-findings-mirror.md`）：選格黃框與法陣不出現在鏡子裡可以嗎（ISSUE 5）；鬼的像在正面鏡裡沒有左右相反要不要調整（ISSUE 6）；鏡中要不要畫玩家自己的剪影（ISSUE 7）；鏡中鏡的第二個像要不要留（ISSUE 8）；台詞（第 13 點）；背景圖要不要重畫成落地鏡、玩家站近一點（ISSUE 1～3）。
 
 ---
@@ -353,9 +354,23 @@
   - **過關後只留「回選單」**（Q3），不再直接跳下一關。過關紀錄 `GameProgress.markCleared(...)` 照舊。
   - 「☰ 關卡」按鈕各關自己移到**右上角**（G1）。
   - G3「直拿就把畫面轉 90°」會影響三關的觸控座標，**等三關分頁都做完再做**（由選單＋共用分頁做，做時要動三關的座標換算就先通知使用者）。
+- **選單＋共用已照回饋改完（2026-11-18，分支 `claude/dreamy-faraday-ronvrm`）**：
+  - **G4 選單逐步解鎖**（`prototype/index.html`）：規則是「第 N 關入口在前一關過關後出現；第 N 關練習模式在第 N 關過關後出現」（Claude 對 G4 文字的解讀：照字面「第二關過關後才出現第二關」會進不去第二關）。第一關沒過時第一項叫「開始遊戲／古堡邀請，充滿鏡子的房間」，過了改成「第一關：充滿鏡子的房間／鏡子中，有一個女鬼」。下一步該玩的那一關有紫框。練習模式連 `?practice=1`。
+  - **第三關入口先連凹透鏡原型 `concave-lens/index.html`**（不是標「製作中」不能點），卡片上加一行黃字「荒野狩獵製作中：目前先玩凹透鏡原型」。第三關練習模式連 `concave-lens/index.html?practice=1`，要等 `GameProgress.markCleared('concave')` 才出現——**凹透鏡／荒野狩獵目前沒有呼叫 markCleared**，由第三關分頁或之後做荒野狩獵時補（在什麼時候算「完成」也還沒定，見 PENDING 15）。
+  - 開發用「自由練習（?free=1）」不放在一般選單，只在 `?unlock=1` 時出現。「重新開始遊戲」、排行榜入口保留（排在選單最下面一排）。
+  - **G2 全螢幕教學**：第一次在選單按「開始遊戲」時跳出說明（按手機的返回鍵／從左右邊緣往內滑離開全螢幕；按右上角「☰ 關卡」回選單），按「知道了，開始遊戲」才進第一關；記在 `localStorage` 的 `opticsGhost.fsTip.v1`，之後不再跳（「重新開始遊戲」不會清掉它）。只在會切全螢幕的裝置跳（觸控、有 Fullscreen API、不是從主畫面開的），iPhone Safari 與桌機不跳。測試可加 `?fstip=1` 強制。
+  - **G3 前半**：`shared/landscape.js` 的「請橫放」提示 `#rotateHint` 拿掉；改成提供 `GameLandscape.lock()`，`shared/fullscreen.js` 進全螢幕後呼叫它鎖橫向（Android）。`manifest.webmanifest` 加 `"orientation": "landscape"`。iPhone 的「加入主畫面」提示（`install-hint.js`）照舊。
+  - **G5**：從選單點第二關／練習模式進得去（e2e 有測）；過關回選單由各關分頁做（第一關已做）。
+  - 新增 `tests/e2e-menu.js`（41 項，已接進 `npm test`；`npm run test:menu` 單跑），截圖 `docs/screenshots/menu-*.png`。`tests/e2e-leaderboard.js` 的選單段落改成新的選單結構。
+  - **還沒在實體手機上試**（全螢幕教學、鎖橫向都只能在實機驗）。
+  - `npm test`（2026-11-18）：選單 41/41、排行榜 40/40 與其他各支都過，**只有第一關 e2e 偶爾 1 項失敗**「只有正面鏡裡有像」（`tests/e2e-plane-mirror.js:286`）：單鏡出題格是隨機的，抽到 c2r3 等格時 `images.back` 為 false，3 次重跑失敗 1 次。和選單／共用無關，沒動；留給第一關分頁查（是單鏡出題格含了正面鏡照不到整隻的格子，還是測試條件太嚴）。
+- **下一步：G3 後半「手機直拿時整個遊戲轉 90°」還沒做**，等第二關、第三關分頁收工（下面「檔案分工」那兩行拿掉）再做。評估（Claude 2026-11-18）：做得到，但**一定要改三關的 `app.js`**，做之前先告訴使用者：
+  - 做法：`landscape.js` 在「觸控＋直向＋沒有 `?portrait=1`」時，把 `body` 設成寬 = 螢幕高、高 = 螢幕寬，`transform: rotate(90deg)` 轉過來；轉向的方向先固定（順時針），看試玩反應。
+  - 要改的地方：三關都用 `getBoundingClientRect()` 和 `clientX/clientY` 算觸控位置（`convex-lens/app.js` 的 `localPos`、`layout`；`concave-lens/app.js` 的 `localPos`、`layout`；`plane-mirror/app.js` 的 `layout`、`toImage`、拖曳平移的 dx/dy、`toClient`）。轉 90° 後這些都會錯（拿到的是轉過的外框、x/y 對調），要改成呼叫共用的 `GameLandscape.toLocal(e, el)`／`GameLandscape.size(el)`。`window.innerWidth/innerHeight` 與 `resize` 也要換成轉向後的尺寸。
+  - 測試：各關 e2e 的直向情境都帶 `?portrait=1`，轉向會照這個參數關掉，所以原本的測試不受影響；要另外加一組「直向不帶參數」的點擊測試。
+  - 風險：系統彈出的東西（鍵盤、`confirm()`、排行榜暱稱輸入框）不會跟著轉；iOS Safari 直拿時網址列在側邊、可用高度會跳動。
 - **檔案分工（2026-11-18）**：
   - 第二關分頁：`prototype/convex-lens/*`、`tests/e2e-convex-*.js`、`tests/check-geometry-convex.js`。
-  - 選單＋共用分頁：`prototype/index.html`、`prototype/shared/*`、`prototype/manifest.webmanifest`、`tests/e2e-leaderboard.js`。
   - `PROJECT.md` 和 `docs/playtest-feedback-2026-11-18.md` 大家都會改：只改自己那段，收工前先 `git pull`。
 
 ### 交接點（凸透鏡虛像題實驗，2026-11-18）
