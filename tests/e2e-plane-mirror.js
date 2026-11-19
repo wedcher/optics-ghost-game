@@ -180,6 +180,7 @@ async function levelFlow(profile, browser) {
   ok(await page.evaluate(() => Leaderboard.activeLevel()) === 'mirror', '排行榜：按【開始抓鬼】才開始第一關計時');
   ok(s.lives === 3 && s.hearts === 3 && s.sealed === 0 && s.phase === 1, '3 條命、封印 0、兩面鏡', JSON.stringify([s.lives, s.sealed, s.phase]));
   ok(s.intact.join() === 'back,right', '兩面鏡都完好');
+  ok(await page.isHidden('#title'), '關卡模式不顯示關卡名稱（2026-11-19 三關一致）');
   ok(await page.evaluate(() => window.__protoMirror.pools[1].some((c) => window.__protoMirror.core.cellId(c.col, c.row) === window.__protoMirror.core.cellId(window.__protoMirror.state.ghost.col, window.__protoMirror.state.ghost.row))), '鬼在雙鏡出題格內', s.ghost);
   ok(['c6r1', 'c5r1', 'c6r2'].indexOf(s.ghost) >= 0, '雙鏡第 1 隻只出在 (右1,上1)(右2,上1)(右1,上2) 三格', s.ghost);
   ok(s.images.back && s.images.right, '兩面鏡裡都有鬼的像');
@@ -395,7 +396,7 @@ async function practiceMode(profile, browser) {
   ok(s.scene === null, '?practice=1 沒有開場過場，直接開始');
   ok(await page.evaluate(() => window.Leaderboard.getRun()) === null, '排行榜：練習模式不開始趕鬼計時');
   ok(await page.isVisible('#hud') && s.lives === 3 && await page.isHidden('#freeTools'), '練習模式照樣有 3 條命、沒有開發工具');
-  ok(/練習/.test(await page.textContent('#title')), '標題寫「練習模式」');
+  ok(await page.isHidden('#title') && /^練習　封印 /.test(s.sealText), '練習模式：不顯示關卡名稱（三關一致），封印數前標「練習」', s.sealText);
   ok(['c6r1', 'c5r1', 'c6r2'].indexOf(s.ghost) >= 0, '練習模式出題規則和關卡相同（雙鏡只出那三格）', s.ghost);
   await t.castWrong(0); await t.waitIdle();
   s = await info();

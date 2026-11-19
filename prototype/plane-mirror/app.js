@@ -721,7 +721,7 @@
     var hearts = $('hearts').children, i;
     for (i = 0; i < hearts.length; i++) hearts[i].className = i < state.lives ? '' : 'lost';
     $('hearts').setAttribute('aria-label', '剩下 ' + state.lives + ' 條命');
-    $('sealCount').textContent = '封印 ' + state.sealed + '／' + R.catchesTotal;
+    $('sealCount').textContent = (PRACTICE ? '練習　' : '') + '封印 ' + state.sealed + '／' + R.catchesTotal;
     $('hud').hidden = FREE;
     $('castBtn').hidden = state.revealed;
     $('castBtn').disabled = !state.selected || !canAct();
@@ -887,6 +887,7 @@
   if (FREE) { $('title').innerHTML = '平面鏡原型 <small>自由練習</small>'; fillCellSel(); }
   layout();
   resetLevel();
-  if (PRACTICE) $('title').innerHTML = '第一關 <small>練習模式</small>';
+  // 關卡名稱不顯示（使用者 2026-11-19：三關一致，都不寫關卡名稱；右上角留給「☰ 回關卡」）。自由練習（開發用）照舊顯示。
+  $('title').hidden = !FREE;
   if (!FREE && !PRACTICE) { if (artReady()) showIntro(); else pendingIntro = true; }
 })();
