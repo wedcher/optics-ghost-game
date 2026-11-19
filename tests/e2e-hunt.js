@@ -229,6 +229,7 @@ const NOLIVES = ['法陣又落空了——荒野深處傳來一陣嘻嘻的笑�
   const res2 = await page.evaluate(() => { const r = document.getElementById('lbResult'); return r && { title: r.querySelector('#lbTitle').textContent, sum: r.querySelector('#lbSummary').textContent, extra: !!r.querySelector('#lbExtra'), practice: !!r.querySelector('#huntPracticeBtn'), hunt: JSON.parse(localStorage.getItem('ogg.run.v2')).hunt }; });
   ok(res2 && res2.title === '狩獵結束' && res2.sum === '你花費 8 分 20 秒 把鬼趕出城堡，並在荒野中封印了 1 隻鬼。' && res2.hunt === 1, '命用完的結算：標題「狩獵結束」、封印 1 隻', res2 && res2.sum);
   ok(res2 && !res2.extra && !res2.practice, '已經完成過：不再顯示「練習模式已解鎖」');
+  await page.screenshot({ path: path.join(SHOTS, 'hunt-5-nolives-result.png') });
   ok(res2 && !NO_POS.test(res2.sum.replace('把鬼趕出城堡', '')), '結算文字不洩漏位置');
   await Promise.all([page.waitForURL(/prototype\/index\.html$/), press('#lbClose')]);
   ok(true, '「回關卡選單」回到選單');

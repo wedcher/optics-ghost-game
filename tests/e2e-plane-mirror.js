@@ -355,6 +355,8 @@ async function levelFlow(profile, browser) {
   await page.waitForFunction(() => window.__protoMirror.scene() && window.__protoMirror.scene().id === 'fail');
   s = await info();
   ok(s.lives === 0 && s.over && s.ghost === g1, '抓錯 3 次：命用完、出現失敗畫面');
+  await page.waitForTimeout(ARM_WAIT);
+  await shot('mirror-11-fail');
   ok(await page.evaluate(() => Leaderboard.activeLevel()) === null && await page.evaluate(() => Leaderboard.getRun().mirrorMs) === mirrorMs1, '排行榜：命用完的那一次不算，保留上次過關的成績');
   bg = await bgInfo();
   ok(bg.data && bg.bg.id === 'fail' && bg.bg.phase === 1, '失敗畫面的背景是當時的房間', JSON.stringify(bg.bg));
