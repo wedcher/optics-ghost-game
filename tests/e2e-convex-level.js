@@ -340,7 +340,7 @@ async function run(profile, browser) {
   s = await st();
   ok(s.scene.endShown && /第二關過關/.test(s.scene.endText) && /荒野（已解鎖）/.test(s.scene.endText) && s.scene.buttons.join() === 'clearMenuBtn,againBtn', P('過關畫面：標題、下一站荒野（已解鎖），「回關卡選單」＋「再玩一次」'), s.scene.endText);
   ok(await page.evaluate(() => document.getElementById('clearMenuBtn').getAttribute('href')) === '../index.html', P('過關畫面的「回關卡選單」連到入口頁'));
-  ok(!/你花費/.test(s.scene.endText) && /你在走廊封印了 5 隻鬼/.test(s.scene.endText) && (await page.evaluate(() => Leaderboard.getRun())) === null, P('排行榜：直接開第二關（沒從第一關開始）不顯示趕鬼時間、不記成績（說明改顯示封印數）'), s.scene.endText);
+  ok(!/你花費/.test(s.scene.endText) && /你在走廊封印了 5 隻鬼/.test(s.scene.endText) && (await page.evaluate(() => { const r = Leaderboard.getRun(); return r && r.mirrorMs == null && r.castleMs == null && r.convexMs > 0; })), P('排行榜：直接開第二關（沒有第一關成績）不顯示趕鬼時間、不記趕鬼時間（只記第二關成績；說明改顯示封印數）'), s.scene.endText);
   await page.waitForTimeout(ARM_WAIT);
   await sceneButtons('過關畫面');
   await shot('8-cleared');
@@ -354,7 +354,7 @@ async function run(profile, browser) {
   await restart();
 
   // ---------- 排行榜：從第一關依序玩過來，第二關過關顯示趕鬼時間 ----------
-  // 先模擬 ?unlock=1 跳關：本輪計時已開始、但第一關沒過 → 不算。再模擬第一關已過 → 算。為了省時間，直接把封印數設成 4、再抓最後一隻。
+  // 先模擬 ?unlock=1 跳關：沒有第一關成績 → 不算。再模擬第一關已過關（成績 10 分）→ 算。為了省時間，直接把封印數設成 4、再抓最後一隻。
   const clearOnce = async (label) => {
     await page.evaluate(() => { window.__protoConvex.level.sealed = 4; });
     await sealRight(label);
@@ -362,17 +362,31 @@ async function run(profile, browser) {
     for (let i = 0; i < 8 && !(await st()).scene.endShown; i++) await tapAt(vw * 0.5, vh * 0.5);
     return st();
   };
-  await page.evaluate(() => localStorage.setItem('ogg.run.v1', JSON.stringify({ startedAt: Date.now() - 600000, castleMs: null, hunt: null })));
+  ok(await page.evaluate(() => Leaderboard.activeLevel()) === 'convex', P('排行榜：按「開始抓鬼」／重新挑戰後第二關在計時'));
   s = await clearOnce('跳關後抓最後一隻');
-  ok(s.screen === 'cleared' && !/你花費/.test(s.scene.endText) && (await page.evaluate(() => Leaderboard.getRun().castleMs)) == null, P('排行榜：第一關沒過（?unlock=1 跳關）第二關過關不算趕鬼時間'), s.scene.endText);
+  {
+    const run = await page.evaluate(() => Leaderboard.getRun());
+    ok(s.screen === 'cleared' && !/你花費/.test(s.scene.endText) && run.castleMs == null && run.convexMs > 0, P('排行榜：只有第二關成績（?unlock=1 跳關）第二關過關不算趕鬼時間'), s.scene.endText);
+  }
   await restart();
-  await page.evaluate(() => localStorage.setItem('ogg.run.v1', JSON.stringify({ startedAt: Date.now() - 600000, mirrorDone: true, castleMs: null, hunt: null })));
-  s = await clearOnce('依序過關後抓最後一隻');
-  const ms = await page.evaluate(() => Leaderboard.getRun().castleMs);
-  ok(s.screen === 'cleared' && /你花費10 分 \d+ 秒，把鬼趕出城堡。下一站：城外的荒野（已解鎖）。/.test(s.scene.endText) && ms >= 600000 && ms < 660000, P('排行榜：依序過關，過關說明照劇本 2-3 顯示趕鬼時間「你花費＿＿，把鬼趕出城堡。」並記下成績'), s.scene.endText);
+  await page.evaluate(() => localStorage.setItem('ogg.run.v2', JSON.stringify({ mirrorMs: 600000, convexMs: null, castleMs: null, hunt: null })));
+  s = await clearOnce('第一關已過關後抓最後一隻');
+  const run2 = await page.evaluate(() => Leaderboard.getRun());
+  ok(s.screen === 'cleared' && /你花費10 分 \d+ 秒，把鬼趕出城堡。下一站：城外的荒野（已解鎖）。/.test(s.scene.endText) && run2.castleMs === 600000 + run2.convexMs && run2.convexMs < 60000,
+    P('排行榜：趕鬼時間＝第一關成績＋第二關這次的遊玩時間，過關說明照劇本 2-3「你花費＿＿，把鬼趕出城堡。」'), s.scene.endText);
+  // 再玩一次但命用完：保留上次過關的成績
+  await page.waitForTimeout(ARM_WAIT);
+  await press('#againBtn', 150);
+  for (let i = 0; i < 3; i++) await sealWrong('再玩一次抓錯 ' + (i + 1));
+  s = await st();
+  {
+    const run = await page.evaluate(() => Leaderboard.getRun());
+    ok(s.screen === 'failed' && await page.evaluate(() => Leaderboard.activeLevel()) === null && run.convexMs === run2.convexMs && run.castleMs === run2.castleMs, P('排行榜：再玩一次命用完，保留上次過關的成績'), JSON.stringify(run));
+  }
+  await restart();
 
   // ---------- ?practice=1 練習模式：不播開場、扣命、不計時、不上榜 ----------
-  await page.evaluate(() => localStorage.setItem('ogg.run.v1', JSON.stringify({ startedAt: Date.now() - 600000, mirrorDone: true, castleMs: null, hunt: null })));
+  await page.evaluate(() => localStorage.setItem('ogg.run.v2', JSON.stringify({ mirrorMs: 600000, convexMs: null, castleMs: null, hunt: null })));
   await page.goto(URL + '?practice=1');
   await page.waitForFunction(() => window.__protoConvex && window.__protoConvex.art().pending === 0);
   s = await st();

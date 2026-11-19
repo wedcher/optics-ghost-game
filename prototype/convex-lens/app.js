@@ -1050,9 +1050,11 @@
     state.seenAnalysisIntro = false; state.seenVirtualIntro = false;
     dealLevelDeck();
     resetRound(nextRandomConfig());
+    if (LB) LB.startLevel('convex'); // 這一次挑戰從 0 起算（練習模式 LB = null，不計時）
   }
   function failLevel() {
     level.screen = 'failed';
+    if (LB) LB.cancelLevel(); // 命用完的那一次不算
     closeScene();
     level.scene = window.StoryScene.show({
       id: 'failed', background: INTRO_BG,
@@ -1067,8 +1069,8 @@
   function showCleared() {
     level.screen = 'cleared';
     if (window.GameProgress) window.GameProgress.markCleared('convex');
-    // 趕鬼時間（計時規則由「趕鬼時間」任務卡改，這裡照舊呼叫 Leaderboard）。null＝這一輪沒有從第一關依序玩過來
-    // （直接開網址、?unlock=1 跳關），不顯示也不上榜。練習模式不計時、不上榜（LB = null）。
+    // 趕鬼時間＝第一關最後一次過關＋第二關這一次（2026-11-18 定案）。null＝還沒有第一關過關成績
+    // （直接開網址、?unlock=1 跳關、重新開始遊戲後），不顯示也不記。練習模式不計時、不上榜（LB = null）。
     var castleMs = LB ? LB.finishCastle() : null;
     // 過關說明照劇本 2-3：有趕鬼時間就顯示「你花費＿＿，把鬼趕出城堡。」；沒有成績時退回劇本舊版的封印數說法。
     var note = castleMs != null

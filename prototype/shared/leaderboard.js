@@ -1,16 +1,21 @@
 /*
  * leaderboard.js — 趕鬼計時、成績上傳、排行榜讀取、結算畫面（三關共用）。
  * 規則（PROJECT.md CONFIRMED、docs/leaderboard.md）：
- *   - 兩個榜：castle＝趕鬼時間（第一關開始到第二關結束，牆上時間，愈短愈好）；
- *             hunt＝荒野 5 分鐘封印數（愈多愈好）。荒野練習模式不計。
- *   - 趕鬼時間是牆上時間：過場、失敗重來都算、不歸零；只有「重新開始遊戲」(restartRun) 會清掉。
+ *   - 兩個榜：castle＝趕鬼時間（愈短愈好）；hunt＝荒野 5 分鐘封印數（愈多愈好）。練習模式不計。
+ *   - 趕鬼時間（使用者 2026-11-18 定案）＝第一關「最後一次過關」的成績＋第二關「最後一次過關」的成績。
+ *     一次挑戰的成績＝按「開始抓鬼」起到過關為止的遊玩時間；關卡中的劇情過場（pauseLevel/resumeLevel 之間）不算。
+ *     命用完（cancelLevel）、中途離開頁面（挑戰只存在記憶體，換頁就消失）的那一次不算。
+ *     再玩一次過關 → 取代那一關的舊成績；沒過關 → 保留上次過關的成績。兩關都有成績才有趕鬼時間。
+ *     只有「重新開始遊戲」(restartRun) 會清掉兩關成績。
  *   - 每個暱稱只留最佳成績；顯示前 10 名。
  *   - 有 window.LEADERBOARD_URL（Apps Script）就用共用排行；沒有就存本機 localStorage。
  *
  * 各關要呼叫的地方（第一關、第二關、選單已接上；荒野狩獵尚未實作）：
- *   第一關關卡模式開始時       Leaderboard.startRun()
- *   第一關過關時               Leaderboard.finishMirror()      → 沒有這一步，第二關結束不算成績（擋 ?unlock=1 跳關）
- *   第二關抓滿 5 隻過關時      Leaderboard.finishCastle()      → 回傳毫秒（沒有開始紀錄則 null）
+ *   第一、二關按「開始抓鬼」／重新挑戰／再玩一次   Leaderboard.startLevel('mirror' | 'convex')
+ *   關卡中的劇情過場出現／結束                     Leaderboard.pauseLevel() / Leaderboard.resumeLevel()
+ *   命用完（失敗畫面）                             Leaderboard.cancelLevel()
+ *   第一關過關時               Leaderboard.finishMirror()      → 回傳這次的毫秒
+ *   第二關抓滿 5 隻過關時      Leaderboard.finishCastle()      → 回傳兩關相加的趕鬼時間（缺第一關成績則 null）
  *   荒野狩獵（正式）結束時     Leaderboard.recordHunt(n)；Leaderboard.showResult({ onClose })
  *   選單「重新開始遊戲」       Leaderboard.restartRun()
  *
@@ -20,7 +25,8 @@
   'use strict';
 
   var TOP = 10, NAME_MAX_W = 20;
-  var RUN_KEY = 'ogg.run.v1', NAME_KEY = 'ogg.nickname.v1', LOCAL_KEY = 'ogg.leaderboard.local.v1';
+  // run.v1 是舊規則（牆上時間）的紀錄，意義不同，不沿用；restartRun 時順便刪掉。
+  var OLD_RUN_KEY = 'ogg.run.v1', RUN_KEY = 'ogg.run.v2', NAME_KEY = 'ogg.nickname.v1', LOCAL_KEY = 'ogg.leaderboard.local.v1';
   var BOARDS = {
     castle: { asc: true,  min: 30 * 1000, max: 24 * 3600 * 1000 },
     hunt:   { asc: false, min: 0,         max: 60 }
@@ -37,32 +43,42 @@
   }
   function url() { return (root.LEADERBOARD_URL || '').trim(); }
 
-  // ---------- 趕鬼計時（牆上時間） ----------
-  // run = { startedAt, mirrorDone, castleMs|null, hunt|null, submitted:{castle,hunt} }
+  // ---------- 趕鬼計時（兩關最後一次過關成績相加） ----------
+  // 存起來的 run = { mirrorMs|null, convexMs|null, castleMs|null, hunt|null }；castleMs 永遠是 mirrorMs+convexMs（兩個都有才有）。
+  // 進行中的這一次挑戰只放記憶體（attempt）：重新整理／回選單＝放棄這一次，不留下任何時間。
+  var attempt = null; // { level, acc, since|null }  since=null 表示暫停中（劇情過場）
   function getRun() { return load(RUN_KEY, null); }
-  function startRun() {
-    var r = getRun();
-    if (r && r.startedAt) return r;          // 失敗重來、重新整理：不歸零
-    r = { startedAt: now(), castleMs: null, hunt: null };
-    save(RUN_KEY, r);
+  function emptyRun() { return { mirrorMs: null, convexMs: null, castleMs: null, hunt: null }; }
+  function withCastle(r) {
+    r.castleMs = (r.mirrorMs != null && r.convexMs != null) ? r.mirrorMs + r.convexMs : null;
     return r;
   }
-  function restartRun() { save(RUN_KEY, null); }
-  function finishMirror() {
-    var r = getRun();
-    if (!r || !r.startedAt) return null;     // 自由練習或沒開始計時：不記
-    if (!r.mirrorDone) { r.mirrorDone = true; save(RUN_KEY, r); }
-    return r;
+  function startLevel(level) { attempt = { level: level, acc: 0, since: now() }; return attempt; }
+  function pauseLevel() { if (attempt && attempt.since != null) { attempt.acc += Math.max(0, now() - attempt.since); attempt.since = null; } }
+  function resumeLevel() { if (attempt && attempt.since == null) attempt.since = now(); }
+  function cancelLevel() { attempt = null; }
+  function levelElapsed() {
+    if (!attempt) return null;
+    return attempt.acc + (attempt.since != null ? Math.max(0, now() - attempt.since) : 0);
   }
+  // 結束這一次挑戰並記成那一關的成績（取代舊成績）。沒有進行中的挑戰（自由練習、練習模式、沒按開始）→ null、不改紀錄。
+  function finishLevel(level) {
+    if (!attempt || attempt.level !== level) return null;
+    var ms = Math.round(levelElapsed());
+    attempt = null;
+    var r = getRun() || emptyRun();
+    r[level + 'Ms'] = ms;
+    save(RUN_KEY, withCastle(r));
+    return ms;
+  }
+  function restartRun() { attempt = null; save(RUN_KEY, null); try { root.localStorage.removeItem(OLD_RUN_KEY); } catch (e) { /* 無妨 */ } }
+  function finishMirror() { return finishLevel('mirror'); }
   function finishCastle() {
-    var r = getRun();
-    if (!r || !r.startedAt) return null;     // 沒從第一關開始（例如直接開第二關網址）就不算成績
-    if (!r.mirrorDone) return null;          // 第一關沒過就玩第二關（例如入口頁 ?unlock=1 跳關）也不算
-    if (r.castleMs == null) { r.castleMs = Math.max(0, now() - r.startedAt); save(RUN_KEY, r); }
-    return r.castleMs;
+    if (finishLevel('convex') == null) return null;
+    return getRun().castleMs; // 只有第二關成績（例如 ?unlock=1 跳關）→ null，不記趕鬼時間
   }
   function recordHunt(n) {
-    var r = getRun() || { startedAt: null, castleMs: null };
+    var r = getRun() || emptyRun();
     r.hunt = Math.max(0, Math.floor(n));
     save(RUN_KEY, r);
     return r;
@@ -236,7 +252,7 @@
     sum.appendChild(el('b', null, hunt != null ? String(hunt) : '—'));
     sum.appendChild(document.createTextNode(' 隻鬼。'));
     card.appendChild(sum);
-    if (castleMs == null) card.appendChild(el('p', { 'class': 'lb-note' }, '這一輪不是從第一關開始玩的，趕鬼時間不列入排行。'));
+    if (castleMs == null) card.appendChild(el('p', { 'class': 'lb-note' }, '第一關或第二關還沒有過關成績，趕鬼時間不列入排行。'));
 
     var row = el('div', { 'class': 'lb-row' });
     var input = el('input', { id: 'lbName', type: 'text', maxlength: String(NAME_MAX_W), placeholder: '暱稱（中文 10 字、英文 20 字內）', autocomplete: 'nickname', enterkeyhint: 'send' });
@@ -274,7 +290,9 @@
   root.Leaderboard = {
     TOP: TOP, NAME_MAX_W: NAME_MAX_W, BOARDS: BOARDS, nameWidth: nameWidth_, isBadName: isBadName_,
     isShared: function () { return !!url(); },
-    startRun: startRun, restartRun: restartRun, finishMirror: finishMirror, finishCastle: finishCastle, recordHunt: recordHunt, getRun: getRun,
+    startLevel: startLevel, pauseLevel: pauseLevel, resumeLevel: resumeLevel, cancelLevel: cancelLevel, levelElapsed: levelElapsed,
+    activeLevel: function () { return attempt ? attempt.level : null; },
+    restartRun: restartRun, finishMirror: finishMirror, finishCastle: finishCastle, recordHunt: recordHunt, getRun: getRun,
     formatTime: formatTime, cleanName: cleanName, getNickname: getNickname, setNickname: setNickname,
     submit: submit, fetchTop: fetchTop, showResult: showResult,
     _setNow: function (fn) { now = fn; } // 測試用

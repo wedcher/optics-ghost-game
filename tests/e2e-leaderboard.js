@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
  * 排行榜前端的 headless 瀏覽器實測：node tests/e2e-leaderboard.js
- *   - 趕鬼計時：牆上時間、失敗重來不歸零、重新開始遊戲才清掉、沒從第一關開始不算
+ *   - 趕鬼計時：兩關「最後一次過關」的遊玩時間相加；劇情過場暫停、命用完／離開頁面不算、再玩一次取代、重新開始遊戲清掉
  *   - 結算畫面：文案、暱稱、上傳、名次、只留最佳
  *   - 排行榜頁：本機模式、共用模式（假伺服器跑真的 backend/leaderboard/Code.gs）、連不上時的訊息
  * 截圖輸出到 docs/screenshots/leaderboard-*.png（橫向手機）。
@@ -69,25 +69,66 @@ const MIN = 60 * 1000;
   // ---------- 1. 計時規則（本機模式） ----------
   {
     const { ctx, page } = await newPage(false);
-    ok(await page.evaluate(() => Leaderboard.finishCastle()) === null, '沒從第一關開始：第二關結束不算時間');
-    await page.evaluate(() => Leaderboard.startRun());
-    await setT(page, 1e12 + 3 * MIN);
-    await page.evaluate(() => Leaderboard.startRun()); // 失敗重來／重新整理
-    ok(await page.evaluate(() => Leaderboard.getRun().startedAt) === 1e12, '再次進第一關不歸零');
+    const L = (fn, ...args) => page.evaluate(([fn, args]) => Leaderboard[fn](...args), [fn, args]);
+    const T0 = 1e12;
+    ok(await L('finishCastle') === null && await L('getRun') === null, '沒按開始抓鬼：第二關結束不算、不留紀錄');
+    ok(await L('finishMirror') === null && await L('getRun') === null, '沒按開始抓鬼：第一關過關不留紀錄（自由練習、練習模式不呼叫 startLevel）');
+    // 第一關：玩 2 分鐘 → 丟圓盤過場 1 分鐘（暫停）→ 再玩 1 分鐘 → 打碎鏡子過場 5 分鐘（暫停）→ 再玩 30 秒 → 過關
+    await L('startLevel', 'mirror');
+    await setT(page, T0 + 2 * MIN); await L('pauseLevel');
+    await setT(page, T0 + 3 * MIN); await L('pauseLevel'); // 重複暫停沒關係
+    await L('resumeLevel');
+    await setT(page, T0 + 4 * MIN); await L('pauseLevel');
+    await setT(page, T0 + 9 * MIN); await L('resumeLevel'); await L('resumeLevel');
+    ok(await L('levelElapsed') === 3 * MIN, '劇情過場暫停的時間不算', await L('levelElapsed'));
+    await setT(page, T0 + 9 * MIN + 30000);
+    ok(await L('finishMirror') === 3 * MIN + 30000, '第一關成績＝扣掉過場的遊玩時間');
+    let run = await L('getRun');
+    ok(run.mirrorMs === 3 * MIN + 30000 && run.convexMs === null && run.castleMs === null, '只有第一關成績：還沒有趕鬼時間', run);
+    ok(await L('activeLevel') === null && await L('finishMirror') === null, '過關後挑戰結束，再呼叫一次不重記');
+    // 「再玩一次」但命用完：保留上次過關成績
+    await L('startLevel', 'mirror'); await setT(page, T0 + 30 * MIN); await L('cancelLevel');
+    ok((await L('getRun')).mirrorMs === 3 * MIN + 30000 && await L('finishMirror') === null, '再玩一次沒過關（命用完）：保留上次過關的成績');
+    // 再玩一次但中途回選單（換頁＝記憶體裡的挑戰消失）
+    await L('startLevel', 'mirror');
     await page.reload();
-    await page.evaluate(() => { window.__t = 1e12 + 9 * 60000 + 30000; Leaderboard._setNow(() => window.__t); });
-    ok(await page.evaluate(() => Leaderboard.finishCastle()) === null, '第一關還沒過（例如 ?unlock=1 跳關）：第二關結束不算時間');
-    await page.evaluate(() => Leaderboard.finishMirror());
-    ok(await page.evaluate(() => Leaderboard.finishCastle()) === 9 * MIN + 30000, '重新整理後仍用原本的開始時間（牆上時間）');
-    await setT(page, 1e12 + 20 * MIN);
-    ok(await page.evaluate(() => Leaderboard.finishCastle()) === 9 * MIN + 30000, '第二關結束時間只記一次');
+    await page.evaluate(() => { window.__t = 1e12 + 40 * 60000; Leaderboard._setNow(() => window.__t); });
+    ok(await L('activeLevel') === null && await L('finishMirror') === null && (await L('getRun')).mirrorMs === 3 * MIN + 30000, '中途回選單（換頁）放棄的那一次不算，舊成績還在');
+    // 第二關：命用完一次（不算）→ 重新挑戰 4 分鐘過關
+    await L('startLevel', 'convex'); await setT(page, T0 + 50 * MIN); await L('cancelLevel');
+    ok(await L('finishCastle') === null, '第二關命用完：不算');
+    await setT(page, T0 + 60 * MIN); await L('startLevel', 'convex'); await setT(page, T0 + 64 * MIN);
+    ok(await L('finishCastle') === 7 * MIN + 30000, '趕鬼時間＝第一關成績＋第二關這一次（重新挑戰從 0 起算）');
+    run = await L('getRun');
+    ok(run.mirrorMs === 3 * MIN + 30000 && run.convexMs === 4 * MIN && run.castleMs === 7 * MIN + 30000, '兩關成績都存下來', run);
+    // 第二關再玩一次、這次比較慢：最後一次取代（不是取最佳）
+    await L('startLevel', 'convex'); await setT(page, T0 + 70 * MIN);
+    ok(await L('finishCastle') === 9 * MIN + 30000, '再玩一次過關：新成績取代舊的（最後一次，即使比較慢）');
+    // 第二關過關後回頭重玩第一關：總時間跟著換成新的第一關成績（PENDING：要不要重新上傳）
+    await L('startLevel', 'mirror'); await setT(page, T0 + 72 * MIN);
+    ok(await L('finishMirror') === 2 * MIN && (await L('getRun')).castleMs === 8 * MIN, '第二關過關後重玩第一關過關：趕鬼時間改用新的第一關成績');
+    // 第二關的挑戰不能用第一關的 finish 收掉
+    await L('startLevel', 'convex');
+    ok(await L('finishMirror') === null && await L('activeLevel') === 'convex', '關卡對不上不記');
+    await L('cancelLevel');
+    await L('restartRun');
+    ok(await L('getRun') === null, '重新開始遊戲清掉兩關成績');
+    // 只有第二關成績（例如 ?unlock=1 跳關）
+    await L('startLevel', 'convex'); await setT(page, T0 + 80 * MIN);
+    ok(await L('finishCastle') === null && (await L('getRun')).convexMs === 8 * MIN && (await L('getRun')).castleMs === null, '只有第二關成績（跳關）：不記趕鬼時間');
+    await L('restartRun');
+    // 舊規則（牆上時間）的紀錄不沿用
+    await page.evaluate(() => localStorage.setItem('ogg.run.v1', JSON.stringify({ startedAt: 1, mirrorDone: true, castleMs: 600000 })));
+    ok(await L('getRun') === null, '舊版 ogg.run.v1（牆上時間）不沿用');
+    await L('restartRun');
+    ok(await page.evaluate(() => localStorage.getItem('ogg.run.v1')) === null, '重新開始遊戲順便刪掉舊版紀錄');
     ok(await page.evaluate(() => Leaderboard.formatTime(9 * 60000 + 30000)) === '9 分 30 秒', '時間格式');
     ok(await page.evaluate(() => Leaderboard.formatTime(3723000)) === '1 小時 2 分 3 秒', '時間格式（小時）');
     await page.evaluate(() => Leaderboard.restartRun());
     ok(await page.evaluate(() => Leaderboard.getRun()) === null, '重新開始遊戲清掉計時');
 
     // ---------- 2. 結算畫面（本機） ----------
-    await page.evaluate(() => { Leaderboard.startRun(); Leaderboard.finishMirror(); window.__t += 11 * 60000; Leaderboard.finishCastle(); Leaderboard.recordHunt(3); Leaderboard.showResult(); });
+    await page.evaluate(() => { Leaderboard.startLevel('mirror'); window.__t += 5 * 60000; Leaderboard.finishMirror(); Leaderboard.startLevel('convex'); window.__t += 6 * 60000; Leaderboard.finishCastle(); Leaderboard.recordHunt(3); Leaderboard.showResult(); });
     const sum = await page.textContent('#lbSummary');
     ok(sum === '你花費 11 分 0 秒 把鬼趕出城堡，並在荒野中封印了 3 隻鬼。', '結算文案', sum);
     ok(/只存在這支手機/.test(await page.textContent('#lbResult')), '本機模式有提示');
@@ -182,7 +223,7 @@ const MIN = 60 * 1000;
     const page = await ctx.newPage();
     page.on('pageerror', (e) => ok(false, 'page error（選單）', String(e)));
     await page.goto(BASE + '/prototype/index.html');
-    await page.evaluate(() => { localStorage.setItem('opticsGhost.progress.v1', JSON.stringify({ mirror: true })); Leaderboard.startRun(); Leaderboard.finishMirror(); });
+    await page.evaluate(() => { localStorage.setItem('opticsGhost.progress.v1', JSON.stringify({ mirror: true })); Leaderboard.startLevel('mirror'); Leaderboard.finishMirror(); });
     await page.reload();
     ok(!!(await page.$('a.card[data-item="convex"]')) && !(await page.$('a.card[data-item="concave"]')), '選單：過了第一關，第二關出現、第三關還沒出現');
     ok(!!(await page.$('a.card[href="leaderboard.html"]')) && !!(await page.$('#resetBtn')), '選單：排行榜入口與「重新開始遊戲」都在');

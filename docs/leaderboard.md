@@ -6,13 +6,19 @@
 
 | 榜 | 內容 | 排序 |
 |---|---|---|
-| 趕鬼時間 | 第一關開始 → 第二關結束（抓滿 5 隻） | 愈短愈前 |
+| 趕鬼時間 | 第一關最後一次過關的成績 ＋ 第二關最後一次過關的成績 | 愈短愈前 |
 | 荒野封印 | 第三關 5 分鐘荒野狩獵封印的鬼數 | 愈多愈前 |
 
 - **全部玩家共用**，後端是 Google 試算表 + Apps Script（使用者自己的 Google 帳號部署）。
-- **趕鬼時間是牆上時間**：過場、失敗重來都算，失敗**不歸零**；重新整理頁面也不歸零。只有選單的「重新開始遊戲」會清掉。
-- 沒有從第一關開始（例如直接開第二關網址）→ 沒有趕鬼時間，不上時間榜。
-- 本輪第一關沒過關就玩第二關（例如入口頁 `?unlock=1` 跳關）→ 也不算。趕鬼時間要本輪計時已開始、且本輪第一關已過關（`finishMirror()`）。
+- **趕鬼時間＝兩關「最後一次過關」的成績相加**（使用者 2026-11-18 定案，取代原本「牆上時間全部算、失敗不歸零」；2026-11-19 實作）：
+  - 每一關的成績＝這一次挑戰的遊玩時間：從按「開始抓鬼」（開場過場結束）起算，到過關（按「過關 ➜」、過關演出出現）為止。
+  - **不算**：開場、過關演出；關卡中的劇情過場（第一關的丟圓盤、丟完圓盤後的「……還真的用丟的喔」、打碎鏡子）；回選單的空檔；命用完的那一次（重新挑戰從 0 起算）；中途回選單／重新整理放棄的那一次；練習模式（`?practice=1`）與自由練習（`?free=1`）。
+  - 「再玩一次」過關 → 新成績**取代**那一關的舊成績（就算比較慢）；再玩一次沒過關 → 保留上次過關的成績。
+  - 兩關都有成績才有趕鬼時間。只有第二關成績（例如入口頁 `?unlock=1` 跳關、直接開第二關網址）→ 不顯示、不記。
+  - 第二關過關後回頭重玩第一關並過關 → 趕鬼時間立刻改用新的第一關成績（「最後一次」的字面意思；是否要重新上傳見 PROJECT.md PENDING）。
+  - 選單「重新開始遊戲」清掉兩關成績。
+  - 進行中的那一次只放在記憶體（換頁就消失）；過關成績存在 `localStorage` 的 `ogg.run.v2`。舊規則的 `ogg.run.v1`（牆上時間）不沿用，「重新開始遊戲」時順便刪掉。
+  - App 切到背景、螢幕關掉時**照算**（沒有特別暫停）。
 - **每個暱稱只留最佳成績**，顯示**前 10 名**；同分時先達成的排前面。
 - 荒野練習模式不計（練習模式不要呼叫上傳）。
 - 暱稱長度用寬度算：中文（全形字）算 2、英數算 1，上限 20，也就是中文 10 字或英文 20 字。去掉 `<>"'\`` 與控制字元，全形英數轉半形。
@@ -24,10 +30,10 @@
 |---|---|
 | `backend/leaderboard/Code.gs` | Apps Script 後端（貼進試算表的 Apps Script 編輯器） |
 | `prototype/shared/leaderboard-config.js` | 填 Apps Script 網址；**留空 = 本機排行**（只存在這支手機） |
-| `prototype/shared/leaderboard.js` | 計時、上傳、讀取、結算畫面 |
+| `prototype/shared/leaderboard.js` | 計時（`startLevel`／`pauseLevel`／`resumeLevel`／`cancelLevel`／`finishMirror`／`finishCastle`）、上傳、讀取、結算畫面 |
 | `prototype/leaderboard.html` | 排行榜頁（選單有入口） |
 | `tests/check-leaderboard.js` | 用假的試算表跑真的 `Code.gs`（29 項） |
-| `tests/e2e-leaderboard.js` | 瀏覽器實測：計時、結算畫面、本機模式、共用模式（假伺服器跑 `Code.gs`）、斷線（32 項） |
+| `tests/e2e-leaderboard.js` | 瀏覽器實測：計時規則（假時鐘）、結算畫面、本機模式、共用模式（假伺服器跑 `Code.gs`）、斷線（53 項） |
 
 ## 部署共用排行榜
 
@@ -72,13 +78,17 @@ https://script.google.com/macros/s/AKfycbwLRDiuQAThbMIY_tVEARySyCkIzKc6mFyKCi54T
 
 | 時機 | 呼叫 | 檔案 |
 |---|---|---|
-| 第一關**關卡模式**開始（開場過場出現時） | `Leaderboard.startRun()` | `prototype/plane-mirror/app.js` `showIntro()`（已接） |
+| 第一關按「開始抓鬼」／失敗後「重新挑戰」／過關後「再玩一次」 | `Leaderboard.startLevel('mirror')` | `prototype/plane-mirror/app.js`（已接） |
+| 第一關丟圓盤、丟完圓盤、打碎鏡子過場出現／結束 | `Leaderboard.pauseLevel()`／`Leaderboard.resumeLevel()` | `prototype/plane-mirror/app.js` `showThrow`、`showAfterThrow`、`showBreak`（已接） |
+| 第一關命用完 | `Leaderboard.cancelLevel()` | `prototype/plane-mirror/app.js` `showFail()`（已接） |
 | 第一關過關 | `Leaderboard.finishMirror()` | `prototype/plane-mirror/app.js` `showClear()`（已接） |
-| 第二關抓滿 5 隻、過關演出前 | `Leaderboard.finishCastle()`，有值就在過關畫面顯示 | `prototype/convex-lens/app.js` `showCleared()`（已接） |
+| 第二關按「開始抓鬼」／「重新挑戰」／「再玩一次」 | `Leaderboard.startLevel('convex')` | `prototype/convex-lens/app.js` `startHunt()`（已接） |
+| 第二關命用完 | `Leaderboard.cancelLevel()` | `prototype/convex-lens/app.js` `failLevel()`（已接） |
+| 第二關抓滿 5 隻、過關演出前 | `Leaderboard.finishCastle()`，回傳兩關相加的趕鬼時間，有值就在過關畫面顯示 | `prototype/convex-lens/app.js` `showCleared()`（已接） |
 | 荒野狩獵（正式，不是練習）結束：時間到或命用完 | `Leaderboard.recordHunt(n); Leaderboard.showResult({ onClose })` | 荒野狩獵（尚未實作） |
 | 選單「重新開始遊戲」 | `Leaderboard.restartRun()`（和 `GameProgress.reset()` 一起） | `prototype/index.html`（已接） |
 
-`?free=1` 的自由練習不要呼叫任何一個。`startRun()` 已經開始的話不會歸零，所以第一關失敗重來重複呼叫沒關係。
+練習模式（`?practice=1`，兩關的 `LB = null`）和 `?free=1` 的自由練習不要呼叫任何一個。沒有 `startLevel` 的挑戰，`finishMirror()`／`finishCastle()` 回傳 `null`、不改紀錄。`pauseLevel()`／`resumeLevel()` 重複呼叫沒關係。
 
 ## 已知風險／限制
 
@@ -89,4 +99,5 @@ https://script.google.com/macros/s/AKfycbwLRDiuQAThbMIY_tVEARySyCkIzKc6mFyKCi54T
 - 真的部署已實測（2026-11-18，雲端工作階段）：curl `GET ?action=top` → `{"ok":true,...}`；照 `Code.gs` 格式 POST（text/plain JSON）→ 回傳名次、試算表自動建立 `castle`／`hunt` 並多一列；不雅暱稱 `sh1t` 被擋；GET 與 302 轉址後的回應都有 `access-control-allow-origin: *`；Playwright 開 `leaderboard.html`（用正式網址）兩個榜都讀到測試資料。測試資料已請使用者在試算表刪除。
 - **還沒實測**：真的手機從遊戲過關 → 結算畫面輸入暱稱 → 上傳 → 排行榜頁看到。目前結算畫面只在荒野狩獵結束時出現，荒野狩獵還沒做，所以**現在遊戲裡沒有路徑會上傳成績**（使用者 2026-11-18 手機玩到第二關過關確認沒有跳出暱稱）；何時讓玩家上傳見 PROJECT.md PENDING 22。
 - `Code.gs` 小問題（未修，改了要重新部署，記在 PROJECT.md PENDING）：`lock.waitLock(10000)` 等不到鎖時會丟例外，Apps Script 回 HTML 錯誤頁而不是 `{ok:false}` JSON；前端會當成連線失敗。一個班級同時送出不太會碰到。
-- 計時存在 `localStorage`：換瀏覽器／無痕模式等於沒有開始紀錄；清除網站資料會讓計時消失（只會讓那一輪沒有成績，不會變快）。
+- 過關成績存在 `localStorage`：換瀏覽器／無痕模式等於沒有成績；清除網站資料會讓成績消失（只會讓那一輪沒有趕鬼時間，不會變快）。
+- 後端的合理範圍仍是 30 秒～24 小時；新規則只算遊玩時間，兩關加起來低於 30 秒實際上不可能（第一關要抓 5 次、第二關要抓 5 隻），所以 `Code.gs` 沒改、不用重新部署。

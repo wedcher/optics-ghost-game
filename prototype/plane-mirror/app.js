@@ -639,6 +639,7 @@
   // ---------- 第一次丟圓盤（第一次點地板） ----------
   var AFTER_THROW_MS = 900;
   function showThrow() {
+    if (LB) LB.pauseLevel(); // 關卡中的劇情過場不算趕鬼時間
     scene = window.StoryScene.show({
       id: 'throw', overlay: true,
       lines: [
@@ -648,6 +649,7 @@
       ],
       onDone: function () {
         scene = null; discTaught = true; throwing = true;
+        if (LB) LB.resumeLevel();
         if (window.Sfx) window.Sfx.clang();
         cast(); // 圓盤落地的那一格直接出現魔法陣
       }
@@ -656,6 +658,7 @@
   function showAfterThrow() {
     throwing = false;
     if (scene || state.over) return;
+    if (LB) LB.pauseLevel();
     scene = window.StoryScene.show({
       id: 'afterThrow', overlay: true,
       lines: [
@@ -663,7 +666,7 @@
         { speaker: '你', text: '還真的用丟的喔！？' },
         { speaker: '你', text: '它飛回來了？', image: window.StoryArt.get('disc') }
       ],
-      onDone: function () { scene = null; syncUI(); requestRender(); }
+      onDone: function () { scene = null; if (LB) LB.resumeLevel(); syncUI(); requestRender(); }
     });
     syncUI();
   }
@@ -754,7 +757,6 @@
     return url;
   }
   function showIntro() {
-    if (LB) LB.startRun(); // 趕鬼計時開始（已開始就不歸零；只在關卡模式呼叫）
     var A = window.StoryArt, room = snapshot('intro', { phase: 1, ghost: state.ghost });
     scene = window.StoryScene.show({
       id: 'intro', background: room,
@@ -772,7 +774,7 @@
       ],
       title: '第一關：鏡子房間',
       note: '鬼只有在鏡子裡才看得到。請推算出牠真正所在的位置，再展開封印法陣。3 條命，要抓到牠 ' + R.catchesTotal + ' 次；抓錯會失去一顆心。',
-      buttons: [{ id: 'startBtn', label: '開始抓鬼', primary: true, onClick: function () { closeScene(); syncUI(); requestRender(); } }]
+      buttons: [{ id: 'startBtn', label: '開始抓鬼', primary: true, onClick: function () { closeScene(); if (LB) LB.startLevel('mirror'); syncUI(); requestRender(); } }]
     });
   }
   // 「匡啷！」那一句：碎玻璃聲＋過場畫面震動（使用者 2026-11-18 回饋 M5）
@@ -783,6 +785,7 @@
     bg.classList.remove('mirror-shake'); void bg.offsetWidth; bg.classList.add('mirror-shake');
   }
   function showBreak() {
+    if (LB) LB.pauseLevel();
     scene = window.StoryScene.show({
       id: 'break', background: snapshot('break', { phase: 2, ghost: null }),
       lines: [
@@ -794,24 +797,26 @@
       note: '只剩正面那面鏡子。再抓到牠 ' + (R.catchesTotal - R.catchesTwoMirrors) + ' 次。',
       buttons: [{ id: 'resumeBtn', label: '繼續抓鬼', primary: true, onClick: function () {
         closeScene();
+        if (LB) LB.resumeLevel();
         state.phase = 2; // 震動與碎裂聲在「匡啷！」那句（M5）；按「繼續抓鬼」後不再震（M6）
         newGhost(); setStatus(MSG.startOne); syncUI(); requestRender();
       } }]
     });
   }
   function showFail() {
+    if (LB) LB.cancelLevel(); // 命用完的那一次不算；重新挑戰從 0 起算
     scene = window.StoryScene.show({
       id: 'fail', background: snapshot('fail', { phase: state.phase, ghost: state.ghost }),
       title: '封印失敗', note: '❤️用完了……還沒成功抓住鬼。',
       buttons: [
-        { id: 'retryBtn', label: '重新挑戰', primary: true, onClick: function () { closeScene(); resetLevel(); } },
+        { id: 'retryBtn', label: '重新挑戰', primary: true, onClick: function () { closeScene(); resetLevel(); if (LB) LB.startLevel('mirror'); } },
         { id: 'failMenuBtn', label: '回關卡選單', href: '../index.html' }
       ]
     });
   }
   function showClear() {
     if (window.GameProgress) window.GameProgress.markCleared('mirror'); // 過關紀錄：解鎖第二關（入口頁用）
-    if (LB) LB.finishMirror(); // 本輪計時記下「第一關已通過」，第二關結束才算成績
+    if (LB) LB.finishMirror(); // 這一次的遊玩時間記成第一關成績（取代舊的）；趕鬼時間＝兩關最後一次過關相加
     scene = window.StoryScene.show({
       id: 'clear', background: snapshot('clear', { phase: 2, ghost: null }),
       lines: [
@@ -823,7 +828,7 @@
       buttons: [
         // 過關後一律回選單、由選單進下一關（使用者 2026-11-18 回饋 Q3：換頁一定會離開全螢幕，不從這裡直接跳第二關）
         { id: 'clearMenuBtn', label: '回關卡選單', primary: true, href: '../index.html' },
-        { id: 'againBtn', label: '再玩一次', onClick: function () { closeScene(); resetLevel(); } }
+        { id: 'againBtn', label: '再玩一次', onClick: function () { closeScene(); resetLevel(); if (LB) LB.startLevel('mirror'); } }
       ]
     });
   }

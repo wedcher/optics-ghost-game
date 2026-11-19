@@ -140,8 +140,8 @@ async function levelFlow(profile, browser) {
   const t = await open(profile, browser, '');
   const { page, press, info, pixels, shot } = t;
   {
-    const run = await t.page.evaluate(() => window.Leaderboard && window.Leaderboard.getRun());
-    ok(!!(run && run.startedAt) && !run.mirrorDone, '排行榜：進第一關（關卡模式）就開始趕鬼計時，尚未標記第一關通過');
+    const lb = await t.page.evaluate(() => ({ run: Leaderboard.getRun(), active: Leaderboard.activeLevel() }));
+    ok(lb.run === null && lb.active === null, '排行榜：開場過場中還沒開始計時（開場不算趕鬼時間）', JSON.stringify(lb));
   }
   const vp = profile.viewport;
 
@@ -177,6 +177,7 @@ async function levelFlow(profile, browser) {
   await press('#startBtn');
   s = await info();
   ok(s.scene === null, '按【開始抓鬼】後進入房間');
+  ok(await page.evaluate(() => Leaderboard.activeLevel()) === 'mirror', '排行榜：按【開始抓鬼】才開始第一關計時');
   ok(s.lives === 3 && s.hearts === 3 && s.sealed === 0 && s.phase === 1, '3 條命、封印 0、兩面鏡', JSON.stringify([s.lives, s.sealed, s.phase]));
   ok(s.intact.join() === 'back,right', '兩面鏡都完好');
   ok(await page.evaluate(() => window.__protoMirror.pools[1].some((c) => window.__protoMirror.core.cellId(c.col, c.row) === window.__protoMirror.core.cellId(window.__protoMirror.state.ghost.col, window.__protoMirror.state.ghost.row))), '鬼在雙鏡出題格內', s.ghost);
@@ -209,6 +210,12 @@ async function levelFlow(profile, browser) {
   await t.tapCell(wrong1);
   s = await info();
   ok(s.selected === wrong1 && s.scene && s.scene.id === 'throw' && s.scene.line === 0, '第一次點地板：選到那一格，並播「丟圓盤」對話', s.selected + ' ' + wrong1 + ' ' + JSON.stringify(s.scene));
+  {
+    const e0 = await page.evaluate(() => Leaderboard.levelElapsed());
+    await page.waitForTimeout(250);
+    const e1 = await page.evaluate(() => Leaderboard.levelElapsed());
+    ok(e0 > 0 && e1 === e0, '排行榜：「丟圓盤」過場中計時暫停', [e0, e1]);
+  }
   px = await pixels();
   ok(px.pickOut > before.pickOut && px.pickIn === before.pickIn, '選格標示只畫在地板上，鏡子裡沒有', JSON.stringify([before, px]));
   await shot('mirror-3-selected');
@@ -271,6 +278,11 @@ async function levelFlow(profile, browser) {
   ok(s.scene && s.scene.id === 'break', '抓到 2 次後播「打碎鏡子」過場');
   bg = await bgInfo();
   ok(bg.data && bg.bg.id === 'break' && bg.bg.phase === 2 && !bg.bg.ghost, '過場背景是右鏡打碎的房間（鬼躲起來了）', JSON.stringify(bg.bg));
+  {
+    const e0 = await page.evaluate(() => Leaderboard.levelElapsed());
+    await page.waitForTimeout(250);
+    ok(await page.evaluate(() => Leaderboard.levelElapsed()) === e0, '排行榜：「打碎鏡子」過場中計時暫停');
+  }
   await shot('mirror-6-break-scene');
   ok(!(await page.evaluate(() => document.querySelector('.story-bg').classList.contains('mirror-shake'))), '第 1 句（鬼撞鏡子）還沒震');
   await t.tapAt(vp.width / 2, vp.height / 2);
@@ -283,6 +295,11 @@ async function levelFlow(profile, browser) {
   s = await info();
   ok(await page.evaluate(() => window.__protoMirror.state.fx === null), '按【繼續抓鬼】後不再震動（2026-11-18 回饋 M6）');
   ok(s.phase === 2 && s.intact.join() === 'back', '只剩正面那面鏡子');
+  {
+    const e0 = await page.evaluate(() => Leaderboard.levelElapsed());
+    await page.waitForTimeout(150);
+    ok(await page.evaluate(() => Leaderboard.levelElapsed()) > e0, '排行榜：按【繼續抓鬼】後恢復計時');
+  }
   ok(s.lives === 2 && s.sealed === 2, '打碎鏡子不補命、封印數保留', JSON.stringify([s.lives, s.sealed]));
   ok(s.images.back && !s.images.right, '只有正面鏡裡有像');
   ok(await page.evaluate(() => window.__protoMirror.pools[2].some((c) => window.__protoMirror.core.cellId(c.col, c.row) === window.__protoMirror.core.cellId(window.__protoMirror.state.ghost.col, window.__protoMirror.state.ghost.row))), '鬼在單鏡出題格內', s.ghost);
@@ -317,7 +334,9 @@ async function levelFlow(profile, browser) {
   await press('#nextBtn');
   s = await info();
   ok(s.scene && s.scene.id === 'clear', '播過關演出');
-  ok(await page.evaluate(() => !!Leaderboard.getRun().mirrorDone), '排行榜：第一關過關後本輪計時記下「第一關已通過」');
+  const mirrorMs1 = await page.evaluate(() => Leaderboard.getRun().mirrorMs);
+  ok(mirrorMs1 > 0 && await page.evaluate(() => Leaderboard.activeLevel()) === null && await page.evaluate(() => Leaderboard.getRun().castleMs) === null,
+    '排行榜：第一關過關記下這次的遊玩時間（還沒有第二關，沒有趕鬼時間）', mirrorMs1);
   bg = await bgInfo();
   ok(bg.data && bg.bg.id === 'clear' && bg.bg.phase === 2 && !bg.bg.ghost, '過關背景：右鏡已碎、鏡子裡沒有鬼（牠逃走了）', JSON.stringify(bg.bg));
   for (let i = 0; i < 3; i++) await t.tapAt(vp.width / 2, vp.height / 2);
@@ -328,6 +347,7 @@ async function levelFlow(profile, browser) {
   await press('#againBtn');
   s = await info();
   ok(s.scene === null && s.lives === 3 && s.sealed === 0 && s.phase === 1 && s.intact.length === 2, '再玩一次：命數、封印數、鏡子都重置');
+  ok(await page.evaluate(() => Leaderboard.activeLevel()) === 'mirror' && await page.evaluate(() => Leaderboard.levelElapsed()) < 1000, '排行榜：再玩一次從 0 起算');
 
   // ---- 命用完 ----
   const g1 = s.ghost;
@@ -335,6 +355,7 @@ async function levelFlow(profile, browser) {
   await page.waitForFunction(() => window.__protoMirror.scene() && window.__protoMirror.scene().id === 'fail');
   s = await info();
   ok(s.lives === 0 && s.over && s.ghost === g1, '抓錯 3 次：命用完、出現失敗畫面');
+  ok(await page.evaluate(() => Leaderboard.activeLevel()) === null && await page.evaluate(() => Leaderboard.getRun().mirrorMs) === mirrorMs1, '排行榜：命用完的那一次不算，保留上次過關的成績');
   bg = await bgInfo();
   ok(bg.data && bg.bg.id === 'fail' && bg.bg.phase === 1, '失敗畫面的背景是當時的房間', JSON.stringify(bg.bg));
   const after = await pixels();
@@ -344,6 +365,7 @@ async function levelFlow(profile, browser) {
   await press('#retryBtn');
   s = await info();
   ok(s.scene === null && s.lives === 3 && s.sealed === 0 && s.phase === 1 && !s.over, '重新挑戰：從兩面鏡重來，不再播開場');
+  ok(await page.evaluate(() => Leaderboard.activeLevel()) === 'mirror' && await page.evaluate(() => Leaderboard.levelElapsed()) < 1000, '排行榜：重新挑戰從 0 起算');
   px = await pixels();
   ok(px.ghostOut < EDGE_PX, '重新挑戰後房間裡沒有鬼');
 
