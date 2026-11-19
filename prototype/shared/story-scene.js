@@ -71,10 +71,14 @@
     'animation:storyFlee 1.7s cubic-bezier(.3,.1,.6,1) forwards}' +
     '.story-ghost::before,.story-ghost::after{content:"";position:absolute;top:14px;width:6px;height:9px;border-radius:50%;background:#0d1020}' +
     '.story-ghost::before{left:8px}.story-ghost::after{right:8px}' +
+    '.story-ghost.story-minion{width:auto;height:min(22vh,150px);margin:calc(min(22vh,150px) / -2) 0 0 -50px;background:none;border-radius:0;box-shadow:none;' +
+    'filter:drop-shadow(0 0 10px rgba(200,230,255,.55))}' +
+    '.story-ghost.story-minion::before,.story-ghost.story-minion::after{display:none}' +
+    '.story-letter.on-art{background:none;box-shadow:none;top:50%}' +
     '@keyframes storyFlee{0%{opacity:0;transform:translate(0,0) scale(.6)}18%{opacity:1}' +
     '100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.5)}}' +
     '@keyframes storyBlink{0%,100%{opacity:.35}50%{opacity:1}}' +
-    '@media (max-height:480px){.story-dialog{min-height:76px;padding:18px 16px 22px}.story-text{font-size:17px}' +
+    '@media (max-height:480px){.story-letter.on-art{top:50%}.story-dialog{min-height:76px;padding:18px 16px 22px}.story-text{font-size:17px}' +
     '.story-letter{top:40%;padding:14px 18px 24px;font-size:17px;line-height:1.55}.story-dialog.has-img{padding-left:84px}' +
     '.story-img{width:60px;height:60px;margin-top:-30px}' +
     '.story-end h2{font-size:22px}.story-end p{margin-bottom:12px;font-size:14px}}' +
@@ -158,8 +162,12 @@
       bg.style.backgroundImage = b === 'black' ? 'none' : 'url("' + b + '")';
     }
     function scatterGhosts(n) {
+      // 有雜魚圖（StoryScene.minionArt，由各關設定）就用圖，沒有就用 placeholder 小鬼
+      var art = root.StoryScene && root.StoryScene.minionArt, start = Math.floor(Math.random() * 9);
       for (var i = 0; i < n; i++) {
-        var g = el('div', 'story-ghost'), ang = (i / n) * Math.PI * 2 + 0.4;
+        var g, ang = (i / n) * Math.PI * 2 + 0.4;
+        if (art && art.length) { g = document.createElement('img'); g.className = 'story-ghost story-minion'; g.alt = ''; g.src = art[(start + i) % art.length]; }
+        else g = el('div', 'story-ghost');
         g.style.setProperty('--dx', Math.round(Math.cos(ang) * 60) + 'vw');
         g.style.setProperty('--dy', Math.round(Math.sin(ang) * 60) + 'vh');
         g.style.animationDelay = (i * 0.07).toFixed(2) + 's';
@@ -173,6 +181,7 @@
         // 信上的字：一句一句加到信紙上，前面的字留著
         dialog.hidden = true;
         letter.hidden = false;
+        letter.classList.toggle('on-art', !!l.letterOnArt); // 背景圖上已經畫了信紙：字直接寫在圖上的紙上
         var old = letter.querySelector('.story-hint');
         if (old) letter.removeChild(old);
         letter.appendChild(el('p', null, l.letter));

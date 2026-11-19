@@ -9,7 +9,11 @@
  */
 (function (root) {
   'use strict';
-  var FILES = { castle: null, letter: null, disc: null };
+  // 正式圖（使用者 2026-11-19 上傳，原圖在 docs/concepts/古堡外觀.png、信件.png、圓盤.png）。
+  // story-letter.webp 是信件圖＋圓盤合成的（劇本：圓盤壓在信件上面）；信紙在圖的正中央，信上的字由過場用 HTML 疊上（letterOnArt）。
+  var FILES = { castle: 'assets/story-castle.webp', letter: 'assets/story-letter.webp', disc: 'assets/story-disc.webp' };
+  // 雜魚（過關時逃散的小鬼），原圖 docs/concepts/雜魚00～08.png。路徑相對於關卡頁面。
+  var MINIONS = []; for (var mi = 0; mi <= 8; mi++) MINIONS.push('../shared/art/minion-0' + mi + '.webp');
 
   function canvas(w, h) { var c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
   function stamp(g, w, h) {
@@ -90,5 +94,8 @@
     if (!cache[key]) cache[key] = MAKERS[key]();
     return cache[key];
   }
-  root.StoryArt = { get: get, placeholder: function (key) { return !FILES[key]; } };
+  // 先載入，過場切到那一句時才不會閃一下
+  [FILES.castle, FILES.letter, FILES.disc].concat(MINIONS).forEach(function (u) { if (u) { var im = new Image(); im.src = u; } });
+  if (root.StoryScene) root.StoryScene.minionArt = MINIONS;
+  root.StoryArt = { get: get, placeholder: function (key) { return !FILES[key]; }, minions: MINIONS };
 })(window);

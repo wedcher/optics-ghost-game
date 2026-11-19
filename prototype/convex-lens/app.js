@@ -1079,6 +1079,8 @@
     var note = (castleMs != null ? '你花費' + LB.formatTime(castleMs) + '，把鬼趕出城堡。' : '成功把鬼趕出城堡。') +
       (PRACTICE ? '' : '第三關：荒野狩獵（已解鎖）');
     closeScene();
+    // 逃散的小鬼用雜魚圖（使用者 2026-11-19 上傳；和第一關過關共用 prototype/shared/art/）
+    if (!window.StoryScene.minionArt) { window.StoryScene.minionArt = []; for (var mi = 0; mi <= 8; mi++) window.StoryScene.minionArt.push('../shared/art/minion-0' + mi + '.webp'); }
     level.scene = window.StoryScene.show({
       id: 'cleared', background: INTRO_BG, scatter: 7,
       // 劇本 2-3（Google 文件《光學抓鬼遊戲 劇本初稿》）。小透鏡是地上另外一片，不是大凸透鏡的碎片

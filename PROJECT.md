@@ -101,7 +101,7 @@
 - **實體手機驗證（使用者 2026-11-19 回報）**：①從第一關玩到荒野結算按「留名上榜」，成績有上共用排行榜（Google Apps Script 部署可用）；②手機直拿時畫面都保持橫向（轉 90° 可用，方向沒問題）；③第三關新加的 12 組題目玩起來沒有違和感。（使用者沒說是 iPhone 還是 Android。）
 
 - **女鬼角色圖換上正式版：暫緩**（使用者 2026-11-19）。
-- 正式美術圖（圓盤、信件、古堡外觀、雜魚 00～09）使用者已畫好，放在使用者電腦，等傳上來後由 Claude 改成專案用的檔名、換掉暫代圖。
+- **正式美術圖已換上（2026-11-19）**：原圖在 `docs/concepts/古堡外觀.png`、`信件.png`、`圓盤.png`、`雜魚00～08.png`（雜魚09 使用者說不用）。轉成手機用的 webp：`plane-mirror/assets/story-castle.webp`、`story-letter.webp`（信件圖＋圓盤合成，照劇本「圓盤壓在信件上面」）、`story-disc.webp`（對話框小圖）、`shared/art/minion-00～08.webp`（第一關、第二關過關時逃散的小鬼，取代 placeholder）。信上的三句字照舊用 HTML 寫在圖中的信紙上（`story-scene.js` 的 `letterOnArt`）。暫代圖程式保留在 `story-art.js`，圖載不到時才用。
 
 ## DO NOT RE-DERIVE
 

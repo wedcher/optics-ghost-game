@@ -153,6 +153,7 @@ async function levelFlow(profile, browser) {
   ok(bg.bg.snapshot && bg.bg.id === 'intro' && bg.bg.phase === 1 && bg.bg.ghost, '開場已備好房間快照：兩面鏡完好、鏡子裡有鬼', JSON.stringify(bg.bg));
   ok(s.scene.bg === 'image' && !s.scene.letter, '開場第一句：古堡外觀（圖）');
   ok(await page.evaluate(() => document.querySelector('.story-text').textContent.indexOf('有一天') >= 0), '開場第一句是「有一天……」');
+  ok(await page.evaluate(() => ['castle', 'letter', 'disc'].every((k) => !StoryArt.placeholder(k)) && StoryScene.minionArt.length === 9), '開場、信件、圓盤用正式圖，雜魚圖 9 張（2026-11-19）');
   await shot('mirror-1-intro');
   // 劇本修訂（2026-11-17）：古堡（「有一天……」＋受邀，2026-11-18 加第一句）→ 信（旁白 + 信上 3 句 + 圓盤）→ 黑畫面（怪聲）→ 房間 2 句，共 10 句
   const INTRO_LINES = 10;

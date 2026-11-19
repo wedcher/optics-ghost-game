@@ -768,9 +768,9 @@
         { background: A.get('castle'), text: '有一天……' },
         { text: '你受邀到一座古老的城堡過夜。' },
         { background: A.get('letter'), text: '晚餐後，你回到房間，發現桌上有一封奇怪的信：' },
-        { letter: '如果你能看見牠們，代表牠們也已經發現你了。' },
-        { letter: '別相信眼睛看到的位置。' },
-        { letter: '找到牠真正所在之處，才能封印牠。' },
+        { letter: '如果你能看見牠們，代表牠們也已經發現你了。', letterOnArt: !A.placeholder('letter') },
+        { letter: '別相信眼睛看到的位置。', letterOnArt: !A.placeholder('letter') },
+        { letter: '找到牠真正所在之處，才能封印牠。', letterOnArt: !A.placeholder('letter') },
         { text: '有一個古老金屬圓盤壓在信件上面。' },
         { background: 'black', text: '半夜，有一間房間不斷傳出奇怪的聲響。', onShow: function () { if (window.Sfx) window.Sfx.nightNoise(); } },
         { background: room, speaker: '你', text: '房間裡……明明沒有人啊？' },
@@ -825,7 +825,7 @@
       id: 'clear', background: snapshot('clear', { phase: 2, ghost: null }),
       lines: [
         { text: '女鬼終於被封印了，房間響起騷動——' },
-        { text: '大量的鬼衝出房間，逃進走廊。', scatter: 14 }, // 小怪的圖還沒生，先用 placeholder 鬼往四周逃
+        { text: '大量的鬼衝出房間，逃進走廊。', scatter: 14 }, // 雜魚圖：StoryScene.minionArt（story-art.js 設定）
         { speaker: '你', text: '也太多鬼了？別跑！' }
       ],
       title: '第一關過關！', note: '鬼逃進了走廊。第二關：城堡走廊（已解鎖）', // 使用者 2026-11-19 統一三關過關文字
