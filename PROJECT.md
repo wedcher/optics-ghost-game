@@ -418,6 +418,7 @@
   - 計時規則沒動。「再玩一次」後再過關會再呼叫一次 `finishCastle()`，交給第二波「趕鬼時間」任務卡（**現在可以開始**：第二關任務卡已併進 main）。
 - **檔案分工（2026-11-18）**：（第一波第二、三關兩張任務卡都做完了，兩行已拿掉）
   - 第二、三波開工時自己在這裡加一行。做完的把自己那行拿掉。
+  - **荒野狩獵正式版（2026-11-19 工作階段 `claude/gifted-ramanujan-s7nfk5`）進行中**：`prototype/concave-lens/*`、`prototype/index.html`（只改第三關入口）、`tests/e2e-concave-lens.js`／新的 `tests/e2e-hunt.js`、`package.json`（接 test）、`docs/prototype-findings.md`；`prototype/shared/*` 只加不改既有行為。
   - `PROJECT.md` 和 `docs/playtest-feedback-2026-11-18.md` 大家都會改：只改自己那段，收工前先 `git pull`。
 
 ### 交接點（凸透鏡虛像題實驗，2026-11-18）
