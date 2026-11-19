@@ -897,7 +897,8 @@
   }
 
   var pointers = {}, gesture = null;
-  function localPos(e) { var r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+  // 手機直拿時整個遊戲轉 90°：觸控座標一律經過 GameLandscape（shared/landscape.js）
+  function localPos(e) { return GameLandscape.toLocal(e, canvas); }
   function pointerCount() { return Object.keys(pointers).length; }
 
   canvas.addEventListener('pointerdown', function (e) {
@@ -1170,7 +1171,7 @@
   }
 
   function layout() {
-    var r = $('stage').getBoundingClientRect();
+    var r = GameLandscape.size($('stage'));
     W = Math.max(50, Math.round(r.width)); H = Math.max(50, Math.round(r.height));
     DPR = Math.min(window.devicePixelRatio || 1, 3);
     FS = Math.min(W, H) < 420 ? 1.25 : 1;

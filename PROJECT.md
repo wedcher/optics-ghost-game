@@ -86,7 +86,7 @@
 - 第二、三關操作一致：選格封印在抓到鬼前再點同一格可取消、抓到後不能改；封印前後都能畫線；封印後**鬼本體**也是畫線的吸附點。
 - 第二關每輪（抓 5 隻）**保證至少一題虛像題**（J、K、L 其中之一）。
 - 第三關上方和第二關一樣顯示 ❤️ 命數，說明文字放在 ❤️ 後面。（已實作 2026-11-18：抓錯扣一顆、用完出現失敗畫面「重新挑戰／回關卡選單」；`?free=1` 不計命；`?practice=1` 扣命、不計時、不上榜。**標題**在正式荒野狩獵做好前用「第三關：荒野（凹透鏡）」（網頁標題）／「第三關 荒野」（`?free=1` 畫面標題）；關卡模式和第二關一樣不顯示標題。細節見 `docs/prototype-findings.md` 最後一節。）
-- 手機直拿時整個遊戲轉 90°（G3 後半），使用者同意開始做。
+- 手機直拿時整個遊戲轉 90°（G3 後半），使用者同意開始做。**✅ 已實作（2026-11-19，只在 headless 測過，要實機驗證）**：做法、共用函式與已知限制見 PENDING 19。
 - 劇本 Google 文件：https://docs.google.com/document/d/1ddmuu3FZN_3SS0G1ePN16ItOrqwyrJxO1rSXOOFzA7A/edit （台詞以這份為準；2026-11-18 已加「有一天……」並同步第一關改過的台詞）。
 
 ## DO NOT RE-DERIVE
@@ -138,7 +138,13 @@
 16. 第二關遊戲中的提示台詞：使用者要等凸透鏡虛像題型（PENDING 14）做完，再請 Claude 補台詞。
 17. **第二關「超清楚」**（使用者 2026-11-18：先不做，也許之後改別的方向）（使用者 2026-11-18 試玩回饋 V3，`docs/playtest-feedback-2026-11-18.md`）：使用者想在「鬼在焦點上、虛像最大」時描線、標「超清楚」。物理上鬼剛好在焦點時不成像（像在無限遠），虛像也沒有對焦問題、永遠清楚。等使用者決定改成什麼（例如：實像剛好對焦時標「超清楚」；或虛像放大率超過某值時給提示；或不做）。
 18. ~~第一關鏡框（回饋 M10）~~ 已釐清並實作（2026-11-18）：使用者要的是較粗的**立體**底框：框立起一點，鏡子裡最靠牆那半格可能被擋到一點點，可以接受、出題格不重算。已實作；使用者看了框高 0.06～0.35 格五種比較圖，**選 A：高 0.06 格**、厚 0.08 格（之後要改調（`plane-mirror/app.js` 的 `FRAME_H`、`FRAME_D`）。
-19. **手機直拿時整個遊戲轉 90°（回饋 G3 後半、Q1）**：還沒做，等第二、三關分頁收工後由選單＋共用分頁做，會改三關 `app.js` 的座標換算（做法與風險見交接點「使用者試玩回饋」）。直拿時轉向左還是向右先固定順時針，待試玩。
+19. **手機直拿時整個遊戲轉 90°（回饋 G3 後半、Q1）**：**✅ 已做（2026-11-19，工作階段 `claude/stoic-bohr-e1q4w8`）；只在 headless Chromium 測過，等使用者在實體手機（iPhone Safari／主畫面圖示、Android Chrome）驗證。** 待使用者回答：①轉的方向（目前固定**順時針**：遊戲的上方在螢幕右邊，手機要往左轉（逆時針）才看得正）要不要改、要不要跟著手機感應器自動選；②下面的已知限制能不能接受。
+    - **做法**（`prototype/shared/landscape.js`）：觸控（`pointer: coarse`）＋視窗高 > 寬＋網址沒有 `?portrait=1` 時，`<html>` 加 `gl-rot`，`body` 固定成寬 = 螢幕高、高 = 螢幕寬，`transform: translateX(螢幕寬) rotate(90deg)`。CSS 變數 `--gl-w`／`--gl-h`（遊戲方向的寬高）、`--gl-sw`／`--gl-sh`（螢幕的寬高）。監聽 `resize`、`orientationchange`、`visualViewport.resize`，手機轉橫（視窗變寬）就取消轉向、轉回直又轉。
+    - **@media**：轉向時頁面上和寬高／方向有關的 `@media`（含過場、排行榜結算動態加進來的 `<style>`）改用「寬高對調」判斷，所以各頁直接走原本的橫向版面，不用另寫一套 CSS。`vw`／`vh` 單位不會跟著換：第一關右側欄的 `20vw` 另外用 `--gl-w` 改寫（`plane-mirror/index.html`）；過場鬼逃散的 `60vw/60vh` 只是動畫距離，沒改。
+    - **共用函式**（各頁算觸控位置與版面一律用這些，不要直接用 `getBoundingClientRect()`／`clientX/Y`／`innerWidth`）：`GameLandscape.toLocal(e, el)`、`size(el)`、`toClient(p, el)`（測試用）、`viewport()`、`isRotated()`。三關已改：第一關 `layout`、`toImage`、拖曳平移的 dx/dy、測試掛鉤 `toClient`；第二、三關 `localPos`、`layout`。選單、排行榜、`story-scene.js` 沒有用座標算東西，不用改。
+    - **捲動**：選單、排行榜內容比轉過的畫面高時，由 `<main>` 捲動（轉過的 `body` 本身當捲動容器時，Chromium 實測手指捲不動）；頁面本身不捲。
+    - **已知限制／風險（實機要看）**：系統的東西不會跟著轉——**鍵盤**、`confirm()`（選單「重新開始遊戲」）、排行榜結算的**暱稱輸入框**（打字時鍵盤是直的）、`<select>` 下拉選單（只有 `?free=1` 開發用）；**iOS Safari** 直拿時網址列／工具列在畫面側邊、捲動或點擊時可用高度會跳動（會觸發重新排版）；Android 第一次點畫面會進全螢幕並鎖橫向（`fullscreen.js`），鎖住後視窗變橫就不再轉；換頁瞬間可能還是閃一下直的畫面（G3 的「先直後橫」要實機看有沒有改善）。
+    - **測試**：`tests/e2e-rotate.js`（已加進 `npm test`；390×844 直向觸控、不帶參數）：三關點格子、拖曳畫線／平移、按鈕點得到、頁面不捲動、選單捲動、`?portrait=1`／橫拿／桌機不轉。各關原本的直向 e2e 都帶 `?portrait=1`，不受影響。截圖 `docs/screenshots/rotate-*.png`。`npm test` 全過（2026-11-19）：凹幾何 97、凸幾何 364、平面鏡幾何 338、凹 e2e 742、凸 e2e 2287、第二關 247、第一關 e2e 280、排行榜後端 52、排行榜 e2e 53、選單 41、轉向 73。
     - 使用者 2026-11-19 回報：從主畫面圖示開和用瀏覽器開都會在「☰ 回關卡」時畫面先直後橫，瀏覽器還出現過直的遊戲畫面；使用者另一個網頁遊戲「密度小艇」沒有這問題。原因（Claude 推測，未在實機確認）：網頁無法可靠鎖橫向（iPhone 完全不行；Android 只在全螢幕或已安裝 App 時，換頁退出全螢幕就解鎖）。根本解法就是本項「直拿時整個遊戲轉 90°」，做了以後不管手機怎麼拿都是橫的畫面。手機型號（Android／iPhone）待使用者回覆。
     - **參考做法：使用者的另一個遊戲 `wedcher/density-submarine`（密度小艇，2026-11-19 Claude 看過程式）**，它沒問題的原因有兩個：
       1. **直拿時自己轉 90°**（`src/classroom.js` `syncOrientation()`、`src/classroom.css`）：觸控裝置且 `clientHeight > clientWidth` 時 `body[data-rotated="true"]`，遊戲容器 `.wrap` 用 `position:absolute; left:100%; top:0; transform-origin:top left; transform:rotate(90deg)`，寬高用 CSS 變數對調（`--scene-width = 高`、`--scene-height = 寬`）；對話框另外 `translate(-50%,-50%) rotate(90deg)`。觸控座標換算（`index.html` `pointAt()`）：轉向時 `x = (clientY − rect.top) × W / rect.height`、`y = (rect.right − clientX) × H / rect.width`。監聽 `matchMedia(orientation: portrait)` change、`resize`、`visualViewport.resize` 重算。鎖橫向（全螢幕＋`screen.orientation.lock`）只是「能鎖就鎖」，失敗就靠轉 90°。
@@ -390,7 +396,7 @@
   - 新增 `tests/e2e-menu.js`（41 項，已接進 `npm test`；`npm run test:menu` 單跑），截圖 `docs/screenshots/menu-*.png`。`tests/e2e-leaderboard.js` 的選單段落改成新的選單結構。
   - **還沒在實體手機上試**（全螢幕教學、鎖橫向都只能在實機驗）。
   - `npm test`（2026-11-18）：選單 41/41、排行榜 40/40 與其他各支都過，~~只有第一關 e2e 偶爾 1 項失敗~~（已修：第一關分頁拿掉「繼續抓鬼」後的等待，測試在新的鬼畫出來前就讀狀態；改成等兩個 frame）「只有正面鏡裡有像」（`tests/e2e-plane-mirror.js:286`）：單鏡出題格是隨機的，抽到 c2r3 等格時 `images.back` 為 false，3 次重跑失敗 1 次。和選單／共用無關，沒動；留給第一關分頁查（是單鏡出題格含了正面鏡照不到整隻的格子，還是測試條件太嚴）。
-- **下一步：G3 後半「手機直拿時整個遊戲轉 90°」還沒做**，等第二關、第三關分頁收工（下面「檔案分工」那兩行拿掉）再做。評估（Claude 2026-11-18）：做得到，但**一定要改三關的 `app.js`**，做之前先告訴使用者：
+- ~~**下一步：G3 後半「手機直拿時整個遊戲轉 90°」還沒做**~~ → ✅ **2026-11-19 第三波做完**（細節、已知限制、測試見 PENDING 19）。**下一步：使用者在實體手機上試**（iPhone 與 Android 各一，直拿進選單 → 第一關 → 回關卡 → 第二關 → 第三關；看轉向方向、點格子／畫線準不準、iOS 網址列、排行榜暱稱輸入）。以下是當初的評估（Claude 2026-11-18）：
   - 做法：`landscape.js` 在「觸控＋直向＋沒有 `?portrait=1`」時，把 `body` 設成寬 = 螢幕高、高 = 螢幕寬，`transform: rotate(90deg)` 轉過來；轉向的方向先固定（順時針），看試玩反應。
   - 要改的地方：三關都用 `getBoundingClientRect()` 和 `clientX/clientY` 算觸控位置（`convex-lens/app.js` 的 `localPos`、`layout`；`concave-lens/app.js` 的 `localPos`、`layout`；`plane-mirror/app.js` 的 `layout`、`toImage`、拖曳平移的 dx/dy、`toClient`）。轉 90° 後這些都會錯（拿到的是轉過的外框、x/y 對調），要改成呼叫共用的 `GameLandscape.toLocal(e, el)`／`GameLandscape.size(el)`。`window.innerWidth/innerHeight` 與 `resize` 也要換成轉向後的尺寸。
   - 測試：各關 e2e 的直向情境都帶 `?portrait=1`，轉向會照這個參數關掉，所以原本的測試不受影響；要另外加一組「直向不帶參數」的點擊測試。
@@ -399,7 +405,7 @@
   - ✅ 第一關「☰ 回關卡」改字（這個工作階段做）；Google 劇本加「有一天……」並同步第一關台詞（這個工作階段做）。
   - **第一波（可同時做）**：任務卡「第二關：一致性、保證虛像題、劇本待辦」（`convex-lens/*`）；任務卡「第三關：❤️、吸附鬼本體、畫線修正」（`concave-lens/*`）。
   - **第二波**：任務卡「趕鬼時間改成兩關最後一次過關成績相加」（`shared/leaderboard.js`、`plane-mirror/app.js` 與 `convex-lens/app.js` 的計時呼叫、`docs/leaderboard.md`）。**要等第二關任務卡併進 main 才開始**。→ ✅ **2026-11-19 做完**：新 API `startLevel`／`pauseLevel`／`resumeLevel`／`cancelLevel`（舊的 `startRun` 拿掉）；第一關的丟圓盤、丟完圓盤、打碎鏡子過場暫停計時；成績存 `ogg.run.v2`（舊 `v1` 牆上時間不沿用）；`Code.gs` 沒改、不用重新部署。測試：排行榜 e2e 53/53、第一關 e2e 280/280、第二關關卡 e2e 247/247。**還沒在實體手機驗證**。沒講到的情況與「上傳」的解讀見 PENDING 23。**第三波（手機直拿轉 90°）現在可以開始**。
-  - **第三波**：任務卡「手機直拿時整個遊戲轉 90°」（`shared/landscape.js` 與三關的座標換算）。**要等前面三張都併進 main 才開始**。
+  - **第三波**：任務卡「手機直拿時整個遊戲轉 90°」（`shared/landscape.js` 與三關的座標換算）。**要等前面三張都併進 main 才開始**。 → ✅ **2026-11-19 做完**（PENDING 19）。headless 全過（`npm test` 含新的 `tests/e2e-rotate.js`）；**還沒在實體手機驗證**。
   - 使用者回報的 bug（第三關）：封印後畫線，放開後看不到線條，但多了交點 P → 線有存進去、可能沒畫出來。交給第三關任務卡查。→ ✅ 已修（2026-11-18）：原因是 `state.replay` 存在時學生的線一律畫成 22% 白，封印後 `state.replay` 一直存在；改成只在重現動畫播放的那幾秒壓淡。e2e 加了像素檢查（改回舊判斷式會失敗）。
   - ✅ **第三關任務卡完成（2026-11-18）**：❤️／扣命／失敗畫面、`?practice=1`、上面的 bug、封印後鬼本體是吸附點、「☰ 回關卡」。凹 e2e 742/742。細節在 `docs/prototype-findings.md` 最後一節。**還沒在實體手機上試。** 仍未做：正式荒野狩獵（5 分鐘、台詞，等 PENDING 15）、`GameProgress.markCleared('concave')`（何時算完成未定）。
 - **第二關任務卡「一致性、保證虛像題、劇本待辦」已做完並推到 main（2026-11-18）**，細節在 `docs/prototype-findings-convex.md` 文末「追加：第二關一致性、保證虛像題、劇本待辦」：

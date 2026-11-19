@@ -93,7 +93,7 @@
 
   // ---------- 版面 ----------
   function layout() {
-    var r = $('stage').getBoundingClientRect();
+    var r = GameLandscape.size($('stage')); // 手機直拿時整個遊戲轉 90°：用遊戲方向的寬高（shared/landscape.js）
     DPR = Math.min(window.devicePixelRatio || 1, 2.5);
     W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
     canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
@@ -534,9 +534,10 @@
   }
 
   // ---------- 操作 ----------
-  function toImage(clientX, clientY) {
-    var r = canvas.getBoundingClientRect();
-    return { x: (clientX - r.left - OX) / S, y: (clientY - r.top - OY) / S };
+  // 觸控座標一律經過 GameLandscape.toLocal（手機直拿轉 90° 時 x、y 會對調）
+  function toImage(e) {
+    var l = GameLandscape.toLocal(e, canvas);
+    return { x: (l.x - OX) / S, y: (l.y - OY) / S };
   }
   function cellAt(p) {
     for (var i = 0; i < SELECTABLE.length; i++) {
@@ -558,21 +559,23 @@
   var down = null, TAP_PX = 12;
   canvas.addEventListener('pointerdown', function (e) {
     if (down) return; // 第二根手指：不理會
-    down = { x: e.clientX, y: e.clientY, id: e.pointerId, panX: view.panX, panY: view.panY, dragged: false };
+    var l = GameLandscape.toLocal(e, canvas);
+    down = { x: l.x, y: l.y, id: e.pointerId, panX: view.panX, panY: view.panY, dragged: false };
     try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
   });
   canvas.addEventListener('pointermove', function (e) {
     if (!down || down.id !== e.pointerId) return;
-    var dx = e.clientX - down.x, dy = e.clientY - down.y;
+    var l = GameLandscape.toLocal(e, canvas), dx = l.x - down.x, dy = l.y - down.y;
     if (!down.dragged && Math.hypot(dx, dy) > TAP_PX) down.dragged = true;
     if (down.dragged && view.zoom > 0) { view.panX = down.panX + dx; view.panY = down.panY + dy; stats.pans++; applyView(); }
   });
   canvas.addEventListener('pointerup', function (e) {
     if (!down || down.id !== e.pointerId) return;
-    var moved = down.dragged || Math.hypot(e.clientX - down.x, e.clientY - down.y) > TAP_PX;
+    var l = GameLandscape.toLocal(e, canvas);
+    var moved = down.dragged || Math.hypot(l.x - down.x, l.y - down.y) > TAP_PX;
     down = null;
     if (moved || !canAct()) return;
-    var p = toImage(e.clientX, e.clientY), cell = cellAt(p);
+    var p = toImage(e), cell = cellAt(p);
     if (cell) {
       state.selected = cell; stats.lastPick = C.cellId(cell.col, cell.row);
       if (!discTaught) { showThrow(); syncUI(); requestRender(); return; }
@@ -874,7 +877,7 @@
     setMask: function (on) { state.mask = !!on; render(); },
     canvasInfo: function () { return { W: W, H: H, DPR: DPR, S: S, OX: OX, OY: OY, zoom: ZOOMS[view.zoom] }; },
     // 影像座標 → 網頁座標（測試用來算該點哪裡）
-    toClient: function (p) { var r = canvas.getBoundingClientRect(); return { x: r.left + OX + p.x * S, y: r.top + OY + p.y * S }; },
+    toClient: function (p) { return GameLandscape.toClient({ x: OX + p.x * S, y: OY + p.y * S }, canvas); },
     cellClient: function (col, row) { return this.toClient(C.project(cam, C.cellCenter(col, row))); },
     glassPoly: function (id) { return glassScreen(id); },
     setGhost: function (col, row) { state.forced = { col: col, row: row }; newGhost(); state.forced = null; syncUI(); render(); }

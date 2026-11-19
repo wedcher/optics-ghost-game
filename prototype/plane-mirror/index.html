@@ -70,6 +70,8 @@
   /* 「匡啷！」那一句：過場畫面震一下（M5） */
   .story-bg.mirror-shake { animation:mirrorShake .65s ease-out; }
   @keyframes mirrorShake { 0%,100% { transform:translate(0,0); } 12% { transform:translate(-14px,6px); } 25% { transform:translate(12px,-8px); } 38% { transform:translate(-9px,5px); } 52% { transform:translate(7px,-4px); } 68% { transform:translate(-4px,2px); } 84% { transform:translate(2px,-1px); } }
+  /* 手機直拿、整個遊戲轉 90° 時（shared/landscape.js），vw 是螢幕的寬，不是遊戲的寬：改用 --gl-w */
+  html.gl-rot #app { grid-template-columns:minmax(0,1fr) clamp(150px, calc(var(--gl-w) * .2), 240px); }
   @media (prefers-reduced-motion: reduce) { .story-bg.mirror-shake { animation:none; } }
 </style>
 </head>

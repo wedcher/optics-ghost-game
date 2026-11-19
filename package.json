@@ -8,11 +8,12 @@
     "check:geometry:convex": "node tests/check-geometry-convex.js",
     "test:e2e:convex": "node tests/e2e-convex-lens.js",
     "test:e2e:convex:level": "node tests/e2e-convex-level.js",
-    "test": "node tests/check-geometry.js && node tests/check-geometry-convex.js && node tests/check-geometry-mirror.js && node tests/e2e-concave-lens.js && node tests/e2e-convex-lens.js && node tests/e2e-convex-level.js && node tests/e2e-plane-mirror.js && node tests/check-leaderboard.js && node tests/e2e-leaderboard.js && node tests/e2e-menu.js",
+    "test": "node tests/check-geometry.js && node tests/check-geometry-convex.js && node tests/check-geometry-mirror.js && node tests/e2e-concave-lens.js && node tests/e2e-convex-lens.js && node tests/e2e-convex-level.js && node tests/e2e-plane-mirror.js && node tests/check-leaderboard.js && node tests/e2e-leaderboard.js && node tests/e2e-menu.js && node tests/e2e-rotate.js",
     "check:geometry:mirror": "node tests/check-geometry-mirror.js",
     "test:e2e:mirror": "node tests/e2e-plane-mirror.js",
     "test:leaderboard": "node tests/check-leaderboard.js && node tests/e2e-leaderboard.js",
-    "test:menu": "node tests/e2e-menu.js"
+    "test:menu": "node tests/e2e-menu.js",
+    "test:rotate": "node tests/e2e-rotate.js"
   },
   "devDependencies": {
     "playwright": "^1.65.1"
