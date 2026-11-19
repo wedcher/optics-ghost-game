@@ -52,7 +52,7 @@
  * 選單逐步解鎖（使用者試玩回饋 G4，2026-11-18）：
  *   - 第 N 關的入口：前一關過關後出現（第一關一開始就有；第一關沒過之前叫「開始遊戲」）。
  *   - 第 N 關的練習模式（?practice=1：扣命、不計時、不計排行）：第 N 關過關後出現。
- *   - 第三關「荒野狩獵」還沒做，入口先連凹透鏡原型（concave-lens/），標「製作中」。
+ *   - 第三關「荒野狩獵」（concave-lens/：5 分鐘、3 條命，結束時上傳排行榜）；結束一次後解鎖荒野練習模式。
  * 網址加 ?unlock=1：全部顯示（老師／開發用），並多出開發用的自由練習入口。
  * G2：第一次從選單按「開始遊戲」時，先教怎麼離開全螢幕（只出現這一次）。
  */
@@ -69,7 +69,7 @@
   if (cleared('mirror')) items.push({ id: 'mirror-practice', href: 'plane-mirror/index.html?practice=1', title: '第一關：練習模式', sub: '扣命、不計時、不列入排行' });
   if (unlocked('convex')) items.push({ id: 'convex', href: 'convex-lens/index.html', title: '第二關：走廊的凸透鏡', sub: '城堡裡到處都是鬼，請趕走他們', main: !cleared('convex') });
   if (cleared('convex')) items.push({ id: 'convex-practice', href: 'convex-lens/index.html?practice=1', title: '第二關：練習模式', sub: '扣命、不計時、不列入排行' });
-  if (unlocked('concave')) items.push({ id: 'concave', href: 'concave-lens/index.html', title: '第三關：荒野狩獵，小凹透鏡派上用場', sub: '趁天亮前，多封印幾隻', note: '荒野狩獵製作中：目前先玩凹透鏡原型', main: !cleared('concave') });
+  if (unlocked('concave')) items.push({ id: 'concave', href: 'concave-lens/index.html', title: '第三關：荒野狩獵，小凹透鏡派上用場', sub: '趁天亮前，多封印幾隻', main: !cleared('concave') });
   if (cleared('concave')) items.push({ id: 'concave-practice', href: 'concave-lens/index.html?practice=1', title: '第三關：練習模式（不計時）', sub: '不列入排行' });
   if (all) {
     items.push({ id: 'mirror-free', href: 'plane-mirror/index.html?free=1', title: '平面鏡 — 自由練習（開發用）', sub: '沒有過場、不計命；可指定鏡子數與鬼的位置、開 Debug。', dev: true });

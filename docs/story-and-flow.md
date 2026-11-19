@@ -1,7 +1,7 @@
 # 劇情與關卡流程
 
 來源：使用者 2026-11-17 的構想，經 GPT 擴寫後整理。
-狀態：**第二關（凸透鏡走廊）已於 2026-11-17 實作**（見 `docs/prototype-findings-convex.md` 文末）；**第一關（平面鏡房間）已於 2026-11-17 實作**（見 `docs/prototype-findings-mirror.md`）；荒野狩獵、關卡解鎖尚未實作。 與 `GAME_SPEC.md`、`PROJECT.md`、`docs/decisions.md` 衝突時以那三份為準；衝突處列在文末「待確認」。
+狀態：**第二關（凸透鏡走廊）已於 2026-11-17 實作**（見 `docs/prototype-findings-convex.md` 文末）；**第一關（平面鏡房間）已於 2026-11-17 實作**（見 `docs/prototype-findings-mirror.md`）；關卡解鎖已實作（選單）；**荒野狩獵已於 2026-11-19 實作**（見 `docs/prototype-findings.md` 文末）。 與 `GAME_SPEC.md`、`PROJECT.md`、`docs/decisions.md` 衝突時以那三份為準；衝突處列在文末「待確認」。
 
 核心不變：玩家看不到鬼本體，只能透過光學元件看到像，用成像規律反推真實位置，再展開封印法陣。
 

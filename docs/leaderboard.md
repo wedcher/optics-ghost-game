@@ -67,7 +67,7 @@ https://script.google.com/macros/s/AKfycbwLRDiuQAThbMIY_tVEARySyCkIzKc6mFyKCi54T
 
 **管理**：試算表會自動出現 `castle`、`hunt` 兩個工作表（A 暱稱、B 成績、C 時間戳）。有不當暱稱就直接刪那一列。要清榜就刪掉所有資料列（保留第一列標題）。
 
-## 接進各關（2026-11-17 已接：第一關、第二關、選單；荒野狩獵尚未實作）
+## 接進各關（2026-11-17 已接：第一關、第二關、選單；2026-11-19 接上荒野狩獵）
 
 每一頁先載入：
 
@@ -85,7 +85,7 @@ https://script.google.com/macros/s/AKfycbwLRDiuQAThbMIY_tVEARySyCkIzKc6mFyKCi54T
 | 第二關按「開始抓鬼」／「重新挑戰」／「再玩一次」 | `Leaderboard.startLevel('convex')` | `prototype/convex-lens/app.js` `startHunt()`（已接） |
 | 第二關命用完 | `Leaderboard.cancelLevel()` | `prototype/convex-lens/app.js` `failLevel()`（已接） |
 | 第二關抓滿 5 隻、過關演出前 | `Leaderboard.finishCastle()`，回傳兩關相加的趕鬼時間，有值就在過關畫面顯示 | `prototype/convex-lens/app.js` `showCleared()`（已接） |
-| 荒野狩獵（正式，不是練習）結束：時間到或命用完 | `Leaderboard.recordHunt(n); Leaderboard.showResult({ onClose })` | 荒野狩獵（尚未實作） |
+| 荒野狩獵（正式，不是練習）結束：時間到或命用完 | `Leaderboard.recordHunt(n); Leaderboard.showResult({ title, closeLabel, extraNote, buttons, onClose })` | `prototype/concave-lens/app.js` `endHunt()`／`showHuntResult()`（2026-11-19 已接） |
 | 選單「重新開始遊戲」 | `Leaderboard.restartRun()`（和 `GameProgress.reset()` 一起） | `prototype/index.html`（已接） |
 
 練習模式（`?practice=1`，兩關的 `LB = null`）和 `?free=1` 的自由練習不要呼叫任何一個。沒有 `startLevel` 的挑戰，`finishMirror()`／`finishCastle()` 回傳 `null`、不改紀錄。`pauseLevel()`／`resumeLevel()` 重複呼叫沒關係。
@@ -97,7 +97,7 @@ https://script.google.com/macros/s/AKfycbwLRDiuQAThbMIY_tVEARySyCkIzKc6mFyKCi54T
 - **不雅字詞過濾只擋常見的**：清單小而保守，諧音、新造字擋不到，漏網的由老師刪列（使用者 2026-11-17 定案，見上方「暱稱」規則）。
 - Apps Script 免費額度對一個班級綽綽有餘；同時大量送出時用 `LockService` 排隊，最多等 10 秒。
 - 真的部署已實測（2026-11-18，雲端工作階段）：curl `GET ?action=top` → `{"ok":true,...}`；照 `Code.gs` 格式 POST（text/plain JSON）→ 回傳名次、試算表自動建立 `castle`／`hunt` 並多一列；不雅暱稱 `sh1t` 被擋；GET 與 302 轉址後的回應都有 `access-control-allow-origin: *`；Playwright 開 `leaderboard.html`（用正式網址）兩個榜都讀到測試資料。測試資料已請使用者在試算表刪除。
-- **還沒實測**：真的手機從遊戲過關 → 結算畫面輸入暱稱 → 上傳 → 排行榜頁看到。目前結算畫面只在荒野狩獵結束時出現，荒野狩獵還沒做，所以**現在遊戲裡沒有路徑會上傳成績**（使用者 2026-11-18 手機玩到第二關過關確認沒有跳出暱稱）；何時讓玩家上傳見 PROJECT.md PENDING 22。
+- **還沒實測**：真的手機從遊戲過關 → 結算畫面輸入暱稱 → 上傳 → 排行榜頁看到。結算畫面只在荒野狩獵結束時出現（PENDING 22 定案）；2026-11-19 荒野狩獵做好後，**遊戲裡第一次有路徑會上傳**，要請使用者用手機實際玩一次確認（headless 只測過本機模式與假伺服器）。
 - `Code.gs` 小問題（未修，改了要重新部署，記在 PROJECT.md PENDING）：`lock.waitLock(10000)` 等不到鎖時會丟例外，Apps Script 回 HTML 錯誤頁而不是 `{ok:false}` JSON；前端會當成連線失敗。一個班級同時送出不太會碰到。
 - 過關成績存在 `localStorage`：換瀏覽器／無痕模式等於沒有成績；清除網站資料會讓成績消失（只會讓那一輪沒有趕鬼時間，不會變快）。
 - 後端的合理範圍仍是 30 秒～24 小時；新規則只算遊玩時間，兩關加起來低於 30 秒實際上不可能（第一關要抓 5 次、第二關要抓 5 隻），所以 `Code.gs` 沒改、不用重新部署。

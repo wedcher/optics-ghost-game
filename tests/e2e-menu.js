@@ -91,7 +91,7 @@ const T = {
 
   items = await menuAt({ mirror: true, convex: true });
   expectItems(items, ['mirror', 'mirror-practice', 'convex', 'convex-practice', 'concave'], '第二關過關後');
-  ok(/製作中/.test(items[4].note), '第三關標「製作中」', items[4]);
+  ok(!items[4].note, '第三關不再標「製作中」（荒野狩獵已做好）', items[4]);
   await page.screenshot({ path: path.join(SHOTS, 'menu-cleared-2.png') });
   await Promise.all([page.waitForURL(/convex-lens\/index\.html\?practice=1$/), page.tap('a.card[data-item="convex-practice"]')]);
   ok(true, '從選單點第二關練習模式進得去');

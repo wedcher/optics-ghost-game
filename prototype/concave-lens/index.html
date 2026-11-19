@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>第三關：荒野（凹透鏡） — Optics Ghost Game</title>
+<title>第三關：荒野狩獵 — Optics Ghost Game</title>
 <link rel="manifest" href="../manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,6 +33,10 @@
   #hearts { display:inline-flex; gap:4px; font-size:26px; line-height:1; color:#ff4d6d; text-shadow:0 0 8px rgba(255,77,109,.6); }
   #hearts .lost { color:#3a3f5e; text-shadow:none; }
   #hud.hit #hearts { animation:hudHit .6s ease-out; }
+  /* 荒野狩獵的剩餘時間（只在正式狩獵出現；練習模式、?free=1 不顯示）。最後 30 秒變紅、閃一下，只提示時間 */
+  #timer { font-variant-numeric:tabular-nums; color:var(--accent); white-space:nowrap; }
+  #timer.low { color:#ff6b6b; animation:timerPulse 1s ease-in-out infinite; }
+  @keyframes timerPulse { 50% { opacity:.55; } }
   @keyframes hudHit { 0%,100% { transform:translateX(0); } 20% { transform:translateX(-5px); } 40% { transform:translateX(5px); } 60% { transform:translateX(-3px); } 80% { transform:translateX(3px); } }
   #debugBtn { min-height:40px; font-size:13px; padding:2px 8px; }
   #configSel { min-height:40px; font-size:14px; }
@@ -75,6 +79,7 @@
     <h1 id="title">第三關 荒野 <small>自由練習</small></h1>
     <div id="hud" hidden>
       <span id="hearts" role="img"><span>♥</span><span>♥</span><span>♥</span></span>
+      <span id="timer" role="timer" hidden></span>
       <span id="sealCount"></span>
     </div>
     <select id="configSel" aria-label="測試配置"></select>
@@ -114,6 +119,8 @@
 </div>
 <script src="../shared/fullscreen.js"></script>
 <script src="../shared/progress.js"></script>
+<script src="../shared/leaderboard-config.js"></script>
+<script src="../shared/leaderboard.js"></script>
 <script src="../shared/story-scene.js"></script>
 <script src="../shared/landscape.js"></script>
 <script src="../shared/optics-core.js"></script>

@@ -236,6 +236,8 @@
   }
 
   // opts: { castleMs?, hunt?（省略則取本輪紀錄）, leaderboardHref?, onClose? }
+  // 2026-11-19 荒野狩獵加的選填欄位（不給就和原本一樣）：title（標題，預設「結算」）、closeLabel（關閉鈕的字，送出後也不改）、
+  //   extraNote（多一行說明）、buttons: [{ id, label, primary?, onClick?, href? }]（排在「看排行榜」那一列前面；onClick 前會先關掉結算畫面）
   function showResult(opts) {
     opts = opts || {};
     injectCss();
@@ -244,7 +246,7 @@
     var hunt = opts.hunt !== undefined ? opts.hunt : run.hunt;
     var ov = el('div', { 'class': 'lb-ov', id: 'lbResult', role: 'dialog', 'aria-modal': 'true' });
     var card = el('div', { 'class': 'lb-card' });
-    card.appendChild(el('h2', null, '結算'));
+    card.appendChild(el('h2', { id: 'lbTitle' }, opts.title || '結算'));
     var sum = el('p', { 'class': 'lb-sum', id: 'lbSummary' });
     sum.appendChild(document.createTextNode('你花費 '));
     sum.appendChild(el('b', null, castleMs != null ? formatTime(castleMs) : '—'));
@@ -253,6 +255,7 @@
     sum.appendChild(document.createTextNode(' 隻鬼。'));
     card.appendChild(sum);
     if (castleMs == null) card.appendChild(el('p', { 'class': 'lb-note' }, '第一關或第二關還沒有過關成績，趕鬼時間不列入排行。'));
+    if (opts.extraNote) card.appendChild(el('p', { 'class': 'lb-sum', id: 'lbExtra' }, opts.extraNote));
 
     var row = el('div', { 'class': 'lb-row' });
     var input = el('input', { id: 'lbName', type: 'text', maxlength: String(NAME_MAX_W), placeholder: '暱稱（中文 10 字、英文 20 字內）', autocomplete: 'nickname', enterkeyhint: 'send' });
@@ -263,7 +266,13 @@
     card.appendChild(msg);
     var row2 = el('div', { 'class': 'lb-row' });
     var view = el('a', { 'class': 'lb-btn', id: 'lbView', href: opts.leaderboardHref || '../leaderboard.html' }, '看排行榜');
-    var close = el('button', { 'class': 'lb-btn', id: 'lbClose', type: 'button' }, '不留名，關閉');
+    var close = el('button', { 'class': 'lb-btn', id: 'lbClose', type: 'button' }, opts.closeLabel || '不留名，關閉');
+    (opts.buttons || []).forEach(function (b) {
+      var be = el(b.href ? 'a' : 'button', { 'class': 'lb-btn' + (b.primary ? ' primary' : ''), id: b.id }, b.label);
+      if (b.href) be.setAttribute('href', b.href); else be.setAttribute('type', 'button');
+      if (b.onClick) be.addEventListener('click', function (e) { e.preventDefault(); ov.remove(); b.onClick(); });
+      row2.appendChild(be);
+    });
     row2.appendChild(view); row2.appendChild(close); card.appendChild(row2);
     card.appendChild(el('p', { 'class': 'lb-note' }, url() ? '每個暱稱只保留最好的成績。' : '目前還沒連上共用排行榜，成績只存在這支手機。'));
     ov.appendChild(card);
@@ -277,7 +286,7 @@
         if (!res.ok) { msg.className = 'lb-msg err'; msg.textContent = res.error; send.disabled = false; return; }
         msg.textContent = '已上榜：' + rankText(res);
         send.textContent = '已送出';
-        close.textContent = '關閉';
+        if (!opts.closeLabel) close.textContent = '關閉';
       });
     }
     send.addEventListener('click', doSend);

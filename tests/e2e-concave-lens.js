@@ -11,7 +11,8 @@
  *   - 沒開 Debug 時畫面與 DOM 不洩漏答案
  *   - 錯誤封印不揭露鬼；正確封印才顯形
  *   - 封印後畫的線真的畫在畫面上（使用者 2026-11-18 回報的 bug）；鬼本體封印後才成為吸附點
- *   - 關卡模式（不帶 ?free=1）：3 顆 ❤️、抓錯扣命、命用完出現失敗畫面；?practice=1 練習模式
+ *   - 荒野練習模式（?practice=1）：3 顆 ❤️、抓錯扣命、命用完出現失敗畫面、不計時、不記排行
+ *   （正式荒野狩獵——開場、5 分鐘倒數、結算、排行榜——在 tests/e2e-hunt.js）
  * 原本的完整流程用 ?free=1（自由練習／開發模式：有配置選單與 Debug、不計命）跑；關卡模式另外在 runLevel 測。
  * 截圖輸出到 docs/screenshots/。
  */
@@ -705,7 +706,7 @@ async function runLevel(browser, query) {
   ok(!s.title && !s.configSel && !s.debugBtn, P('關卡模式不顯示標題、配置選單與 Debug（和第二關一樣）'));
   ok(s.menu === '☰ 回關卡', P('右上角按鈕字樣「☰ 回關卡」'), s.menu);
   ok(practice ? /^練習/.test(s.count) : s.count === '封印 0 隻', P(practice ? '練習模式：命數旁標「練習」' : '命數旁顯示封印數'), s.count);
-  ok(s.lb === 'undefined', P('這一頁沒有載入 Leaderboard（不計時、不上榜）'));
+  ok(await page.evaluate(() => window.__proto.HUNT === false && document.getElementById('timer').hidden && window.__proto.hunt.deadline == null), P('練習模式：沒有開場、不倒數'));
   {
     // 說明文字放在 ❤️ 後面：同一列、在愛心右邊、在「☰ 回關卡」左邊
     const r = await page.evaluate(() => { const b = (id) => document.getElementById(id).getBoundingClientRect(); return { hud: b('hud'), st: b('status'), menu: b('menuBtn') }; });
@@ -736,6 +737,9 @@ async function runLevel(browser, query) {
   await sealCell(await wrongCell());
   s = await info();
   ok(s.lives === 0 && s.heartsLeft === 0 && s.screen === 'failed' && s.scene && s.scene.id === 'failed', P('命用完：出現失敗畫面'));
+  ok(s.scene && /❤️用完了/.test(s.scene.text) && !(await page.$('#lbResult')), P('失敗標題「❤️用完了……」、沒有結算／暱稱畫面'));
+  ok(await page.evaluate(() => { const r = JSON.parse(localStorage.getItem('ogg.run.v2') || 'null'); return !r || r.hunt == null; }) && await page.evaluate(() => !GameProgress.isCleared('concave')),
+    P('練習模式不記荒野封印數、不算完成荒野狩獵'));
   ok(s.scene && s.scene.buttons.join() === 'retryBtn,failMenuBtn' && s.scene.menuHref === '../index.html', P('失敗畫面有「重新挑戰」與「回關卡選單」'), s.scene && s.scene.buttons.join());
   const cellsHidden = await page.evaluate(() => { const c = window.__proto.cfg(); return c.targetCell; });
   ok(s.scene && !/[左右前後遠近]|格/.test(s.scene.text) && !s.scene.text.includes('第 ' + cellsHidden), P('失敗畫面的文字不洩漏位置'), s.scene && s.scene.text.replace(/\s+/g, ' '));
@@ -744,7 +748,7 @@ async function runLevel(browser, query) {
   await press('#retryBtn', 150);
   s = await info();
   ok(!s.scene && s.screen === 'play' && s.lives === 3 && s.heartsLeft === 3 && s.sealed === 0 && s.phase === 'explore', P('重新挑戰：3 顆 ❤️、封印數歸零、回到探索'));
-  if (!practice) {
+  {
     // ?debug=1 在關卡模式不能打開 Debug（會洩漏答案）
     await page.goto(URL + '?debug=1');
     await page.waitForFunction(() => window.__proto);
@@ -771,7 +775,7 @@ async function runLevel(browser, query) {
   for (const p of PROFILES) {
     try { await run(p, browser); } catch (e) { ok(false, '[' + p.name + '] 測試腳本例外', e.message); }
   }
-  for (const q of ['', '?practice=1']) {
+  for (const q of ['?practice=1']) {
     try { await runLevel(browser, q); } catch (e) { ok(false, '[level ' + q + '] 測試腳本例外', e.message); }
   }
   await browser.close();

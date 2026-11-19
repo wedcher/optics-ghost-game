@@ -30,15 +30,22 @@
   var canvas = $('view');
   var ctx = canvas.getContext('2d');
 
-  // 第三關（PROJECT.md「2026-11-18 試玩回饋後定案」）：上方和第二關一樣顯示 3 顆 ❤️，抓錯扣一顆，用完出現失敗畫面。
-  // 正式的「荒野狩獵」（5 分鐘、台詞）還沒做（PENDING 15），所以這裡沒有計時、沒有開場過場、不呼叫 Leaderboard。
-  // ?free=1 自由練習／開發模式：不計命，顯示配置選單與 Debug。
-  // ?practice=1 練習模式：照規則扣命、不計時、不上排行榜（這一頁目前本來就不計時、不上榜，只在命數旁標「練習」）。
+  // 第三關「荒野狩獵」（PROJECT.md CONFIRMED、docs/story-and-flow.md；2026-11-19 做成正式關卡）：
+  //   開場過場（劇本 3-1）→【開始狩獵】→ 倒數 5:00、3 顆 ❤️，能抓幾隻算幾隻；抓錯才扣命。
+  //   時間到或命用完 → 結束過場（劇本 3-2）→ 結算畫面（Leaderboard.showResult：輸入暱稱上傳，PENDING 22 定案只在這裡出現）。
+  //   結束時 GameProgress.markCleared('concave')，選單解鎖荒野練習模式。
+  // ?practice=1 荒野練習模式：沒有開場、不限時、扣命、不呼叫 Leaderboard；命用完出現失敗畫面。
+  // ?free=1 自由練習／開發模式：不計命、不計時，顯示配置選單、Debug 與「下一組配置」循環。
   var FREE = /[?&]free=1/.test(location.search);
   var PRACTICE = !FREE && /[?&]practice=1/.test(location.search);
+  var HUNT = !FREE && !PRACTICE; // 正式荒野狩獵（計時、上排行榜）
   var LEVEL_LIVES = 3;
-  var MENU_URL = '../index.html', FAIL_BG = 'assets/wilderness-1-open.jpg';
+  var HUNT_MS = 5 * 60 * 1000, HUNT_LOW_MS = 30 * 1000;
+  var MENU_URL = '../index.html', FAIL_BG = 'assets/wilderness-1-open.jpg', INTRO_BG = 'assets/wilderness-3-moon.jpg';
+  var LB = HUNT ? window.Leaderboard : null;
   var level = { on: !FREE, screen: 'play', lives: LEVEL_LIVES, sealed: 0, scene: null };
+  // 倒數用牆上時間（Date.now）：App 切到背景、螢幕關掉時照樣在走（和趕鬼時間一樣，使用者 2026-11-19 確認不暫停）
+  var hunt = { deadline: null, over: false, pendingEnd: null, lowShown: false, timer: null };
 
   var state = {
     cfgIndex: 0,
@@ -798,12 +805,14 @@
           level.lives--;
           flashHud();
           setStatus('法陣落空，裡面什麼也沒有……（嘻）　失去一顆心。再檢查你的光線作圖。');
-          if (level.lives <= 0) failLevel();
+          if (level.lives <= 0 && !hunt.pendingEnd) { if (HUNT) endHunt('lives'); else failLevel(); }
         } else {
           setStatus('法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。');
         }
       }
       syncUI(); requestRender();
+      // 法陣展開時剛好時間到：等這一次的結果出來（抓到也算）再結束
+      if (hunt.pendingEnd) endHunt(hunt.pendingEnd);
     }, 1500);
   }
 
@@ -976,6 +985,7 @@
       $('hearts').setAttribute('aria-label', '剩下 ' + level.lives + ' 條命');
       $('sealCount').textContent = (PRACTICE ? '練習　' : '') + '封印 ' + level.sealed + ' 隻';
     }
+    syncTimer();
     $('zoomIn').disabled = state.zoomIdx >= ZOOM_STEPS.length - 1;
     $('zoomOut').disabled = state.zoomIdx <= 0;
     $('debugBtn').classList.toggle('on', state.debug);
@@ -1008,13 +1018,14 @@
     clearTimeout(hudTimer); hudTimer = setTimeout(function () { h.classList.remove('hit'); }, 700);
   }
   function closeScene() { if (level.scene) { level.scene.close(); level.scene = null; } }
+  // 練習模式（?practice=1）命用完：失敗畫面，不計時、不上榜
   function failLevel() {
     level.screen = 'failed';
     closeScene();
     // 說明只講結果，不提鬼在哪裡（不能洩漏位置）
     level.scene = window.StoryScene.show({
       id: 'failed', background: FAIL_BG,
-      title: '三顆心都用完了……',
+      title: '❤️用完了……', // 命用完的文字統一用 ❤️（CONFIRMED 劇本修訂）
       note: '鬼還躲在荒野裡。這次封印了 ' + level.sealed + ' 隻。重新挑戰會從頭算起。',
       buttons: [
         { id: 'retryBtn', label: '重新挑戰', primary: true, onClick: startHunt },
@@ -1022,11 +1033,97 @@
       ]
     });
   }
-  /** 重新挑戰：命數與封印數重置，換一隻鬼。 */
+
+  // ---- 荒野狩獵：開場、倒數、結束、結算 ----
+  // 台詞照 Google 文件《光學抓鬼遊戲 劇本初稿》3-1、3-2（【Claude 草稿】，使用者 2026-11-19「乍看 OK」，PENDING 15）。
+  function showIntro() {
+    closeScene();
+    level.screen = 'intro';
+    level.scene = window.StoryScene.show({
+      id: 'hunt-intro', background: INTRO_BG,
+      lines: [
+        { text: '你追出城堡，眼前是一片漆黑的荒野。' },
+        { text: '鬼影四散，一轉眼就消失在夜色裡。' },
+        { speaker: '你', text: '又看不到了……' },
+        { speaker: '你', text: '還好出門前帶了這片透鏡。' },
+        { speaker: '你', text: '咦？等等，鬼怎麼變小了？' },
+        { text: '這是一片凹透鏡。' },
+        { speaker: '你', text: '天亮之前，能抓幾隻就抓幾隻！' }
+      ],
+      title: '荒野狩獵',
+      note: '鬼只有透過凹透鏡才看得到。從透鏡裡的像推出牠真正在哪裡，再展開封印法陣。限時 5 分鐘，能封印幾隻算幾隻；3 條命，抓錯會失去一顆心。',
+      buttons: [{ id: 'startHuntBtn', label: '開始狩獵', primary: true, onClick: startHunt }] // 按下後才開始倒數
+    });
+  }
+  /** 開始（或重新挑戰）：命數與封印數重置，換一隻鬼；正式狩獵從 5:00 開始倒數。 */
   function startHunt() {
     closeScene();
+    var old = document.getElementById('lbResult'); if (old) old.remove();
     level.screen = 'play'; level.lives = LEVEL_LIVES; level.sealed = 0;
+    hunt.over = false; hunt.pendingEnd = null; hunt.lowShown = false;
+    hunt.deadline = HUNT ? Date.now() + HUNT_MS : null;
+    clearInterval(hunt.timer); hunt.timer = HUNT ? setInterval(tickHunt, 250) : null;
     resetRound(nextConfig());
+  }
+  function huntRemaining() { return hunt.deadline == null ? null : Math.max(0, hunt.deadline - Date.now()); }
+  function fmtClock(ms) { var s = Math.ceil(ms / 1000); return Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2); }
+  function syncTimer() {
+    var t = $('timer'), on = HUNT && hunt.deadline != null;
+    t.hidden = !on;
+    if (!on) return;
+    var ms = huntRemaining();
+    t.textContent = '⏳ ' + fmtClock(ms);
+    t.setAttribute('aria-label', '剩下 ' + fmtClock(ms));
+    t.classList.toggle('low', ms <= HUNT_LOW_MS);
+  }
+  function tickHunt() {
+    if (hunt.over || hunt.deadline == null) return;
+    var ms = huntRemaining();
+    syncTimer();
+    // 最後 30 秒：只提示時間，不帶任何和鬼的位置有關的東西
+    if (ms <= HUNT_LOW_MS && ms > 0 && !hunt.lowShown) { hunt.lowShown = true; showBanner('天快亮了！剩下 30 秒。', 2600); }
+    if (ms > 0) return;
+    if (state.seal && !state.seal.done) { hunt.pendingEnd = 'time'; return; } // 法陣展開中：等結果
+    endHunt('time');
+  }
+  /** 狩獵結束：reason = 'time'（時間到）或 'lives'（命用完）。 */
+  function endHunt(reason) {
+    if (hunt.over) return;
+    hunt.over = true; hunt.pendingEnd = null;
+    clearInterval(hunt.timer); hunt.timer = null;
+    level.screen = 'ended'; level.endReason = reason;
+    state.drag = null; state.pending = null;
+    syncTimer();
+    var P = window.GameProgress, firstClear = !!P && !P.isCleared('concave');
+    if (P) P.markCleared('concave'); // 兩種結束都算完成荒野狩獵（劇本 3-2），選單解鎖練習模式
+    if (LB) LB.recordHunt(level.sealed);
+    closeScene();
+    level.scene = window.StoryScene.show({
+      id: reason === 'time' ? 'hunt-timeup' : 'hunt-nolives', background: FAIL_BG,
+      lines: reason === 'time' ? [
+        { text: '東邊的天空漸漸亮了起來。' },
+        { text: '剩下的鬼趁著晨霧，躲得無影無蹤。' },
+        { speaker: '你', text: '呼……天亮了，今晚就到這裡吧。' }
+      ] : [
+        { text: '法陣又落空了——荒野深處傳來一陣嘻嘻的笑聲。' },
+        { speaker: '你', text: '可惡……下次一定把你們全部抓回來！' }
+      ],
+      onDone: function () { level.scene = null; showHuntResult(reason, firstClear); }
+    });
+  }
+  // 結算：「你花費＿＿把鬼趕出城堡，並在荒野中封印了＿＿隻鬼。」（趕鬼時間＝shared/leaderboard.js 記的兩關最後一次過關成績相加）
+  function showHuntResult(reason, firstClear) {
+    level.screen = 'result';
+    if (!LB) return;
+    var buttons = [{ id: 'huntRetryBtn', label: '再挑戰一次', primary: true, onClick: startHunt }];
+    if (firstClear) buttons.push({ id: 'huntPracticeBtn', label: '荒野練習模式', href: 'index.html?practice=1' });
+    LB.showResult({
+      title: reason === 'time' ? '時間到！' : '狩獵結束',
+      extraNote: firstClear ? '荒野練習模式已解鎖（不限時間，不計入排行榜）。' : null,
+      closeLabel: '回關卡選單',
+      buttons: buttons,
+      onClose: function () { location.href = MENU_URL; }
+    });
   }
   // 關卡模式出題：配置洗牌後依序出，出完再洗；不會連續兩次同一組。自由練習照舊依序循環。
   var deck = [];
@@ -1145,12 +1242,15 @@
       w2s: w2s, s2w: s2w, snapPoints: snapPoints, nearestSnap: nearestSnap, imageScreenPos: imageScreenPos,
       studentIntersections: studentIntersections, exploreMetrics: exploreMetrics,
       canvasSize: function () { return { W: W, H: H, DPR: DPR }; }, render: render, replaySpec: replaySpec,
+      HUNT: HUNT, hunt: hunt, huntRemaining: huntRemaining,
+      setHuntRemaining: function (ms) { hunt.deadline = Date.now() + ms; tickHunt(); }, // 測試用：快轉倒數
       background: function () { return { ready: bg.ready, src: bgOff ? null : BG_DIRS.map(function (d) { return d.src; }) }; }
     };
   }
 
   state.cfgIndex = -1; // 讓第一副牌不會因為「和上一組相同」被調換
   resetRound(level.on ? nextConfig() : 0);
+  if (HUNT) showIntro(); // 正式狩獵：先看開場，按【開始狩獵】才開始倒數；練習模式直接開始
   if (bg.settled) exposeHooks();
   else bgWaiters.push(function () { render(); exposeHooks(); });
 })();
