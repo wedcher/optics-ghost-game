@@ -329,7 +329,7 @@ async function run(profile, browser) {
   await shot('7-cleared-flee');
   // 劇本 2-3：凸透鏡太大帶不走 → 撿起地上的一片小透鏡（不是大凸透鏡的碎片）
   const said = [];
-  for (const want of [['你', '但凸透鏡太大了，帶不走阿。'], [null, '你撿起地上的一片小透鏡。'], ['你', '咦，這個……'], ['你', '也可以吧。']]) {
+  for (const want of [['你', '但凸透鏡太大了，帶不走啊。'], [null, '你撿起地上的一片小透鏡。'], ['你', '咦，這個……'], ['你', '也可以吧。']]) {
     await tapAt(vw * 0.5, vh * 0.5);
     s = await st();
     said.push(s.scene.text);
