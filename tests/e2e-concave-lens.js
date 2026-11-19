@@ -52,7 +52,7 @@ function ok(cond, label, detail) {
 
 const PROFILES = [
   // 遊戲一律橫向（docs/decisions.md）。橫向手機是主要情境，跑完全部配置。
-  { name: 'phone-landscape', viewport: { width: 812, height: 375 }, touch: true, dsf: 2, configs: [0, 1, 2, 3], shots: /./, query: '?free=1' },
+  { name: 'phone-landscape', viewport: { width: 812, height: 375 }, touch: true, dsf: 2, configs: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], shots: /./, query: '?free=1' },
   // 直向只當備援版面檢查：用 ?portrait=1 關掉「請橫放」提示。
   { name: 'phone-portrait', viewport: { width: 375, height: 812 }, touch: true, dsf: 2, configs: [0], shots: /^[258]-/, query: '?portrait=1&free=1' },
   { name: 'desktop', viewport: { width: 1280, height: 800 }, touch: false, dsf: 1, configs: [0, 2], shots: /^[258]-/, query: '?free=1' }
@@ -570,7 +570,9 @@ async function run(profile, browser) {
         ok((await st()).lines === n0 + 2, T('C4 封印後從標示點拖曳 → 畫出水平線'));
       }
       if (first) await shot('8b-draw-after-seal');
-      await press('#undoBtn'); if (e2) await press('#undoBtn');
+      // 照真人速度按：拖曳畫線（CDP 觸控）剛結束就點按鈕，手機模擬偶爾不產生 click（2026-11-19 配置 F、H 抓到），先等一下
+      await page.waitForTimeout(400); await press('#undoBtn');
+      if (e2) { await page.waitForTimeout(400); await press('#undoBtn'); }
       ok((await st()).lines === n0, T('C4 封印後「復原」也能用'));
     }
 

@@ -30,7 +30,21 @@ const MIN_EDGE_MARGIN = 0.3; // 交點離格線至少 0.3 格寬（0.5 = 正中�
 
 console.log('== 配置檢查 ==');
 ok(Cfg.all.length >= 3, '至少 3 組配置', Cfg.all.length + ' 組');
-ok(new Set(Cfg.all.map((c) => c.dObj)).size === Cfg.all.length, '各組物距不同');
+// 2026-11-19（PENDING 25）：防背答案——不能從「鬼在哪個方位」推出答案格
+{
+  const byDir = {};
+  for (const c of Cfg.all) (byDir[c.direction] = byDir[c.direction] || []).push(c);
+  const dirs = Object.keys(byDir);
+  ok(dirs.length === 4 && dirs.every((d) => byDir[d].length >= 3), '四個方位各至少 3 組', dirs.map((d) => W.directions[d] + byDir[d].length).join(' '));
+  ok(dirs.every((d) => new Set(byDir[d].map((c) => c.targetCell)).size === byDir[d].length), '同一方位內答案格都不同',
+    dirs.map((d) => W.directions[d] + ':' + byDir[d].map((c) => c.targetCell).join('/')).join(' '));
+  const cellDirs = {};
+  for (const c of Cfg.all) (cellDirs[c.targetCell] = cellDirs[c.targetCell] || new Set()).add(c.direction);
+  const shared = Object.keys(cellDirs).filter((k) => cellDirs[k].size >= 2);
+  ok(shared.length >= 3, '至少 3 個答案格出現在不同方位（格子也猜不出方位）', '格 ' + shared.join(','));
+  ok(dirs.every((d) => byDir[d].some((c) => c.h > 0) && byDir[d].some((c) => c.h < 0)), '每個方位都有鬼在主軸上方與下方的題目');
+  ok(new Set(Cfg.all.map((c) => c.id)).size === Cfg.all.length && new Set(Cfg.all.map((c) => [c.f, c.targetCell, c.h, c.direction].join())).size === Cfg.all.length, '各組 id 與參數都不重複');
+}
 
 for (const c of Cfg.all) {
   console.log('\n配置 ' + c.id + ': f=' + c.f + ' 物點=' + pt(c.object) + ' 像點=' + pt(c.image) +

@@ -103,7 +103,7 @@
   PASS  [phone-landscape] 配置A 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置A 光路重現：結束時標出像點  — 139 px（重現前 64）
   PASS  [phone-landscape] 配置A 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 配置A 封印後鬼本體成為吸附點（座標 = 物點）
   PASS  [phone-landscape] 配置A 封印後點「鬼本體」再點 F → 畫出連線
   PASS  [phone-landscape] 配置A 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 80 個像素
@@ -287,7 +287,7 @@
   PASS  [phone-landscape] 配置C 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置C 光路重現：結束時標出像點  — 136 px（重現前 64）
   PASS  [phone-landscape] 配置C 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置C 封印後鬼本體成為吸附點（座標 = 物點）
   PASS  [phone-landscape] 配置C 封印後點「鬼本體」再點 F → 畫出連線
   PASS  [phone-landscape] 配置C 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 69 個像素
@@ -376,12 +376,732 @@
   PASS  [phone-landscape] 配置D 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置D 光路重現：結束時標出像點  — 130 px（重現前 70）
   PASS  [phone-landscape] 配置D 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置D 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置D 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置D 封印後鬼本體成為吸附點（座標 = 物點）
   PASS  [phone-landscape] 配置D 封印後點「鬼本體」再點 F → 畫出連線
   PASS  [phone-landscape] 配置D 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 78 個像素
   PASS  [phone-landscape] 配置D 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 41 個像素
   PASS  [phone-landscape] 配置D 封印後畫的線可以復原
+  PASS  [phone-landscape] 配置E 裸眼畫面沒有鬼
+  PASS  [phone-landscape] 配置E 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 43% 像素改變；此方位沒有鬼
+  PASS  [phone-landscape] 配置E 透鏡外畫面不變  — 0.00%
+  PASS  [phone-landscape] 配置E 鬼像只出現在一個方位的透鏡內  — 出現於方位 0
+  PASS  [phone-landscape] 配置E 鬼像整個在透鏡圓內
+  PASS  [phone-landscape] 配置E 鬼像畫在幾何算出的虛像視角位置
+  PASS  [phone-landscape] 配置E 透鏡外沒有鬼的像素
+  PASS  [phone-landscape] 配置E 點在沒有鬼像的地方不會產生標記
+  PASS  [phone-landscape] 配置E 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-landscape] 配置E 舉起後按鈕變成「放下凹透鏡」
+  PASS  [phone-landscape] 配置E 放下透鏡後鬼像消失
+  PASS  [phone-landscape] 配置E 放下透鏡後標記保留
+  PASS  [phone-landscape] 配置E 按「光路分析」切到側視分析
+  PASS  [phone-landscape] 配置E 分析開始：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置E 分析開始：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置E 分析開始：吸附點裡沒有物點
+  PASS  [phone-landscape] 配置E 預設縮放下所有吸附點都點得到（沒有被按鈕蓋住）
+  PASS  [phone-landscape] 配置E 畫線模式下點地板格：不選格、不畫線
+  PASS  [phone-landscape] 配置E 線 1：虛像 ↔ 光心 O（點擊偏 12px 仍吸附）
+  PASS  [phone-landscape] 配置E 線 2：F ↔ 虛像，延長後在透鏡上產生可吸附的 P = (0, h)  — P.y=110.000
+  PASS  [phone-landscape] 配置E 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
+  PASS  [phone-landscape] 配置E 學生作圖的交點落在唯一一格的中央附近  — 格 5，離格線 0.50 格
+  PASS  [phone-landscape] 配置E 畫完三條線：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置E 畫完三條線：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置E ＋ 按鈕放大  — 1.50×
+  PASS  [phone-landscape] 配置E 放大後單指拖曳可平移  — Δx=90px
+  PASS  [phone-landscape] 配置E 拖曳平移不會畫線／選格／改變縮放
+  PASS  [phone-landscape] 配置E 從標示點斜向拖到空白處放開：不留線、不算點擊
+  PASS  [phone-landscape] 配置E 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
+  PASS  [phone-landscape] 配置E 「全圖」回到預設視圖
+  PASS  [phone-landscape] 配置E 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置E 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置E 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置E 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置E 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置E 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置E 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置E 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置E 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置E 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置E 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置E 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置E 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置E 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置E 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置E 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置E 拖曳畫線：線經過另一個標示點（手指只到半路）→ 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置E 放開：留下通過兩個標示點的直線（手指沒有碰到第二個點）
+  PASS  [phone-landscape] 配置E 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置E C2 沒有「連線」「平行線」「實線／虛線」按鈕（點兩個點連線在「畫線」模式裡）
+  PASS  [phone-landscape] 配置E 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置E 點地板格可選取（虛像所在的第 2 格）
+  PASS  [phone-landscape] 配置E C3 封印前再點同一格 → 取消選取（施放鈕變不能按）
+  PASS  [phone-landscape] 配置E C3 取消後再點一次 → 重新選取
+  PASS  [phone-landscape] 配置E 封印虛像所在格 → 失敗
+  PASS  [phone-landscape] 配置E 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
+  PASS  [phone-landscape] 配置E 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置E 錯誤封印後：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置E 錯誤封印後：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置E 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
+  PASS  [phone-landscape] 配置E 整個直欄都是該格的點擊區
+  PASS  [phone-landscape] 配置E 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置E C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
+  PASS  [phone-landscape] 配置E C4 封印成功後自動回到畫線模式
+  PASS  [phone-landscape] 配置E C4 封印後依序點兩個點 → 畫出連線
+  PASS  [phone-landscape] 配置E C4 封印後「復原」也能用
+  PASS  [phone-landscape] 配置E 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [phone-landscape] 配置E 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
+  PASS  [phone-landscape] 配置E 光路重現：六段實際光線＋三段反向延長線（三條主光線）
+  PASS  [phone-landscape] 配置E 光路重現：三條光線都從鬼本體出發
+  PASS  [phone-landscape] 配置E 光路重現：光線 1 平行主軸射到透鏡上的 P
+  PASS  [phone-landscape] 配置E 光路重現：光線 1 折射後發散，方向像是從物側焦點 F 射出  — 偏離 2.6e-14 cm
+  PASS  [phone-landscape] 配置E 光路重現：光線 2 通過光心 O 不偏折
+  PASS  [phone-landscape] 配置E 光路重現：反向延長線：P → F、O → 虛像
+  PASS  [phone-landscape] 配置E 光路重現：光線 3 對準另一側焦點 F′ 射到透鏡  — 偏離 0.0e+0 cm
+  PASS  [phone-landscape] 配置E 光路重現：光線 3 折射後平行主光軸
+  PASS  [phone-landscape] 配置E 光路重現：光線 3 的反向延長線（水平）通過虛像
+  PASS  [phone-landscape] 配置E 光路重現：三條反向延長線交於虛像  — (-164.79, 40.28)
+  PASS  [phone-landscape] 配置E 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置E 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置E 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置E 光路重現 t=3.80s：全部光線都畫出來了  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置E 光路重現：畫面上方有說明文字框
+  PASS  [phone-landscape] 配置E 光路重現：結束時標出像點  — 136 px（重現前 69）
+  PASS  [phone-landscape] 配置E 光路重現：反向延長線用另一種顏色的虛線
+  PASS  [phone-landscape] 配置E 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置E 封印後鬼本體成為吸附點（座標 = 物點）
+  PASS  [phone-landscape] 配置E 封印後點「鬼本體」再點 F → 畫出連線
+  PASS  [phone-landscape] 配置E 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 77 個像素
+  PASS  [phone-landscape] 配置E 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 68 個像素
+  PASS  [phone-landscape] 配置E 封印後畫的線可以復原
+  PASS  [phone-landscape] 配置F 裸眼畫面沒有鬼
+  PASS  [phone-landscape] 配置F 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 41% 像素改變；此方位沒有鬼
+  PASS  [phone-landscape] 配置F 透鏡外畫面不變  — 0.00%
+  PASS  [phone-landscape] 配置F 鬼像只出現在一個方位的透鏡內  — 出現於方位 0
+  PASS  [phone-landscape] 配置F 鬼像整個在透鏡圓內
+  PASS  [phone-landscape] 配置F 鬼像畫在幾何算出的虛像視角位置
+  PASS  [phone-landscape] 配置F 透鏡外沒有鬼的像素
+  PASS  [phone-landscape] 配置F 點在沒有鬼像的地方不會產生標記
+  PASS  [phone-landscape] 配置F 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-landscape] 配置F 舉起後按鈕變成「放下凹透鏡」
+  PASS  [phone-landscape] 配置F 放下透鏡後鬼像消失
+  PASS  [phone-landscape] 配置F 放下透鏡後標記保留
+  PASS  [phone-landscape] 配置F 按「光路分析」切到側視分析
+  PASS  [phone-landscape] 配置F 分析開始：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置F 分析開始：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置F 分析開始：吸附點裡沒有物點
+  PASS  [phone-landscape] 配置F 預設縮放下所有吸附點都點得到（沒有被按鈕蓋住）
+  PASS  [phone-landscape] 配置F 畫線模式下點地板格：不選格、不畫線
+  PASS  [phone-landscape] 配置F 線 1：虛像 ↔ 光心 O（點擊偏 12px 仍吸附）
+  PASS  [phone-landscape] 配置F 線 2：F ↔ 虛像，延長後在透鏡上產生可吸附的 P = (0, h)  — P.y=-100.000
+  PASS  [phone-landscape] 配置F 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 1.4e-14 cm
+  PASS  [phone-landscape] 配置F 學生作圖的交點落在唯一一格的中央附近  — 格 7，離格線 0.50 格
+  PASS  [phone-landscape] 配置F 畫完三條線：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置F 畫完三條線：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置F ＋ 按鈕放大  — 1.50×
+  PASS  [phone-landscape] 配置F 放大後單指拖曳可平移  — Δx=90px
+  PASS  [phone-landscape] 配置F 拖曳平移不會畫線／選格／改變縮放
+  PASS  [phone-landscape] 配置F 從標示點斜向拖到空白處放開：不留線、不算點擊
+  PASS  [phone-landscape] 配置F 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
+  PASS  [phone-landscape] 配置F 「全圖」回到預設視圖
+  PASS  [phone-landscape] 配置F 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置F 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置F 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置F 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置F 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置F 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置F 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置F 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置F 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置F 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置F 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置F 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置F 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置F 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置F 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置F 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置F 拖曳畫線：線經過另一個標示點（手指只到半路）→ 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置F 放開：留下通過兩個標示點的直線（手指沒有碰到第二個點）
+  PASS  [phone-landscape] 配置F 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置F C2 沒有「連線」「平行線」「實線／虛線」按鈕（點兩個點連線在「畫線」模式裡）
+  PASS  [phone-landscape] 配置F 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置F 點地板格可選取（虛像所在的第 3 格）
+  PASS  [phone-landscape] 配置F C3 封印前再點同一格 → 取消選取（施放鈕變不能按）
+  PASS  [phone-landscape] 配置F C3 取消後再點一次 → 重新選取
+  PASS  [phone-landscape] 配置F 封印虛像所在格 → 失敗
+  PASS  [phone-landscape] 配置F 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
+  PASS  [phone-landscape] 配置F 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置F 錯誤封印後：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置F 錯誤封印後：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置F 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
+  PASS  [phone-landscape] 配置F 整個直欄都是該格的點擊區
+  PASS  [phone-landscape] 配置F 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置F C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
+  PASS  [phone-landscape] 配置F C4 封印成功後自動回到畫線模式
+  PASS  [phone-landscape] 配置F C4 封印後依序點兩個點 → 畫出連線
+  PASS  [phone-landscape] 配置F C4 封印後從標示點拖曳 → 畫出水平線
+  PASS  [phone-landscape] 配置F C4 封印後「復原」也能用
+  PASS  [phone-landscape] 配置F 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [phone-landscape] 配置F 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
+  PASS  [phone-landscape] 配置F 光路重現：六段實際光線＋三段反向延長線（三條主光線）
+  PASS  [phone-landscape] 配置F 光路重現：三條光線都從鬼本體出發
+  PASS  [phone-landscape] 配置F 光路重現：光線 1 平行主軸射到透鏡上的 P
+  PASS  [phone-landscape] 配置F 光路重現：光線 1 折射後發散，方向像是從物側焦點 F 射出  — 偏離 0.0e+0 cm
+  PASS  [phone-landscape] 配置F 光路重現：光線 2 通過光心 O 不偏折
+  PASS  [phone-landscape] 配置F 光路重現：反向延長線：P → F、O → 虛像
+  PASS  [phone-landscape] 配置F 光路重現：光線 3 對準另一側焦點 F′ 射到透鏡  — 偏離 0.0e+0 cm
+  PASS  [phone-landscape] 配置F 光路重現：光線 3 折射後平行主光軸
+  PASS  [phone-landscape] 配置F 光路重現：光線 3 的反向延長線（水平）通過虛像
+  PASS  [phone-landscape] 配置F 光路重現：三條反向延長線交於虛像  — (-214.43, -32.99)
+  PASS  [phone-landscape] 配置F 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置F 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置F 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置F 光路重現 t=3.80s：全部光線都畫出來了  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置F 光路重現：畫面上方有說明文字框
+  PASS  [phone-landscape] 配置F 光路重現：結束時標出像點  — 140 px（重現前 67）
+  PASS  [phone-landscape] 配置F 光路重現：反向延長線用另一種顏色的虛線
+  PASS  [phone-landscape] 配置F 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置F 封印後鬼本體成為吸附點（座標 = 物點）
+  PASS  [phone-landscape] 配置F 封印後點「鬼本體」再點 F → 畫出連線
+  PASS  [phone-landscape] 配置F 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 70 個像素
+  PASS  [phone-landscape] 配置F 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 68 個像素
+  PASS  [phone-landscape] 配置F 封印後畫的線可以復原
+  PASS  [phone-landscape] 配置G 裸眼畫面沒有鬼
+  PASS  [phone-landscape] 配置G 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 47% 像素改變；此方位沒有鬼
+  PASS  [phone-landscape] 配置G 透鏡外畫面不變  — 0.00%
+  PASS  [phone-landscape] 配置G 鬼像只出現在一個方位的透鏡內  — 出現於方位 1
+  PASS  [phone-landscape] 配置G 鬼像整個在透鏡圓內
+  PASS  [phone-landscape] 配置G 鬼像畫在幾何算出的虛像視角位置
+  PASS  [phone-landscape] 配置G 透鏡外沒有鬼的像素
+  PASS  [phone-landscape] 配置G 點在沒有鬼像的地方不會產生標記
+  PASS  [phone-landscape] 配置G 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-landscape] 配置G 舉起後按鈕變成「放下凹透鏡」
+  PASS  [phone-landscape] 配置G 放下透鏡後鬼像消失
+  PASS  [phone-landscape] 配置G 放下透鏡後標記保留
+  PASS  [phone-landscape] 配置G 按「光路分析」切到側視分析
+  PASS  [phone-landscape] 配置G 分析開始：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置G 分析開始：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置G 分析開始：吸附點裡沒有物點
+  PASS  [phone-landscape] 配置G 預設縮放下所有吸附點都點得到（沒有被按鈕蓋住）
+  PASS  [phone-landscape] 配置G 畫線模式下點地板格：不選格、不畫線
+  PASS  [phone-landscape] 配置G 線 1：虛像 ↔ 光心 O（點擊偏 12px 仍吸附）
+  PASS  [phone-landscape] 配置G 線 2：F ↔ 虛像，延長後在透鏡上產生可吸附的 P = (0, h)  — P.y=-70.000
+  PASS  [phone-landscape] 配置G 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
+  PASS  [phone-landscape] 配置G 學生作圖的交點落在唯一一格的中央附近  — 格 2，離格線 0.50 格
+  PASS  [phone-landscape] 配置G 畫完三條線：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置G 畫完三條線：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置G ＋ 按鈕放大  — 1.50×
+  PASS  [phone-landscape] 配置G 放大後單指拖曳可平移  — Δx=90px
+  PASS  [phone-landscape] 配置G 拖曳平移不會畫線／選格／改變縮放
+  PASS  [phone-landscape] 配置G 從標示點斜向拖到空白處放開：不留線、不算點擊
+  PASS  [phone-landscape] 配置G 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
+  PASS  [phone-landscape] 配置G 「全圖」回到預設視圖
+  PASS  [phone-landscape] 配置G 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置G 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置G 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置G 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置G 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置G 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置G 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置G 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置G 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置G 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置G 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置G 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置G 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置G 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置G 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置G 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置G 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置G C2 沒有「連線」「平行線」「實線／虛線」按鈕（點兩個點連線在「畫線」模式裡）
+  PASS  [phone-landscape] 配置G 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置G 點地板格可選取（虛像所在的第 1 格）
+  PASS  [phone-landscape] 配置G C3 封印前再點同一格 → 取消選取（施放鈕變不能按）
+  PASS  [phone-landscape] 配置G C3 取消後再點一次 → 重新選取
+  PASS  [phone-landscape] 配置G 封印虛像所在格 → 失敗
+  PASS  [phone-landscape] 配置G 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
+  PASS  [phone-landscape] 配置G 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置G 錯誤封印後：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置G 錯誤封印後：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置G 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
+  PASS  [phone-landscape] 配置G 整個直欄都是該格的點擊區
+  PASS  [phone-landscape] 配置G 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置G C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
+  PASS  [phone-landscape] 配置G C4 封印成功後自動回到畫線模式
+  PASS  [phone-landscape] 配置G C4 封印後依序點兩個點 → 畫出連線
+  PASS  [phone-landscape] 配置G C4 封印後「復原」也能用
+  PASS  [phone-landscape] 配置G 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [phone-landscape] 配置G 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
+  PASS  [phone-landscape] 配置G 光路重現：六段實際光線＋三段反向延長線（三條主光線）
+  PASS  [phone-landscape] 配置G 光路重現：三條光線都從鬼本體出發
+  PASS  [phone-landscape] 配置G 光路重現：光線 1 平行主軸射到透鏡上的 P
+  PASS  [phone-landscape] 配置G 光路重現：光線 1 折射後發散，方向像是從物側焦點 F 射出  — 偏離 1.2e-14 cm
+  PASS  [phone-landscape] 配置G 光路重現：光線 2 通過光心 O 不偏折
+  PASS  [phone-landscape] 配置G 光路重現：反向延長線：P → F、O → 虛像
+  PASS  [phone-landscape] 配置G 光路重現：光線 3 對準另一側焦點 F′ 射到透鏡  — 偏離 1.2e-14 cm
+  PASS  [phone-landscape] 配置G 光路重現：光線 3 折射後平行主光軸
+  PASS  [phone-landscape] 配置G 光路重現：光線 3 的反向延長線（水平）通過虛像
+  PASS  [phone-landscape] 配置G 光路重現：三條反向延長線交於虛像  — (-98.86, -46.14)
+  PASS  [phone-landscape] 配置G 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
+  PASS  [phone-landscape] 配置G 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
+  PASS  [phone-landscape] 配置G 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
+  PASS  [phone-landscape] 配置G 光路重現 t=3.80s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
+  PASS  [phone-landscape] 配置G 光路重現：畫面上方有說明文字框
+  PASS  [phone-landscape] 配置G 光路重現：結束時標出像點  — 133 px（重現前 73）
+  PASS  [phone-landscape] 配置G 光路重現：反向延長線用另一種顏色的虛線
+  PASS  [phone-landscape] 配置G 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置G 封印後鬼本體成為吸附點（座標 = 物點）
+  PASS  [phone-landscape] 配置G 封印後點「鬼本體」再點 F → 畫出連線
+  PASS  [phone-landscape] 配置G 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 77 個像素
+  PASS  [phone-landscape] 配置G 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 50 個像素
+  PASS  [phone-landscape] 配置G 封印後畫的線可以復原
+  PASS  [phone-landscape] 配置H 裸眼畫面沒有鬼
+  PASS  [phone-landscape] 配置H 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 47% 像素改變；此方位沒有鬼
+  PASS  [phone-landscape] 配置H 透鏡外畫面不變  — 0.00%
+  PASS  [phone-landscape] 配置H 鬼像只出現在一個方位的透鏡內  — 出現於方位 1
+  PASS  [phone-landscape] 配置H 鬼像整個在透鏡圓內
+  PASS  [phone-landscape] 配置H 鬼像畫在幾何算出的虛像視角位置
+  PASS  [phone-landscape] 配置H 透鏡外沒有鬼的像素
+  PASS  [phone-landscape] 配置H 點在沒有鬼像的地方不會產生標記
+  PASS  [phone-landscape] 配置H 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-landscape] 配置H 舉起後按鈕變成「放下凹透鏡」
+  PASS  [phone-landscape] 配置H 放下透鏡後鬼像消失
+  PASS  [phone-landscape] 配置H 放下透鏡後標記保留
+  PASS  [phone-landscape] 配置H 按「光路分析」切到側視分析
+  PASS  [phone-landscape] 配置H 分析開始：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置H 分析開始：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置H 分析開始：吸附點裡沒有物點
+  PASS  [phone-landscape] 配置H 預設縮放下所有吸附點都點得到（沒有被按鈕蓋住）
+  PASS  [phone-landscape] 配置H 畫線模式下點地板格：不選格、不畫線
+  PASS  [phone-landscape] 配置H 線 1：虛像 ↔ 光心 O（點擊偏 12px 仍吸附）
+  PASS  [phone-landscape] 配置H 線 2：F ↔ 虛像，延長後在透鏡上產生可吸附的 P = (0, h)  — P.y=120.000
+  PASS  [phone-landscape] 配置H 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 1.4e-14 cm
+  PASS  [phone-landscape] 配置H 學生作圖的交點落在唯一一格的中央附近  — 格 6，離格線 0.50 格
+  PASS  [phone-landscape] 配置H 畫完三條線：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置H 畫完三條線：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置H ＋ 按鈕放大  — 1.50×
+  PASS  [phone-landscape] 配置H 放大後單指拖曳可平移  — Δx=90px
+  PASS  [phone-landscape] 配置H 拖曳平移不會畫線／選格／改變縮放
+  PASS  [phone-landscape] 配置H 從標示點斜向拖到空白處放開：不留線、不算點擊
+  PASS  [phone-landscape] 配置H 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
+  PASS  [phone-landscape] 配置H 「全圖」回到預設視圖
+  PASS  [phone-landscape] 配置H 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置H 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置H 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置H 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置H 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置H 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置H 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置H 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置H 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置H 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置H 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置H 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置H 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置H 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置H 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置H 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置H 拖曳畫線：線經過另一個標示點（手指只到半路）→ 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置H 放開：留下通過兩個標示點的直線（手指沒有碰到第二個點）
+  PASS  [phone-landscape] 配置H 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置H C2 沒有「連線」「平行線」「實線／虛線」按鈕（點兩個點連線在「畫線」模式裡）
+  PASS  [phone-landscape] 配置H 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置H 點地板格可選取（虛像所在的第 3 格）
+  PASS  [phone-landscape] 配置H C3 封印前再點同一格 → 取消選取（施放鈕變不能按）
+  PASS  [phone-landscape] 配置H C3 取消後再點一次 → 重新選取
+  PASS  [phone-landscape] 配置H 封印虛像所在格 → 失敗
+  PASS  [phone-landscape] 配置H 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
+  PASS  [phone-landscape] 配置H 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置H 錯誤封印後：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置H 錯誤封印後：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置H 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
+  PASS  [phone-landscape] 配置H 整個直欄都是該格的點擊區
+  PASS  [phone-landscape] 配置H 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置H C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
+  PASS  [phone-landscape] 配置H C4 封印成功後自動回到畫線模式
+  PASS  [phone-landscape] 配置H C4 封印後依序點兩個點 → 畫出連線
+  PASS  [phone-landscape] 配置H C4 封印後從標示點拖曳 → 畫出水平線
+  PASS  [phone-landscape] 配置H C4 封印後「復原」也能用
+  PASS  [phone-landscape] 配置H 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [phone-landscape] 配置H 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
+  PASS  [phone-landscape] 配置H 光路重現：六段實際光線＋三段反向延長線（三條主光線）
+  PASS  [phone-landscape] 配置H 光路重現：三條光線都從鬼本體出發
+  PASS  [phone-landscape] 配置H 光路重現：光線 1 平行主軸射到透鏡上的 P
+  PASS  [phone-landscape] 配置H 光路重現：光線 1 折射後發散，方向像是從物側焦點 F 射出  — 偏離 0.0e+0 cm
+  PASS  [phone-landscape] 配置H 光路重現：光線 2 通過光心 O 不偏折
+  PASS  [phone-landscape] 配置H 光路重現：反向延長線：P → F、O → 虛像
+  PASS  [phone-landscape] 配置H 光路重現：光線 3 對準另一側焦點 F′ 射到透鏡  — 偏離 0.0e+0 cm
+  PASS  [phone-landscape] 配置H 光路重現：光線 3 折射後平行主光軸
+  PASS  [phone-landscape] 配置H 光路重現：光線 3 的反向延長線（水平）通過虛像
+  PASS  [phone-landscape] 配置H 光路重現：三條反向延長線交於虛像  — (-202.30, 44.14)
+  PASS  [phone-landscape] 配置H 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置H 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置H 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置H 光路重現 t=3.80s：全部光線都畫出來了  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置H 光路重現：畫面上方有說明文字框
+  PASS  [phone-landscape] 配置H 光路重現：結束時標出像點  — 136 px（重現前 67）
+  PASS  [phone-landscape] 配置H 光路重現：反向延長線用另一種顏色的虛線
+  PASS  [phone-landscape] 配置H 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置H 封印後鬼本體成為吸附點（座標 = 物點）
+  PASS  [phone-landscape] 配置H 封印後點「鬼本體」再點 F → 畫出連線
+  PASS  [phone-landscape] 配置H 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 75 個像素
+  PASS  [phone-landscape] 配置H 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 68 個像素
+  PASS  [phone-landscape] 配置H 封印後畫的線可以復原
+  PASS  [phone-landscape] 配置I 裸眼畫面沒有鬼
+  PASS  [phone-landscape] 配置I 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 56% 像素改變；此方位沒有鬼
+  PASS  [phone-landscape] 配置I 透鏡外畫面不變  — 0.00%
+  PASS  [phone-landscape] 配置I 鬼像只出現在一個方位的透鏡內  — 出現於方位 2
+  PASS  [phone-landscape] 配置I 鬼像整個在透鏡圓內
+  PASS  [phone-landscape] 配置I 鬼像畫在幾何算出的虛像視角位置
+  PASS  [phone-landscape] 配置I 透鏡外沒有鬼的像素
+  PASS  [phone-landscape] 配置I 點在沒有鬼像的地方不會產生標記
+  PASS  [phone-landscape] 配置I 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-landscape] 配置I 舉起後按鈕變成「放下凹透鏡」
+  PASS  [phone-landscape] 配置I 放下透鏡後鬼像消失
+  PASS  [phone-landscape] 配置I 放下透鏡後標記保留
+  PASS  [phone-landscape] 配置I 按「光路分析」切到側視分析
+  PASS  [phone-landscape] 配置I 分析開始：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置I 分析開始：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置I 分析開始：吸附點裡沒有物點
+  PASS  [phone-landscape] 配置I 預設縮放下所有吸附點都點得到（沒有被按鈕蓋住）
+  PASS  [phone-landscape] 配置I 畫線模式下點地板格：不選格、不畫線
+  PASS  [phone-landscape] 配置I 線 1：虛像 ↔ 光心 O（點擊偏 12px 仍吸附）
+  PASS  [phone-landscape] 配置I 線 2：F ↔ 虛像，延長後在透鏡上產生可吸附的 P = (0, h)  — P.y=100.000
+  PASS  [phone-landscape] 配置I 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 3.2e-14 cm
+  PASS  [phone-landscape] 配置I 學生作圖的交點落在唯一一格的中央附近  — 格 3，離格線 0.50 格
+  PASS  [phone-landscape] 配置I 畫完三條線：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置I 畫完三條線：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置I ＋ 按鈕放大  — 1.50×
+  PASS  [phone-landscape] 配置I 放大後單指拖曳可平移  — Δx=90px
+  PASS  [phone-landscape] 配置I 拖曳平移不會畫線／選格／改變縮放
+  PASS  [phone-landscape] 配置I 從標示點斜向拖到空白處放開：不留線、不算點擊
+  PASS  [phone-landscape] 配置I 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
+  PASS  [phone-landscape] 配置I 「全圖」回到預設視圖
+  PASS  [phone-landscape] 配置I 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置I 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置I 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置I 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置I 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置I 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置I 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置I 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置I 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置I 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置I 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置I 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置I 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置I 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置I 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置I 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置I 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置I C2 沒有「連線」「平行線」「實線／虛線」按鈕（點兩個點連線在「畫線」模式裡）
+  PASS  [phone-landscape] 配置I 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置I 點地板格可選取（虛像所在的第 2 格）
+  PASS  [phone-landscape] 配置I C3 封印前再點同一格 → 取消選取（施放鈕變不能按）
+  PASS  [phone-landscape] 配置I C3 取消後再點一次 → 重新選取
+  PASS  [phone-landscape] 配置I 封印虛像所在格 → 失敗
+  PASS  [phone-landscape] 配置I 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
+  PASS  [phone-landscape] 配置I 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置I 錯誤封印後：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置I 錯誤封印後：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置I 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
+  PASS  [phone-landscape] 配置I 整個直欄都是該格的點擊區
+  PASS  [phone-landscape] 配置I 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置I C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
+  PASS  [phone-landscape] 配置I C4 封印成功後自動回到畫線模式
+  PASS  [phone-landscape] 配置I C4 封印後依序點兩個點 → 畫出連線
+  PASS  [phone-landscape] 配置I C4 封印後「復原」也能用
+  PASS  [phone-landscape] 配置I 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [phone-landscape] 配置I 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
+  PASS  [phone-landscape] 配置I 光路重現：六段實際光線＋三段反向延長線（三條主光線）
+  PASS  [phone-landscape] 配置I 光路重現：三條光線都從鬼本體出發
+  PASS  [phone-landscape] 配置I 光路重現：光線 1 平行主軸射到透鏡上的 P
+  PASS  [phone-landscape] 配置I 光路重現：光線 1 折射後發散，方向像是從物側焦點 F 射出  — 偏離 0.0e+0 cm
+  PASS  [phone-landscape] 配置I 光路重現：光線 2 通過光心 O 不偏折
+  PASS  [phone-landscape] 配置I 光路重現：反向延長線：P → F、O → 虛像
+  PASS  [phone-landscape] 配置I 光路重現：光線 3 對準另一側焦點 F′ 射到透鏡  — 偏離 0.0e+0 cm
+  PASS  [phone-landscape] 配置I 光路重現：光線 3 折射後平行主光軸
+  PASS  [phone-landscape] 配置I 光路重現：光線 3 的反向延長線（水平）通過虛像
+  PASS  [phone-landscape] 配置I 光路重現：三條反向延長線交於虛像  — (-122.45, 48.98)
+  PASS  [phone-landscape] 配置I 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置I 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置I 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置I 光路重現 t=3.80s：全部光線都畫出來了  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置I 光路重現：畫面上方有說明文字框
+  PASS  [phone-landscape] 配置I 光路重現：結束時標出像點  — 136 px（重現前 64）
+  PASS  [phone-landscape] 配置I 光路重現：反向延長線用另一種顏色的虛線
+  PASS  [phone-landscape] 配置I 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置I 封印後鬼本體成為吸附點（座標 = 物點）
+  PASS  [phone-landscape] 配置I 封印後點「鬼本體」再點 F → 畫出連線
+  PASS  [phone-landscape] 配置I 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 69 個像素
+  PASS  [phone-landscape] 配置I 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 68 個像素
+  PASS  [phone-landscape] 配置I 封印後畫的線可以復原
+  PASS  [phone-landscape] 配置J 裸眼畫面沒有鬼
+  PASS  [phone-landscape] 配置J 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 53% 像素改變；此方位沒有鬼
+  PASS  [phone-landscape] 配置J 透鏡外畫面不變  — 0.00%
+  PASS  [phone-landscape] 配置J 鬼像只出現在一個方位的透鏡內  — 出現於方位 2
+  PASS  [phone-landscape] 配置J 鬼像整個在透鏡圓內
+  PASS  [phone-landscape] 配置J 鬼像畫在幾何算出的虛像視角位置
+  PASS  [phone-landscape] 配置J 透鏡外沒有鬼的像素
+  PASS  [phone-landscape] 配置J 點在沒有鬼像的地方不會產生標記
+  PASS  [phone-landscape] 配置J 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-landscape] 配置J 舉起後按鈕變成「放下凹透鏡」
+  PASS  [phone-landscape] 配置J 放下透鏡後鬼像消失
+  PASS  [phone-landscape] 配置J 放下透鏡後標記保留
+  PASS  [phone-landscape] 配置J 按「光路分析」切到側視分析
+  PASS  [phone-landscape] 配置J 分析開始：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置J 分析開始：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置J 分析開始：吸附點裡沒有物點
+  PASS  [phone-landscape] 配置J 預設縮放下所有吸附點都點得到（沒有被按鈕蓋住）
+  PASS  [phone-landscape] 配置J 畫線模式下點地板格：不選格、不畫線
+  PASS  [phone-landscape] 配置J 線 1：虛像 ↔ 光心 O（點擊偏 12px 仍吸附）
+  PASS  [phone-landscape] 配置J 線 2：F ↔ 虛像，延長後在透鏡上產生可吸附的 P = (0, h)  — P.y=-110.000
+  PASS  [phone-landscape] 配置J 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 0.0e+0 cm
+  PASS  [phone-landscape] 配置J 學生作圖的交點落在唯一一格的中央附近  — 格 5，離格線 0.50 格
+  PASS  [phone-landscape] 配置J 畫完三條線：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置J 畫完三條線：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置J ＋ 按鈕放大  — 1.50×
+  PASS  [phone-landscape] 配置J 放大後單指拖曳可平移  — Δx=90px
+  PASS  [phone-landscape] 配置J 拖曳平移不會畫線／選格／改變縮放
+  PASS  [phone-landscape] 配置J 從標示點斜向拖到空白處放開：不留線、不算點擊
+  PASS  [phone-landscape] 配置J 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
+  PASS  [phone-landscape] 配置J 「全圖」回到預設視圖
+  PASS  [phone-landscape] 配置J 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置J 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置J 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置J 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置J 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置J 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置J 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置J 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置J 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置J 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置J 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置J 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置J 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置J 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置J 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置J 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置J 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置J C2 沒有「連線」「平行線」「實線／虛線」按鈕（點兩個點連線在「畫線」模式裡）
+  PASS  [phone-landscape] 配置J 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置J 點地板格可選取（虛像所在的第 2 格）
+  PASS  [phone-landscape] 配置J C3 封印前再點同一格 → 取消選取（施放鈕變不能按）
+  PASS  [phone-landscape] 配置J C3 取消後再點一次 → 重新選取
+  PASS  [phone-landscape] 配置J 封印虛像所在格 → 失敗
+  PASS  [phone-landscape] 配置J 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
+  PASS  [phone-landscape] 配置J 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置J 錯誤封印後：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置J 錯誤封印後：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置J 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
+  PASS  [phone-landscape] 配置J 整個直欄都是該格的點擊區
+  PASS  [phone-landscape] 配置J 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置J C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
+  PASS  [phone-landscape] 配置J C4 封印成功後自動回到畫線模式
+  PASS  [phone-landscape] 配置J C4 封印後依序點兩個點 → 畫出連線
+  PASS  [phone-landscape] 配置J C4 封印後「復原」也能用
+  PASS  [phone-landscape] 配置J 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [phone-landscape] 配置J 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
+  PASS  [phone-landscape] 配置J 光路重現：六段實際光線＋三段反向延長線（三條主光線）
+  PASS  [phone-landscape] 配置J 光路重現：三條光線都從鬼本體出發
+  PASS  [phone-landscape] 配置J 光路重現：光線 1 平行主軸射到透鏡上的 P
+  PASS  [phone-landscape] 配置J 光路重現：光線 1 折射後發散，方向像是從物側焦點 F 射出  — 偏離 0.0e+0 cm
+  PASS  [phone-landscape] 配置J 光路重現：光線 2 通過光心 O 不偏折
+  PASS  [phone-landscape] 配置J 光路重現：反向延長線：P → F、O → 虛像
+  PASS  [phone-landscape] 配置J 光路重現：光線 3 對準另一側焦點 F′ 射到透鏡  — 偏離 0.0e+0 cm
+  PASS  [phone-landscape] 配置J 光路重現：光線 3 折射後平行主光軸
+  PASS  [phone-landscape] 配置J 光路重現：光線 3 的反向延長線（水平）通過虛像
+  PASS  [phone-landscape] 配置J 光路重現：三條反向延長線交於虛像  — (-180.00, -44.00)
+  PASS  [phone-landscape] 配置J 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置J 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置J 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置J 光路重現 t=3.80s：全部光線都畫出來了  — 14/14 個取樣點在畫面內
+  PASS  [phone-landscape] 配置J 光路重現：畫面上方有說明文字框
+  PASS  [phone-landscape] 配置J 光路重現：結束時標出像點  — 137 px（重現前 71）
+  PASS  [phone-landscape] 配置J 光路重現：反向延長線用另一種顏色的虛線
+  PASS  [phone-landscape] 配置J 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置J 封印後鬼本體成為吸附點（座標 = 物點）
+  PASS  [phone-landscape] 配置J 封印後點「鬼本體」再點 F → 畫出連線
+  PASS  [phone-landscape] 配置J 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 81 個像素
+  PASS  [phone-landscape] 配置J 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 28 個像素
+  PASS  [phone-landscape] 配置J 封印後畫的線可以復原
+  PASS  [phone-landscape] 配置K 裸眼畫面沒有鬼
+  PASS  [phone-landscape] 配置K 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 59% 像素改變；此方位沒有鬼
+  PASS  [phone-landscape] 配置K 透鏡外畫面不變  — 0.00%
+  PASS  [phone-landscape] 配置K 鬼像只出現在一個方位的透鏡內  — 出現於方位 3
+  PASS  [phone-landscape] 配置K 鬼像整個在透鏡圓內
+  PASS  [phone-landscape] 配置K 鬼像畫在幾何算出的虛像視角位置
+  PASS  [phone-landscape] 配置K 透鏡外沒有鬼的像素
+  PASS  [phone-landscape] 配置K 點在沒有鬼像的地方不會產生標記
+  PASS  [phone-landscape] 配置K 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-landscape] 配置K 舉起後按鈕變成「放下凹透鏡」
+  PASS  [phone-landscape] 配置K 放下透鏡後鬼像消失
+  PASS  [phone-landscape] 配置K 放下透鏡後標記保留
+  PASS  [phone-landscape] 配置K 按「光路分析」切到側視分析
+  PASS  [phone-landscape] 配置K 分析開始：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置K 分析開始：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置K 分析開始：吸附點裡沒有物點
+  PASS  [phone-landscape] 配置K 預設縮放下所有吸附點都點得到（沒有被按鈕蓋住）
+  PASS  [phone-landscape] 配置K 畫線模式下點地板格：不選格、不畫線
+  PASS  [phone-landscape] 配置K 線 1：虛像 ↔ 光心 O（點擊偏 12px 仍吸附）
+  PASS  [phone-landscape] 配置K 線 2：F ↔ 虛像，延長後在透鏡上產生可吸附的 P = (0, h)  — P.y=70.000
+  PASS  [phone-landscape] 配置K 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 3.2e-14 cm
+  PASS  [phone-landscape] 配置K 學生作圖的交點落在唯一一格的中央附近  — 格 2，離格線 0.50 格
+  PASS  [phone-landscape] 配置K 畫完三條線：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置K 畫完三條線：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置K ＋ 按鈕放大  — 1.50×
+  PASS  [phone-landscape] 配置K 放大後單指拖曳可平移  — Δx=90px
+  PASS  [phone-landscape] 配置K 拖曳平移不會畫線／選格／改變縮放
+  PASS  [phone-landscape] 配置K 從標示點斜向拖到空白處放開：不留線、不算點擊
+  PASS  [phone-landscape] 配置K 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
+  PASS  [phone-landscape] 配置K 「全圖」回到預設視圖
+  PASS  [phone-landscape] 配置K 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置K 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置K 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置K 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置K 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置K 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置K 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置K 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置K 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置K 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置K 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置K 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置K 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置K 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置K 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置K 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置K 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置K C2 沒有「連線」「平行線」「實線／虛線」按鈕（點兩個點連線在「畫線」模式裡）
+  PASS  [phone-landscape] 配置K 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置K 點地板格可選取（虛像所在的第 1 格）
+  PASS  [phone-landscape] 配置K C3 封印前再點同一格 → 取消選取（施放鈕變不能按）
+  PASS  [phone-landscape] 配置K C3 取消後再點一次 → 重新選取
+  PASS  [phone-landscape] 配置K 封印虛像所在格 → 失敗
+  PASS  [phone-landscape] 配置K 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
+  PASS  [phone-landscape] 配置K 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置K 錯誤封印後：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置K 錯誤封印後：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置K 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
+  PASS  [phone-landscape] 配置K 整個直欄都是該格的點擊區
+  PASS  [phone-landscape] 配置K 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置K C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
+  PASS  [phone-landscape] 配置K C4 封印成功後自動回到畫線模式
+  PASS  [phone-landscape] 配置K C4 封印後依序點兩個點 → 畫出連線
+  PASS  [phone-landscape] 配置K C4 封印後「復原」也能用
+  PASS  [phone-landscape] 配置K 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [phone-landscape] 配置K 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
+  PASS  [phone-landscape] 配置K 光路重現：六段實際光線＋三段反向延長線（三條主光線）
+  PASS  [phone-landscape] 配置K 光路重現：三條光線都從鬼本體出發
+  PASS  [phone-landscape] 配置K 光路重現：光線 1 平行主軸射到透鏡上的 P
+  PASS  [phone-landscape] 配置K 光路重現：光線 1 折射後發散，方向像是從物側焦點 F 射出  — 偏離 0.0e+0 cm
+  PASS  [phone-landscape] 配置K 光路重現：光線 2 通過光心 O 不偏折
+  PASS  [phone-landscape] 配置K 光路重現：反向延長線：P → F、O → 虛像
+  PASS  [phone-landscape] 配置K 光路重現：光線 3 對準另一側焦點 F′ 射到透鏡  — 偏離 1.2e-14 cm
+  PASS  [phone-landscape] 配置K 光路重現：光線 3 折射後平行主光軸
+  PASS  [phone-landscape] 配置K 光路重現：光線 3 的反向延長線（水平）通過虛像
+  PASS  [phone-landscape] 配置K 光路重現：三條反向延長線交於虛像  — (-97.67, 45.58)
+  PASS  [phone-landscape] 配置K 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
+  PASS  [phone-landscape] 配置K 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
+  PASS  [phone-landscape] 配置K 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
+  PASS  [phone-landscape] 配置K 光路重現 t=3.80s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
+  PASS  [phone-landscape] 配置K 光路重現：畫面上方有說明文字框
+  PASS  [phone-landscape] 配置K 光路重現：結束時標出像點  — 133 px（重現前 69）
+  PASS  [phone-landscape] 配置K 光路重現：反向延長線用另一種顏色的虛線
+  PASS  [phone-landscape] 配置K 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置K 封印後鬼本體成為吸附點（座標 = 物點）
+  PASS  [phone-landscape] 配置K 封印後點「鬼本體」再點 F → 畫出連線
+  PASS  [phone-landscape] 配置K 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 76 個像素
+  PASS  [phone-landscape] 配置K 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 85 個像素
+  PASS  [phone-landscape] 配置K 封印後畫的線可以復原
+  PASS  [phone-landscape] 配置L 裸眼畫面沒有鬼
+  PASS  [phone-landscape] 配置L 透鏡內整個場景被重映射（非只縮鬼）  — 透鏡內 59% 像素改變；此方位沒有鬼
+  PASS  [phone-landscape] 配置L 透鏡外畫面不變  — 0.00%
+  PASS  [phone-landscape] 配置L 鬼像只出現在一個方位的透鏡內  — 出現於方位 3
+  PASS  [phone-landscape] 配置L 鬼像整個在透鏡圓內
+  PASS  [phone-landscape] 配置L 鬼像畫在幾何算出的虛像視角位置
+  PASS  [phone-landscape] 配置L 透鏡外沒有鬼的像素
+  PASS  [phone-landscape] 配置L 點在沒有鬼像的地方不會產生標記
+  PASS  [phone-landscape] 配置L 點鬼像（偏 11px）可標記虛像
+  PASS  [phone-landscape] 配置L 舉起後按鈕變成「放下凹透鏡」
+  PASS  [phone-landscape] 配置L 放下透鏡後鬼像消失
+  PASS  [phone-landscape] 配置L 放下透鏡後標記保留
+  PASS  [phone-landscape] 配置L 按「光路分析」切到側視分析
+  PASS  [phone-landscape] 配置L 分析開始：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置L 分析開始：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置L 分析開始：吸附點裡沒有物點
+  PASS  [phone-landscape] 配置L 預設縮放下所有吸附點都點得到（沒有被按鈕蓋住）
+  PASS  [phone-landscape] 配置L 畫線模式下點地板格：不選格、不畫線
+  PASS  [phone-landscape] 配置L 線 1：虛像 ↔ 光心 O（點擊偏 12px 仍吸附）
+  PASS  [phone-landscape] 配置L 線 2：F ↔ 虛像，延長後在透鏡上產生可吸附的 P = (0, h)  — P.y=-90.000
+  PASS  [phone-landscape] 配置L 線 3：從 P 橫向拖曳拉出平行線；與光心線的交點 = 物點  — 誤差 1.4e-14 cm
+  PASS  [phone-landscape] 配置L 學生作圖的交點落在唯一一格的中央附近  — 格 4，離格線 0.50 格
+  PASS  [phone-landscape] 配置L 畫完三條線：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置L 畫完三條線：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置L ＋ 按鈕放大  — 1.50×
+  PASS  [phone-landscape] 配置L 放大後單指拖曳可平移  — Δx=90px
+  PASS  [phone-landscape] 配置L 拖曳平移不會畫線／選格／改變縮放
+  PASS  [phone-landscape] 配置L 從標示點斜向拖到空白處放開：不留線、不算點擊
+  PASS  [phone-landscape] 配置L 雙指 pinch：不縮放頁面、不縮放視圖、不畫線、不選格  — visualViewport.scale=1
+  PASS  [phone-landscape] 配置L 「全圖」回到預設視圖
+  PASS  [phone-landscape] 配置L 標示點有畫在畫面上（起點處是白點）  — rgb 總和 765
+  PASS  [phone-landscape] 配置L 拖曳畫線：拉成接近水平 → 預覽吸附成水平實線，還沒有真的畫線
+  PASS  [phone-landscape] 配置L 放開：留下通過起點、精確水平的線（存的是標示點座標）
+  PASS  [phone-landscape] 配置L 從標示點拖曳時畫面不會跟著平移
+  PASS  [phone-landscape] 配置L 「復原」可以拿掉拖出來的水平線
+  PASS  [phone-landscape] 配置L 拖曳畫線：拉成接近垂直 → 預覽吸附成垂直實線
+  PASS  [phone-landscape] 配置L 放開：留下通過起點、精確垂直的線
+  PASS  [phone-landscape] 配置L 垂直線不產生新的 P，交點與吸附點座標都正常
+  PASS  [phone-landscape] 配置L 「復原」可以拿掉拖出來的垂直線
+  PASS  [phone-landscape] 配置L 拖曳畫線：斜向拖到空白處 → 只有跟手的虛線預覽（沒有吸附）
+  PASS  [phone-landscape] 配置L 虛線時放開：線消失，不留線
+  PASS  [phone-landscape] 配置L 斜向拖曳也不會平移畫面
+  PASS  [phone-landscape] 配置L 吸附後又拉到空白處：變回虛線，放開不留線
+  PASS  [phone-landscape] 配置L 拖曳畫線：拖到另一個標示點 → 吸附到該點，預覽變實線
+  PASS  [phone-landscape] 配置L 放開：留下通過兩個標示點的直線（兩端都是標示點的精確座標）
+  PASS  [phone-landscape] 配置L 「復原」可以拿掉拖出來的連線
+  PASS  [phone-landscape] 配置L 選格封印模式下，從標示點拖曳不會畫線
+  PASS  [phone-landscape] 配置L C2 沒有「連線」「平行線」「實線／虛線」按鈕（點兩個點連線在「畫線」模式裡）
+  PASS  [phone-landscape] 配置L 封印模式下點擊不會畫線
+  PASS  [phone-landscape] 配置L 點地板格可選取（虛像所在的第 2 格）
+  PASS  [phone-landscape] 配置L C3 封印前再點同一格 → 取消選取（施放鈕變不能按）
+  PASS  [phone-landscape] 配置L C3 取消後再點一次 → 重新選取
+  PASS  [phone-landscape] 配置L 封印虛像所在格 → 失敗
+  PASS  [phone-landscape] 配置L 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
+  PASS  [phone-landscape] 配置L 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置L 錯誤封印後：畫面上沒有鬼本體
+  PASS  [phone-landscape] 配置L 錯誤封印後：DOM／文字／Debug 圖層沒有答案
+  PASS  [phone-landscape] 配置L 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
+  PASS  [phone-landscape] 配置L 整個直欄都是該格的點擊區
+  PASS  [phone-landscape] 配置L 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置L C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
+  PASS  [phone-landscape] 配置L C4 封印成功後自動回到畫線模式
+  PASS  [phone-landscape] 配置L C4 封印後依序點兩個點 → 畫出連線
+  PASS  [phone-landscape] 配置L C4 封印後「復原」也能用
+  PASS  [phone-landscape] 配置L 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [phone-landscape] 配置L 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
+  PASS  [phone-landscape] 配置L 光路重現：六段實際光線＋三段反向延長線（三條主光線）
+  PASS  [phone-landscape] 配置L 光路重現：三條光線都從鬼本體出發
+  PASS  [phone-landscape] 配置L 光路重現：光線 1 平行主軸射到透鏡上的 P
+  PASS  [phone-landscape] 配置L 光路重現：光線 1 折射後發散，方向像是從物側焦點 F 射出  — 偏離 0.0e+0 cm
+  PASS  [phone-landscape] 配置L 光路重現：光線 2 通過光心 O 不偏折
+  PASS  [phone-landscape] 配置L 光路重現：反向延長線：P → F、O → 虛像
+  PASS  [phone-landscape] 配置L 光路重現：光線 3 對準另一側焦點 F′ 射到透鏡  — 偏離 0.0e+0 cm
+  PASS  [phone-landscape] 配置L 光路重現：光線 3 折射後平行主光軸
+  PASS  [phone-landscape] 配置L 光路重現：光線 3 的反向延長線（水平）通過虛像
+  PASS  [phone-landscape] 配置L 光路重現：三條反向延長線交於虛像  — (-152.42, -39.19)
+  PASS  [phone-landscape] 配置L 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置L 光路重現 t=1.40s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置L 光路重現 t=2.40s：光線依序長出（走到的亮、沒走到的不亮）  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置L 光路重現 t=3.80s：全部光線都畫出來了  — 13/13 個取樣點在畫面內
+  PASS  [phone-landscape] 配置L 光路重現：畫面上方有說明文字框
+  PASS  [phone-landscape] 配置L 光路重現：結束時標出像點  — 140 px（重現前 67）
+  PASS  [phone-landscape] 配置L 光路重現：反向延長線用另一種顏色的虛線
+  PASS  [phone-landscape] 配置L 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置L 封印後鬼本體成為吸附點（座標 = 物點）
+  PASS  [phone-landscape] 配置L 封印後點「鬼本體」再點 F → 畫出連線
+  PASS  [phone-landscape] 配置L 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 62 個像素
+  PASS  [phone-landscape] 配置L 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 19 個像素
+  PASS  [phone-landscape] 配置L 封印後畫的線可以復原
   PASS  [phone-landscape] 沒有 JS 錯誤
   PASS  [phone-portrait] 背景圖已載入
   PASS  [phone-portrait] 探索：所有控制項都在畫面內  — canvas 375×639
@@ -485,7 +1205,7 @@
   PASS  [phone-portrait] 配置A 光路重現：畫面上方有說明文字框
   PASS  [phone-portrait] 配置A 光路重現：結束時標出像點  — 137 px（重現前 67）
   PASS  [phone-portrait] 配置A 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-portrait] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-portrait] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-portrait] 配置A 封印後鬼本體成為吸附點（座標 = 物點）
   PASS  [phone-portrait] 配置A 封印後點「鬼本體」再點 F → 畫出連線
   PASS  [phone-portrait] 配置A 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 79 個像素
@@ -701,32 +1421,11 @@
   PASS  [desktop] 配置C 封印後拖曳畫的垂直線放開後看得到（線經過處出現綠色線的像素）  — 18 個像素
   PASS  [desktop] 配置C 封印後畫的線可以復原
   PASS  [desktop] 沒有 JS 錯誤
-  PASS  [level] 上方顯示 3 顆 ❤️
-  PASS  [level] 關卡模式不顯示標題、配置選單與 Debug（和第二關一樣）
-  PASS  [level] 右上角按鈕字樣「☰ 回關卡」  — ☰ 回關卡
-  PASS  [level] 命數旁顯示封印數  — 封印 0 隻
-  PASS  [level] 這一頁沒有載入 Leaderboard（不計時、不上榜）
-  PASS  [level] 說明文字在 ❤️ 後面、同一列（照第二關的排法）  — hud 右緣 176、說明 180～718
-  PASS  [level] 第 1 次抓錯：扣一顆 ❤️（剩 2）
-  PASS  [level] 第 1 次抓錯：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　失去一顆心。再檢查你的光線作圖。」
-  PASS  [level] 第 2 次抓錯：扣一顆 ❤️（剩 1）
-  PASS  [level] 第 2 次抓錯：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　失去一顆心。再檢查你的光線作圖。」
-  PASS  [level] 抓對：封印數 +1、不扣命  — 封印 1 隻
-  PASS  [level] 封印後按鈕是「下一隻鬼 ➜」  — 下一隻鬼 ➜
-  PASS  [level] 下一隻鬼：回到探索，命數與封印數保留
-  PASS  [level] 命用完：出現失敗畫面
-  PASS  [level] 失敗畫面有「重新挑戰」與「回關卡選單」  — retryBtn,failMenuBtn
-  PASS  [level] 失敗畫面的文字不洩漏位置  — 三顆心都用完了…… 鬼還躲在荒野裡。這次封印了 1 隻。重新挑戰會從頭算起。 重新挑戰 回關卡選單
-  PASS  [level] 重新挑戰：3 顆 ❤️、封印數歸零、回到探索
-  PASS  [level] 關卡模式下 ?debug=1 不會打開 Debug
-  PASS  [level] ?free=1：不顯示 ❤️，標題「第三關」、配置選單與 Debug 照舊
-  PASS  [level] ?free=1：抓錯不扣命
-  PASS  [level] 沒有 JS 錯誤
   PASS  [level-practice] 上方顯示 3 顆 ❤️
   PASS  [level-practice] 關卡模式不顯示標題、配置選單與 Debug（和第二關一樣）
   PASS  [level-practice] 右上角按鈕字樣「☰ 回關卡」  — ☰ 回關卡
   PASS  [level-practice] 練習模式：命數旁標「練習」  — 練習　封印 0 隻
-  PASS  [level-practice] 這一頁沒有載入 Leaderboard（不計時、不上榜）
+  PASS  [level-practice] 練習模式：沒有開場、不倒數
   PASS  [level-practice] 說明文字在 ❤️ 後面、同一列（照第二關的排法）  — hud 右緣 224、說明 228～718
   PASS  [level-practice] 第 1 次抓錯：扣一顆 ❤️（剩 2）
   PASS  [level-practice] 第 1 次抓錯：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　失去一顆心。再檢查你的光線作圖。」
@@ -736,9 +1435,14 @@
   PASS  [level-practice] 封印後按鈕是「下一隻鬼 ➜」  — 下一隻鬼 ➜
   PASS  [level-practice] 下一隻鬼：回到探索，命數與封印數保留
   PASS  [level-practice] 命用完：出現失敗畫面
+  PASS  [level-practice] 失敗標題「❤️用完了……」、沒有結算／暱稱畫面
+  PASS  [level-practice] 練習模式不記荒野封印數、不算完成荒野狩獵
   PASS  [level-practice] 失敗畫面有「重新挑戰」與「回關卡選單」  — retryBtn,failMenuBtn
-  PASS  [level-practice] 失敗畫面的文字不洩漏位置  — 三顆心都用完了…… 鬼還躲在荒野裡。這次封印了 1 隻。重新挑戰會從頭算起。 重新挑戰 回關卡選單
+  PASS  [level-practice] 失敗畫面的文字不洩漏位置  — ❤️用完了…… 鬼還躲在荒野裡。這次封印了 1 隻。重新挑戰會從頭算起。 重新挑戰 回關卡選單
   PASS  [level-practice] 重新挑戰：3 顆 ❤️、封印數歸零、回到探索
+  PASS  [level-practice] 關卡模式下 ?debug=1 不會打開 Debug
+  PASS  [level-practice] ?free=1：不顯示 ❤️，標題「第三關」、配置選單與 Debug 照舊
+  PASS  [level-practice] ?free=1：抓錯不扣命
   PASS  [level-practice] 沒有 JS 錯誤
 
-ALL PASS: 742/742 checks
+ALL PASS: 1446/1446 checks

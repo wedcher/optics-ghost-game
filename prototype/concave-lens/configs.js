@@ -35,7 +35,17 @@
     { id: 'A', f: -200, targetCell: 4, h: 100, direction: 1 },
     { id: 'B', f: -250, targetCell: 6, h: -90, direction: 2 },
     { id: 'C', f: -300, targetCell: 7, h: 120, direction: 3 },
-    { id: 'D', f: -180, targetCell: 3, h: -70, direction: 0 }
+    { id: 'D', f: -180, targetCell: 3, h: -70, direction: 0 },
+    // 2026-11-19 加（PENDING 25）：原本一個方位只有一組，學生會背「東邊＝第 4 格」。
+    // 每個方位改成 3 組、答案格都不同，焦距與鬼的高度（正負）也換過；全部過 tests/check-geometry.js。
+    { id: 'E', f: -260, targetCell: 5, h: 110, direction: 0 },
+    { id: 'F', f: -320, targetCell: 7, h: -100, direction: 0 },
+    { id: 'G', f: -290, targetCell: 2, h: -70, direction: 1 },
+    { id: 'H', f: -320, targetCell: 6, h: 120, direction: 1 },
+    { id: 'I', f: -240, targetCell: 3, h: 100, direction: 2 },
+    { id: 'J', f: -300, targetCell: 5, h: -110, direction: 2 },
+    { id: 'K', f: -280, targetCell: 2, h: 70, direction: 3 },
+    { id: 'L', f: -270, targetCell: 4, h: -90, direction: 3 }
   ];
 
   var floor = Optics.makeFloorRow(WORLD.cellWidth, WORLD.cellCount);
