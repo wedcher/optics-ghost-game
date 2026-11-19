@@ -102,6 +102,7 @@
 
 - **女鬼角色圖換上正式版：暫緩**（使用者 2026-11-19）。
 - **正式美術圖已換上（2026-11-19）**：原圖在 `docs/concepts/古堡外觀.png`、`信件.png`、`圓盤.png`、`雜魚00～08.png`（雜魚09 使用者說不用）。轉成手機用的 webp：`plane-mirror/assets/story-castle.webp`、`story-letter.webp`（信件圖＋圓盤合成，照劇本「圓盤壓在信件上面」）、`story-disc.webp`（對話框小圖）、`shared/art/minion-00～08.webp`（第一關、第二關過關時逃散的小鬼，取代 placeholder）。信上的三句字照舊用 HTML 寫在圖中的信紙上（`story-scene.js` 的 `letterOnArt`）。暫代圖程式保留在 `story-art.js`，圖載不到時才用。
+- **第一關地磚貼圖已換上（2026-11-20）**：使用者給的石磚圖存成 `docs/concepts/地磚.png`，遊戲用 `plane-mirror/assets/floor-tile.webp`（512×512）。一格貼一張，用分塊仿射做透視貼圖；直接看、各面鏡子、鏡中鏡各算一次後快取（`app.js` 的 `floorLayer`）。隔一格壓暗（西洋棋盤，鏡中好數格），格線改成磚邊的銅色、細一點。圖載不到就退回程式畫的地板。**還沒在實體手機上看效能**（第一次畫面出現前要多算一下貼圖）。
 
 ## DO NOT RE-DERIVE
 

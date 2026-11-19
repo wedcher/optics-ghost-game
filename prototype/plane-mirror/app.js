@@ -28,11 +28,12 @@
   function loadArt(src) {
     var a = { img: new Image(), ready: false };
     a.img.onload = function () { a.ready = true; requestRender(); if (pendingIntro && artReady()) { pendingIntro = false; showIntro(); } };
+    a.img.onerror = function () { a.failed = true; if (pendingIntro && artReady()) { pendingIntro = false; showIntro(); } }; // 圖載不到：照樣開始（地磚退回程式畫的）
     a.img.src = src;
     return a;
   }
   var pendingIntro = false; // 開場要等圖都載好才出現（背景是遊戲畫面的快照）
-  function artReady() { return ART.intact.ready && ART.broken.ready && ART.ghost.ready && ART.ghostBack.ready; }
+  function artReady() { return ART.intact.ready && ART.broken.ready && ART.ghost.ready && ART.ghostBack.ready && (typeof floorTex === "undefined" || floorTex.ready || floorTex.failed); }
   var ART = { intact: loadArt('assets/room-intact.jpg'), broken: loadArt('assets/room-broken.jpg'), ghost: loadArt('assets/ghost.webp'), ghostBack: loadArt('assets/ghost-back.webp') };
   // 測試用：把鬼畫成單一顏色的剪影，測試才能用顏色數「鬼出現在哪裡」（見 __protoMirror.setMask）
   var ghostMask = {};
@@ -199,13 +200,65 @@
     });
   }
 
+  // ---------- 地磚貼圖（使用者 2026-11-20 給的 docs/concepts/地磚.png，一格貼一張） ----------
+  // 透視貼圖：每格切成 n×n 小塊、每塊兩個三角形用仿射變換貼（canvas 沒有透視貼圖）。
+  // 地板不會動，所以每個視角（直接看、各面鏡子、鏡中鏡）只算一次，存成影像座標大小的圖層。
+  var floorTex = loadArt('assets/floor-tile.webp'), floorCache = {};
+  function floorLayer(T) {
+    if (!floorTex.ready) return null;
+    var key = [T.sx, T.sz, T.ox, T.oz].map(function (n) { return Math.round((n || 0) * 1000); }).join(',');
+    if (floorCache[key]) return floorCache[key];
+    var cv = document.createElement('canvas'); cv.width = IW; cv.height = IH;
+    var g = cv.getContext('2d'), img = floorTex.img, TW = img.width, TH = img.height;
+    function tri(p0, p1, p2, u0, v0, u1, v1, u2, v2) {
+      // 把貼圖上的三角形 (u,v) 仿射到畫面上的三角形 p；邊緣外擴 0.6 px 免得接縫露出細線
+      var cx = (p0.x + p1.x + p2.x) / 3, cy = (p0.y + p1.y + p2.y) / 3;
+      g.save(); g.beginPath();
+      [p0, p1, p2].forEach(function (q, k) { var dx = q.x - cx, dy = q.y - cy, l = Math.hypot(dx, dy) || 1, x = q.x + dx / l * 0.6, y = q.y + dy / l * 0.6; if (k) g.lineTo(x, y); else g.moveTo(x, y); });
+      g.closePath(); g.clip();
+      var d = u0 * (v1 - v2) + u1 * (v2 - v0) + u2 * (v0 - v1);
+      if (Math.abs(d) < 1e-9) { g.restore(); return; }
+      var a = (p0.x * (v1 - v2) + p1.x * (v2 - v0) + p2.x * (v0 - v1)) / d,
+          b = (p0.y * (v1 - v2) + p1.y * (v2 - v0) + p2.y * (v0 - v1)) / d,
+          c = (p0.x * (u2 - u1) + p1.x * (u0 - u2) + p2.x * (u1 - u0)) / d,
+          e = (p0.y * (u2 - u1) + p1.y * (u0 - u2) + p2.y * (u1 - u0)) / d,
+          f = (p0.x * (u1 * v2 - u2 * v1) + p1.x * (u2 * v0 - u0 * v2) + p2.x * (u0 * v1 - u1 * v0)) / d,
+          h = (p0.y * (u1 * v2 - u2 * v1) + p1.y * (u2 * v0 - u0 * v2) + p2.y * (u0 * v1 - u1 * v0)) / d;
+      g.setTransform(a, b, c, e, f, h); g.drawImage(img, 0, 0); g.restore();
+    }
+    for (var row = 1; row <= R.length; row++) for (var col = 1; col <= R.cols; col++) {
+      var corners = [proj(T, { x: col - 1, y: 0, z: row - 1 }), proj(T, { x: col, y: 0, z: row - 1 }), proj(T, { x: col, y: 0, z: row }), proj(T, { x: col - 1, y: 0, z: row })];
+      var size = 0;
+      corners.forEach(function (q, k) { var r = corners[(k + 1) % 4]; if (q && r) size = Math.max(size, Math.hypot(q.x - r.x, q.y - r.y)); });
+      if (!size) continue;
+      var n = Math.max(1, Math.min(10, Math.ceil(size / 45))), P = [], i, j;
+      for (j = 0; j <= n; j++) { P.push([]); for (i = 0; i <= n; i++) P[j].push(proj(T, { x: col - 1 + i / n, y: 0, z: row - 1 + j / n })); }
+      for (j = 0; j < n; j++) for (i = 0; i < n; i++) {
+        var a00 = P[j][i], a10 = P[j][i + 1], a01 = P[j + 1][i], a11 = P[j + 1][i + 1];
+        var u0 = i / n * TW, u1 = (i + 1) / n * TW, w0 = j / n * TH, w1 = (j + 1) / n * TH;
+        if (a00 && a10 && a01) tri(a00, a10, a01, u0, w0, u1, w0, u0, w1);
+        if (a10 && a11 && a01) tri(a10, a11, a01, u1, w0, u1, w1, u0, w1);
+      }
+      // 西洋棋盤：隔一格壓暗一點，鏡子裡的格子很小時比較好數
+      if ((col + row) % 2 === 0) {
+        var poly = projPoly(T, C.cellPoly(col, row));
+        if (poly.length >= 3) { g.beginPath(); poly.forEach(function (q, k) { if (k) g.lineTo(q.x, q.y); else g.moveTo(q.x, q.y); }); g.closePath(); g.fillStyle = 'rgba(0,0,0,.22)'; g.fill(); }
+      }
+    }
+    floorCache[key] = cv;
+    return cv;
+  }
   function drawFloor(T) {
     var outline = projPoly(T, [{ x: 0, y: 0, z: 0 }, { x: R.cols, y: 0, z: 0 }, { x: R.cols, y: 0, z: R.length }, { x: 0, y: 0, z: R.length }]);
     if (outline.length < 3) return;
     ctx.save();
     path(outline); ctx.clip();
     var col, row, p, v;
-    for (row = R.length; row >= 1; row--) for (col = 1; col <= R.cols; col++) {
+    var layer = floorLayer(T);
+    if (layer) {
+      // 正式地磚貼圖（每個視角算一次後快取；圖已經是影像座標）
+      ctx.drawImage(layer, 0, 0, IW, IH);
+    } else for (row = R.length; row >= 1; row--) for (col = 1; col <= R.cols; col++) {
       p = projPoly(T, C.cellPoly(col, row));
       if (p.length < 3) continue;
       // 兩種深淺交錯（西洋棋盤）：鏡子裡的格子很小，交錯的顏色比較好數
@@ -224,11 +277,12 @@
       ctx.restore();
     });
     // 格線（地磚的縫）。每條線分段畫，線寬依遠近變化。
-    ctx.strokeStyle = 'rgba(205,176,142,.72)'; ctx.lineCap = 'round';
+    // 有地磚貼圖時格線改成和磚邊一樣的銅色、細一點，石紋才看得到；格線仍要清楚，數格子靠它
+    ctx.strokeStyle = layer ? 'rgba(176,128,92,.7)' : 'rgba(205,176,142,.72)'; ctx.lineCap = 'round';
     function seam(a, b) {
       var s = projPoly(T, [a, b]);
       if (s.length < 2) return;
-      ctx.lineWidth = Math.max(1, Math.min(7, 26 / ((s[0].depth + s[1].depth) / 2)));
+      ctx.lineWidth = Math.max(1, Math.min(layer ? 4.5 : 7, (layer ? 17 : 26) / ((s[0].depth + s[1].depth) / 2)));
       ctx.beginPath(); ctx.moveTo(s[0].x, s[0].y); ctx.lineTo(s[1].x, s[1].y); ctx.stroke();
     }
     var i, j;
