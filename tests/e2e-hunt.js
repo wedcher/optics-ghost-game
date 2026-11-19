@@ -197,12 +197,12 @@ const NOLIVES = ['法陣又落空了——荒野深處傳來一陣嘻嘻的笑�
       btns: Array.from(r.querySelectorAll('.lb-btn')).map((b) => b.id + ':' + b.textContent), practiceHref: (r.querySelector('#huntPracticeBtn') || { getAttribute: () => null }).getAttribute('href'),
       run: JSON.parse(localStorage.getItem('ogg.run.v2')), cleared: GameProgress.isCleared('concave') };
   });
-  ok(res && res.title === '時間到！', '結算畫面標題「時間到！」', res && res.title);
+  ok(res && res.title === '狩獵結束', '時間到的結算畫面標題也是「狩獵結束」（2026-11-19 統一）', res && res.title);
   ok(res && res.sum === '你花費 8 分 20 秒 把鬼趕出城堡，並在荒野中封印了 9 隻鬼。', '結算文案：趕鬼時間（兩關相加）＋荒野封印數', res && res.sum);
   ok(res && res.run.hunt === 9 && res.run.castleMs === 500000, 'Leaderboard.recordHunt(9)；趕鬼時間沒被改', res && JSON.stringify(res.run));
   ok(res && res.cleared, 'GameProgress.markCleared("concave")');
   ok(res && res.extra === '荒野練習模式已解鎖（不限時間，不計入排行榜）。' && res.practiceHref === 'index.html?practice=1', '第一次完成：多一行「練習模式已解鎖」與【荒野練習模式】按鈕', res && res.extra);
-  ok(res && res.btns.join() === 'lbSubmit:留名上榜,huntRetryBtn:再挑戰一次,huntPracticeBtn:荒野練習模式,lbView:看排行榜,lbClose:回關卡選單', '結算按鈕：留名上榜／再挑戰一次／荒野練習模式／看排行榜／回關卡選單', res && res.btns.join());
+  ok(res && res.btns.join() === 'lbSubmit:留名上榜,huntRetryBtn:重新挑戰,huntPracticeBtn:荒野練習模式,lbView:看排行榜,lbClose:回關卡選單', '結算按鈕：留名上榜／重新挑戰／荒野練習模式／看排行榜／回關卡選單', res && res.btns.join());
   await page.screenshot({ path: path.join(SHOTS, 'hunt-4-result.png') });
   // 上傳（本機模式）
   await page.fill('#lbName', '測試獵人');

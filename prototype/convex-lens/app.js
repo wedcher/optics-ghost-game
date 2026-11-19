@@ -1074,10 +1074,9 @@
     // （直接開網址、?unlock=1 跳關、重新開始遊戲後），不顯示也不記。練習模式不計時、不上榜（LB = null）。
     var castleMs = LB ? LB.finishCastle() : null;
     // 過關說明照劇本 2-3：有趕鬼時間就顯示「你花費＿＿，把鬼趕出城堡。」；沒有成績時退回劇本舊版的封印數說法。
-    var note = castleMs != null
-      ? '你花費' + LB.formatTime(castleMs) + '，把鬼趕出城堡。'
-      : '你在走廊封印了 ' + level.sealed + ' 隻鬼。';
-    if (!PRACTICE) note += '下一站：城外的荒野（已解鎖）。';
+    // 使用者 2026-11-19 統一三關過關文字：「成功把鬼趕出城堡。第三關：荒野狩獵（已解鎖）」。
+    // 趕鬼時間仍照算、照記（荒野結算畫面會顯示），這裡不再顯示。
+    var note = '成功把鬼趕出城堡。' + (PRACTICE ? '' : '第三關：荒野狩獵（已解鎖）');
     closeScene();
     level.scene = window.StoryScene.show({
       id: 'cleared', background: INTRO_BG, scatter: 7,

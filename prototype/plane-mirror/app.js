@@ -271,10 +271,11 @@
     };
   }
   // 從目前的視點（經過鏡射 T 之後）看到的是鬼的正面還是背面。
-  // 鬼朝 +z；鏡射後牠的朝向變成 (0, 0, T.sz)。視點在牠朝向的那一側就是正面。
+  // 鬼朝 R.ghost.facing·z（-1 = 面向正面的鏡子、背對玩家；使用者 2026-11-19：正面鏡裡看到正面、抓到的本體是背面）；
+  // 鏡射後牠的朝向變成 (0, 0, facing·T.sz)。視點在牠朝向的那一側就是正面。
   function seesBack(T) {
     var c = C.apply(T, C.cellCenter(state.ghost.col, state.ghost.row));
-    return (cam.eye.z - c.z) * T.sz < 0;
+    return (cam.eye.z - c.z) * T.sz * R.ghost.facing < 0;
   }
   // 鬼從地板冒出來的地方：格子中央一圈暗色的漩渦。有了它才看得出牠站在哪一格。
   // part = 'under'：畫在鬼的後面（整圈）；'over'：只畫靠近玩家的半圈邊，蓋在裙襬上。
@@ -827,7 +828,7 @@
         { text: '大量的鬼衝出房間，逃進走廊。', scatter: 14 }, // 小怪的圖還沒生，先用 placeholder 鬼往四周逃
         { speaker: '你', text: '也太多鬼了？別跑！' }
       ],
-      title: '第一關過關！', note: '鬼逃進了走廊。回到關卡選單，就能進入第二關：城堡走廊。',
+      title: '第一關過關！', note: '鬼逃進了走廊。第二關：城堡走廊（已解鎖）', // 使用者 2026-11-19 統一三關過關文字
       buttons: [
         // 過關後一律回選單、由選單進下一關（使用者 2026-11-18 回饋 Q3：換頁一定會離開全螢幕，不從這裡直接跳第二關）
         { id: 'clearMenuBtn', label: '回關卡選單', primary: true, href: '../index.html' },

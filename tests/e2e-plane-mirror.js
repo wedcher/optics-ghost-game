@@ -186,7 +186,7 @@ async function levelFlow(profile, browser) {
   const vis0 = await page.evaluate(() => { const m = window.__protoMirror, g = m.state.ghost; return ['back', 'right'].map((id) => m.core.visibility(m.room, m.cam, g, id).full); });
   ok(vis0[0] && vis0[1], '雙鏡階段：鬼站的位置兩面鏡都照得到整隻');
   const sides = await page.evaluate(() => { const m = window.__protoMirror; return [m.ghostSide([]), m.ghostSide(['back']), m.ghostSide(['right']), m.ghostSide(['back', 'right'])]; });
-  ok(sides.join() === 'front,back,front,back', '鬼面向玩家：直接看與右鏡是正面，正面鏡（與穿過正面鏡的二次像）是背面', sides.join());
+  ok(sides.join() === 'back,front,back,front', '鬼面向正面鏡（2026-11-19）：正面鏡與鏡中鏡是正面，直接看（現身）與右鏡是背面', sides.join());
   let px = await pixels();
   ok(px.ghostIn > 0 && px.ghostOut < EDGE_PX, '鬼只出現在鏡子裡，房間裡看不到', JSON.stringify(px));
   ok(s.castDisabled, '還沒選格時不能施放');

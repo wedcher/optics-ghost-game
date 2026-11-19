@@ -338,9 +338,9 @@ async function run(profile, browser) {
   ok(!said.some((t) => /碎片|碎掉|敲下/.test(t || '')), P('物理：小透鏡不是大凸透鏡的碎片（凸透鏡碎片仍會聚）'));
   await tapAt(vw * 0.5, vh * 0.5);
   s = await st();
-  ok(s.scene.endShown && /第二關過關/.test(s.scene.endText) && /荒野（已解鎖）/.test(s.scene.endText) && s.scene.buttons.join() === 'clearMenuBtn,againBtn', P('過關畫面：標題、下一站荒野（已解鎖），「回關卡選單」＋「再玩一次」'), s.scene.endText);
+  ok(s.scene.endShown && /第二關過關/.test(s.scene.endText) && /第三關：荒野狩獵（已解鎖）/.test(s.scene.endText) && s.scene.buttons.join() === 'clearMenuBtn,againBtn', P('過關畫面：標題、第三關：荒野狩獵（已解鎖），「回關卡選單」＋「再玩一次」'), s.scene.endText);
   ok(await page.evaluate(() => document.getElementById('clearMenuBtn').getAttribute('href')) === '../index.html', P('過關畫面的「回關卡選單」連到入口頁'));
-  ok(!/你花費/.test(s.scene.endText) && /你在走廊封印了 5 隻鬼/.test(s.scene.endText) && (await page.evaluate(() => { const r = Leaderboard.getRun(); return r && r.mirrorMs == null && r.castleMs == null && r.convexMs > 0; })), P('排行榜：直接開第二關（沒有第一關成績）不顯示趕鬼時間、不記趕鬼時間（只記第二關成績；說明改顯示封印數）'), s.scene.endText);
+  ok(!/你花費/.test(s.scene.endText) && /成功把鬼趕出城堡。第三關：荒野狩獵（已解鎖）/.test(s.scene.endText) && (await page.evaluate(() => { const r = Leaderboard.getRun(); return r && r.mirrorMs == null && r.castleMs == null && r.convexMs > 0; })), P('排行榜：直接開第二關（沒有第一關成績）不顯示趕鬼時間、不記趕鬼時間（只記第二關成績）；過關文字照 2026-11-19 統一版'), s.scene.endText);
   await page.waitForTimeout(ARM_WAIT);
   await sceneButtons('過關畫面');
   await shot('8-cleared');
@@ -372,8 +372,8 @@ async function run(profile, browser) {
   await page.evaluate(() => localStorage.setItem('ogg.run.v2', JSON.stringify({ mirrorMs: 600000, convexMs: null, castleMs: null, hunt: null })));
   s = await clearOnce('第一關已過關後抓最後一隻');
   const run2 = await page.evaluate(() => Leaderboard.getRun());
-  ok(s.screen === 'cleared' && /你花費10 分 \d+ 秒，把鬼趕出城堡。下一站：城外的荒野（已解鎖）。/.test(s.scene.endText) && run2.castleMs === 600000 + run2.convexMs && run2.convexMs < 60000,
-    P('排行榜：趕鬼時間＝第一關成績＋第二關這次的遊玩時間，過關說明照劇本 2-3「你花費＿＿，把鬼趕出城堡。」'), s.scene.endText);
+  ok(s.screen === 'cleared' && !/你花費/.test(s.scene.endText) && /成功把鬼趕出城堡。第三關：荒野狩獵（已解鎖）/.test(s.scene.endText) && run2.castleMs === 600000 + run2.convexMs && run2.convexMs < 60000,
+    P('排行榜：趕鬼時間＝第一關成績＋第二關這次的遊玩時間，過關說明是統一版「成功把鬼趕出城堡。第三關：荒野狩獵（已解鎖）」（趕鬼時間照記，在荒野結算顯示）'), s.scene.endText);
   // 再玩一次但命用完：保留上次過關的成績
   await page.waitForTimeout(ARM_WAIT);
   await press('#againBtn', 150);

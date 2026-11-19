@@ -1115,10 +1115,10 @@
   function showHuntResult(reason, firstClear) {
     level.screen = 'result';
     if (!LB) return;
-    var buttons = [{ id: 'huntRetryBtn', label: '再挑戰一次', primary: true, onClick: startHunt }];
+    var buttons = [{ id: 'huntRetryBtn', label: '重新挑戰', primary: true, onClick: startHunt }]; // 失敗／結束畫面的主按鈕三關統一叫「重新挑戰」（2026-11-19）
     if (firstClear) buttons.push({ id: 'huntPracticeBtn', label: '荒野練習模式', href: 'index.html?practice=1' });
     LB.showResult({
-      title: reason === 'time' ? '時間到！' : '狩獵結束',
+      title: '狩獵結束', // 時間到或命用完都叫「狩獵結束」（使用者 2026-11-19）
       extraNote: firstClear ? '荒野練習模式已解鎖（不限時間，不計入排行榜）。' : null,
       closeLabel: '回關卡選單',
       buttons: buttons,

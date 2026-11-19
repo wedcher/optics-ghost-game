@@ -30,7 +30,9 @@
     ceiling: 3.6,
     // 鬼：docs/concepts/ghost01.png 的女鬼。原圖裙襬收成一個尖、看起來懸空，沒辦法判斷牠站在哪一格，
     // 所以把圖在裙子還很寬的地方（原圖 y=1390）切平，讓牠像從地板冒出來；切口中央對準格子中央。
-    ghost: { width: 0.81, height: 1.6, poolRadius: 0.38 },
+    // facing：鬼面向 +z（玩家）或 -z（正面的鏡子）。使用者 2026-11-19 選 -1：女鬼面對正面鏡，
+    // 所以正面鏡裡是正面、直接看（抓到現身）是背面；右鏡裡是背面、鏡中鏡是正面（都照鏡射算，不是硬貼）。
+    ghost: { width: 0.81, height: 1.6, poolRadius: 0.38, facing: -1 },
     mirrors: {
       back:  { axis: 'z', value: 0, label: '正面的鏡子', glass: { a: 0.26, b: 5.83, topA: 3.26, topB: 3.26, bottom: 0 } },
       right: { axis: 'x', value: 6, label: '右邊的鏡子', glass: { a: 0.23, b: 5.0, topA: 3.16, topB: 3.16, bottom: 0 } }
