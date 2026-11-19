@@ -372,8 +372,8 @@ async function run(profile, browser) {
   await page.evaluate(() => localStorage.setItem('ogg.run.v2', JSON.stringify({ mirrorMs: 600000, convexMs: null, castleMs: null, hunt: null })));
   s = await clearOnce('第一關已過關後抓最後一隻');
   const run2 = await page.evaluate(() => Leaderboard.getRun());
-  ok(s.screen === 'cleared' && !/你花費/.test(s.scene.endText) && /成功把鬼趕出城堡。第三關：荒野狩獵（已解鎖）/.test(s.scene.endText) && run2.castleMs === 600000 + run2.convexMs && run2.convexMs < 60000,
-    P('排行榜：趕鬼時間＝第一關成績＋第二關這次的遊玩時間，過關說明是統一版「成功把鬼趕出城堡。第三關：荒野狩獵（已解鎖）」（趕鬼時間照記，在荒野結算顯示）'), s.scene.endText);
+  ok(s.screen === 'cleared' && /你花費10 分 \d+ 秒，把鬼趕出城堡。第三關：荒野狩獵（已解鎖）/.test(s.scene.endText) && run2.castleMs === 600000 + run2.convexMs && run2.convexMs < 60000,
+    P('排行榜：趕鬼時間＝第一關成績＋第二關這次的遊玩時間，過關說明「你花費＿＿，把鬼趕出城堡。第三關：荒野狩獵（已解鎖）」'), s.scene.endText);
   // 再玩一次但命用完：保留上次過關的成績
   await page.waitForTimeout(ARM_WAIT);
   await press('#againBtn', 150);
