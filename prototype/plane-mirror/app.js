@@ -445,14 +445,42 @@
         P[j].push(src && dst ? { s: src, d: dst, inImg: src.x >= 0 && src.x <= IW && src.y >= 0 && src.y <= IH } : null);
       }
     }
-    function tri(a, b, c) {
-      if (!a || !b || !c || !a.inImg || !b.inImg || !c.inImg) return;
+    // 直接看時超出圖右緣的那段：用碎鏡圖右緣附近的顏色填（使用者 2026-11-20）。
+    // 每一列格點找它在圖右緣的高度，取那附近一小塊的平均色；相鄰兩列的平均色填那一列的格子，看起來是上下漸變的暗玻璃。
+    var edgeCol = [], sample = null;
+    try {
+      var sc = document.createElement('canvas'); sc.width = IW; sc.height = IH;
+      var sg = sc.getContext('2d'); sg.drawImage(img, 0, 0, IW, IH); sample = sg;
+    } catch (e) { sample = null; }
+    for (j = 0; j <= NY; j++) {
+      var last = null;
+      for (i = 0; i <= NT; i++) if (P[j][i] && P[j][i].inImg) last = P[j][i];
+      var col = [7, 7, 11];
+      if (last && sample) {
+        try {
+          var d = sample.getImageData(IW - 24, Math.max(0, Math.min(IH - 14, Math.round(last.s.y) - 7)), 20, 14).data, rr = 0, gg = 0, bb = 0, n = 0;
+          for (var k = 0; k < d.length; k += 4) { rr += d[k]; gg += d[k + 1]; bb += d[k + 2]; n++; }
+          col = [rr / n, gg / n, bb / n];
+        } catch (e) { /* 讀不到像素就維持暗色 */ }
+      }
+      edgeCol.push(col);
+    }
+    function fillOut(a, b, c, j) {
+      var c0 = edgeCol[j], c1 = edgeCol[j + 1];
+      var st = 'rgb(' + Math.round((c0[0] + c1[0]) / 2) + ',' + Math.round((c0[1] + c1[1]) / 2) + ',' + Math.round((c0[2] + c1[2]) / 2) + ')';
+      g.beginPath(); g.moveTo(a.d.x, a.d.y); g.lineTo(b.d.x, b.d.y); g.lineTo(c.d.x, c.d.y); g.closePath();
+      g.fillStyle = st; g.fill(); g.strokeStyle = st; g.lineWidth = 1; g.stroke(); // 描邊蓋掉三角形之間的細縫
+      stats.brokenFilled = (stats.brokenFilled || 0) + 1;
+    }
+    function tri(a, b, c, j) {
+      if (!a || !b || !c) return;
+      if (!a.inImg || !b.inImg || !c.inImg) { fillOut(a, b, c, j); return; }
       affineTri(g, img, a.d, b.d, c.d, a.s.x * sx, a.s.y * sy, b.s.x * sx, b.s.y * sy, c.s.x * sx, c.s.y * sy);
       drawn++;
     }
     for (j = 0; j < NY; j++) for (i = 0; i < NT; i++) {
-      tri(P[j][i], P[j][i + 1], P[j + 1][i]);
-      tri(P[j][i + 1], P[j + 1][i + 1], P[j + 1][i]);
+      tri(P[j][i], P[j][i + 1], P[j + 1][i], j);
+      tri(P[j][i + 1], P[j + 1][i + 1], P[j + 1][i], j);
     }
     stats.brokenTris = drawn;
     brokenCache[key] = cv;
