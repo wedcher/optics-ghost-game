@@ -251,18 +251,16 @@ async function run(profile, browser) {
   ok(await countGhost() === 0, P('開始抓鬼時畫面上沒有鬼本體'));
   await hudLayout('抓鬼／觀察');
   if (profile.name === 'phone-landscape') {
-    await rowCheck('觀察（812×375）', 'exploreControls', ['◀ 微調', '標記', '微調 ▶', '光路分析']);
-    // 「看布幕／看透鏡」在布幕那一格的右下角（使用者 2026-11-20），放在底部空帶裡、不蓋住布幕畫面
+    await rowCheck('觀察（812×375）', 'exploreControls', ['◀ 微調', '標記', '微調 ▶', '光路分析', '看布幕', '看透鏡']);
+    // 「看布幕／看透鏡」跟著布幕（透鏡）那一欄（使用者 2026-11-20）：在那一欄正下方、左右不超出那一欄、不蓋住畫面
     const lb = await page.evaluate(() => {
       const H = window.__protoConvex, rg = H.regions(), v = document.getElementById('view').getBoundingClientRect();
-      const bs = Array.from(document.querySelectorAll('#lookBox button')).map((e) => { const b = e.getBoundingClientRect(); return { text: e.textContent.trim(), l: b.left - v.left, t: b.top - v.top, r: b.right - v.left, b: b.bottom - v.top, w: b.width, h: b.height, clip: e.scrollWidth > e.clientWidth + 1 }; });
-      return { bs, wall: rg.wall, view: rg.wallView };
+      const bs = Array.from(document.querySelectorAll('#lookBox button')).map((e) => { const b = e.getBoundingClientRect(); return { l: b.left - v.left, t: b.top - v.top, r: b.right - v.left }; });
+      return { bs, wall: rg.wall, vh: v.height };
     });
-    const w = lb.wall, last = lb.bs[lb.bs.length - 1];
-    ok(lb.bs.map((b) => b.text).join('｜') === '看布幕｜看透鏡', P('看布幕／看透鏡：兩顆並排'), lb.bs.map((b) => b.text).join('｜'));
-    ok(lb.bs.every((b) => b.l >= w.x - 0.5 && b.r <= w.x + w.w + 0.5 && b.t >= lb.view.y + lb.view.h - 0.5 && b.b <= w.y + w.h + 0.5), P('看布幕／看透鏡：在布幕那一格底部空帶裡（不蓋住布幕畫面）'), JSON.stringify(lb.bs.map((b) => [Math.round(b.l), Math.round(b.t), Math.round(b.r), Math.round(b.b)])) + ' wall ' + JSON.stringify(w));
-    ok(w.x + w.w - last.r < 12 && w.y + w.h - last.b < 12, P('看布幕／看透鏡：靠右下角'));
-    ok(lb.bs.every((b) => b.w >= 44 && b.h >= 40 && !b.clip), P('看布幕／看透鏡：每顆 ≥ 44×40 px、文字沒被截斷'), lb.bs.map((b) => Math.round(b.w) + '×' + Math.round(b.h)).join('、'));
+    const w = lb.wall, L = lb.bs[0], Rb = lb.bs[lb.bs.length - 1];
+    ok(L.l >= w.x - 2 && L.l - w.x < 14 && Rb.r <= w.x + w.w + 1 && w.x + w.w - Rb.r < 14, P('看布幕／看透鏡：寬度對齊布幕那一欄'), Math.round(L.l) + '～' + Math.round(Rb.r) + '，那一欄 ' + Math.round(w.x) + '～' + Math.round(w.x + w.w));
+    ok(lb.bs.every((b) => b.t >= lb.vh), P('看布幕／看透鏡：在畫面下方的按鈕列，不蓋住布幕'));
   }
   await shot('3-hunt-start');
 

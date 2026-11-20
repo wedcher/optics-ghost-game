@@ -16,13 +16,11 @@
   PASS  [phone-landscape] 抓鬼／觀察：愛心在左上角  — (8, 4)
   PASS  [phone-landscape] 抓鬼／觀察：右上角按鈕字樣「☰ 回關卡」  — ☰ 回關卡
   PASS  [phone-landscape] 抓鬼／觀察：「☰ 回關卡」在右上角（G1）  — 離右邊 8 px、離上面 4 px、82×40
-  PASS  [phone-landscape] 觀察（812×375）：按鈕與順序  — ◀ 微調｜標記｜微調 ▶｜光路分析
-  PASS  [phone-landscape] 觀察（812×375）：只排一排  — 323,323,323,323
-  PASS  [phone-landscape] 觀察（812×375）：每顆 ≥ 44×44 px、文字沒被截斷  — ◀ 微調 196×46、標記 196×46、微調 ▶ 196×46、光路分析 196×46
-  PASS  [phone-landscape] 看布幕／看透鏡：兩顆並排  — 看布幕｜看透鏡
-  PASS  [phone-landscape] 看布幕／看透鏡：在布幕那一格底部空帶裡（不蓋住布幕畫面）  — [[668,220,738,262],[738,220,806,262]] wall {"x":662,"y":0,"w":150,"h":267}
-  PASS  [phone-landscape] 看布幕／看透鏡：靠右下角
-  PASS  [phone-landscape] 看布幕／看透鏡：每顆 ≥ 44×40 px、文字沒被截斷  — 70×42、69×42
+  PASS  [phone-landscape] 觀察（812×375）：按鈕與順序  — ◀ 微調｜標記｜微調 ▶｜光路分析｜看布幕｜看透鏡
+  PASS  [phone-landscape] 觀察（812×375）：只排一排  — 323,323,323,323,323,323
+  PASS  [phone-landscape] 觀察（812×375）：每顆 ≥ 44×44 px、文字沒被截斷  — ◀ 微調 152×46、標記 152×46、微調 ▶ 152×46、光路分析 152×46、看布幕 85×46、看透鏡 84×46
+  PASS  [phone-landscape] 看布幕／看透鏡：寬度對齊布幕那一欄  — 638～806，那一欄 632～812
+  PASS  [phone-landscape] 看布幕／看透鏡：在畫面下方的按鈕列，不蓋住布幕
   PASS  [phone-landscape] 按「跳過」直接到【開始抓鬼】（仍要按才開始）
   PASS  [phone-landscape] 跳過後按【開始抓鬼】進入抓鬼
   PASS  [phone-landscape] 光路分析・畫線（812×375）：按鈕與順序  — 重新對焦｜選格封印｜畫線｜復原｜清除
@@ -40,7 +38,7 @@
   PASS  [phone-landscape] 抓鬼／封印：愛心在左上角  — (8, 3)
   PASS  [phone-landscape] 抓鬼／封印：右上角按鈕字樣「☰ 回關卡」  — ☰ 回關卡
   PASS  [phone-landscape] 抓鬼／封印：「☰ 回關卡」在右上角（G1）  — 離右邊 8 px、離上面 3 px、82×40
-  PASS  [phone-landscape] 抓對第 1 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 1／5（配置 G）
+  PASS  [phone-landscape] 抓對第 1 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 1／5（配置 B）
   PASS  [phone-landscape] 抓對第 1 隻：左上角顯示「封印 1／5」
   PASS  [phone-landscape] 抓對後按鈕是「下一隻鬼 ➜」
   PASS  [phone-landscape] 封印成功後（812×375）：按鈕與順序  — 畫線｜復原｜清除｜光路重現｜下一隻鬼 ➜
@@ -63,26 +61,26 @@
   PASS  [phone-landscape] 重新挑戰：直接回到抓鬼，不再播開場
   PASS  [phone-landscape] 重新挑戰：命數與封印數重置
   PASS  [phone-landscape] 重新挑戰：回到觀察，標記／作圖／選格都清空，畫面上沒有鬼
-  PASS  [phone-landscape] 抓對第 1 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 1／5（配置 B）
+  PASS  [phone-landscape] 抓對第 1 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 1／5（配置 C）
   PASS  [phone-landscape] 抓對第 1 隻：左上角顯示「封印 1／5」
   PASS  [phone-landscape] 第 1 隻之後還沒過關
-  PASS  [phone-landscape] 抓對第 2 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 2／5（配置 J）
+  PASS  [phone-landscape] 抓對第 2 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 2／5（配置 B）
   PASS  [phone-landscape] 抓對第 2 隻：左上角顯示「封印 2／5」
   PASS  [phone-landscape] 第 2 隻之後還沒過關
   PASS  [phone-landscape] 過關途中抓錯一次：抓錯扣一顆心  — 3 → 2 條命
   PASS  [phone-landscape] 過關途中抓錯一次：封印數不變、還是同一隻鬼
   PASS  [phone-landscape] 過關途中抓錯一次：全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 過關途中抓錯一次：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
-  PASS  [phone-landscape] 抓對第 3 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 3／5（配置 H）
+  PASS  [phone-landscape] 抓對第 3 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 3／5（配置 D）
   PASS  [phone-landscape] 抓對第 3 隻：左上角顯示「封印 3／5」
   PASS  [phone-landscape] 第 3 隻之後還沒過關
-  PASS  [phone-landscape] 抓對第 4 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 4／5（配置 L）
+  PASS  [phone-landscape] 抓對第 4 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 4／5（配置 J）
   PASS  [phone-landscape] 抓對第 4 隻：左上角顯示「封印 4／5」
   PASS  [phone-landscape] 第 4 隻之後還沒過關
-  PASS  [phone-landscape] 抓對第 5 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 K）
+  PASS  [phone-landscape] 抓對第 5 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 I）
   PASS  [phone-landscape] 抓對第 5 隻：左上角顯示「封印 5／5」
-  PASS  [phone-landscape] 5 隻鬼是 5 組不同的配置，隨機出題  — 1→9→7→11→10
-  PASS  [phone-landscape] 這一輪 5 隻裡至少有一題虛像題  — 1→9→7→11→10
+  PASS  [phone-landscape] 5 隻鬼是 5 組不同的配置，隨機出題  — 2→1→3→9→8
+  PASS  [phone-landscape] 這一輪 5 隻裡至少有一題虛像題  — 2→1→3→9→8
   PASS  [phone-landscape] 抓滿 5 隻：按鈕變成「過關 ➜」，先讓玩家看完顯形與光路重現
   PASS  [phone-landscape] 按「過關 ➜」進入過關演出
   PASS  [phone-landscape] 過關演出：鬼一哄而散（旁白）  — 7 隻逃散的鬼
@@ -97,12 +95,12 @@
   PASS  [phone-landscape] 過關畫面：按鈕都在畫面內、≥ 44×44、點得到，頁面不捲動  — clearMenuBtn 200×62、againBtn 150×62
   PASS  [phone-landscape] 「再玩一次」：直接回到抓鬼，命數與封印數重置
   PASS  [phone-landscape] 「再玩一次」：回到觀察，標記／作圖／選格都清空
-  PASS  [phone-landscape] 「再玩一次」：重洗牌堆，這輪 5 隻不重複、含虛像題  — 2→5→4→7→9
+  PASS  [phone-landscape] 「再玩一次」：重洗牌堆，這輪 5 隻不重複、含虛像題  — 5→6→4→10→0
   PASS  [phone-landscape] 排行榜：按「開始抓鬼」／重新挑戰後第二關在計時
   PASS  [phone-landscape] 跳關後抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 K）
   PASS  [phone-landscape] 跳關後抓最後一隻：左上角顯示「封印 5／5」
   PASS  [phone-landscape] 排行榜：只有第二關成績（?unlock=1 跳關）第二關過關不算趕鬼時間  — 第二關過關！成功把鬼趕出城堡。第三關：荒野狩獵（已解鎖）回關卡選單再玩一次
-  PASS  [phone-landscape] 第一關已過關後抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 D）
+  PASS  [phone-landscape] 第一關已過關後抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 L）
   PASS  [phone-landscape] 第一關已過關後抓最後一隻：左上角顯示「封印 5／5」
   PASS  [phone-landscape] 排行榜：趕鬼時間＝第一關成績＋第二關這次的遊玩時間，過關說明「你花費＿＿，把鬼趕出城堡。第三關：荒野狩獵（已解鎖）」  — 第二關過關！你花費10 分 3 秒，把鬼趕出城堡。第三關：荒野狩獵（已解鎖）回關卡選單再玩一次
   PASS  [phone-landscape] 再玩一次抓錯 1：抓錯扣一顆心  — 3 → 2 條命
@@ -117,19 +115,19 @@
   PASS  [phone-landscape] 再玩一次抓錯 3：封印數不變、還是同一隻鬼
   PASS  [phone-landscape] 再玩一次抓錯 3：全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 再玩一次抓錯 3：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
-  PASS  [phone-landscape] 排行榜：再玩一次命用完，保留上次過關的成績  — {"mirrorMs":600000,"convexMs":2519,"castleMs":602519,"hunt":null}
+  PASS  [phone-landscape] 排行榜：再玩一次命用完，保留上次過關的成績  — {"mirrorMs":600000,"convexMs":2739,"castleMs":602739,"hunt":null}
   PASS  [phone-landscape] ?practice=1：不播開場，直接抓鬼；有愛心、沒有開發工具
   PASS  [phone-landscape] ?practice=1：左上角標「練習」  — 練習　封印 0／5
   PASS  [phone-landscape] 練習模式抓錯：抓錯扣一顆心  — 3 → 2 條命
   PASS  [phone-landscape] 練習模式抓錯：封印數不變、還是同一隻鬼
   PASS  [phone-landscape] 練習模式抓錯：全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [phone-landscape] 練習模式抓錯：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
-  PASS  [phone-landscape] 練習模式抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 K）
+  PASS  [phone-landscape] 練習模式抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 H）
   PASS  [phone-landscape] 練習模式抓最後一隻：左上角顯示「練習　封印 5／5」
   PASS  [phone-landscape] ?practice=1：過關不顯示趕鬼時間、不記成績（就算本輪第一關已過）；「回關卡選單」＋「再玩一次」  — 第二關過關！成功把鬼趕出城堡。回關卡選單再玩一次
   PASS  [phone-landscape] 發牌統計 3000 輪：每輪都有虛像題、5 隻不重複  — 缺虛像題 0 輪
-  PASS  [phone-landscape] 發牌統計：第一題虛像題出現在第 1～5 隻都有（不固定第一或最後一題）  — 854/765/581/446/354
-  PASS  [phone-landscape] 發牌統計：J、K、L 三題都會出現  — {"J":1420,"K":1396,"L":1469}
+  PASS  [phone-landscape] 發牌統計：第一題虛像題出現在第 1～5 隻都有（不固定第一或最後一題）  — 879/707/569/467/378
+  PASS  [phone-landscape] 發牌統計：J、K、L 三題都會出現  — {"K":1433,"L":1397,"J":1419}
   PASS  [phone-landscape] ?free=1：沒有過場與愛心，保留配置選單與 Debug
   PASS  [phone-landscape] 沒有 JS 錯誤、沒有載入失敗的檔案
   PASS  [desktop] 進入第二關先看到開場過場
@@ -160,7 +158,7 @@
   PASS  [desktop] 抓鬼／封印：愛心在左上角  — (8, 6)
   PASS  [desktop] 抓鬼／封印：右上角按鈕字樣「☰ 回關卡」  — ☰ 回關卡
   PASS  [desktop] 抓鬼／封印：「☰ 回關卡」在右上角（G1）  — 離右邊 8 px、離上面 6 px、82×40
-  PASS  [desktop] 抓對第 1 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 1／5（配置 A）
+  PASS  [desktop] 抓對第 1 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 1／5（配置 J）
   PASS  [desktop] 抓對第 1 隻：左上角顯示「封印 1／5」
   PASS  [desktop] 抓對後按鈕是「下一隻鬼 ➜」
   PASS  [desktop] 下一隻鬼：換配置、回到觀察、命數與封印數保留
@@ -180,26 +178,26 @@
   PASS  [desktop] 重新挑戰：直接回到抓鬼，不再播開場
   PASS  [desktop] 重新挑戰：命數與封印數重置
   PASS  [desktop] 重新挑戰：回到觀察，標記／作圖／選格都清空，畫面上沒有鬼
-  PASS  [desktop] 抓對第 1 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 1／5（配置 K）
+  PASS  [desktop] 抓對第 1 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 1／5（配置 L）
   PASS  [desktop] 抓對第 1 隻：左上角顯示「封印 1／5」
   PASS  [desktop] 第 1 隻之後還沒過關
-  PASS  [desktop] 抓對第 2 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 2／5（配置 E）
+  PASS  [desktop] 抓對第 2 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 2／5（配置 H）
   PASS  [desktop] 抓對第 2 隻：左上角顯示「封印 2／5」
   PASS  [desktop] 第 2 隻之後還沒過關
   PASS  [desktop] 過關途中抓錯一次：抓錯扣一顆心  — 3 → 2 條命
   PASS  [desktop] 過關途中抓錯一次：封印數不變、還是同一隻鬼
   PASS  [desktop] 過關途中抓錯一次：全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [desktop] 過關途中抓錯一次：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
-  PASS  [desktop] 抓對第 3 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 3／5（配置 B）
+  PASS  [desktop] 抓對第 3 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 3／5（配置 D）
   PASS  [desktop] 抓對第 3 隻：左上角顯示「封印 3／5」
   PASS  [desktop] 第 3 隻之後還沒過關
-  PASS  [desktop] 抓對第 4 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 4／5（配置 C）
+  PASS  [desktop] 抓對第 4 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 4／5（配置 K）
   PASS  [desktop] 抓對第 4 隻：左上角顯示「封印 4／5」
   PASS  [desktop] 第 4 隻之後還沒過關
-  PASS  [desktop] 抓對第 5 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 H）
+  PASS  [desktop] 抓對第 5 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 A）
   PASS  [desktop] 抓對第 5 隻：左上角顯示「封印 5／5」
-  PASS  [desktop] 5 隻鬼是 5 組不同的配置，隨機出題  — 10→4→1→2→7
-  PASS  [desktop] 這一輪 5 隻裡至少有一題虛像題  — 10→4→1→2→7
+  PASS  [desktop] 5 隻鬼是 5 組不同的配置，隨機出題  — 11→7→3→10→0
+  PASS  [desktop] 這一輪 5 隻裡至少有一題虛像題  — 11→7→3→10→0
   PASS  [desktop] 抓滿 5 隻：按鈕變成「過關 ➜」，先讓玩家看完顯形與光路重現
   PASS  [desktop] 按「過關 ➜」進入過關演出
   PASS  [desktop] 過關演出：鬼一哄而散（旁白）  — 7 隻逃散的鬼
@@ -214,9 +212,9 @@
   PASS  [desktop] 過關畫面：按鈕都在畫面內、≥ 44×44、點得到，頁面不捲動  — clearMenuBtn 200×62、againBtn 150×62
   PASS  [desktop] 「再玩一次」：直接回到抓鬼，命數與封印數重置
   PASS  [desktop] 「再玩一次」：回到觀察，標記／作圖／選格都清空
-  PASS  [desktop] 「再玩一次」：重洗牌堆，這輪 5 隻不重複、含虛像題  — 8→7→11→2→10
+  PASS  [desktop] 「再玩一次」：重洗牌堆，這輪 5 隻不重複、含虛像題  — 3→8→10→4→9
   PASS  [desktop] 排行榜：按「開始抓鬼」／重新挑戰後第二關在計時
-  PASS  [desktop] 跳關後抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 L）
+  PASS  [desktop] 跳關後抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 I）
   PASS  [desktop] 跳關後抓最後一隻：左上角顯示「封印 5／5」
   PASS  [desktop] 排行榜：只有第二關成績（?unlock=1 跳關）第二關過關不算趕鬼時間  — 第二關過關！成功把鬼趕出城堡。第三關：荒野狩獵（已解鎖）回關卡選單再玩一次
   PASS  [desktop] 第一關已過關後抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 G）
@@ -234,20 +232,20 @@
   PASS  [desktop] 再玩一次抓錯 3：封印數不變、還是同一隻鬼
   PASS  [desktop] 再玩一次抓錯 3：全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [desktop] 再玩一次抓錯 3：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
-  PASS  [desktop] 排行榜：再玩一次命用完，保留上次過關的成績  — {"mirrorMs":600000,"convexMs":2403,"castleMs":602403,"hunt":null}
+  PASS  [desktop] 排行榜：再玩一次命用完，保留上次過關的成績  — {"mirrorMs":600000,"convexMs":2471,"castleMs":602471,"hunt":null}
   PASS  [desktop] ?practice=1：不播開場，直接抓鬼；有愛心、沒有開發工具
   PASS  [desktop] ?practice=1：左上角標「練習」  — 練習　封印 0／5
   PASS  [desktop] 練習模式抓錯：抓錯扣一顆心  — 3 → 2 條命
   PASS  [desktop] 練習模式抓錯：封印數不變、還是同一隻鬼
   PASS  [desktop] 練習模式抓錯：全程不顯示鬼  — 動畫取樣 0/0/0
   PASS  [desktop] 練習模式抓錯：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
-  PASS  [desktop] 練習模式抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 F）
+  PASS  [desktop] 練習模式抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 E）
   PASS  [desktop] 練習模式抓最後一隻：左上角顯示「練習　封印 5／5」
   PASS  [desktop] ?practice=1：過關不顯示趕鬼時間、不記成績（就算本輪第一關已過）；「回關卡選單」＋「再玩一次」  — 第二關過關！成功把鬼趕出城堡。回關卡選單再玩一次
   PASS  [desktop] 發牌統計 3000 輪：每輪都有虛像題、5 隻不重複  — 缺虛像題 0 輪
-  PASS  [desktop] 發牌統計：第一題虛像題出現在第 1～5 隻都有（不固定第一或最後一題）  — 854/673/572/495/406
-  PASS  [desktop] 發牌統計：J、K、L 三題都會出現  — {"K":1399,"L":1422,"J":1373}
+  PASS  [desktop] 發牌統計：第一題虛像題出現在第 1～5 隻都有（不固定第一或最後一題）  — 830/708/566/520/376
+  PASS  [desktop] 發牌統計：J、K、L 三題都會出現  — {"L":1367,"K":1447,"J":1380}
   PASS  [desktop] ?free=1：沒有過場與愛心，保留配置選單與 Debug
   PASS  [desktop] 沒有 JS 錯誤、沒有載入失敗的檔案
 
-ALL PASS: 251/251 checks
+ALL PASS: 249/249 checks

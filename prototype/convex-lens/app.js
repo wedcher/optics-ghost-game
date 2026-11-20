@@ -92,30 +92,26 @@
   // 版面：觀察階段把畫布分成「布幕正面」與「走廊側視」兩塊
   // ====================================================================
 
-  // 布幕（透鏡）那一格底部留一條空帶放「看布幕／看透鏡」（#lookBox，使用者 2026-11-20：放在那一格的右下角），
-  // 布幕和透鏡畫在空帶上面（wallView），切換鈕不會蓋住布幕上的像。
-  var LOOK_BAND = 52, LOOK_MIN_W = 150;
+  // 右邊布幕（透鏡）那一欄至少這麼寬：放得下底下的「看布幕／看透鏡」，透鏡畫面也比較大（使用者 2026-11-20 要透鏡和像大一點）
+  var WALL_MIN_W = 180;
   function regions() {
     var rg;
     if (W > H * 1.25) {
-      // 布幕是直的窄長條（寬:高 = wallHalfWidth:axisHeight），只留它需要的寬度，其餘給走廊側視；至少要放得下切換鈕
-      var ww = Math.round(Math.min(W * 0.36, Math.max(LOOK_MIN_W, (H - 38 - LOOK_BAND) * WORLD.wallHalfWidth / WORLD.axisHeight + 34)));
+      // 布幕是直的窄長條（寬:高 = wallHalfWidth:axisHeight），只留它需要的寬度，其餘給走廊側視
+      var ww = Math.round(Math.min(W * 0.36, Math.max(WALL_MIN_W, (H - 38) * WORLD.wallHalfWidth / WORLD.axisHeight + 34)));
       rg = { wall: { x: W - ww, y: 0, w: ww, h: H }, side: { x: 0, y: 0, w: W - ww, h: H } };
     } else {
       var wh = Math.round(H * 0.58);
       rg = { wall: { x: 0, y: 0, w: W, h: wh }, side: { x: 0, y: wh, w: W, h: H - wh } };
     }
-    rg.wallView = { x: rg.wall.x, y: rg.wall.y, w: rg.wall.w, h: rg.wall.h - LOOK_BAND };
+    rg.wallView = rg.wall; // 舊名（測試用）
     return rg;
   }
+  // 「看布幕／看透鏡」跟著布幕（透鏡）那一欄（使用者 2026-11-20）：橫向版面時寬度對齊那一欄，排在按鈕列最右邊、就在那一欄正下方
   function placeLookBox() {
-    var box = $('lookBox');
-    box.hidden = state.phase === 'analysis';
-    if (box.hidden) return;
-    var wr = regions().wall, bw = Math.min(wr.w - 12, 220);
-    box.style.width = bw + 'px';
-    box.style.left = (wr.x + wr.w - 6 - bw) + 'px';
-    box.style.top = (wr.y + wr.h - LOOK_BAND + (LOOK_BAND - 42) / 2) + 'px';
+    var box = $('lookBox'), wr = regions().wall, col = W > H * 1.25 && wr.x > 0;
+    box.classList.toggle('col', col);
+    box.style.width = col ? Math.max(100, wr.w - 12) + 'px' : '';
   }
 
   function fitInto(r) {
@@ -311,7 +307,8 @@
     var k = Math.min((r.w - 2 * pad) / (2 * WORLD.wallHalfWidth), (r.h - 2 * pad - 18) / (2 * WORLD.axisHeight));
     var foot = Math.round(34 * FS);                              // 底部一列：直接看鬼的大小（對照）
     var cx = r.x + r.w / 2, cy = r.y + 22 + (r.h - 22 - foot) / 2;
-    var maxR = Math.min(WORLD.wallHalfWidth * k, (r.h - 22 - foot) / 2 - 6); // 鏡框半徑上限 = 布幕半寬（不比布幕大）
+    // 鏡框半徑上限：那一欄放得下多大就多大（使用者 2026-11-20 要透鏡和像大一點；原本限制不比布幕寬）
+    var maxR = Math.min(r.w / 2 - 16, (r.h - 22 - foot) / 2 - 6);
     var eye = WORLD.eyeX, D = eye - c.object.x, dLens = eye - state.lensX;
     var angR = WORLD.lensRadius / dLens, naked = WORLD.ghostHalfHeight / D;
     var K = Math.min(maxR * 0.3 / naked, maxR / angR);          // 視角（正切）→ 畫面 px；直接看鬼時鬼的半高 = 鏡框上限的 30%
@@ -1231,8 +1228,7 @@
     } else {
       var rg = regions();
       renderSide(rg.side);
-      ctx.fillStyle = '#0a0b16'; ctx.fillRect(rg.wall.x, rg.wall.y, rg.wall.w, rg.wall.h); // 底部空帶（放切換鈕）
-      if (state.look === 'lens') renderLensView(rg.wallView); else renderWall(rg.wallView);
+      if (state.look === 'lens') renderLensView(rg.wall); else renderWall(rg.wall);
       ctx.strokeStyle = '#2c3359'; ctx.lineWidth = 2;
       ctx.beginPath();
       if (rg.wall.y === 0 && rg.wall.x > 0) { ctx.moveTo(rg.wall.x, 0); ctx.lineTo(rg.wall.x, H); }
