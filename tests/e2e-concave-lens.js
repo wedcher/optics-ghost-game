@@ -530,12 +530,14 @@ async function run(profile, browser) {
     s = await st();
     const status = await page.evaluate(() => document.getElementById('status').textContent);
     ok(!s.solved && s.attempts === 1 && s.selectedCell === null, T('封印虛像所在格 → 失敗'));
+    ok(s.mode === 'draw' && await page.evaluate(() => document.getElementById('modeDraw').classList.contains('on')), T('封印失敗後自動切回「畫線」（使用者 2026-11-20）'));
     ok(during.every((n) => n === 0) && await countColor(GHOST) === 0 && !s.stats.ghostRevealed, T('錯誤封印全程不顯示鬼'), '動畫取樣 ' + during.join('/'));
     ok(!/[左右前後遠近]|太|靠|第\s*\d|格子?\s*\d|\d/.test(status), T('錯誤訊息不含方向／距離／格號線索'), '「' + status + '」');
     await leak('錯誤封印後');
     await checkReplayIdle({ page, hook: '__proto', ok, T, when: '錯誤封印後' });
 
     // ---------- 正確封印（對照組：確認「顯形」真的偵測得到） ----------
+    await press('#modeSeal');
     wp = await w2s({ x: -(c.targetCell - 0.5) * 100, y: 60 }); // 點直欄上方也能選到格
     await tap(wp.x, wp.y);
     ok((await st()).selectedCell === c.targetCell, T('整個直欄都是該格的點擊區'));

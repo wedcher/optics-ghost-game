@@ -92,14 +92,30 @@
   // 版面：觀察階段把畫布分成「布幕正面」與「走廊側視」兩塊
   // ====================================================================
 
+  // 布幕（透鏡）那一格底部留一條空帶放「看布幕／看透鏡」（#lookBox，使用者 2026-11-20：放在那一格的右下角），
+  // 布幕和透鏡畫在空帶上面（wallView），切換鈕不會蓋住布幕上的像。
+  var LOOK_BAND = 52, LOOK_MIN_W = 150;
   function regions() {
+    var rg;
     if (W > H * 1.25) {
-      // 布幕是直的窄長條（寬:高 = wallHalfWidth:axisHeight），只留它需要的寬度，其餘給走廊側視
-      var ww = Math.round(Math.min(W * 0.36, (H - 38) * WORLD.wallHalfWidth / WORLD.axisHeight + 34));
-      return { wall: { x: W - ww, y: 0, w: ww, h: H }, side: { x: 0, y: 0, w: W - ww, h: H } };
+      // 布幕是直的窄長條（寬:高 = wallHalfWidth:axisHeight），只留它需要的寬度，其餘給走廊側視；至少要放得下切換鈕
+      var ww = Math.round(Math.min(W * 0.36, Math.max(LOOK_MIN_W, (H - 38 - LOOK_BAND) * WORLD.wallHalfWidth / WORLD.axisHeight + 34)));
+      rg = { wall: { x: W - ww, y: 0, w: ww, h: H }, side: { x: 0, y: 0, w: W - ww, h: H } };
+    } else {
+      var wh = Math.round(H * 0.58);
+      rg = { wall: { x: 0, y: 0, w: W, h: wh }, side: { x: 0, y: wh, w: W, h: H - wh } };
     }
-    var wh = Math.round(H * 0.58);
-    return { wall: { x: 0, y: 0, w: W, h: wh }, side: { x: 0, y: wh, w: W, h: H - wh } };
+    rg.wallView = { x: rg.wall.x, y: rg.wall.y, w: rg.wall.w, h: rg.wall.h - LOOK_BAND };
+    return rg;
+  }
+  function placeLookBox() {
+    var box = $('lookBox');
+    box.hidden = state.phase === 'analysis';
+    if (box.hidden) return;
+    var wr = regions().wall, bw = Math.min(wr.w - 12, 220);
+    box.style.width = bw + 'px';
+    box.style.left = (wr.x + wr.w - 6 - bw) + 'px';
+    box.style.top = (wr.y + wr.h - LOOK_BAND + (LOOK_BAND - 42) / 2) + 'px';
   }
 
   function fitInto(r) {
@@ -803,6 +819,7 @@
         startReplay();
       } else {
         state.selectedCell = null;
+        state.mode = 'draw'; // 抓錯後自動切回畫線，方便重新檢查作圖（使用者 2026-11-20，第二、三關一致）
         giggle();
         if (level.on) {
           // 扣命只看「抓錯」這件事本身，訊息與畫面都不帶任何位置線索
@@ -965,6 +982,7 @@
     $('exploreControls').hidden = analysis;
     $('analysisControls').hidden = !analysis;
     $('zoomBox').hidden = !analysis;
+    placeLookBox();
     $('zoomBox').classList.toggle('low', !!state.marker && !state.marker.virtual && state.marker.y > 0); // 避開布幕上的實像標記（見 index.html）；虛像標記在走廊中間，不必避
     $('toAnalysis').disabled = !state.marker;
     $('toAnalysis').classList.toggle('primary', !!state.marker);
@@ -1213,7 +1231,8 @@
     } else {
       var rg = regions();
       renderSide(rg.side);
-      if (state.look === 'lens') renderLensView(rg.wall); else renderWall(rg.wall);
+      ctx.fillStyle = '#0a0b16'; ctx.fillRect(rg.wall.x, rg.wall.y, rg.wall.w, rg.wall.h); // 底部空帶（放切換鈕）
+      if (state.look === 'lens') renderLensView(rg.wallView); else renderWall(rg.wallView);
       ctx.strokeStyle = '#2c3359'; ctx.lineWidth = 2;
       ctx.beginPath();
       if (rg.wall.y === 0 && rg.wall.x > 0) { ctx.moveTo(rg.wall.x, 0); ctx.lineTo(rg.wall.x, H); }

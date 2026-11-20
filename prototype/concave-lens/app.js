@@ -799,6 +799,7 @@
         startReplay();
       } else {
         state.selectedCell = null;
+        state.mode = 'draw'; // 抓錯後自動切回畫線，方便重新檢查作圖（使用者 2026-11-20，第二、三關一致）
         giggle();
         if (level.on) {
           // 扣命只看「抓錯」這件事本身，訊息與畫面都不帶任何位置線索

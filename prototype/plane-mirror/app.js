@@ -203,15 +203,8 @@
   // ---------- 地磚貼圖（使用者 2026-11-20 給的 docs/concepts/地磚.png，一格貼一張） ----------
   // 透視貼圖：每格切成 n×n 小塊、每塊兩個三角形用仿射變換貼（canvas 沒有透視貼圖）。
   // 地板不會動，所以每個視角（直接看、各面鏡子、鏡中鏡）只算一次，存成影像座標大小的圖層。
-  var floorTex = loadArt('assets/floor-tile.webp'), floorCache = {};
-  function floorLayer(T) {
-    if (!floorTex.ready) return null;
-    var key = [T.sx, T.sz, T.ox, T.oz].map(function (n) { return Math.round((n || 0) * 1000); }).join(',');
-    if (floorCache[key]) return floorCache[key];
-    var cv = document.createElement('canvas'); cv.width = IW; cv.height = IH;
-    var g = cv.getContext('2d'), img = floorTex.img, TW = img.width, TH = img.height;
-    function tri(p0, p1, p2, u0, v0, u1, v1, u2, v2) {
-      // 把貼圖上的三角形 (u,v) 仿射到畫面上的三角形 p；邊緣外擴 0.6 px 免得接縫露出細線
+  // 把貼圖 img 上的三角形 (u,v) 仿射到 g 畫面上的三角形 p；邊緣外擴 0.6 px 免得接縫露出細線
+  function affineTri(g, img, p0, p1, p2, u0, v0, u1, v1, u2, v2) {
       var cx = (p0.x + p1.x + p2.x) / 3, cy = (p0.y + p1.y + p2.y) / 3;
       g.save(); g.beginPath();
       [p0, p1, p2].forEach(function (q, k) { var dx = q.x - cx, dy = q.y - cy, l = Math.hypot(dx, dy) || 1, x = q.x + dx / l * 0.6, y = q.y + dy / l * 0.6; if (k) g.lineTo(x, y); else g.moveTo(x, y); });
@@ -225,7 +218,16 @@
           f = (p0.x * (u1 * v2 - u2 * v1) + p1.x * (u2 * v0 - u0 * v2) + p2.x * (u0 * v1 - u1 * v0)) / d,
           h = (p0.y * (u1 * v2 - u2 * v1) + p1.y * (u2 * v0 - u0 * v2) + p2.y * (u0 * v1 - u1 * v0)) / d;
       g.setTransform(a, b, c, e, f, h); g.drawImage(img, 0, 0); g.restore();
-    }
+  }
+  function viewKey(T) { return [T.sx, T.sz, T.ox, T.oz].map(function (n) { return Math.round((n || 0) * 1000); }).join(','); }
+  var floorTex = loadArt('assets/floor-tile.webp'), floorCache = {};
+  function floorLayer(T) {
+    if (!floorTex.ready) return null;
+    var key = viewKey(T);
+    if (floorCache[key]) return floorCache[key];
+    var cv = document.createElement('canvas'); cv.width = IW; cv.height = IH;
+    var g = cv.getContext('2d'), img = floorTex.img, TW = img.width, TH = img.height;
+    function tri(p0, p1, p2, u0, v0, u1, v1, u2, v2) { affineTri(g, img, p0, p1, p2, u0, v0, u1, v1, u2, v2); }
     for (var row = 1; row <= R.length; row++) for (var col = 1; col <= R.cols; col++) {
       var corners = [proj(T, { x: col - 1, y: 0, z: row - 1 }), proj(T, { x: col, y: 0, z: row - 1 }), proj(T, { x: col, y: 0, z: row }), proj(T, { x: col - 1, y: 0, z: row })];
       var size = 0;
@@ -401,7 +403,7 @@
       if (p.length < 3) return;
       if (intact && chain.length < 2) drawView(chain.concat(id), p);
       else if (intact) fillPoly(p, '#141a26');
-      else drawBrokenGlass(p);
+      else drawBrokenGlass(p, T);
       path(p); ctx.strokeStyle = '#b8873a'; ctx.lineWidth = Math.max(2, 26 / avgDepth(p) * 2.2); ctx.lineJoin = 'round'; ctx.stroke();
     });
     // 人形：遠的先畫
@@ -423,8 +425,47 @@
     pts.forEach(function (p) { b.x0 = Math.min(b.x0, p.x); b.y0 = Math.min(b.y0, p.y); b.x1 = Math.max(b.x1, p.x); b.y1 = Math.max(b.y1, p.y); });
     return b;
   }
-  function drawBrokenGlass(p) {
+  // 鏡子裡映出的那面碎鏡子（使用者 2026-11-20）：用背景圖 room-broken.jpg 裡畫好的碎玻璃，照鏡射貼進鏡中。
+  // 碎鏡面上取格點：每點在「直接看」的畫面（proj(IDENTITY)）的位置當貼圖座標，在這個鏡射視角（proj(T)）的位置當目的地，
+  // 分塊仿射貼（和地磚同一招），所以形狀、透視都照鏡射算。直接看時超出圖右緣的那段沒有圖可貼，維持暗色。
+  var brokenCache = {};
+  function brokenGlassLayer(T) {
+    if (!ART.broken.ready) return null;
+    var key = viewKey(T);
+    if (brokenCache[key]) return brokenCache[key];
+    var m = R.mirrors[R.breaks], gl = m.glass, img = ART.broken.img, sx = img.width / IW, sy = img.height / IH;
+    var cv = document.createElement('canvas'); cv.width = IW; cv.height = IH;
+    var g = cv.getContext('2d'), NT = 40, NY = 16, P = [], i, j, drawn = 0;
+    function pt(t, y) { return m.axis === 'z' ? { x: t, y: y, z: m.value } : { x: m.value, y: y, z: t }; }
+    for (j = 0; j <= NY; j++) {
+      P.push([]);
+      for (i = 0; i <= NT; i++) {
+        var t = gl.a + (gl.b - gl.a) * i / NT, top = gl.topA + (gl.topB - gl.topA) * i / NT, q = pt(t, R.paintedBottom + (top - R.paintedBottom) * j / NY);
+        var src = proj(C.IDENTITY, q), dst = proj(T, q);
+        P[j].push(src && dst ? { s: src, d: dst, inImg: src.x >= 0 && src.x <= IW && src.y >= 0 && src.y <= IH } : null);
+      }
+    }
+    function tri(a, b, c) {
+      if (!a || !b || !c || !a.inImg || !b.inImg || !c.inImg) return;
+      affineTri(g, img, a.d, b.d, c.d, a.s.x * sx, a.s.y * sy, b.s.x * sx, b.s.y * sy, c.s.x * sx, c.s.y * sy);
+      drawn++;
+    }
+    for (j = 0; j < NY; j++) for (i = 0; i < NT; i++) {
+      tri(P[j][i], P[j][i + 1], P[j + 1][i]);
+      tri(P[j][i + 1], P[j + 1][i + 1], P[j + 1][i]);
+    }
+    stats.brokenTris = drawn;
+    brokenCache[key] = cv;
+    return cv;
+  }
+  function drawBrokenGlass(p, T) {
     fillPoly(p, '#07070b');
+    var layer = T && brokenGlassLayer(T);
+    if (layer) {
+      ctx.save(); path(p); ctx.clip(); ctx.drawImage(layer, 0, 0, IW, IH); ctx.restore();
+      stats.brokenTextured = true;
+      return;
+    }
     var b = bounds(p), cx = b.x0 + (b.x1 - b.x0) * 0.62, cy = b.y0 + (b.y1 - b.y0) * 0.5, i;
     ctx.save(); path(p); ctx.clip();
     ctx.strokeStyle = 'rgba(210,220,235,.5)'; ctx.lineWidth = 1;
@@ -503,6 +544,7 @@
   var CAST_GROW = 800, CAST_FADE = 600;
   function render() {
     var now = performance.now(), animating = false;
+    stats.brokenTextured = false;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
     var jx = 0, jy = 0, flash = 0;

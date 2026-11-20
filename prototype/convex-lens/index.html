@@ -49,8 +49,9 @@
   /* 觀察、光路分析的按鈕都只排一排（使用者 2026-11-18 回饋 V1、V2）。直拿的窄螢幕才允許換行（備援版面） */
   .row { display:flex; gap:6px; flex-wrap:wrap; }
   .row > button { flex:1 1 0; min-width:60px; padding:4px 6px; white-space:nowrap; }
-  /* 「看布幕／看凸透鏡」兩個並排的切換鈕 */
-  .row > .seg { flex:2 1 0; display:flex; min-width:0; }
+  /* 「看布幕／看透鏡」兩個並排的切換鈕：疊在布幕（透鏡）那一格底部、靠右；那一格底部留了一條空帶給它（app.js LOOK_BAND），不蓋住布幕上的像 */
+  #lookBox { position:absolute; display:flex; }
+  #lookBox > button { min-height:42px; height:42px; font-size:15px; white-space:nowrap; }
   .row > button.wide { flex:1.6 1 0; }
   .seg > button { flex:1 1 0; min-width:0; padding:4px 4px; }
   .seg > button:first-child { border-radius:10px 0 0 10px; }
@@ -100,6 +101,8 @@
       <button id="zoomOut" type="button" aria-label="縮小">－</button>
       <button id="zoomFit" type="button" aria-label="顯示全圖">全圖</button>
     </div>
+    <!-- 「看布幕／看透鏡」放在布幕（透鏡）畫面的右下角（使用者 2026-11-20）；位置由 app.js 的 placeLookBox() 依 regions() 設定 -->
+    <div id="lookBox" class="seg"><button id="lookScreen" type="button" class="on" aria-pressed="true">看布幕</button><button id="lookLens" type="button" aria-pressed="false">看透鏡</button></div>
     <div id="debugPanel" hidden></div>
     <div id="banner" hidden></div>
   </main>
@@ -110,7 +113,6 @@
         <button id="markBtn" type="button" class="primary">標記</button>
         <button id="nudgeRight" type="button" aria-label="透鏡往右微調">微調 ▶</button>
         <button id="toAnalysis" type="button" disabled>光路分析</button>
-        <span class="seg"><button id="lookScreen" type="button" class="on" aria-pressed="true">看布幕</button><button id="lookLens" type="button" aria-pressed="false">看透鏡</button></span>
       </div>
     </div>
     <div id="analysisControls" hidden>
