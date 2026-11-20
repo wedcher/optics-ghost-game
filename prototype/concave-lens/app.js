@@ -737,12 +737,12 @@
         { a: Q, b: { x: c.image.x, y: Q.y }, start: 1.9, end: 2.9, kind: 'extension' }
       ],
       points: [{ p: c.image, start: 2.9 }],
-      captions: [
-        { start: 0, text: '鬼身上發出三條光線' },
-        { start: 1.0, text: '經過凹透鏡：平行的發散，過光心的直走，對準 F′ 的變平行' },
-        { start: 1.9, text: '把折射後的光線反向延長（虛線）' },
-        { start: 2.9, text: '實際光路 → 反向延長 → 虛像位置' }
-      ]
+      // 使用者 2026-11-20：整段一直顯示同一句，只換重點（重點的顏色＝畫面上對應的線或點）
+      captions: [0, 1.0, 1.9, 2.9].map(function (t, i) {
+        var RR = window.RayReplay;
+        return { start: t, hi: [0, 0, 2, 4][i], parts: ['實際光路', ' → ', '反向延長', ' → ', '虛像位置'],
+          colors: [RR.RAY_COLOR, null, RR.EXT_COLOR, null, RR.POINT_COLOR] };
+      })
     };
   }
   function replayRunning() { return !!state.replay && (performance.now() - state.replay.t0) / 1000 < replaySpec().duration + 0.3; }

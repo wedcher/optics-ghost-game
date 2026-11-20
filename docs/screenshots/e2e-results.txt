@@ -81,6 +81,7 @@
   PASS  [phone-landscape] 配置A 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置A 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置A 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置A 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [phone-landscape] 配置A C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [phone-landscape] 配置A C4 封印成功後自動回到畫線模式
   PASS  [phone-landscape] 配置A C4 封印後依序點兩個點 → 畫出連線
@@ -104,7 +105,7 @@
   PASS  [phone-landscape] 配置A 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置A 光路重現：結束時標出像點  — 139 px（重現前 64）
   PASS  [phone-landscape] 配置A 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置A 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置A 封印後鬼本體成為吸附點（座標 = 物點）
   PASS  [phone-landscape] 配置A 封印後點「鬼本體」再點 F → 畫出連線
   PASS  [phone-landscape] 配置A 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 80 個像素
@@ -175,6 +176,7 @@
   PASS  [phone-landscape] 配置B 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置B 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置B 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置B 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [phone-landscape] 配置B C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [phone-landscape] 配置B C4 封印成功後自動回到畫線模式
   PASS  [phone-landscape] 配置B C4 封印後依序點兩個點 → 畫出連線
@@ -198,7 +200,7 @@
   PASS  [phone-landscape] 配置B 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置B 光路重現：結束時標出像點  — 137 px（重現前 66）
   PASS  [phone-landscape] 配置B 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置B 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置B 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置B 封印後鬼本體成為吸附點（座標 = 物點）
   PASS  [phone-landscape] 配置B 封印後點「鬼本體」再點 F → 畫出連線
   PASS  [phone-landscape] 配置B 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 70 個像素
@@ -267,6 +269,7 @@
   PASS  [phone-landscape] 配置C 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置C 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置C 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置C 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [phone-landscape] 配置C C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [phone-landscape] 配置C C4 封印成功後自動回到畫線模式
   PASS  [phone-landscape] 配置C C4 封印後依序點兩個點 → 畫出連線
@@ -357,6 +360,7 @@
   PASS  [phone-landscape] 配置D 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置D 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置D 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置D 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [phone-landscape] 配置D C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [phone-landscape] 配置D C4 封印成功後自動回到畫線模式
   PASS  [phone-landscape] 配置D C4 封印後依序點兩個點 → 畫出連線
@@ -380,7 +384,7 @@
   PASS  [phone-landscape] 配置D 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置D 光路重現：結束時標出像點  — 130 px（重現前 70）
   PASS  [phone-landscape] 配置D 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置D 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置D 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置D 封印後鬼本體成為吸附點（座標 = 物點）
   PASS  [phone-landscape] 配置D 封印後點「鬼本體」再點 F → 畫出連線
   PASS  [phone-landscape] 配置D 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 78 個像素
@@ -449,6 +453,7 @@
   PASS  [phone-landscape] 配置E 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置E 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置E 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置E 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [phone-landscape] 配置E C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [phone-landscape] 配置E C4 封印成功後自動回到畫線模式
   PASS  [phone-landscape] 配置E C4 封印後依序點兩個點 → 畫出連線
@@ -541,6 +546,7 @@
   PASS  [phone-landscape] 配置F 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置F 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置F 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置F 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [phone-landscape] 配置F C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [phone-landscape] 配置F C4 封印成功後自動回到畫線模式
   PASS  [phone-landscape] 配置F C4 封印後依序點兩個點 → 畫出連線
@@ -632,6 +638,7 @@
   PASS  [phone-landscape] 配置G 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置G 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置G 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置G 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [phone-landscape] 配置G C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [phone-landscape] 配置G C4 封印成功後自動回到畫線模式
   PASS  [phone-landscape] 配置G C4 封印後依序點兩個點 → 畫出連線
@@ -655,7 +662,7 @@
   PASS  [phone-landscape] 配置G 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置G 光路重現：結束時標出像點  — 133 px（重現前 73）
   PASS  [phone-landscape] 配置G 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置G 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置G 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置G 封印後鬼本體成為吸附點（座標 = 物點）
   PASS  [phone-landscape] 配置G 封印後點「鬼本體」再點 F → 畫出連線
   PASS  [phone-landscape] 配置G 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 77 個像素
@@ -724,6 +731,7 @@
   PASS  [phone-landscape] 配置H 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置H 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置H 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置H 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [phone-landscape] 配置H C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [phone-landscape] 配置H C4 封印成功後自動回到畫線模式
   PASS  [phone-landscape] 配置H C4 封印後依序點兩個點 → 畫出連線
@@ -815,6 +823,7 @@
   PASS  [phone-landscape] 配置I 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置I 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置I 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置I 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [phone-landscape] 配置I C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [phone-landscape] 配置I C4 封印成功後自動回到畫線模式
   PASS  [phone-landscape] 配置I C4 封印後依序點兩個點 → 畫出連線
@@ -905,6 +914,7 @@
   PASS  [phone-landscape] 配置J 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置J 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置J 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置J 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [phone-landscape] 配置J C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [phone-landscape] 配置J C4 封印成功後自動回到畫線模式
   PASS  [phone-landscape] 配置J C4 封印後依序點兩個點 → 畫出連線
@@ -995,6 +1005,7 @@
   PASS  [phone-landscape] 配置K 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置K 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置K 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置K 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [phone-landscape] 配置K C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [phone-landscape] 配置K C4 封印成功後自動回到畫線模式
   PASS  [phone-landscape] 配置K C4 封印後依序點兩個點 → 畫出連線
@@ -1018,7 +1029,7 @@
   PASS  [phone-landscape] 配置K 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置K 光路重現：結束時標出像點  — 133 px（重現前 69）
   PASS  [phone-landscape] 配置K 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [phone-landscape] 配置K 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置K 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置K 封印後鬼本體成為吸附點（座標 = 物點）
   PASS  [phone-landscape] 配置K 封印後點「鬼本體」再點 F → 畫出連線
   PASS  [phone-landscape] 配置K 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 76 個像素
@@ -1085,6 +1096,7 @@
   PASS  [phone-landscape] 配置L 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置L 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置L 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置L 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [phone-landscape] 配置L C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [phone-landscape] 配置L C4 封印成功後自動回到畫線模式
   PASS  [phone-landscape] 配置L C4 封印後依序點兩個點 → 畫出連線
@@ -1195,6 +1207,7 @@
   PASS  [phone-portrait] 配置A 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-portrait] 配置A 整個直欄都是該格的點擊區
   PASS  [phone-portrait] 配置A 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-portrait] 配置A 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [phone-portrait] 配置A C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [phone-portrait] 配置A C4 封印成功後自動回到畫線模式
   PASS  [phone-portrait] 配置A C4 封印後依序點兩個點 → 畫出連線
@@ -1311,6 +1324,7 @@
   PASS  [desktop] 配置A 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [desktop] 配置A 整個直欄都是該格的點擊區
   PASS  [desktop] 配置A 封印作圖交點所在格 → 成功並顯形
+  PASS  [desktop] 配置A 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [desktop] 配置A C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [desktop] 配置A C4 封印成功後自動回到畫線模式
   PASS  [desktop] 配置A C4 封印後依序點兩個點 → 畫出連線
@@ -1405,6 +1419,7 @@
   PASS  [desktop] 配置C 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [desktop] 配置C 整個直欄都是該格的點擊區
   PASS  [desktop] 配置C 封印作圖交點所在格 → 成功並顯形
+  PASS  [desktop] 配置C 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [desktop] 配置C C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [desktop] 配置C C4 封印成功後自動回到畫線模式
   PASS  [desktop] 配置C C4 封印後依序點兩個點 → 畫出連線
@@ -1429,7 +1444,7 @@
   PASS  [desktop] 配置C 光路重現：畫面上方有說明文字框
   PASS  [desktop] 配置C 光路重現：結束時標出像點  — 27 px（重現前 16）
   PASS  [desktop] 配置C 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [desktop] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [desktop] 配置C 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [desktop] 配置C 封印後鬼本體成為吸附點（座標 = 物點）
   PASS  [desktop] 配置C 封印後點「鬼本體」再點 F → 畫出連線
   PASS  [desktop] 配置C 封印後畫的連線有畫在畫面上（線經過處出現黃色線的像素）  — 17 個像素
@@ -1460,4 +1475,4 @@
   PASS  [level-practice] ?free=1：抓錯不扣命
   PASS  [level-practice] 沒有 JS 錯誤
 
-ALL PASS: 1461/1461 checks
+ALL PASS: 1476/1476 checks

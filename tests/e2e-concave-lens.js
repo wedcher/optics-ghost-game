@@ -546,6 +546,14 @@ async function run(profile, browser) {
     s = await st();
     ok(s.solved && await countColor(GHOST) > 20, T('封印作圖交點所在格 → 成功並顯形'));
     if (first) await shot('8-seal-success');
+    // 光路重現的說明：整段同一句，重點依序是 實際光路 → 反向延長 → 虛像位置（使用者 2026-11-20）
+    const caps = await page.evaluate(() => {
+      const H = window.__proto, out = [];
+      for (const t of [0.3, 1.3, 2.2, 3.2]) { H.state.replay = { t0: performance.now() - t * 1000 }; H.render(); out.push(window.RayReplay.lastCaption()); }
+      return out;
+    });
+    ok(caps.every((c) => c && c.text === '實際光路 → 反向延長 → 虛像位置') && caps.map((c) => c.hi).join('/') === '實際光路/實際光路/反向延長/虛像位置',
+      T('光路重現說明：同一句，重點依序換'), caps.map((c) => c && c.hi).join('/'));
 
     // C3：抓到鬼之後不能取消、也不能改選別格
     {
