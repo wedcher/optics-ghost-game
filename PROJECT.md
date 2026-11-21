@@ -518,6 +518,8 @@
   - **還沒在實體手機驗證**：外框頁裡的全螢幕不退出、Android 安裝按鈕叫出安裝視窗、笑聲音量、螺旋特效的效能。
 - **檔案分工**：這個工作階段（`claude/amazing-lamport-4kx8tr`）改三關 `app.js`／`index.html`、`shared/*`、`prototype/index.html`、新外框頁、`tests/*`、`PROJECT.md`。其他工作階段要改這些檔案前先問使用者。
 
+- **✅ 2026-11-21 晚：已併進 main**（使用者說「那就不確認了，直接併」；PR https://github.com/wedcher/optics-ghost-game/pull/12 ，merge commit `c701ad3`）。`claude/amazing-lamport-4kx8tr`、`claude/laughing-archimedes-1653ni` 等舊分支可以刪。GitHub Pages 要等一兩分鐘更新；**要用正式網址再看一次第一關過場鏡面（黑畫面修法）**。
+
 ### 交接點（確認視窗改頁面內，2026-11-21 晚，分支 `claude/jolly-wozniak-8fslus`）
 
 - **使用者手機實測 OK**：Android 安裝按鈕不再一直跳、笑聲音量、螺旋特效效能、製作與素材頁外觀、凸透鏡虛像題手感。
