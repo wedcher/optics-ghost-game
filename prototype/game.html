@@ -32,7 +32,7 @@
   'use strict';
   var frame = document.getElementById('game');
   // 只接受遊戲自己的頁面（避免 #… 被拿來開別的網址）
-  var OK = /^(index\.html|leaderboard\.html|(plane-mirror|convex-lens|concave-lens)\/index\.html)(\?[\w=&.-]*)?$/;
+  var OK = /^(index\.html|leaderboard\.html|credits\.html|(plane-mirror|convex-lens|concave-lens)\/index\.html)(\?[\w=&.-]*)?$/;
   var want = '';
   try { want = decodeURIComponent(location.hash.slice(1)); } catch (e) { want = ''; }
   frame.src = OK.test(want) ? want : 'index.html';
