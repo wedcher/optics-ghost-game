@@ -467,6 +467,7 @@
   4. 跳關一律擋回選單（`shared/progress.js` 的 `gate`／`showGate`；三關開頭各呼叫一次）。測試裡要進練習模式或第三關的，先在 `localStorage` 標前面的關卡已過關。
   5. 遊戲名稱「光學抓鬼」。
 - **測試**：自動測試用鬼的顏色數像素檢查「有沒有露出鬼」，所以 e2e 會設 `window.__ghostArtOff = true` 讓鬼退回單色輪廓（位置大小和小鬼圖同一個框）；小鬼圖另外檢查 9 張都載入、確實有畫、下一隻換圖。
+- `npm test` 全過（2026-11-21）：凹幾何 277、凸幾何 364、凹 e2e 1479、荒野狩獵 39、凸 e2e 2308、第二關 265（含跳關擋回選單 6 項、小鬼圖 2 項）、平面鏡幾何／第一關 e2e、排行榜後端 52、排行榜 e2e 53、選單 41、轉向 73。小鬼圖在布幕（倒立）、透鏡（正立放大虛像）、荒野透鏡裡的樣子是 Claude 用 headless 截圖看過的；**還沒在實體手機驗證**。
 - **使用者試玩時要看**：①第一關只剩一面鏡子時，鏡中碎鏡子；②第二關「看布幕／看透鏡」位置、透鏡大小、小鬼圖（布幕上倒立、透鏡裡正立放大）、光路重現說明；③第三關小鬼圖、封印失敗回畫線；④沒過關就直接開後面關卡（或練習模式）的網址會被擋回選單。
 - 使用者確認後：把這個分支併進 main（推 main 要在使用者的電腦或有權限的工作階段），`origin/claude/laughing-archimedes-1653ni` 就可以刪。
 - **檔案分工**：這個工作階段改 `prototype/shared/ghost-sprite.js`（新）、`shared/progress.js`、`plane-mirror/app.js`（結尾幾行）、`tests/e2e-plane-mirror.js`、`convex-lens/{app.js,index.html}`、`concave-lens/{app.js,index.html}`、各頁 `<title>`、`prototype/index.html` 標題、`manifest.webmanifest`、`tests/e2e-{convex-level,convex-lens,concave-lens,hunt}.js`、`PROJECT.md`。（收工時這行留著，直到併進 main。）

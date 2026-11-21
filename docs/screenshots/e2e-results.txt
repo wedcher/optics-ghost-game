@@ -81,6 +81,7 @@
   PASS  [phone-landscape] 配置A 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-landscape] 配置A 整個直欄都是該格的點擊區
   PASS  [phone-landscape] 配置A 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-landscape] 配置A 小鬼圖 9 張都載入，鬼都經過小鬼圖繪製  — {"loaded":9,"calls":77}
   PASS  [phone-landscape] 配置A 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [phone-landscape] 配置A C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [phone-landscape] 配置A C4 封印成功後自動回到畫線模式
@@ -1207,6 +1208,7 @@
   PASS  [phone-portrait] 配置A 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [phone-portrait] 配置A 整個直欄都是該格的點擊區
   PASS  [phone-portrait] 配置A 封印作圖交點所在格 → 成功並顯形
+  PASS  [phone-portrait] 配置A 小鬼圖 9 張都載入，鬼都經過小鬼圖繪製  — {"loaded":9,"calls":80}
   PASS  [phone-portrait] 配置A 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [phone-portrait] 配置A C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [phone-portrait] 配置A C4 封印成功後自動回到畫線模式
@@ -1324,6 +1326,7 @@
   PASS  [desktop] 配置A 錯誤封印後：光路重現沒有啟動、沒有「光路重現」按鈕
   PASS  [desktop] 配置A 整個直欄都是該格的點擊區
   PASS  [desktop] 配置A 封印作圖交點所在格 → 成功並顯形
+  PASS  [desktop] 配置A 小鬼圖 9 張都載入，鬼都經過小鬼圖繪製  — {"loaded":9,"calls":77}
   PASS  [desktop] 配置A 光路重現說明：同一句，重點依序換  — 實際光路/實際光路/反向延長/虛像位置
   PASS  [desktop] 配置A C3 封印後點同一格／別格：選取不變，「選格封印」「施放」按鈕收起
   PASS  [desktop] 配置A C4 封印成功後自動回到畫線模式
@@ -1466,7 +1469,7 @@
   PASS  [level-practice] 下一隻鬼：回到探索，命數與封印數保留
   PASS  [level-practice] 命用完：出現失敗畫面
   PASS  [level-practice] 失敗標題「❤️用完了……」、沒有結算／暱稱畫面
-  PASS  [level-practice] 練習模式不記荒野封印數、不算完成荒野狩獵
+  PASS  [level-practice] 練習模式不記荒野封印數
   PASS  [level-practice] 失敗畫面有「重新挑戰」與「回關卡選單」  — retryBtn,failMenuBtn
   PASS  [level-practice] 失敗畫面的文字不洩漏位置  — ❤️用完了…… 鬼還躲在荒野裡。這次封印了 1 隻。重新挑戰會從頭算起。 重新挑戰 回關卡選單
   PASS  [level-practice] 重新挑戰：3 顆 ❤️、封印數歸零、回到探索
@@ -1475,4 +1478,4 @@
   PASS  [level-practice] ?free=1：抓錯不扣命
   PASS  [level-practice] 沒有 JS 錯誤
 
-ALL PASS: 1476/1476 checks
+ALL PASS: 1479/1479 checks
