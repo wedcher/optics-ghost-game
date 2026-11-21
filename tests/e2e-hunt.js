@@ -6,7 +6,7 @@
  *   - 開場過場（劇本 3-1 逐句）→【開始狩獵】才開始倒數 5:00
  *   - 倒數顯示在畫面上，手機橫向 812×375 排得下、不擋按鈕；最後 30 秒變紅＋提示（不帶位置）
  *   - 3 顆 ❤️，抓錯才扣命、訊息不帶位置；每抓到一隻換下一組配置，不連續重複
- *   - 時間到（含法陣展開中剛好到時）／命用完 → 結束過場（劇本 3-2）→ 結算畫面
+ *   - 時間到不踢人（使用者 2026-11-21）：正在抓的這一隻可以抓完，抓到後按「結束狩獵 ➜」；命用完照樣結束 → 結束過場（劇本 3-2）→ 結算畫面
  *     「你花費＿＿把鬼趕出城堡，並在荒野中封印了＿＿隻鬼。」（趕鬼時間＝兩關最後一次過關成績相加）
  *   - Leaderboard.recordHunt、GameProgress.markCleared('concave')；第一次完成多一行「練習模式已解鎖」與按鈕
  *   - 結算畫面「再挑戰一次」「回關卡選單」；輸入暱稱上傳（本機模式）
@@ -41,8 +41,8 @@ function ok(cond, label, detail) {
 }
 const NO_POS = /[左右前後遠近東西南北]|太|靠|第\s*\d|格/;
 
-const INTRO = ['你追出城堡，眼前是一片漆黑的荒野。', '鬼影四散，一轉眼就消失在夜色裡。', '又看不到了……', '還好出門前帶了這片透鏡。',
-  '咦？等等，鬼怎麼變小了？', '這是一片凹透鏡。', '天亮之前，能抓幾隻就抓幾隻！'];
+const INTRO = ['你追出城堡，眼前是一片漆黑的荒野。', '鬼影四散，一轉眼就消失在夜色裡。', '又看不到鬼了……', '還好出門前帶了這片透鏡。',
+  '咦？等等，鬼怎麼變小了？', '邊緣厚，中間薄，這是一片凹透鏡。', '天亮之前，能抓幾隻就抓幾隻！'];
 const TIMEUP = ['東邊的天空漸漸亮了起來。', '剩下的鬼趁著晨霧，躲得無影無蹤。', '呼……天亮了，今晚就到這裡吧。'];
 const NOLIVES = ['法陣又落空了——荒野深處傳來一陣嘻嘻的笑聲。', '可惡……下次一定把你們全部抓回來！'];
 
@@ -53,6 +53,8 @@ const NOLIVES = ['法陣又落空了——荒野深處傳來一陣嘻嘻的笑�
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 812, height: 375 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
   await context.route('**/shared/leaderboard-config.js', (r) => r.fulfill({ contentType: 'text/javascript', body: "window.LEADERBOARD_URL = '';" }));
+  await context.addInitScript(() => { try { const k = 'opticsGhost.progress.v1', o = JSON.parse(localStorage.getItem(k) || '{}'); o.mirror = true; o.convex = true; localStorage.setItem(k, JSON.stringify(o)); } catch (e) {} }); // 跳關會被擋回選單（2026-11-21）：先標前面的關卡已過關
+  await context.addInitScript(() => { window.__ghostArtOff = true; }); // 鬼用程式畫的單色輪廓，才能用顏色數像素（小鬼圖另外檢查）
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -115,7 +117,7 @@ const NOLIVES = ['法陣又落空了——荒野深處傳來一陣嘻嘻的笑�
   const intro = await readScene();
   ok(JSON.stringify(intro) === JSON.stringify(INTRO), '開場台詞照劇本 3-1（逐句）', intro.join(' / '));
   const end = await page.evaluate(() => { const e = document.querySelector('.story-end'); return { h: e.querySelector('h2').textContent, p: e.querySelector('p').textContent, b: Array.from(e.querySelectorAll('.story-btn')).map((x) => x.id + ':' + x.textContent) }; });
-  ok(end.h === '荒野狩獵' && /限時 5 分鐘/.test(end.p) && /3 條命/.test(end.p) && end.b.join() === 'startHuntBtn:開始狩獵', '開場結尾：標題「荒野狩獵」、說明、【開始狩獵】', JSON.stringify(end));
+  ok(end.h === '第三關：荒野狩獵' && /限時 5 分鐘/.test(end.p) && /3 顆❤️/.test(end.p) && end.b.join() === 'startHuntBtn:開始狩獵', '開場結尾：標題「第三關：荒野狩獵」、說明、【開始狩獵】', JSON.stringify(end));
   await page.waitForTimeout(400);
   await press('#startHuntBtn', 200);
 
@@ -146,7 +148,7 @@ const NOLIVES = ['法陣又落空了——荒野深處傳來一陣嘻嘻的笑�
   await seal(await wrong());
   s = await info();
   ok(s.lives === 2 && s.heartsLeft === 2 && s.screen === 'play', '抓錯：扣一顆 ❤️');
-  ok(!NO_POS.test(s.status.replace('失去一顆心', '')) && !/\d/.test(s.status), '抓錯訊息不含方向／距離／格號', s.status);
+  ok(!NO_POS.test(s.status.replace('失去一顆心', '').replace('沒有東西', '')) && !/\d/.test(s.status), '抓錯訊息不含方向／距離／格號', s.status);
 
   // 抓對 → 換下一組（不連續重複）。連抓 8 隻看順序
   const seq = [s.cfg];
@@ -176,16 +178,24 @@ const NOLIVES = ['法陣又落空了——荒野深處傳來一陣嘻嘻的笑�
   ok(banner && /30 秒/.test(banner) && !NO_POS.test(banner), '最後 30 秒：提示只講時間、不帶位置', banner);
   await page.screenshot({ path: path.join(SHOTS, 'hunt-3-last30.png') });
 
-  // ---------- 法陣展開中剛好時間到：等結果，抓到也算 ----------
+  // ---------- 時間到：不踢人，這一隻可以抓完（使用者 2026-11-21） ----------
+  await page.evaluate(() => window.__proto.setHuntRemaining(0));
+  await page.waitForTimeout(300);
+  s = await info();
+  ok(s.screen === 'play' && !s.scene && s.timer === '⏳ 0:00' && /抓完這一隻/.test(s.status), '時間到：還在抓鬼，提示「抓完這一隻就結束」', s.status);
   await toAnalysis();
+  await seal(await wrong());
+  s = await info();
+  ok(s.screen === 'play' && s.lives === 1, '時間到後抓錯：照樣扣命，還能繼續抓這一隻', String(s.lives));
   await pickCell(await target());
   await press('#castBtn', 50);
-  await page.evaluate(() => window.__proto.setHuntRemaining(0));
-  s = await info();
-  ok(s.screen === 'play' && !s.scene && s.timer === '⏳ 0:00', '法陣展開中時間到：先等法陣結果', s.timer);
   await page.waitForTimeout(1700);
   s = await info();
-  ok(s.sealed === 9 && s.screen === 'ended' && s.scene === 'hunt-timeup', '法陣結果出來（抓到，封印 9）後才進「時間到」過場');
+  const nb = await page.evaluate(() => document.getElementById('nextBtn').textContent.trim());
+  ok(s.sealed === 9 && s.screen === 'play' && nb === '結束狩獵 ➜', '這一隻抓到（封印 9）：不會換下一隻，按鈕變「結束狩獵 ➜」', nb);
+  await press('#nextBtn', 150);
+  s = await info();
+  ok(s.screen === 'ended' && s.scene === 'hunt-timeup', '按「結束狩獵 ➜」進「時間到」過場');
   const timeup = await readScene();
   ok(JSON.stringify(timeup) === JSON.stringify(TIMEUP), '時間到台詞照劇本 3-2 情況一', timeup.join(' / '));
   await page.waitForTimeout(200);
@@ -243,10 +253,13 @@ const NOLIVES = ['法陣又落空了——荒野深處傳來一陣嘻嘻的笑�
   await page.tap('.story-skip'); await page.waitForTimeout(400);
   await press('#startHuntBtn', 150);
   await page.evaluate(() => window.__proto.setHuntRemaining(0));
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(300);
+  await toAnalysis();
+  await seal(await target());
+  await press('#nextBtn', 150); // 結束狩獵 ➜
   await page.tap('.story-skip'); await page.waitForTimeout(150);
   const res3 = await page.evaluate(() => { const r = document.getElementById('lbResult'); return r && r.querySelector('#lbSummary').textContent + ' | ' + r.innerText; });
-  ok(res3 && /你花費 — 把鬼趕出城堡，並在荒野中封印了 0 隻鬼。/.test(res3) && /還沒有過關成績/.test(res3), '沒有前兩關成績：趕鬼時間顯示「—」並說明', res3 && res3.split(' | ')[0]);
+  ok(res3 && /你花費 — 把鬼趕出城堡，並在荒野中封印了 1 隻鬼。/.test(res3) && /還沒有過關成績/.test(res3), '沒有前兩關成績：趕鬼時間顯示「—」並說明', res3 && res3.split(' | ')[0]);
 
   // ---------- 練習模式不呼叫 Leaderboard ----------
   await page.goto(URL + '?practice=1');

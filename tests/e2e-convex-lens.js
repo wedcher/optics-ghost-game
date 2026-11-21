@@ -71,6 +71,7 @@ async function run(profile, browser) {
   const context = await browser.newContext({
     viewport: profile.viewport, hasTouch: profile.touch, isMobile: profile.touch, deviceScaleFactor: profile.dsf
   });
+  await context.addInitScript(() => { window.__ghostArtOff = true; }); // 鬼用程式畫的單色輪廓，才能用顏色數像素（小鬼圖另外檢查）
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);
   const errors = [];
@@ -195,7 +196,7 @@ async function run(profile, browser) {
   }, { key, compareTo });
   // 布幕正面視圖：暫時藏起標記，讀實像的像素（true = 被投影的光照亮）
   const wallProbe = () => page.evaluate(() => {
-    const H = window.__protoConvex, s = H.state, W = H.configs.WORLD, r = H.regions().wall, w = H.wallNow(), dpr = H.canvasSize().DPR;
+    const H = window.__protoConvex, s = H.state, W = H.configs.WORLD, r = H.regions().wallView, w = H.wallNow(), dpr = H.canvasSize().DPR;
     const saved = s.marker; s.marker = null; H.render();
     const k = Math.min((r.w - 20) / (2 * W.wallHalfWidth), (r.h - 20 - 18) / (2 * W.axisHeight));
     const cx = r.x + r.w / 2, cy = r.y + 18 + (r.h - 18) / 2;
@@ -354,12 +355,14 @@ async function run(profile, browser) {
     let a = await snap('I'), b = await snap('O');
     await tap(a.x - 6, a.y + (a.wy > 0 ? -6 : 6)); await tap(b.x - 7, b.y + (c.h > 0 ? 6 : -6));
     ok((await st()).lines === 1, T('線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）'));
+    ok(await page.evaluate(() => !document.getElementById('modeSeal').classList.contains('primary')), T('只有一條線：「選格封印」還不是紫色'));
     // 線 2：實像 ↔ 像側焦點 F′，延長後交透鏡於 P
     a = await snap('I'); b = await snap('F2');
     await tap(a.x - 5, a.y + (a.wy > 0 ? -6 : 6)); await tap(b.x + 6, b.y + (c.h > 0 ? 6 : -6));
     s = await st();
     const pts = await page.evaluate(() => window.__protoConvex.snapPoints());
     const Pp = pts.find((q) => q.id === 'P');
+    ok(await page.evaluate(() => document.getElementById('modeSeal').classList.contains('primary')), T('畫出第二條線：「選格封印」變紫色提醒（使用者 2026-11-21）'));
     ok(s.lines === 2 && Pp && Math.abs(Pp.x - sp.lensX) < 1e-9 && Math.abs(Pp.y - c.object.y) < 1e-6, T('線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）'), Pp ? 'P.y=' + Pp.y.toFixed(3) : 'no P');
     // 線 3：過 P 平行主軸
     a = await snap('P');
@@ -577,12 +580,14 @@ async function run(profile, browser) {
     await page.waitForTimeout(600);
     s = await st();
     ok(!s.solved && s.attempts === 1 && s.selectedCell === null, T('封印透鏡所在格 → 失敗'));
+    ok(s.mode === 'draw' && await page.evaluate(() => document.getElementById('modeDraw').classList.contains('on')), T('封印失敗後自動切回「畫線」（使用者 2026-11-20）'));
     ok(during.every((n) => n === 0) && await countColor(GHOST) === 0 && !s.stats.ghostRevealed, T('錯誤封印全程不顯示鬼'), '動畫取樣 ' + during.join('/'));
     ok(!/[左右前後遠近]|太|靠|第\s*\d|格子?\s*\d|\d/.test(s.status), T('錯誤訊息不含方向／距離／格號線索'), '「' + s.status + '」');
     await leak('錯誤封印後');
     await checkReplayIdle({ page, hook: '__protoConvex', ok, T, when: '錯誤封印後' });
 
     // ---------- 正確封印 ----------
+    await press('#modeSeal');
     wp = await w2s({ x: -(c.targetCell - 0.5) * 100, y: 60 }); // 點直欄上方也能選到格
     await tap(wp.x, wp.y);
     ok((await st()).selectedCell === c.targetCell, T('整個直欄都是該格的點擊區'));
@@ -736,7 +741,8 @@ async function run(profile, browser) {
     ok(lvInfo.lv.eye === 'virtual' && lvInfo.lv.m > 1 && lvInfo.lv.angMag > 1 && purple > 20, T('透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大'),
       'm=' + lvInfo.lv.m.toFixed(2) + '，視角放大 ' + lvInfo.lv.angMag.toFixed(2) + ' 倍，' + purple + ' px');
     const cap = await page.evaluate(() => { const H = window.__protoConvex; H.render(); return H.stats.lensCaption; });
-    ok(cap === '虛像（正立、放大）', T('鏡框裡寫「虛像（正立、放大）」（使用者答虛像題 V2）'), String(cap));
+    const nearLens = Math.abs(lvInfo.lv.v) < 60; // 像離透鏡 < 60 cm：多一行「建議標記別處」，仍可標記（使用者 2026-11-21）
+    ok(cap === '虛像（正立、放大）' + (nearLens ? '建議標記別處' : ''), T('鏡框裡寫「虛像（正立、放大）」；像離透鏡太近時多寫「建議標記別處」'), String(cap) + '，像離透鏡 ' + Math.round(Math.abs(lvInfo.lv.v)) + ' cm');
     await noLeak('看透鏡');
     await shotV('1-lens-view');
     // 透鏡越過鬼：透鏡裡和布幕上都沒有像
@@ -763,6 +769,8 @@ async function run(profile, browser) {
     await press('#lookScreen');
     ok(!(await st()).marker, T('切到「看布幕」：虛像標記取消'));
     ok(await page.evaluate(() => { const H = window.__protoConvex; H.render(); return H.stats.lensCaption; }) === null, T('看布幕時沒有「虛像」字樣'));
+    await press('#markBtn'); // 透鏡還在同一個位置（可能就是虛像離透鏡太近的位置），但現在看的是布幕
+    ok(!/建議標記別處/.test((await st()).status), T('看布幕時按標記：不會出現「建議標記別處」（只在看透鏡時才有）'), '「' + (await st()).status + '」');
     await press('#lookLens');
     await press('#markBtn');
     ok(!!(await st()).marker, T('切回「看透鏡」可以重新標記'));

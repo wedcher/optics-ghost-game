@@ -26,7 +26,8 @@
 
   var TOP = 10, NAME_MAX_W = 20;
   // run.v1 是舊規則（牆上時間）的紀錄，意義不同，不沿用；restartRun 時順便刪掉。
-  var OLD_RUN_KEY = 'ogg.run.v1', RUN_KEY = 'ogg.run.v2', NAME_KEY = 'ogg.nickname.v1', LOCAL_KEY = 'ogg.leaderboard.local.v1';
+  var OLD_RUN_KEY = 'ogg.run.v1', RUN_KEY = 'ogg.run.v2', NAME_KEY = 'ogg.nickname.v1', LOCAL_KEY = 'ogg.leaderboard.local.v1', DEVICE_KEY = 'ogg.device.v1';
+  var PAGE_SIZE = 10;
   var BOARDS = {
     castle: { asc: true,  min: 30 * 1000, max: 24 * 3600 * 1000 },
     hunt:   { asc: false, min: 0,         max: 60 }
@@ -130,6 +131,20 @@
     s = s.replace(/[\u0000-\u001f\u007f<>"'`\\]/g, '').replace(/\s+/g, ' ').trim();
     return cutToWidth_(s, NAME_MAX_W).trim();
   }
+  // 裝置代碼（使用者 2026-11-21）：第一次玩時隨機產生、存在這支手機的瀏覽器裡；不含個人資料。
+  // 排行榜用「裝置代碼＋暱稱」判斷是不是同一個人：同一個人只留最好的一筆，不同手機同名的人分開列。
+  function deviceId() {
+    var d = load(DEVICE_KEY, '');
+    if (typeof d === 'string' && /^[a-z0-9]{8,40}$/.test(d)) return d;
+    d = 'd';
+    try {
+      var a = new Uint32Array(4); root.crypto.getRandomValues(a);
+      for (var i = 0; i < a.length; i++) d += a[i].toString(36);
+    } catch (e) { for (var k = 0; k < 4; k++) d += Math.floor(Math.random() * 0xffffffff).toString(36); }
+    d = d.slice(0, 32);
+    save(DEVICE_KEY, d);
+    return d;
+  }
   function getNickname() { return load(NAME_KEY, ''); }
   function setNickname(n) { save(NAME_KEY, cleanName(n)); }
 
@@ -154,11 +169,19 @@
       var mine = list.filter(function (r) { return r.name === name; })[0];
       if (!mine) { mine = { name: name, value: value, at: t }; list.push(mine); improved = true; }
       else if (BOARDS[key].asc ? value < mine.value : value > mine.value) { mine.value = value; mine.at = t; improved = true; }
-      var s = sortBoard(key, list);
-      out[key] = { rank: s.indexOf(mine) + 1, best: mine.value, improved: improved };
+      var s = sortBoard(key, list), rk = s.indexOf(mine) + 1;
+      out[key] = { rank: rk, best: mine.value, improved: improved, page: Math.ceil(rk / PAGE_SIZE) };
     });
     save(LOCAL_KEY, db);
     return out;
+  }
+  // 本機排行的一頁（同 Code.gs 的 page_）：這支手機上只有自己，以暱稱分人
+  function localPage(key, page) {
+    var db = load(LOCAL_KEY, { castle: [], hunt: [] }), s = sortBoard(key, db[key] || []), me = getNickname();
+    var total = s.length, pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    page = Math.max(1, Math.min(pages, Math.floor(page) || 1));
+    return { ok: true, board: key, total: total, page: page, size: PAGE_SIZE, pages: pages,
+      rows: s.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map(function (r, i) { return { rank: (page - 1) * PAGE_SIZE + i + 1, name: r.name, value: r.value, at: r.at, me: !!me && r.name === me }; }) };
   }
   function localTop() {
     var db = load(LOCAL_KEY, { castle: [], hunt: [] });
@@ -184,7 +207,7 @@
     if (!Object.keys(entries).length) return Promise.resolve({ ok: false, error: '沒有可上傳的成績' });
     setNickname(name);
     if (!url()) { var r = localSubmit(name, entries); r.mode = 'local'; return Promise.resolve(r); }
-    var body = { name: name };
+    var body = { name: name, device: deviceId() };
     if (entries.castle != null) body.castleMs = entries.castle;
     if (entries.hunt != null) body.hunt = entries.hunt;
     // text/plain：不觸發 CORS preflight（Apps Script 不回應 OPTIONS）
@@ -192,6 +215,41 @@
       .then(function (res) { return res.json(); })
       .then(function (j) { j.mode = 'remote'; if (!j.ok) j.error = '上傳失敗（' + (j.error || '未知') + '）'; return j; })
       .catch(function () { return { ok: false, mode: 'remote', error: '連不上排行榜，請檢查網路後再試' }; });
+  }
+  function getJson(params) {
+    var q = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
+    return fetch(url() + (url().indexOf('?') < 0 ? '?' : '&') + q + '&t=' + now()).then(function (res) { return res.json(); });
+  }
+  // 一頁排行（2026-11-21）：回傳 Promise<{ok, board, total, page, pages, size, rows:[{rank,name,value,at,me}], mode, legacy?, error?}>
+  // 後端還沒重新部署（不認得 action=page）時，退回舊的前 10 名（legacy: true，不能翻頁）。
+  function fetchPage(board, page) {
+    if (!url()) { var r = localPage(board, page); r.mode = 'local'; return Promise.resolve(r); }
+    return getJson({ action: 'page', board: board, page: page || 1, size: PAGE_SIZE, device: deviceId(), name: getNickname() || '' })
+      .then(function (j) {
+        if (j && j.ok) { j.mode = 'remote'; return j; }
+        if (j && j.error === 'unknown action') {
+          return getJson({ action: 'top' }).then(function (t) {
+            var list = (t && t[board]) || [], me = getNickname();
+            return { ok: !!(t && t.ok), mode: 'remote', legacy: true, board: board, total: list.length, page: 1, pages: 1, size: list.length,
+              rows: list.map(function (r, i) { return { rank: i + 1, name: r.name, value: r.value, at: r.at, me: !!me && r.name === me }; }) };
+          });
+        }
+        return { ok: false, mode: 'remote', rows: [], error: '讀取失敗（' + ((j && j.error) || '未知') + '）' };
+      })
+      .catch(function () { return { ok: false, mode: 'remote', rows: [], error: '連不上排行榜' }; });
+  }
+  // 自己在這個榜的名次與頁數：Promise<{ok, rank(0＝沒上榜), page}>
+  function fetchMyRank(board) {
+    var me = getNickname();
+    if (!me) return Promise.resolve({ ok: true, rank: 0, page: 0 });
+    if (!url()) {
+      var db = load(LOCAL_KEY, { castle: [], hunt: [] }), s = sortBoard(board, db[board] || []), rk = 0;
+      for (var i = 0; i < s.length; i++) if (s[i].name === me) { rk = i + 1; break; }
+      return Promise.resolve({ ok: true, rank: rk, page: rk ? Math.ceil(rk / PAGE_SIZE) : 0 });
+    }
+    return getJson({ action: 'rank', board: board, device: deviceId(), name: me })
+      .then(function (j) { return j && j.ok ? j : { ok: false, rank: 0, page: 0, error: (j && j.error) || '讀取失敗' }; })
+      .catch(function () { return { ok: false, rank: 0, page: 0, error: '連不上排行榜' }; });
   }
   // 回傳 Promise<{ok, castle:[{name,value,at}], hunt:[...], mode, error?}>
   function fetchTop() {
@@ -230,8 +288,8 @@
   }
   function rankText(res) {
     var parts = [];
-    if (res.castle) parts.push('趕鬼時間第 ' + res.castle.rank + ' 名' + (res.castle.improved ? '' : '（沒有超過你之前的 ' + formatTime(res.castle.best) + '）'));
-    if (res.hunt) parts.push('荒野封印第 ' + res.hunt.rank + ' 名' + (res.hunt.improved ? '' : '（沒有超過你之前的 ' + res.hunt.best + ' 隻）'));
+    if (res.castle) parts.push('趕鬼時間第 ' + res.castle.rank + ' 名' + (res.castle.page > 1 ? '（排行榜第 ' + res.castle.page + ' 頁）' : '') + (res.castle.improved ? '' : '（沒有超過你之前的 ' + formatTime(res.castle.best) + '）'));
+    if (res.hunt) parts.push('荒野封印第 ' + res.hunt.rank + ' 名' + (res.hunt.page > 1 ? '（排行榜第 ' + res.hunt.page + ' 頁）' : '') + (res.hunt.improved ? '' : '（沒有超過你之前的 ' + res.hunt.best + ' 隻）'));
     return parts.join('；');
   }
 
@@ -303,7 +361,7 @@
     activeLevel: function () { return attempt ? attempt.level : null; },
     restartRun: restartRun, finishMirror: finishMirror, finishCastle: finishCastle, recordHunt: recordHunt, getRun: getRun,
     formatTime: formatTime, cleanName: cleanName, getNickname: getNickname, setNickname: setNickname,
-    submit: submit, fetchTop: fetchTop, showResult: showResult,
+    submit: submit, fetchTop: fetchTop, fetchPage: fetchPage, fetchMyRank: fetchMyRank, deviceId: deviceId, PAGE_SIZE: PAGE_SIZE, showResult: showResult,
     _setNow: function (fn) { now = fn; } // 測試用
   };
 })(window);

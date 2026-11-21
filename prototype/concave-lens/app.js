@@ -45,7 +45,7 @@
   var LB = HUNT ? window.Leaderboard : null;
   var level = { on: !FREE, screen: 'play', lives: LEVEL_LIVES, sealed: 0, scene: null };
   // 倒數用牆上時間（Date.now）：App 切到背景、螢幕關掉時照樣在走（和趕鬼時間一樣，使用者 2026-11-19 確認不暫停）
-  var hunt = { deadline: null, over: false, pendingEnd: null, lowShown: false, timer: null };
+  var hunt = { deadline: null, over: false, lastGhost: false, lowShown: false, timer: null };
 
   var state = {
     cfgIndex: 0,
@@ -160,6 +160,8 @@
   }
 
   function drawGhostShape(c, px, py, hw, hh) {
+    // 使用者給的小鬼圖（shared/ghost-sprite.js）；圖還沒載入才用下面的程式畫鬼
+    if (window.GhostSprite && window.GhostSprite.draw(c, px, py, hw, hh, 1, 1, 'rgba(120,255,200,.75)')) return;
     c.save();
     c.shadowColor = 'rgba(120,255,200,.9)';
     c.shadowBlur = Math.max(4, hw * 0.6);
@@ -676,9 +678,15 @@
         drawMagicCircle(cc.x, cc.y + tileH * 0.4, rx * Math.min(1, t / 0.5), 1, t * 1.5);
         if (t > 0.7) {
           var gp = w2s(c.object), ga = Math.min(1, (t - 0.7) / 0.5);
+          // 封印特效（使用者 2026-11-21）：紫色螺旋從法陣往上纏繞鬼；第二三關鬼留著不消失（讓學生復盤）
+          var ghh = Math.max(10, WORLD.ghostHalfHeight * s), floorY = cc.y + tileH * 0.4;
+          var vfx = window.SealFx && { cx: gp.x, cz: 0, r: rx * 0.72, h: Math.max(20, floorY - (gp.y - ghh)) * 1.08, line: 2.4, glow: 10,
+            project: function (x, y, z) { return { x: x, y: floorY - y + z * 0.28, depth: -z }; } };
+          if (vfx) window.SealFx.draw(ctx, vfx, t - 0.7, 'back');
           ctx.save(); ctx.globalAlpha = ga;
-          drawGhostShape(ctx, gp.x, gp.y, Math.max(7, WORLD.ghostHalfWidth * s), Math.max(10, WORLD.ghostHalfHeight * s));
+          drawGhostShape(ctx, gp.x, gp.y, Math.max(7, WORLD.ghostHalfWidth * s), ghh);
           ctx.restore();
+          if (vfx) window.SealFx.draw(ctx, vfx, t - 0.7, 'front');
           label('鬼本體', gp.x, gp.y - Math.max(10, WORLD.ghostHalfHeight * s) - 12, GHOST_COLOR);
           stats.ghostRevealed = true;
         }
@@ -737,12 +745,12 @@
         { a: Q, b: { x: c.image.x, y: Q.y }, start: 1.9, end: 2.9, kind: 'extension' }
       ],
       points: [{ p: c.image, start: 2.9 }],
-      captions: [
-        { start: 0, text: '鬼身上發出三條光線' },
-        { start: 1.0, text: '經過凹透鏡：平行的發散，過光心的直走，對準 F′ 的變平行' },
-        { start: 1.9, text: '把折射後的光線反向延長（虛線）' },
-        { start: 2.9, text: '實際光路 → 反向延長 → 虛像位置' }
-      ]
+      // 使用者 2026-11-20：整段一直顯示同一句，只換重點（重點的顏色＝畫面上對應的線或點）
+      captions: [0, 1.0, 1.9, 2.9].map(function (t, i) {
+        var RR = window.RayReplay;
+        return { start: t, hi: [0, 0, 2, 4][i], parts: ['實際光路', ' → ', '反向延長', ' → ', '虛像位置'],
+          colors: [RR.RAY_COLOR, null, RR.EXT_COLOR, null, RR.POINT_COLOR] };
+      })
     };
   }
   function replayRunning() { return !!state.replay && (performance.now() - state.replay.t0) / 1000 < replaySpec().duration + 0.3; }
@@ -756,10 +764,10 @@
       // 還沒抓到鬼之前，再點一次已選的格就取消選取（回饋 C3）；抓到之後上面已經 return，不能取消
       if (state.selectedCell === k) {
         state.selectedCell = null; state.seal = null;
-        setStatus('已取消選取。再點一個地板格，然後按「施放封印法陣」。');
+        setStatus('已取消選取。');
       } else {
         state.selectedCell = k; state.seal = null;
-        setStatus('已選第 ' + k + ' 格。確定的話按「施放封印法陣」；再點一次同一格可以取消。');
+        setStatus('已選第 ' + k + ' 格。'); pulse($('castBtn')); // 文字縮短；封印按鈕閃微光提醒（使用者 2026-11-21）
       }
       syncUI(); requestRender();
       return;
@@ -799,26 +807,27 @@
         startReplay();
       } else {
         state.selectedCell = null;
+        state.mode = 'draw'; // 抓錯後自動切回畫線，方便重新檢查作圖（使用者 2026-11-20，第二、三關一致）
         giggle();
         if (level.on) {
           // 扣命只看「抓錯」這件事本身，訊息與畫面都不帶任何位置線索
           level.lives--;
           flashHud();
-          setStatus('法陣落空，裡面什麼也沒有……（嘻）　失去一顆心。再檢查你的光線作圖。');
-          if (level.lives <= 0 && !hunt.pendingEnd) { if (HUNT) endHunt('lives'); else failLevel(); }
+          setStatus('法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。');
+          if (level.lives <= 0) { if (HUNT) endHunt('lives'); else failLevel(); }
         } else {
-          setStatus('法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。');
+          setStatus('法陣裡沒有東西……再檢查你的光線作圖。');
         }
       }
+      if (success && HUNT && hunt.lastGhost) setStatus('封印成功！時間到了，這是最後一隻。看完光路，按「結束狩獵 ➜」結算。');
       syncUI(); requestRender();
-      // 法陣展開時剛好時間到：等這一次的結果出來（抓到也算）再結束
-      if (hunt.pendingEnd) endHunt(hunt.pendingEnd);
     }, 1500);
   }
 
   // 短促、單聲道、無方向性的回饋音
   var audioCtx = null;
   function giggle() {
+    if (window.Sfx && window.Sfx.giggle && window.Sfx.giggle('minion')) return; // 真的笑聲音檔（使用者 2026-11-21）；不能播才用下面的合成音
     try {
       audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
       var t0 = audioCtx.currentTime;
@@ -944,8 +953,17 @@
   canvas.addEventListener('pointercancel', function (e) { endPointer(e, true); });
   canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
   // iOS Safari 會忽略 user-scalable=no；擋掉頁面層級的雙指縮放手勢
+  if (window.GhostSprite) window.GhostSprite.onLoad(function () { requestRender(); }); // 小鬼圖載入後重畫
   ['gesturestart', 'gesturechange'].forEach(function (n) { document.addEventListener(n, function (e) { e.preventDefault(); }); });
 
+  // 選好格子後，封印按鈕閃一下微光（使用者 2026-11-21：比多寫一句提示有效；三關一致）
+  function pulse(el) {
+    if (!el || !el.animate) return;
+    try {
+      el.animate([{ boxShadow: '0 0 0 0 rgba(255,226,140,0)' }, { boxShadow: '0 0 16px 5px rgba(255,226,140,.9)' }, { boxShadow: '0 0 0 0 rgba(255,226,140,0)' }],
+        { duration: 800, iterations: 2, easing: 'ease-in-out' });
+    } catch (e) { /* 不支援就不閃 */ }
+  }
   function setStatus(t) { $('status').textContent = t; }
 
   var bannerTimer = null;
@@ -965,6 +983,9 @@
     $('toAnalysis').classList.toggle('primary', !!state.marker);
     $('modeDraw').classList.toggle('on', state.mode === 'draw');
     $('modeSeal').classList.toggle('on', state.mode === 'seal');
+    // 畫出第二條線後（兩條線才有交點），「選格封印」變紫色提醒；變紫後這一隻鬼都維持（使用者 2026-11-21）
+    if (state.lines.length >= 2) state.sealHint = true;
+    $('modeSeal').classList.toggle('primary', !!state.sealHint && state.mode !== 'seal');
     $('undoBtn').disabled = !state.lines.length && !state.pending;
     $('clearBtn').disabled = !state.lines.length && !state.pending;
     $('castBtn').disabled = state.selectedCell == null || state.solved || !!(state.seal && !state.seal.done);
@@ -972,7 +993,7 @@
     $('modeSeal').hidden = state.solved; // 抓到鬼之後選格不能再改（C3），只留畫線
     $('toExplore').hidden = state.solved; // 破關後不能回探索：那會把法陣和現身的鬼清掉，而且探索畫面沒有「下一組配置」
     $('nextBtn').hidden = !state.solved;
-    $('nextBtn').textContent = level.on ? '下一隻鬼 ➜' : '下一組配置';
+    $('nextBtn').textContent = !level.on ? '下一組配置' : (HUNT && hunt.lastGhost ? '結束狩獵 ➜' : '下一隻鬼 ➜');
     $('nextBtn').classList.toggle('primary', level.on);
     $('replayBtn').hidden = !state.solved;
     // 關卡模式：左上角是愛心與封印數（和第二關一樣）；配置選單與 Debug 是開發工具，只在 ?free=1 出現
@@ -1044,14 +1065,14 @@
       lines: [
         { text: '你追出城堡，眼前是一片漆黑的荒野。' },
         { text: '鬼影四散，一轉眼就消失在夜色裡。' },
-        { speaker: '你', text: '又看不到了……' },
+        { speaker: '你', text: '又看不到鬼了……' },
         { speaker: '你', text: '還好出門前帶了這片透鏡。' },
         { speaker: '你', text: '咦？等等，鬼怎麼變小了？' },
-        { text: '這是一片凹透鏡。' },
+        { text: '邊緣厚，中間薄，這是一片凹透鏡。' },
         { speaker: '你', text: '天亮之前，能抓幾隻就抓幾隻！' }
       ],
-      title: '荒野狩獵',
-      note: '鬼只有透過凹透鏡才看得到。從透鏡裡的像推出牠真正在哪裡，再展開封印法陣。限時 5 分鐘，能封印幾隻算幾隻；3 條命，抓錯會失去一顆心。',
+      title: '第三關：荒野狩獵',
+      note: '鬼只有透過凹透鏡才看得到。從透鏡裡的像推出牠真正在哪裡，再展開封印法陣。限時 5 分鐘，能封印幾隻算幾隻；3 顆❤️，抓錯扣一❤️。',
       buttons: [{ id: 'startHuntBtn', label: '開始狩獵', primary: true, onClick: startHunt }] // 按下後才開始倒數
     });
   }
@@ -1060,7 +1081,7 @@
     closeScene();
     var old = document.getElementById('lbResult'); if (old) old.remove();
     level.screen = 'play'; level.lives = LEVEL_LIVES; level.sealed = 0;
-    hunt.over = false; hunt.pendingEnd = null; hunt.lowShown = false;
+    hunt.over = false; hunt.lastGhost = false; hunt.lowShown = false;
     hunt.deadline = HUNT ? Date.now() + HUNT_MS : null;
     clearInterval(hunt.timer); hunt.timer = HUNT ? setInterval(tickHunt, 250) : null;
     resetRound(nextConfig());
@@ -1082,14 +1103,18 @@
     syncTimer();
     // 最後 30 秒：只提示時間，不帶任何和鬼的位置有關的東西
     if (ms <= HUNT_LOW_MS && ms > 0 && !hunt.lowShown) { hunt.lowShown = true; showBanner('天快亮了！剩下 30 秒。', 2600); }
-    if (ms > 0) return;
-    if (state.seal && !state.seal.done) { hunt.pendingEnd = 'time'; return; } // 法陣展開中：等結果
-    endHunt('time');
+    if (ms > 0 || hunt.lastGhost) return;
+    // 使用者 2026-11-21：時間到不把人踢走（抓到一半很嘔）。正在抓的這一隻可以抓完，只是不能再開下一隻：
+    // 抓到後「下一隻鬼 ➜」變成「結束狩獵 ➜」；這一隻抓到之前命用完，照樣是命用完結束。
+    hunt.lastGhost = true;
+    if (state.solved) setStatus('天亮了！這一隻已經封印，按「結束狩獵 ➜」結算。');
+    else { showBanner('天亮了！抓完這一隻就結束。', 3000); setStatus('天亮了！抓完這一隻就結束。'); }
+    syncUI();
   }
   /** 狩獵結束：reason = 'time'（時間到）或 'lives'（命用完）。 */
   function endHunt(reason) {
     if (hunt.over) return;
-    hunt.over = true; hunt.pendingEnd = null;
+    hunt.over = true; hunt.lastGhost = false;
     clearInterval(hunt.timer); hunt.timer = null;
     level.screen = 'ended'; level.endReason = reason;
     state.drag = null; state.pending = null;
@@ -1105,7 +1130,7 @@
         { text: '剩下的鬼趁著晨霧，躲得無影無蹤。' },
         { speaker: '你', text: '呼……天亮了，今晚就到這裡吧。' }
       ] : [
-        { text: '法陣又落空了——荒野深處傳來一陣嘻嘻的笑聲。' },
+        { text: '法陣又落空了——荒野深處傳來一陣嘻嘻的笑聲。', onShow: function () { giggle(); } },
         { speaker: '你', text: '可惡……下次一定把你們全部抓回來！' }
       ],
       onDone: function () { level.scene = null; showHuntResult(reason, firstClear); }
@@ -1139,8 +1164,9 @@
 
   function resetRound(idx) {
     state.cfgIndex = idx;
+    if (window.GhostSprite) window.GhostSprite.pick(); // 每一隻鬼換一張小鬼圖
     state.phase = 'explore'; state.facing = 0; state.lensUp = false; state.marker = null;
-    state.mode = 'draw'; state.pending = null; state.lines = []; state.drag = null;
+    state.mode = 'draw'; state.pending = null; state.lines = []; state.drag = null; state.sealHint = false;
     state.selectedCell = null; state.seal = null; state.solved = false; state.attempts = 0; state.replay = null;
     state.zoomIdx = 0;
     $('configSel').value = String(idx);
@@ -1188,7 +1214,7 @@
     animating = true;
     (function tick() {
       render();
-      if ((state.seal && performance.now() - state.seal.t0 < 2200) || replayRunning()) requestAnimationFrame(tick); else animating = false;
+      if ((state.seal && performance.now() - state.seal.t0 < (state.seal.success ? 3800 : 2200)) || replayRunning()) requestAnimationFrame(tick); else animating = false;
     })();
   }
   function render() {
@@ -1219,13 +1245,13 @@
     setStatus('回到探索視角。虛像標記仍保留。');
     syncUI(); layout();
   });
-  $('modeDraw').addEventListener('click', function () { state.mode = 'draw'; setStatus('畫線：從標示點拖曳，或依序點兩個點。不會選到地板格。'); syncUI(); requestRender(); });
-  $('modeSeal').addEventListener('click', function () { if (state.solved) return; state.mode = 'seal'; state.pending = null; setStatus('封印模式：點一個地板格（整個直欄都可點），再按「施放封印法陣」；再點同一格可取消。'); syncUI(); requestRender(); });
-  $('menuBtn').addEventListener('click', function () { if (window.confirm('回到關卡選單？這一關目前的進度不會保留。')) location.href = '../index.html'; });
+  $('modeDraw').addEventListener('click', function () { state.mode = 'draw'; setStatus('畫線：從標示點拖曳，或依序點兩個點連線。'); syncUI(); requestRender(); });
+  $('modeSeal').addEventListener('click', function () { if (state.solved) return; state.mode = 'seal'; state.pending = null; setStatus('點選地板，選擇封印位置，重複點選取消選擇。'); syncUI(); requestRender(); });
+  $('menuBtn').addEventListener('click', function () { GameConfirm.ask({ text: '回到關卡選單？這一關目前的進度不會保留。', ok: '回關卡選單', cancel: '繼續玩' }, function () { location.href = '../index.html'; }); });
   $('undoBtn').addEventListener('click', function () { if (state.pending) state.pending = null; else state.lines.pop(); syncUI(); requestRender(); });
   $('clearBtn').addEventListener('click', function () { state.lines = []; state.pending = null; setStatus('已清除所有線。'); syncUI(); requestRender(); });
   $('castBtn').addEventListener('click', castSeal);
-  $('nextBtn').addEventListener('click', function () { resetRound(nextConfig()); });
+  $('nextBtn').addEventListener('click', function () { if (HUNT && hunt.lastGhost) { endHunt('time'); return; } resetRound(nextConfig()); });
   $('replayBtn').addEventListener('click', function () { if (state.solved) startReplay(); });
   $('zoomIn').addEventListener('click', function () { setZoom(state.zoomIdx + 1); });
   $('zoomOut').addEventListener('click', function () { setZoom(state.zoomIdx - 1); });
@@ -1250,7 +1276,10 @@
 
   state.cfgIndex = -1; // 讓第一副牌不會因為「和上一組相同」被調換
   resetRound(level.on ? nextConfig() : 0);
-  if (HUNT) showIntro(); // 正式狩獵：先看開場，按【開始狩獵】才開始倒數；練習模式直接開始
+  // 跳過還沒過關的關卡（網址直接開）→ 只顯示「還沒通過第 N 關」＋【回關卡選單】（使用者 2026-11-21；shared/progress.js）
+  var gateScene = level.on && window.GameProgress ? window.GameProgress.showGate('concave', PRACTICE, INTRO_BG) : null;
+  if (gateScene) { level.screen = 'gate'; level.scene = gateScene; }
+  else if (HUNT) showIntro(); // 正式狩獵：先看開場，按【開始狩獵】才開始倒數；練習模式直接開始
   if (bg.settled) exposeHooks();
   else bgWaiters.push(function () { render(); exposeHooks(); });
 })();

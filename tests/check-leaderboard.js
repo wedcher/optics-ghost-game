@@ -100,5 +100,43 @@ ok(!g.post('not json').ok, '拒絕：壞 JSON');
 ok(!g.get().hunt.some((x) => x.name === 'x'), '被拒的上傳不留紀錄');
 ok(post(g, { name: '零隻', hunt: 0 }).ok, '0 隻可以上榜');
 
+// ---------- 2026-11-21：裝置代碼分人、分頁、找名次 ----------
+g = loadGas();
+const D1 = 'dev0000000000a1', D2 = 'dev0000000000b2';
+post(g, { name: '小明', device: D1, hunt: 5 });
+post(g, { name: '小明', device: D2, hunt: 3 });
+ok(g.sheets.hunt.rows.length === 3, '同名不同裝置：分成兩筆（兩個人）', g.sheets.hunt.rows);
+r = post(g, { name: '小明', device: D1, hunt: 2 });
+ok(!r.hunt.improved && r.hunt.best === 5 && g.sheets.hunt.rows.length === 3, '同裝置＋同名：較差成績不多一筆', r);
+r = post(g, { name: '小明', device: D1, hunt: 7 });
+ok(r.hunt.improved && r.hunt.rank === 1 && r.hunt.page === 1 && g.sheets.hunt.rows.length === 3, '同裝置＋同名：較好成績覆蓋自己那一筆', r);
+ok(g.sheets.hunt.rows[0][3] === 'device' && g.sheets.hunt.rows[1][3] === D1, '試算表多一欄 D 裝置代碼', g.sheets.hunt.rows[0]);
+post(g, { name: '小華', device: 'bad code!', hunt: 4 });
+ok(g.sheets.hunt.rows.some((x) => x[0] === '小華' && x[3] === ''), '格式不對的裝置代碼當作沒有');
+// 舊資料列（沒有 D 欄）照舊以暱稱當同一人
+g = loadGas();
+post(g, { name: '舊同學', hunt: 3 });
+g.sheets.hunt.rows[1].length = 3;
+r = post(g, { name: '舊同學', hunt: 6 });
+ok(r.hunt.improved && g.sheets.hunt.rows.length === 2, '沒有裝置代碼的舊資料：同名照舊覆蓋', g.sheets.hunt.rows);
+// 分頁
+g = loadGas();
+for (let i = 0; i < 25; i++) post(g, { name: 'p' + i, device: 'dev' + String(i).padStart(12, '0'), hunt: i });
+let pg = g.get({ action: 'page', board: 'hunt', page: '2' });
+ok(pg.ok && pg.total === 25 && pg.pages === 3 && pg.page === 2 && pg.rows.length === 10 && pg.rows[0].rank === 11 && pg.rows[0].name === 'p14', '分頁：每頁 10 名，第 2 頁從第 11 名開始', pg);
+ok(g.get({ action: 'page', board: 'hunt', page: '9' }).page === 3 && g.get({ action: 'page', board: 'hunt', page: '3' }).rows.length === 5, '頁數超過就給最後一頁；最後一頁 5 筆');
+ok(pg.rows.every((x) => typeof x.at === 'number' && x.at > 0), '每一列有日期（時間戳）');
+pg = g.get({ action: 'page', board: 'hunt', page: '2', device: 'dev000000000010', name: 'p10' });
+ok(pg.rows.filter((x) => x.me).map((x) => x.name).join() === 'p10', '分頁：帶裝置代碼＋暱稱時標出自己那一列', pg.rows.filter((x) => x.me));
+let rk = g.get({ action: 'rank', board: 'hunt', device: 'dev000000000003', name: 'p3' });
+ok(rk.ok && rk.rank === 22 && rk.page === 3 && rk.total === 25, '找名次：第 22 名在第 3 頁', rk);
+ok(g.get({ action: 'rank', board: 'hunt', device: 'dev000000000003', name: '別人' }).rank === 0, '找名次：裝置對、暱稱不對＝不在榜上');
+ok(!g.get({ action: 'page', board: 'xx' }).ok, '分頁：不認識的榜被拒');
+ok(g.get().hunt.length === 10, '舊版前端的 action=top 照舊可用');
+// 伺服器忙：回 JSON 錯誤（不是 HTML 錯誤頁）
+g = loadGas({ busy: true });
+r = post(g, { name: '小明', hunt: 1 });
+ok(!r.ok && r.error === 'busy', '等不到鎖：回 {ok:false,error:"busy"}（PENDING 21）', r);
+
 console.log((failures ? 'FAILED ' : 'OK ') + (checks - failures) + '/' + checks + ' leaderboard backend checks');
 process.exit(failures ? 1 : 0);

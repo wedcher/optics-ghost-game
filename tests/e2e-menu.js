@@ -35,11 +35,11 @@ function ok(c, label, detail) {
 const KEY = 'opticsGhost.progress.v1';
 const T = {
   start: ['開始遊戲', '古堡邀請，充滿鏡子的房間', 'plane-mirror/index.html'],
-  mirror: ['第一關：充滿鏡子的房間', '鏡子中，有一個女鬼', 'plane-mirror/index.html'],
+  mirror: ['第一關：鏡子房間', '鏡子中，有一個女鬼', 'plane-mirror/index.html'],
   'mirror-practice': ['第一關：練習模式', null, 'plane-mirror/index.html?practice=1'],
-  convex: ['第二關：走廊的凸透鏡', '城堡裡到處都是鬼，請趕走他們', 'convex-lens/index.html'],
+  convex: ['第二關：城堡走廊', '城堡裡到處都是鬼，請趕走他們', 'convex-lens/index.html'],
   'convex-practice': ['第二關：練習模式', null, 'convex-lens/index.html?practice=1'],
-  concave: ['第三關：荒野狩獵，小凹透鏡派上用場', '趁天亮前，多封印幾隻', 'concave-lens/index.html'],
+  concave: ['第三關：荒野狩獵', '趁天亮前，多封印幾隻', 'concave-lens/index.html'],
   'concave-practice': ['第三關：練習模式（不計時）', null, 'concave-lens/index.html?practice=1'],
 };
 
@@ -78,7 +78,7 @@ const T = {
   ok(!!(await page.$('a.card[href="leaderboard.html"]')) && !!(await page.$('#resetBtn')), '排行榜入口與「重新開始遊戲」保留');
   ok(!(await page.$('#menu a.card.dev')), '開發用自由練習不放進一般選單');
   ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), '橫向手機沒有橫向捲動');
-  const sz = await page.$$eval('#menu a.card, #lbLink, #resetBtn', (els) => els.map((e) => Math.min(e.getBoundingClientRect().width, e.getBoundingClientRect().height)));
+  const sz = await page.$$eval('#menu a.card, #lbLink, #resetBtn, #creditsLink', (els) => els.map((e) => Math.min(e.getBoundingClientRect().width, e.getBoundingClientRect().height)));
   ok(sz.every((s) => s >= 44), '選單按鈕 ≥ 44 px', sz);
   await page.screenshot({ path: path.join(SHOTS, 'menu-first.png') });
 
@@ -125,10 +125,29 @@ const T = {
   await Promise.all([page.waitForURL(/plane-mirror\/index\.html$/), page.tap('a.card[data-item="mirror"]')]);
   ok(true, '「第一關」「練習模式」等其他入口不跳教學');
 
+  // ---------- 製作與素材頁 ----------
+  await menuAt(null);
+  ok(!!(await page.$('a#creditsLink[href="credits.html"]')), '選單最下面有「製作與素材」入口');
+  await Promise.all([page.waitForURL(/credits\.html$/), page.tap('#creditsLink')]);
+  const cr = await page.evaluate(() => ({
+    rows: [...document.querySelectorAll('.credits dt')].map((dt) => dt.textContent + '：' + dt.nextElementSibling.textContent),
+    links: [...document.querySelectorAll('main a')].map((a) => a.getAttribute('href')),
+    btn: (() => { const b = document.getElementById('menuBtn').getBoundingClientRect(); return Math.min(b.width, b.height); })(),
+    text: document.body.textContent,
+    noHScroll: document.documentElement.scrollWidth <= window.innerWidth,
+  }));
+  ok(JSON.stringify(cr.rows) === JSON.stringify(['遊戲設計：絕絕', '背景與角色圖：ChatGPT', '程式：Claude', '女鬼聲音：Pixabay「u_2rfb4q2b10」', '小鬼聲音：Pixabay「freesound_community」', '其他音效：程式合成']), '製作與素材：文字照定稿', cr.rows);
+  ok(JSON.stringify(cr.links) === '["index.html"]', '製作與素材：除了回選單沒有其他連結', cr.links);
+  ok(/☰ 回選單/.test(cr.text) && cr.btn >= 44, '製作與素材：「☰ 回選單」≥ 44 px', cr.btn);
+  ok(cr.noHScroll, '製作與素材：橫向手機沒有橫向捲動');
+  await page.screenshot({ path: path.join(SHOTS, 'credits.png') });
+  await Promise.all([page.waitForURL(/prototype\/index\.html$/), page.tap('#menuBtn')]);
+  ok(true, '製作與素材：按「☰ 回選單」回得去');
+
   // ---------- G3 不再有轉向提示 ----------
   const pctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
   const pp = await pctx.newPage();
-  for (const u of ['/prototype/index.html', '/prototype/plane-mirror/index.html', '/prototype/convex-lens/index.html', '/prototype/concave-lens/index.html', '/prototype/leaderboard.html']) {
+  for (const u of ['/prototype/index.html', '/prototype/plane-mirror/index.html', '/prototype/convex-lens/index.html', '/prototype/concave-lens/index.html', '/prototype/leaderboard.html', '/prototype/credits.html']) {
     await pp.goto(BASE + u);
     ok(!(await pp.$('#rotateHint')), '直拿手機不出現「請橫放」提示：' + u);
   }

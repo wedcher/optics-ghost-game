@@ -63,6 +63,7 @@ async function run(profile, browser) {
   const context = await browser.newContext({
     viewport: profile.viewport, hasTouch: profile.touch, isMobile: profile.touch, deviceScaleFactor: profile.dsf
   });
+  await context.addInitScript(() => { window.__ghostArtOff = true; }); // 鬼用程式畫的單色輪廓，才能用顏色數像素（小鬼圖另外檢查）
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);
   const errors = [];
@@ -515,7 +516,7 @@ async function run(profile, browser) {
     ok((await st()).selectedCell === wrongCell, T('點地板格可選取（虛像所在的第 ' + wrongCell + ' 格）'));
     if (first) {
       const rb = await rowButtons('#analysisControls');
-      ok(rb.labels.join('|') === '回探索|選格封印|畫線|復原|清除|施放封印法陣' && (rb.oneRow || profile.name === 'phone-portrait'), T('選格封印模式：「施放封印法陣」接在同一排最後'), rb.labels.join('、'));
+      ok(rb.labels.join('|') === '回探索|選格封印|畫線|復原|清除|丟圓盤封印' && (rb.oneRow || profile.name === 'phone-portrait'), T('選格封印模式：「丟圓盤封印」接在同一排最後'), rb.labels.join('、'));
     }
     // C3：還沒抓到鬼之前，再點一次同一格取消選取
     await tap(wp.x, wp.y);
@@ -530,12 +531,14 @@ async function run(profile, browser) {
     s = await st();
     const status = await page.evaluate(() => document.getElementById('status').textContent);
     ok(!s.solved && s.attempts === 1 && s.selectedCell === null, T('封印虛像所在格 → 失敗'));
+    ok(s.mode === 'draw' && await page.evaluate(() => document.getElementById('modeDraw').classList.contains('on')), T('封印失敗後自動切回「畫線」（使用者 2026-11-20）'));
     ok(during.every((n) => n === 0) && await countColor(GHOST) === 0 && !s.stats.ghostRevealed, T('錯誤封印全程不顯示鬼'), '動畫取樣 ' + during.join('/'));
     ok(!/[左右前後遠近]|太|靠|第\s*\d|格子?\s*\d|\d/.test(status), T('錯誤訊息不含方向／距離／格號線索'), '「' + status + '」');
     await leak('錯誤封印後');
     await checkReplayIdle({ page, hook: '__proto', ok, T, when: '錯誤封印後' });
 
     // ---------- 正確封印（對照組：確認「顯形」真的偵測得到） ----------
+    await press('#modeSeal');
     wp = await w2s({ x: -(c.targetCell - 0.5) * 100, y: 60 }); // 點直欄上方也能選到格
     await tap(wp.x, wp.y);
     ok((await st()).selectedCell === c.targetCell, T('整個直欄都是該格的點擊區'));
@@ -543,7 +546,16 @@ async function run(profile, browser) {
     await page.waitForTimeout(1750);
     s = await st();
     ok(s.solved && await countColor(GHOST) > 20, T('封印作圖交點所在格 → 成功並顯形'));
+    if (first) { const art = await page.evaluate(() => ({ loaded: window.GhostSprite.loaded(), calls: window.GhostSprite.calls() })); ok(art.loaded === 9 && art.calls > 0, T('小鬼圖 9 張都載入，鬼都經過小鬼圖繪製'), JSON.stringify(art)); }
     if (first) await shot('8-seal-success');
+    // 光路重現的說明：整段同一句，重點依序是 實際光路 → 反向延長 → 虛像位置（使用者 2026-11-20）
+    const caps = await page.evaluate(() => {
+      const H = window.__proto, out = [];
+      for (const t of [0.3, 1.3, 2.2, 3.2]) { H.state.replay = { t0: performance.now() - t * 1000 }; H.render(); out.push(window.RayReplay.lastCaption()); }
+      return out;
+    });
+    ok(caps.every((c) => c && c.text === '實際光路 → 反向延長 → 虛像位置') && caps.map((c) => c.hi).join('/') === '實際光路/實際光路/反向延長/虛像位置',
+      T('光路重現說明：同一句，重點依序換'), caps.map((c) => c && c.hi).join('/'));
 
     // C3：抓到鬼之後不能取消、也不能改選別格
     {
@@ -664,6 +676,8 @@ async function runLevel(browser, query) {
   const name = practice ? 'level-practice' : 'level';
   console.log('\n===== ' + name + ' 812×375 touch ' + query + ' =====');
   const context = await browser.newContext({ viewport: { width: 812, height: 375 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
+  await context.addInitScript(() => { try { const k = 'opticsGhost.progress.v1', o = JSON.parse(localStorage.getItem(k) || '{}'); o.mirror = true; o.convex = true; o.concave = true; localStorage.setItem(k, JSON.stringify(o)); } catch (e) {} }); // 跳關會被擋回選單（2026-11-21）：先標前面的關卡已過關
+  await context.addInitScript(() => { window.__ghostArtOff = true; }); // 鬼用程式畫的單色輪廓，才能用顏色數像素（小鬼圖另外檢查）
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -740,8 +754,9 @@ async function runLevel(browser, query) {
   s = await info();
   ok(s.lives === 0 && s.heartsLeft === 0 && s.screen === 'failed' && s.scene && s.scene.id === 'failed', P('命用完：出現失敗畫面'));
   ok(s.scene && /❤️用完了/.test(s.scene.text) && !(await page.$('#lbResult')), P('失敗標題「❤️用完了……」、沒有結算／暱稱畫面'));
-  ok(await page.evaluate(() => { const r = JSON.parse(localStorage.getItem('ogg.run.v2') || 'null'); return !r || r.hunt == null; }) && await page.evaluate(() => !GameProgress.isCleared('concave')),
-    P('練習模式不記荒野封印數、不算完成荒野狩獵'));
+  // 練習模式要先通過第三關才進得來（跳關擋回選單，2026-11-21），所以這裡只檢查不記封印數（不再檢查「不算完成」）
+  ok(await page.evaluate(() => { const r = JSON.parse(localStorage.getItem('ogg.run.v2') || 'null'); return !r || r.hunt == null; }),
+    P('練習模式不記荒野封印數'));
   ok(s.scene && s.scene.buttons.join() === 'retryBtn,failMenuBtn' && s.scene.menuHref === '../index.html', P('失敗畫面有「重新挑戰」與「回關卡選單」'), s.scene && s.scene.buttons.join());
   const cellsHidden = await page.evaluate(() => { const c = window.__proto.cfg(); return c.targetCell; });
   ok(s.scene && !/[左右前後遠近]|格/.test(s.scene.text) && !s.scene.text.includes('第 ' + cellsHidden), P('失敗畫面的文字不洩漏位置'), s.scene && s.scene.text.replace(/\s+/g, ' '));

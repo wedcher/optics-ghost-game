@@ -12,6 +12,8 @@
  *   segments: [{ a:{x,y}, b:{x,y}, start, end, kind:'ray'|'extension' }],  // 世界座標
  *   points:   [{ p:{x,y}, start, label }],
  *   captions: [{ start, text }]
+ *     或 [{ start, parts: ['實際光路', ' → ', …], hi: 0 }]：整句不變，第 hi 段是這一刻的重點，用 colors[hi] 的顏色亮起來、其他段變暗
+ *     （使用者 2026-11-20：第三關重現時一直顯示同一句，只換重點）。colors 不給時：重點用白色。
  * }
  */
 (function (root) {
@@ -21,6 +23,8 @@
   var EXT_COLOR = '#ff9be6';        // 反向延長線：虛線
   var POINT_COLOR = '#ff5fd2';
 
+  function captionText(c) { return c.parts ? c.parts.join('') : c.text; }
+  var lastCaption = null; // 最後畫出的說明（測試用）
   function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
   function ease(t) { return t * t * (3 - 2 * t); }
 
@@ -88,8 +92,9 @@
       ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(q.x, q.y, 5, 0, 7); ctx.stroke();
     }
     // 說明文字：顯示目前階段的那一句
-    var text = null;
-    for (i = 0; i < (spec.captions || []).length; i++) if (tau >= spec.captions[i].start) text = spec.captions[i].text;
+    var cap = null;
+    for (i = 0; i < (spec.captions || []).length; i++) if (tau >= spec.captions[i].start) cap = spec.captions[i];
+    var text = cap ? captionText(cap) : null;
     if (text && area) {
       ctx.font = '600 15px system-ui, -apple-system, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -98,7 +103,7 @@
       // 說明框預設在上方；若會蓋到光線（例如鬼在高處、平行光線貼近畫面上緣），改放下方。
       // 用整段動畫裡最寬的那一句、全部的光線來判斷，位置才不會播到一半跳動。
       var maxW = 0;
-      for (i = 0; i < spec.captions.length; i++) maxW = Math.max(maxW, ctx.measureText(spec.captions[i].text).width + 28);
+      for (i = 0; i < spec.captions.length; i++) maxW = Math.max(maxW, ctx.measureText(captionText(spec.captions[i])).width + 28);
       maxW = Math.min(area.w - 16, maxW);
       var cyBottom = area.y + area.h - th / 2 - 8;
       if (boxHitsRays(w2s, spec, cx - maxW / 2, cy - th / 2, maxW, th) && !boxHitsRays(w2s, spec, cx - maxW / 2, cyBottom - th / 2, maxW, th)) cy = cyBottom;
@@ -106,10 +111,24 @@
       ctx.beginPath();
       if (ctx.roundRect) ctx.roundRect(cx - tw / 2, cy - th / 2, tw, th, 10); else ctx.rect(cx - tw / 2, cy - th / 2, tw, th);
       ctx.fill(); ctx.stroke();
-      ctx.fillStyle = '#fff'; ctx.fillText(text, cx, cy, tw - 16);
+      if (!cap.parts) { ctx.fillStyle = '#fff'; ctx.fillText(text, cx, cy, tw - 16); }
+      else {
+        // 分段畫：重點那段用它的顏色、其他段暗一點；整句放不下時水平壓縮（和 fillText 的 maxWidth 一樣）
+        var full = ctx.measureText(text).width, sx = Math.min(1, (tw - 16) / full), x = -full / 2;
+        ctx.save(); ctx.translate(cx, cy); ctx.scale(sx, 1); ctx.textAlign = 'left';
+        for (i = 0; i < cap.parts.length; i++) {
+          var on = i === cap.hi;
+          ctx.fillStyle = on ? ((cap.colors && cap.colors[i]) || '#fff') : 'rgba(205,205,230,.55)';
+          ctx.fillText(cap.parts[i], x, 0);
+          x += ctx.measureText(cap.parts[i]).width;
+        }
+        ctx.restore();
+      }
+      lastCaption = cap.parts ? { text: text, hi: cap.parts[cap.hi] } : { text: text, hi: null };
     }
     ctx.restore();
   }
 
-  root.RayReplay = { draw: draw, RAY_COLOR: RAY_COLOR, EXT_COLOR: EXT_COLOR };
+  root.RayReplay = { draw: draw, RAY_COLOR: RAY_COLOR, EXT_COLOR: EXT_COLOR, POINT_COLOR: POINT_COLOR,
+    lastCaption: function () { return lastCaption; } };
 })(typeof self !== 'undefined' ? self : this);

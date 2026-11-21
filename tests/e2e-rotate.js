@@ -143,7 +143,7 @@ async function mirror(browser) {
   const p = await page.evaluate((c) => window.__protoMirror.cellClient(c.col, c.row), c);
   await page.touchscreen.tap(p.x, p.y); await page.waitForTimeout(60);
   await page.tap('#castBtn'); await page.waitForTimeout(80);
-  ok((await page.evaluate(() => window.__protoMirror.stats.casts)) >= 1, '第一關：「展開封印法陣」按鈕點得到');
+  ok((await page.evaluate(() => window.__protoMirror.stats.casts)) >= 1, '第一關：「丟圓盤封印」按鈕點得到');
   await noScroll(page, '第一關');
   await page.screenshot({ path: path.join(SHOTS, 'rotate-mirror.png') });
   ok(errors.length === 0, '第一關：沒有 JS 錯誤', errors.join(' | ') || undefined);

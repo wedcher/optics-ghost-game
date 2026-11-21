@@ -92,14 +92,26 @@
   // 版面：觀察階段把畫布分成「布幕正面」與「走廊側視」兩塊
   // ====================================================================
 
+  // 右邊布幕（透鏡）那一欄至少這麼寬：放得下底下的「看布幕／看透鏡」，透鏡畫面也比較大（使用者 2026-11-20 要透鏡和像大一點）
+  var WALL_MIN_W = 180;
   function regions() {
+    var rg;
     if (W > H * 1.25) {
       // 布幕是直的窄長條（寬:高 = wallHalfWidth:axisHeight），只留它需要的寬度，其餘給走廊側視
-      var ww = Math.round(Math.min(W * 0.36, (H - 38) * WORLD.wallHalfWidth / WORLD.axisHeight + 34));
-      return { wall: { x: W - ww, y: 0, w: ww, h: H }, side: { x: 0, y: 0, w: W - ww, h: H } };
+      var ww = Math.round(Math.min(W * 0.36, Math.max(WALL_MIN_W, (H - 38) * WORLD.wallHalfWidth / WORLD.axisHeight + 34)));
+      rg = { wall: { x: W - ww, y: 0, w: ww, h: H }, side: { x: 0, y: 0, w: W - ww, h: H } };
+    } else {
+      var wh = Math.round(H * 0.58);
+      rg = { wall: { x: 0, y: 0, w: W, h: wh }, side: { x: 0, y: wh, w: W, h: H - wh } };
     }
-    var wh = Math.round(H * 0.58);
-    return { wall: { x: 0, y: 0, w: W, h: wh }, side: { x: 0, y: wh, w: W, h: H - wh } };
+    rg.wallView = rg.wall; // 舊名（測試用）
+    return rg;
+  }
+  // 「看布幕／看透鏡」跟著布幕（透鏡）那一欄（使用者 2026-11-20）：橫向版面時寬度對齊那一欄，排在按鈕列最右邊、就在那一欄正下方
+  function placeLookBox() {
+    var box = $('lookBox'), wr = regions().wall, col = W > H * 1.25 && wr.x > 0;
+    box.classList.toggle('col', col);
+    box.style.width = col ? Math.max(100, wr.w - 12) + 'px' : '';
   }
 
   function fitInto(r) {
@@ -178,7 +190,14 @@
     e(hw * 1.22, -hh * 0.05, hw * 0.24, hw * 0.24); // 小手（在鬼自己的右側）
   }
 
+  /** 畫鬼（本體或像）：先用小鬼圖（shared/ghost-sprite.js），圖還沒載入才用程式畫的輪廓。 */
+  function drawGhost(c, px, py, hw, hh, sx, sy, fill, glow) {
+    if (window.GhostSprite && window.GhostSprite.draw(c, px, py, hw, hh, sx, sy, glow)) return;
+    c.fillStyle = fill; ghostPath(c, px, py, hw, hh, sx, sy); c.fill('evenodd');
+  }
+
   function drawGhostSolid(c, px, py, hw, hh) {
+    if (window.GhostSprite && window.GhostSprite.draw(c, px, py, hw, hh, 1, 1, 'rgba(120,255,200,.75)')) return;
     c.save();
     c.shadowColor = 'rgba(120,255,200,.9)'; c.shadowBlur = Math.max(4, hw * 0.6);
     c.fillStyle = GHOST_COLOR;
@@ -252,8 +271,7 @@
         ctx.globalAlpha = n === 1 ? 1 : 1 / n;
         for (var i = 0; i < n; i++) {
           var rr = n === 1 ? 0 : b * Math.sqrt((i + 0.5) / n), th = i * 2.399963;
-          ghostPath(ctx, px + rr * Math.cos(th), py + rr * Math.sin(th), hw, hh, -1, -1); // 倒立且左右相反
-          ctx.fill('evenodd');
+          drawGhost(ctx, px + rr * Math.cos(th), py + rr * Math.sin(th), hw, hh, -1, -1, GHOST_COLOR, null); // 倒立且左右相反
         }
       }
       ctx.restore();
@@ -276,16 +294,46 @@
   var VIRTUAL_CAPTION = '虛像（正立、放大）';
   // 鏡框裡的「虛像（正立、放大）」字樣（使用者 2026-11-18 答虛像題 V2）。放在鏡片裡、和像相反的那一半，
   // 字放不下一行就拆兩行、再不夠就縮小字（最小 11 px）。只說明像的性質，不含任何位置資訊。
-  function lensCaption(cx, cy, rad, imgUp) {
-    var lines = [VIRTUAL_CAPTION], size = Math.round(14 * FS), maxW = rad * 1.55;
+  // 虛像不能標記（落在走廊外，或放大太多）時改寫 TOO_FAR_CAPTION（使用者 2026-11-21 指定文字）。
+  var TOO_FAR_CAPTION = '成像太遠，無法標記。';
+  // 虛像離透鏡太近（< NEAR_IMAGE_CM）時，側視圖上標記、透鏡、鬼會擠在一起不好畫線：
+  // 鏡片裡多寫一行 NEAR_HINT，但仍然可以標記（使用者 2026-11-21：「他如果硬要選，也給他選」）。
+  var NEAR_IMAGE_CM = 60, NEAR_HINT = '建議標記別處';
+  function imageTooNear(lv) { return lv.eye === 'virtual' && lv.markable && Math.abs(lv.v) < NEAR_IMAGE_CM; }
+  // 看到倒立實像時鏡片上的字（使用者 2026-11-21）
+  var REAL_CAPTION = '目前為實像，請改用布幕';
+  // kind：null＝一般虛像｜'far'＝成像太遠不能標記｜'near'＝可以標記但建議標記別處｜'real'＝倒立實像
+  function lensCaption(cx, cy, rad, imgUp, kind) {
+    var tooFar = kind === 'far', near = kind === 'near', real = kind === 'real';
+    var lines = real ? [REAL_CAPTION] : tooFar ? [TOO_FAR_CAPTION] : near ? [VIRTUAL_CAPTION, NEAR_HINT] : [VIRTUAL_CAPTION], size = Math.round(14 * FS), maxW = rad * 1.55;
     ctx.save();
     var fit = function () { ctx.font = '700 ' + size + 'px system-ui, sans-serif'; return lines.every(function (t) { return ctx.measureText(t).width <= maxW; }); };
-    if (!fit()) { lines = ['虛像', '（正立、放大）']; while (!fit() && size > 11) size--; }
-    var lh = size * 1.2, y0 = cy + (imgUp > 0 ? 1 : -1) * rad * 0.62 - (lines.length - 1) * lh / 2;
+    if (!fit()) { lines = real ? ['目前為實像，', '請改用布幕'] : tooFar ? ['成像太遠，', '無法標記。'] : near ? ['虛像', '（正立、放大）', NEAR_HINT] : ['虛像', '（正立、放大）']; while (!fit() && size > 11) size--; }
+    var lh = size * 1.2, y0 = cy + (imgUp > 0 ? 1 : -1) * rad * (lines.length > 2 ? 0.45 : 0.62) - (lines.length - 1) * lh / 2; // 三行時往中心移，免得被圓框切掉
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(8,10,24,.92)'; ctx.fillStyle = '#e7e0ff';
     lines.forEach(function (t, i) { ctx.strokeText(t, cx, y0 + i * lh); ctx.fillText(t, cx, y0 + i * lh); });
     ctx.restore();
     stats.lensCaption = lines.join('');
+  }
+  // 數鬼的像實際畫進鏡片圓裡的像素（縮小到 48×48 的離屏畫布；不畫光暈）。鬼圖邊緣多半是空白，不能只看外框（2026-11-21）
+  var lensProbe = null;
+  function ghostPixelsInLens(cx, cy, rad, py, hw, hh, sg) {
+    var N = 48;
+    if (!lensProbe) { lensProbe = document.createElement('canvas'); lensProbe.width = lensProbe.height = N; }
+    var g = lensProbe.getContext('2d'), s = N / (2 * rad);
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, N, N);
+    g.save();
+    g.setTransform(s, 0, 0, s, -(cx - rad) * s, -(cy - rad) * s);
+    g.beginPath(); g.arc(cx, cy, rad, 0, 7); g.clip();
+    g.fillStyle = '#fff'; drawGhost(g, cx, py, hw, hh, sg, sg, '#fff', null);
+    g.restore();
+    // 鬼圖從別的網域載入時（例如試玩網址 raw.githack 會把圖片轉到別的網域），畫布被「污染」，讀像素會丟錯。
+    // 丟錯會讓整個 render 停住（透鏡拖不動、切布幕沒反應），所以一定要接住，改用外框估算（回傳 -1）。
+    var d;
+    try { d = g.getImageData(0, 0, N, N).data; } catch (e) { return -1; }
+    var n = 0;
+    for (var i = 3; i < d.length; i += 4) if (d[i] > 60) n++;
+    return n;
   }
   function renderLensView(r) {
     var c = cfg(), pad = 10;
@@ -293,26 +341,39 @@
     ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip();
     ctx.fillStyle = '#0a0b16'; ctx.fillRect(r.x, r.y, r.w, r.h);
     var k = Math.min((r.w - 2 * pad) / (2 * WORLD.wallHalfWidth), (r.h - 2 * pad - 18) / (2 * WORLD.axisHeight));
-    var foot = Math.round(34 * FS);                              // 底部一列：直接看鬼的大小（對照）
+    // 底部原本有「← 直接看」對照小鬼，使用者 2026-11-21 拿掉（鬼裸眼不可見；大小又會透露距離，findings V5）
+    var foot = 0;
     var cx = r.x + r.w / 2, cy = r.y + 22 + (r.h - 22 - foot) / 2;
-    var maxR = Math.min(WORLD.wallHalfWidth * k, (r.h - 22 - foot) / 2 - 6); // 鏡框半徑上限 = 布幕半寬（不比布幕大）
-    var eye = WORLD.eyeX, D = eye - c.object.x, dLens = eye - state.lensX;
-    var angR = WORLD.lensRadius / dLens, naked = WORLD.ghostHalfHeight / D;
-    var K = Math.min(maxR * 0.3 / naked, maxR / angR);          // 視角（正切）→ 畫面 px；直接看鬼時鬼的半高 = 鏡框上限的 30%
+    // 鏡框半徑上限：那一欄放得下多大就多大（使用者 2026-11-20 要透鏡和像大一點；原本限制不比布幕寬）
+    var maxR = Math.min(r.w / 2 - 16, (r.h - 22 - foot) / 2 - 6);
+    var eye = WORLD.eyeX, dLens = eye - state.lensX;
+    var angR = WORLD.lensRadius / dLens;
+    // 視角（正切）→ 畫面 px：鏡框永遠撐滿上限。原本會依「直接看鬼的大小」縮小鏡框（隨鬼的距離變，會透露距離），2026-11-21 拿掉。
+    // 像和鏡框的比例照物理算，不受影響。
+    var K = maxR / angR;
     var rad = angR * K;
     var lv = lensViewNow();
+    stats.lensImageVisible = false;
     // 鏡片（正面看是圓形；木框＋玻璃）
     ctx.fillStyle = '#5a4630'; ctx.beginPath(); ctx.arc(cx, cy, rad + 5, 0, 7); ctx.fill();
     ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, rad, 0, 7); ctx.clip();
     var gg = ctx.createRadialGradient(cx - rad * 0.3, cy - rad * 0.35, rad * 0.05, cx, cy, rad);
     gg.addColorStop(0, '#26304f'); gg.addColorStop(1, '#141a30');
     ctx.fillStyle = gg; ctx.fillRect(cx - rad, cy - rad, 2 * rad, 2 * rad);
-    if (!state.solved && (lv.eye === 'virtual' || lv.eye === 'realInFront')) {
-      var d = eye - lv.x, am = Math.abs(lv.m), virt = lv.eye === 'virtual';
-      ctx.save(); ctx.globalAlpha = 0.78; ctx.fillStyle = virt ? VIRTUAL_COLOR : REAL_IMG_COLOR;
-      ghostPath(ctx, cx, cy - (lv.y / d) * K, WORLD.ghostHalfWidth * am / d * K, WORLD.ghostHalfHeight * am / d * K, virt ? 1 : -1, virt ? 1 : -1);
-      ctx.fill('evenodd'); ctx.restore();
-      if (virt) lensCaption(cx, cy, rad, lv.y / d * K); // 回饋「虛像題 V2」：鏡框裡寫出像的性質
+    // 看得清楚的像：虛像、眼前的倒立實像、在無限遠（物在焦點上）、在眼睛後面（使用者 2026-11-21：照物理畫，不再是一團淡光）。
+    // 位置、大小一律用視角 A（configs.lensView）：A > 0 正立，A < 0 倒立。
+    if (!state.solved && (lv.eye === 'virtual' || lv.eye === 'realInFront' || lv.eye === 'infinity' || lv.eye === 'behind')) {
+      var A = lv.A, sg = A > 0 ? 1 : -1, virt = lv.eye === 'virtual', col = virt ? VIRTUAL_COLOR : REAL_IMG_COLOR;
+      var gpy = cy - A * c.h * K, ghw = WORLD.ghostHalfWidth * Math.abs(A) * K, ghh = WORLD.ghostHalfHeight * Math.abs(A) * K;
+      ctx.save(); ctx.fillStyle = col; ctx.globalAlpha = 0.9;
+      drawGhost(ctx, cx, gpy, ghw, ghh, sg, sg, col, col);
+      ctx.restore();
+      var px = lv.inView ? ghostPixelsInLens(cx, cy, rad, gpy, ghw, ghh, sg) : 0;
+      // 讀不到像素（-1）：用外框估算——鬼圖的身體大約在外框內 2/3，進到鏡片圓裡才算看得到
+      stats.lensImageVisible = px < 0 ? Math.abs(gpy - cy) - 0.67 * ghh < rad : px > 0;
+      if (!stats.lensImageVisible) { /* 像在鏡框外（或只有空白邊緣進來）：鏡片裡是空的，不寫字 */ }
+      else if (virt) lensCaption(cx, cy, rad, A * c.h * K, !lv.markable ? 'far' : imageTooNear(lv) ? 'near' : null); // 回饋「虛像題 V2」：鏡框裡寫出像的性質
+      else lensCaption(cx, cy, rad, A * c.h * K, lv.eye === 'realInFront' ? 'real' : 'far');
     } else if (!state.solved && lv.eye === 'blur') {
       var gr = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
       gr.addColorStop(0, 'rgba(157,255,216,.30)'); gr.addColorStop(1, 'rgba(157,255,216,.04)');
@@ -327,11 +388,6 @@
       var my = cy - (state.marker.y / (eye - state.marker.x)) * K;
       drawMarker(cx, my);
     }
-    // 對照：不用透鏡、直接看鬼時看起來的大小（灰色虛線，底部一列）
-    var rw = WORLD.ghostHalfWidth / D * K, rh = naked * K, fy = r.y + r.h - foot / 2;
-    ctx.save(); ctx.strokeStyle = 'rgba(200,205,230,.85)'; ctx.setLineDash([4, 3]); ctx.lineWidth = 1.5;
-    ghostPath(ctx, r.x + 10 + rw, fy, rw, rh, 1, 1); ctx.stroke(); ctx.restore();
-    label('← 直接看', r.x + 10 + rw * 2.6, fy, '#aab3e6', 'left');
     label('隔著凸透鏡看', r.x + 8, r.y + 12, '#aab3e6', 'left');
     ctx.restore();
   }
@@ -580,9 +636,15 @@
         drawMagicCircle(cc.x, cc.y + tileH * 0.4, rx * Math.min(1, t / 0.5), 1, t * 1.5);
         if (t > 0.7) {
           var gp = w2s(c.object);
+          // 封印特效（使用者 2026-11-21）：紫色螺旋從法陣往上纏繞鬼；第二三關鬼留著不消失（讓學生復盤）
+          var ghh = Math.max(10, WORLD.ghostHalfHeight * s), floorY = cc.y + tileH * 0.4;
+          var vfx = window.SealFx && { cx: gp.x, cz: 0, r: rx * 0.72, h: Math.max(20, floorY - (gp.y - ghh)) * 1.08, line: 2.4, glow: 10,
+            project: function (x, y, z) { return { x: x, y: floorY - y + z * 0.28, depth: -z }; } };
+          if (vfx) window.SealFx.draw(ctx, vfx, t - 0.7, 'back');
           ctx.save(); ctx.globalAlpha = Math.min(1, (t - 0.7) / 0.5);
-          drawGhostSolid(ctx, gp.x, gp.y, Math.max(7, WORLD.ghostHalfWidth * s), Math.max(10, WORLD.ghostHalfHeight * s));
+          drawGhostSolid(ctx, gp.x, gp.y, Math.max(7, WORLD.ghostHalfWidth * s), ghh);
           ctx.restore();
+          if (vfx) window.SealFx.draw(ctx, vfx, t - 0.7, 'front');
           label('鬼本體', gp.x, gp.y - Math.max(10, WORLD.ghostHalfHeight * s) - 12, GHOST_COLOR);
           stats.ghostRevealed = true;
         }
@@ -603,8 +665,8 @@
         ctx.save(); ctx.globalAlpha = 0.7 * Math.min(1, (tau - spec.imageAt) / 0.5);
         ctx.fillStyle = vm ? VIRTUAL_COLOR : GHOST_COLOR;
         // 實像：倒立，上下、左右都相反（和布幕正面視圖、課本一致），畫在布幕左邊。虛像：正立，畫在虛像的位置
-        if (vm) ghostPath(ctx, ip.x, ip.y, ihw, ihh, 1, 1); else ghostPath(ctx, ip.x - ihw - 4, ip.y, ihw, ihh, -1, -1);
-        ctx.fill('evenodd');
+        if (vm) drawGhost(ctx, ip.x, ip.y, ihw, ihh, 1, 1, ctx.fillStyle, VIRTUAL_COLOR);
+        else drawGhost(ctx, ip.x - ihw - 4, ip.y, ihw, ihh, -1, -1, ctx.fillStyle, GHOST_COLOR);
         ctx.restore();
       }
       window.RayReplay.draw(ctx, w2s, spec, tau, clipRect);
@@ -666,12 +728,15 @@
     var lv = lensViewNow();
     if (lv.eye === 'virtual' && lv.markable) {
       state.marker = { lensX: state.lensX, x: lv.x, y: lv.y, virtual: true };
-      setStatus('你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」');
+      setStatus('你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」' + (imageTooNear(lv) ? '（像離透鏡太近，畫線會擠在一起，' + NEAR_HINT + '。）' : ''));
       syncUI(); requestRender();
       return;
     }
-    setStatus(lv.eye === 'virtual' ? '透鏡裡的鬼放大得太厲害，看不清全貌。稍微移動透鏡再試。'
-      : lv.eye === 'realInFront' ? '透鏡裡看到的是倒立的像——那不是虛像。要標記倒立的實像，請改「看布幕」。'
+    // 像整個落在鏡框外（鬼離主軸很遠）：鏡片裡是空的，不能說「看到」（2026-11-21，配置 B 開場）
+    render(); // 確保 stats.lensImageVisible 是現在的透鏡位置
+    setStatus(lv.eye !== 'blur' && lv.eye !== 'none' && !stats.lensImageVisible ? '透鏡裡看不到鬼的像。移動透鏡試試。'
+      : lv.eye === 'virtual' || lv.eye === 'infinity' || lv.eye === 'behind' ? TOO_FAR_CAPTION + '再移動看看。'
+      : lv.eye === 'realInFront' ? '現在看到的是鬼的倒立實像。實像可以投在布幕上，請改用布幕找清楚的像。' // 使用者 2026-11-21 定的文字：實像只在布幕上標記
       : lv.eye === 'none' ? '透鏡裡看不到鬼的像。移動透鏡試試。'
       : '透鏡裡模糊一片，看不清楚。移動透鏡試試。');
   }
@@ -705,11 +770,8 @@
         { a: Q, b: { x: 0, y: Q.y }, start: 1.0, end: 2.2, kind: 'ray' }
       ],
       points: [{ p: I, start: 2.2 }],
-      captions: [
-        { start: 0, text: '鬼身上發出三條光線' },
-        { start: 1.0, text: '經過凸透鏡：平行的折向焦點 F′，過光心的直走，過焦點 F 的變平行' },
-        { start: 2.2, text: '實際光路 → 光線會聚 → 實像位置' }
-      ]
+      // 使用者 2026-11-21：和第三關一樣，整段一直顯示同一句，只換重點（重點的顏色＝畫面上對應的線或點）
+      captions: replayCaptions([0, 1.0, 2.2], ['實際光路', ' → ', '光線會聚', ' → ', '實像位置'])
     };
   }
   // 虛像：三條主光線折射後發散，一路走到布幕（布幕上不會聚成像）；
@@ -739,13 +801,16 @@
         { a: Q, b: I, start: 2.2, end: 3.2, kind: 'extension' }
       ],
       points: [{ p: I, start: 3.2 }],
-      captions: [
-        { start: 0, text: '鬼身上發出三條光線' },
-        { start: 1.0, text: '鬼在焦點內：折射後的光線彼此分開，布幕上不會聚成像' },
-        { start: 2.2, text: '從布幕這邊看，光線像是從同一點發出（反向延長的虛線）' },
-        { start: 3.2, text: '虛線交點 → 正立、放大的虛像，和鬼在透鏡同一側' }
-      ]
+      captions: replayCaptions([0, 2.2, 3.2], ['實際光路', ' → ', '反向延長', ' → ', '虛像位置'])
     };
+  }
+  // 重現說明：一句分三段（第 0、2、4 段），times[i] 起第 i 段亮起來；顏色＝實線光線／反向延長虛線／像的標示點
+  function replayCaptions(times, parts) {
+    var RR = window.RayReplay, virt = parts[2] === '反向延長';
+    return times.map(function (t, i) {
+      return { start: t, hi: i * 2, parts: parts,
+        colors: [RR.RAY_COLOR, null, virt ? RR.EXT_COLOR : RR.RAY_COLOR, null, RR.POINT_COLOR] };
+    });
   }
   function replayRunning() { return !!state.replay && (performance.now() - state.replay.t0) / 1000 < replaySpec().duration + 0.3; }
   function startReplay() { $('banner').hidden = true; state.replay = { t0: performance.now() }; animate(); }
@@ -758,10 +823,10 @@
       // 還沒抓到鬼之前，再點一次已選的格就取消選取（和第三關一致）；抓到之後上面已經 return，不能改
       if (state.selectedCell === k) {
         state.selectedCell = null; state.seal = null;
-        setStatus('已取消選取。再點一個地板格，然後按「施放封印法陣」。');
+        setStatus('已取消選取。');
       } else {
         state.selectedCell = k; state.seal = null;
-        setStatus('已選第 ' + k + ' 格。確定的話按「施放封印法陣」；再點一次同一格可以取消。');
+        setStatus('已選第 ' + k + ' 格。'); pulse($('castBtn')); // 文字縮短；封印按鈕閃微光提醒（使用者 2026-11-21）
       }
       syncUI(); requestRender();
       return;
@@ -803,15 +868,16 @@
         startReplay();
       } else {
         state.selectedCell = null;
+        state.mode = 'draw'; // 抓錯後自動切回畫線，方便重新檢查作圖（使用者 2026-11-20，第二、三關一致）
         giggle();
         if (level.on) {
           // 扣命只看「抓錯」這件事本身，訊息與畫面都不帶任何位置線索
           level.lives--;
           flashHud();
-          setStatus('法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。');
+          setStatus('法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。');
           if (level.lives <= 0) failLevel();
         } else {
-          setStatus('法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。');
+          setStatus('法陣裡沒有東西……再檢查你的光線作圖。');
         }
       }
       syncUI(); requestRender();
@@ -820,6 +886,7 @@
 
   var audioCtx = null;
   function giggle() {
+    if (window.Sfx && window.Sfx.giggle && window.Sfx.giggle('minion')) return; // 真的笑聲音檔（使用者 2026-11-21）；不能播才用下面的合成音
     try {
       audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
       var t0 = audioCtx.currentTime;
@@ -949,8 +1016,17 @@
   canvas.addEventListener('pointerup', function (e) { endPointer(e, false); });
   canvas.addEventListener('pointercancel', function (e) { endPointer(e, true); });
   canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  if (window.GhostSprite) window.GhostSprite.onLoad(function () { requestRender(); }); // 小鬼圖載入後重畫
   ['gesturestart', 'gesturechange'].forEach(function (n) { document.addEventListener(n, function (e) { e.preventDefault(); }); });
 
+  // 選好格子後，封印按鈕閃一下微光（使用者 2026-11-21：比多寫一句提示有效；三關一致）
+  function pulse(el) {
+    if (!el || !el.animate) return;
+    try {
+      el.animate([{ boxShadow: '0 0 0 0 rgba(255,226,140,0)' }, { boxShadow: '0 0 16px 5px rgba(255,226,140,.9)' }, { boxShadow: '0 0 0 0 rgba(255,226,140,0)' }],
+        { duration: 800, iterations: 2, easing: 'ease-in-out' });
+    } catch (e) { /* 不支援就不閃 */ }
+  }
   function setStatus(t) { $('status').textContent = t; }
 
   var bannerTimer = null;
@@ -965,6 +1041,7 @@
     $('exploreControls').hidden = analysis;
     $('analysisControls').hidden = !analysis;
     $('zoomBox').hidden = !analysis;
+    placeLookBox();
     $('zoomBox').classList.toggle('low', !!state.marker && !state.marker.virtual && state.marker.y > 0); // 避開布幕上的實像標記（見 index.html）；虛像標記在走廊中間，不必避
     $('toAnalysis').disabled = !state.marker;
     $('toAnalysis').classList.toggle('primary', !!state.marker);
@@ -975,6 +1052,9 @@
     $('lookLens').setAttribute('aria-pressed', String(state.look === 'lens'));
     $('modeDraw').classList.toggle('on', state.mode === 'draw');
     $('modeSeal').classList.toggle('on', state.mode === 'seal');
+    // 畫出第二條線後（兩條線才有交點），「選格封印」變紫色提醒；變紫後這一隻鬼都維持（使用者 2026-11-21）
+    if (state.lines.length >= 2) state.sealHint = true;
+    $('modeSeal').classList.toggle('primary', !!state.sealHint && state.mode !== 'seal');
     // 一排：重新對焦｜選格封印｜畫線｜復原｜清除，再加上該階段的動作鈕（封印模式：施放；封印成功後：光路重現、下一隻）
     $('castBtn').hidden = state.mode !== 'seal' || state.solved;
     $('modeSeal').hidden = state.solved; // 抓到鬼之後選格不能再改，只留畫線
@@ -1040,7 +1120,8 @@
         { speaker: '你', text: '可是這裡沒有鏡子。' },
         { speaker: '你', text: '咦？這裡怎麼有一個這麼大的凸透鏡？' }
       ],
-      note: '走廊裡鬼影重重。請抓到 ' + LEVEL_GOAL + ' 隻鬼；抓錯會失去一顆心。',
+      title: '第二關：城堡走廊',
+      note: '走廊裡鬼影重重。3 顆❤️，請抓到 ' + LEVEL_GOAL + ' 隻鬼；抓錯扣一❤️。',
       buttons: [{ id: 'startHuntBtn', label: '開始抓鬼', primary: true, onClick: startHunt }]
     });
   }
@@ -1059,7 +1140,8 @@
     closeScene();
     level.scene = window.StoryScene.show({
       id: 'failed', background: INTRO_BG,
-      title: '❤️用完了……', // 命用完的文字統一用 ❤️（CONFIRMED 劇本修訂）
+      lines: [{ speaker: '你', text: '等我休息一下，再來抓你們。' }], // 使用者 2026-11-21
+      title: '驅逐失敗', // 使用者 2026-11-21：第一關「封印失敗」、第二關「驅逐失敗」
       note: '鬼還躲在走廊裡。這次封印了 ' + level.sealed + ' 隻。重新挑戰會從頭算起。',
       buttons: [
         { id: 'retryBtn', label: '重新挑戰', primary: true, onClick: startHunt },
@@ -1087,16 +1169,18 @@
       // （凸透鏡的碎片仍是會聚的，不會變成第三關的凹透鏡；CONFIRMED「劇本修訂」物理）。
       lines: [
         { text: '剩下的鬼一哄而散，逃出了城堡！' },
+        { speaker: '你', text: '想跑？追！' },
         { speaker: '你', text: '但凸透鏡太大了，帶不走啊。' },
-        { text: '你撿起地上的一片小透鏡。' },
         { speaker: '你', text: '咦，這個……' },
-        { speaker: '你', text: '也可以吧。' }
+        { text: '你撿起地上的一片小透鏡。' },
+        { speaker: '你', text: '這個也可以吧。' }
       ],
       title: '第二關過關！',
       note: note,
       // 過關後回選單，由選單進下一關；或「再玩一次」整關重來（命、封印數、牌堆都重置）。和第一關一致（2026-11-18 定案）
       buttons: [
-        { id: 'clearMenuBtn', label: '回關卡選單', primary: true, href: MENU_URL },
+        { id: 'nextLevelBtn', label: '前往第三關 ➜', primary: true, href: '../concave-lens/index.html' }, // 使用者 2026-11-21：可直接進下一關
+        { id: 'clearMenuBtn', label: '回關卡選單', href: MENU_URL },
         { id: 'againBtn', label: '再玩一次', onClick: startHunt }
       ]
     });
@@ -1126,12 +1210,24 @@
     deck = Cfg.all.map(function (_, i) { return i; });
     for (var i = deck.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = deck[i]; deck[i] = deck[j]; deck[j] = t; }
     var n = Math.min(LEVEL_GOAL, deck.length), first = deck.length - n;
-    if (deck.slice(first).some(isVirtualCfg)) return;
-    var rest = [];
-    for (var r = 0; r < first; r++) if (isVirtualCfg(deck[r])) rest.push(r);
-    if (!rest.length) return; // 沒有虛像題配置（不會發生；check-geometry-convex 驗證有 J、K、L）
-    var from = rest[Math.floor(Math.random() * rest.length)], to = first + Math.floor(Math.random() * n), tmp = deck[to];
-    deck[to] = deck[from]; deck[from] = tmp;
+    var L = deck.length - 1; // deck.pop() 從尾巴發，deck[L] 是第一隻鬼
+    if (!deck.slice(first).some(isVirtualCfg)) {
+      var rest = [];
+      for (var r = 0; r < first; r++) if (isVirtualCfg(deck[r])) rest.push(r);
+      if (rest.length) { // 沒有虛像題配置不會發生（check-geometry-convex 驗證有 J～O）
+        // 換進第 2～5 隻的位置（第一隻不放虛像題，見下）
+        var from = rest[Math.floor(Math.random() * rest.length)], to = first + Math.floor(Math.random() * Math.max(1, n - 1)), tmp = deck[to];
+        deck[to] = deck[from]; deck[from] = tmp;
+      }
+    }
+    // 使用者 2026-11-21：第一隻鬼不出純虛像題（先學會在布幕上找實像）。和同一輪裡的實像題對調，虛像題仍留在前 5 隻裡。
+    if (isVirtualCfg(deck[L])) {
+      var swap = [];
+      for (var k = first; k < L; k++) if (!isVirtualCfg(deck[k])) swap.push(k);
+      if (!swap.length) for (k = 0; k < first; k++) if (!isVirtualCfg(deck[k])) swap.push(k);
+      var w = swap[Math.floor(Math.random() * swap.length)], t2 = deck[w];
+      deck[w] = deck[L]; deck[L] = t2;
+    }
   }
 
   // 透鏡的起始位置：離兩個清晰位置都夠遠，否則一開場布幕上就幾乎是清楚的像（等於不用對焦）。
@@ -1149,8 +1245,9 @@
 
   function resetRound(idx) {
     state.cfgIndex = idx; roundsStarted++;
+    if (window.GhostSprite) window.GhostSprite.pick(); // 每一隻鬼換一張小鬼圖
     state.phase = 'observe'; state.lensX = startLensX(Cfg.all[idx]); state.marker = null; state.look = 'screen';
-    state.mode = 'draw'; state.pending = null; state.lines = []; state.drag = null;
+    state.mode = 'draw'; state.pending = null; state.lines = []; state.drag = null; state.sealHint = false;
     state.selectedCell = null; state.seal = null; state.solved = false; state.attempts = 0; state.replay = null;
     state.zoomIdx = 0;
     $('configSel').value = String(idx);
@@ -1200,7 +1297,7 @@
     animating = true;
     (function tick() {
       render();
-      if ((state.seal && performance.now() - state.seal.t0 < 2200) || replayRunning()) requestAnimationFrame(tick);
+      if ((state.seal && performance.now() - state.seal.t0 < (state.seal.success ? 3800 : 2200)) || replayRunning()) requestAnimationFrame(tick);
       else { animating = false; requestRender(); } // 再畫一張：重現剛結束，學生的線恢復原色
     })();
   }
@@ -1240,8 +1337,8 @@
     layout();
   });
   $('modeDraw').addEventListener('click', function () { state.mode = 'draw'; setStatus('畫線：從標示點拖曳，或依序點兩個點連線。'); syncUI(); requestRender(); });
-  $('modeSeal').addEventListener('click', function () { if (state.solved) return; state.mode = 'seal'; state.pending = null; setStatus('封印模式：點一個地板格（整個直欄都可點），再按「施放封印法陣」。'); syncUI(); requestRender(); });
-  $('menuBtn').addEventListener('click', function () { if (window.confirm('回到關卡選單？這一關目前的進度不會保留。')) location.href = '../index.html'; });
+  $('modeSeal').addEventListener('click', function () { if (state.solved) return; state.mode = 'seal'; state.pending = null; setStatus('點選地板，選擇封印位置，重複點選取消選擇。'); syncUI(); requestRender(); });
+  $('menuBtn').addEventListener('click', function () { GameConfirm.ask({ text: '回到關卡選單？這一關目前的進度不會保留。', ok: '回關卡選單', cancel: '繼續玩' }, function () { location.href = '../index.html'; }); });
   $('undoBtn').addEventListener('click', function () { if (state.pending) state.pending = null; else state.lines.pop(); syncUI(); requestRender(); });
   $('clearBtn').addEventListener('click', function () { state.lines = []; state.pending = null; setStatus('已清除所有線。'); syncUI(); requestRender(); });
   $('castBtn').addEventListener('click', castSeal);
@@ -1267,6 +1364,9 @@
   };
 
   resetRound(nextRandomConfig()); // 一開始也隨機，不固定從配置 A 開始
-  if (PRACTICE) startHunt(); // 練習模式：不跑開場過場，直接開始抓鬼
+  // 跳過還沒過關的關卡（網址直接開）→ 只顯示「還沒通過第 N 關」＋【回關卡選單】（使用者 2026-11-21；shared/progress.js）
+  var gateScene = level.on && window.GameProgress ? window.GameProgress.showGate('convex', PRACTICE, INTRO_BG) : null;
+  if (gateScene) { level.screen = 'gate'; level.scene = gateScene; }
+  else if (PRACTICE) startHunt(); // 練習模式：不跑開場過場，直接開始抓鬼
   else if (level.on) showIntro();
 })();

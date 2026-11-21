@@ -9,7 +9,7 @@
  *   - 抓錯與失敗畫面都不洩漏鬼的位置
  *   - 命用完 → 失敗畫面 → 重新挑戰後命數、封印數、作圖狀態都重置，不再播開場
  *   - 抓滿 5 隻 → 過關演出（劇本 2-3：撿起小透鏡）→「回關卡選單」＋「再玩一次」（2026-11-18 定案）
- *   - 「再玩一次」／重新挑戰：命、封印數、牌堆都重置；每輪 5 隻保證至少一題虛像題（J、K、L），位置隨機
+ *   - 「再玩一次」／重新挑戰：命、封印數、牌堆都重置；每輪 5 隻保證至少一題虛像題（J～O），位置隨機
  *   - 觀察／光路分析的按鈕各排成一排、每顆 ≥ 44 px（回饋 V1、V2）；「☰ 回關卡」在右上角（G1）
  *   - ?practice=1 練習模式：不播開場、照樣扣命、不計時不上榜
  * 對焦用測試掛鉤直接把透鏡放到清晰位置（拖曳／微調已由另一支測試涵蓋），其餘都是真的點擊。
@@ -56,6 +56,7 @@ const ARM_WAIT = 420; // 結尾按鈕出現後 350 ms 內不接受點擊
 async function run(profile, browser) {
   console.log('\n===== ' + profile.name + ' ' + profile.viewport.width + '×' + profile.viewport.height + (profile.touch ? ' touch' : ' mouse') + ' =====');
   const context = await browser.newContext({ viewport: profile.viewport, hasTouch: profile.touch, isMobile: profile.touch, deviceScaleFactor: profile.dsf });
+  await context.addInitScript(() => { window.__ghostArtOff = true; }); // 鬼用程式畫的單色輪廓，才能用顏色數像素（小鬼圖另外檢查）
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -183,9 +184,12 @@ async function run(profile, browser) {
     await tapAt(b.x + q.x, b.y + q.y);
     await press('#castBtn');
   };
+  // 抓錯用的格：透鏡所在的格；虛像題的鬼離透鏡不到 1 m，可能同一格 → 改抓隔壁格（2026-11-21：J 改 f=110 後透鏡在第 4 格＝答案）
+  const wrongCell = (c) => { const lc = Math.ceil(-c.lensX / 100); return lc !== c.targetCell ? lc : c.targetCell > 1 ? c.targetCell - 1 : c.targetCell + 1; };
   const sealWrong = async (label, shotName) => {
     const c = await toSealMode();
-    const wrong = Math.ceil(-c.lensX / 100); // 透鏡所在的格，一定不是目標格
+    // 透鏡所在的格；虛像題的鬼離透鏡不到 1 m，可能同一格 → 改抓隔壁格（2026-11-21：J 改 f=110 後透鏡在第 4 格＝答案）
+    const wrong = wrongCell(c);
     const before = await st();
     await castAt(wrong);
     const during = [];
@@ -209,6 +213,29 @@ async function run(profile, browser) {
     ok(s.sealText.endsWith('封印 ' + s.sealed + '／' + s.goal), P(label + '：左上角顯示「' + s.sealText + '」'));
     return s;
   };
+
+  // ---------- 沒過第一關就用網址進第二關 → 引導回選單（使用者 2026-11-21） ----------
+  await page.goto(URL);
+  await page.waitForSelector('.story[data-scene="gate"]');
+  let g = await st();
+  ok(g.screen === 'gate' && g.scene.buttons.join(',') === 'gateMenuBtn' && /還沒通過第一關/.test(g.scene.all) && await sceneBlocksGame(), P('沒過第一關：只顯示「還沒通過第一關」與「回關卡選單」，遊戲點不到'), g.scene.all.replace(/\s+/g, ' '));
+  await shot('0-gate');
+  // 其他跳關的網址也一樣擋（第二關練習要先過第二關、第三關要先過第二關、第一關練習要先過第一關）
+  const gateAt = async (u, title) => {
+    await page.goto(u);
+    await page.waitForSelector('.story[data-scene="gate"]', { timeout: 5000 }).catch(() => {});
+    const t = await page.evaluate(() => { const sc = document.querySelector('.story[data-scene="gate"]'); return sc ? sc.innerText.replace(/\s+/g, ' ') : ''; });
+    ok(t.includes(title) && t.includes('回關卡選單'), P('跳關擋回選單：' + u.replace(/^.*prototype\//, '')), t);
+  };
+  const ROOT_URL = URL.replace(/convex-lens\/index\.html$/, '');
+  await gateAt(URL + '?practice=1', '還沒通過第二關');
+  await gateAt(ROOT_URL + 'concave-lens/index.html', '還沒通過第二關');
+  await gateAt(ROOT_URL + 'concave-lens/index.html?practice=1', '還沒通過第三關');
+  await gateAt(ROOT_URL + 'plane-mirror/index.html?practice=1', '還沒通過第一關');
+  await page.goto(URL + '?unlock=1');
+  await page.waitForSelector('.story');
+  ok((await st()).screen === 'intro', P('?unlock=1（老師／開發）不擋'));
+  await page.evaluate(() => window.GameProgress.markCleared('mirror')); // 之後照正常流程：第一關已過關
 
   // ---------- 開場過場 ----------
   await load();
@@ -239,7 +266,7 @@ async function run(profile, browser) {
   });
   s = await st();
   ok(guard === 'intro' && s.scene.endShown && s.scene.text === null && !s.scene.skipShown, P('最後一句之後換成【開始抓鬼】；剛出現的瞬間連點不會誤觸'));
-  ok(/請抓到 5 隻鬼/.test(s.scene.endText) && /失去一顆心/.test(s.scene.endText) && s.scene.buttons.join() === 'startHuntBtn', P('開始前說明規則（劇本 2-1）：抓到 5 隻、抓錯失去一顆心'), s.scene.endText);
+  ok(/第二關：城堡走廊/.test(s.scene.endText) && /3 顆❤️/.test(s.scene.endText) && /請抓到 5 隻鬼/.test(s.scene.endText) && /抓錯扣一❤️/.test(s.scene.endText) && s.scene.buttons.join() === 'startHuntBtn', P('開場結尾：標題「第二關：城堡走廊」、3 顆❤️、抓到 5 隻、抓錯扣一❤️（2026-11-21）'), s.scene.endText);
   await page.waitForTimeout(ARM_WAIT);
   await sceneButtons('開始抓鬼');
   await shot('2-intro-start');
@@ -250,7 +277,18 @@ async function run(profile, browser) {
   ok(!s.configVisible && !s.debugVisible, P('關卡模式不顯示配置選單與 Debug'));
   ok(await countGhost() === 0, P('開始抓鬼時畫面上沒有鬼本體'));
   await hudLayout('抓鬼／觀察');
-  if (profile.name === 'phone-landscape') await rowCheck('觀察（812×375）', 'exploreControls', ['◀ 微調', '標記', '微調 ▶', '光路分析', '看布幕', '看透鏡']);
+  if (profile.name === 'phone-landscape') {
+    await rowCheck('觀察（812×375）', 'exploreControls', ['◀ 微調', '標記', '微調 ▶', '光路分析', '看布幕', '看透鏡']);
+    // 「看布幕／看透鏡」跟著布幕（透鏡）那一欄（使用者 2026-11-20）：在那一欄正下方、左右不超出那一欄、不蓋住畫面
+    const lb = await page.evaluate(() => {
+      const H = window.__protoConvex, rg = H.regions(), v = document.getElementById('view').getBoundingClientRect();
+      const bs = Array.from(document.querySelectorAll('#lookBox button')).map((e) => { const b = e.getBoundingClientRect(); return { l: b.left - v.left, t: b.top - v.top, r: b.right - v.left }; });
+      return { bs, wall: rg.wall, vh: v.height };
+    });
+    const w = lb.wall, L = lb.bs[0], Rb = lb.bs[lb.bs.length - 1];
+    ok(L.l >= w.x - 2 && L.l - w.x < 14 && Rb.r <= w.x + w.w + 1 && w.x + w.w - Rb.r < 14, P('看布幕／看透鏡：寬度對齊布幕那一欄'), Math.round(L.l) + '～' + Math.round(Rb.r) + '，那一欄 ' + Math.round(w.x) + '～' + Math.round(w.x + w.w));
+    ok(lb.bs.every((b) => b.t >= lb.vh), P('看布幕／看透鏡：在畫面下方的按鈕列，不蓋住布幕'));
+  }
   await shot('3-hunt-start');
 
   // 「跳過」：直接到【開始抓鬼】
@@ -269,7 +307,7 @@ async function run(profile, browser) {
     await rowCheck('光路分析・畫線（812×375）', 'analysisControls', ['重新對焦', '選格封印', '畫線', '復原', '清除']);
     ok(await page.evaluate(() => !document.getElementById('toolLine')), P('光路分析沒有「連線」按鈕（V2）'));
     await press('#modeSeal');
-    await rowCheck('光路分析・選格封印（812×375）', 'analysisControls', ['重新對焦', '選格封印', '畫線', '復原', '清除', '施放封印法陣']);
+    await rowCheck('光路分析・選格封印（812×375）', 'analysisControls', ['重新對焦', '選格封印', '畫線', '復原', '清除', '丟圓盤封印']);
   }
   await sealWrong('第 1 次抓錯', '4-wrong-one-life-lost');
   await hudLayout('抓鬼／封印');
@@ -277,7 +315,12 @@ async function run(profile, browser) {
   ok(s.nextText === '下一隻鬼 ➜' && s.screen === 'play', P('抓對後按鈕是「下一隻鬼 ➜」'));
   if (profile.name === 'phone-landscape') await rowCheck('封印成功後（812×375）', 'analysisControls', ['畫線', '復原', '清除', '光路重現', '下一隻鬼 ➜']);
   const prevCfg = s.cfg;
+  const art = () => page.evaluate(() => ({ loaded: window.GhostSprite.loaded(), calls: window.GhostSprite.calls(), idx: window.GhostSprite.index() }));
+  const art1 = await art();
+  ok(art1.loaded === 9 && art1.calls > 0, P('小鬼圖 9 張都載入，鬼本體與像都經過小鬼圖繪製'), JSON.stringify(art1));
   await press('#nextBtn', 120);
+  const art2 = await art();
+  ok(art2.idx !== art1.idx, P('下一隻鬼換一張小鬼圖'), art1.idx + ' → ' + art2.idx);
   s = await st();
   ok(s.cfg !== prevCfg && s.phase === 'observe' && !s.marker && s.lines === 0 && !s.solved && s.lives === 2 && s.sealed === 1, P('下一隻鬼：換配置、回到觀察、命數與封印數保留'));
   ok(await countGhost() === 0, P('下一隻鬼開始時畫面上沒有鬼本體'));
@@ -286,11 +329,15 @@ async function run(profile, browser) {
   await sealWrong('第 2 次抓錯');
   ok((await st()).screen === 'play', P('剩 1 條命時還在抓鬼'));
   const c3 = await toSealMode();
-  await castAt(Math.ceil(-c3.lensX / 100));
+  await castAt(wrongCell(c3));
   await page.waitForTimeout(1700);
   s = await st();
   ok(s.screen === 'failed' && s.scene && s.scene.id === 'failed' && s.lives === 0 && s.heartsLeft === 0, P('第 3 次抓錯：命用完，出現失敗畫面'));
-  ok(/❤️用完了/.test(s.scene.endText) && !/三顆心/.test(s.scene.endText), P('失敗標題用 ❤️（劇本修訂：命的文字統一用 ❤️）'), s.scene.endText);
+  ok(s.scene.text === '等我休息一下，再來抓你們。' && s.scene.speaker === '你', P('失敗畫面先說「等我休息一下，再來抓你們。」（使用者 2026-11-21）'), s.scene.text);
+  await page.waitForTimeout(ARM_WAIT);
+  await tapAt(vw * 0.5, vh * 0.5);
+  s = await st();
+  ok(/驅逐失敗/.test(s.scene.endText) && !/三顆心/.test(s.scene.endText), P('失敗標題「驅逐失敗」（使用者 2026-11-21）'), s.scene.endText);
   ok(s.scene.buttons.join() === 'retryBtn,failMenuBtn' && s.scene.endShown, P('失敗畫面有「重新挑戰」與「回關卡選單」'));
   ok(s.scene.ghosts === 0 && await countGhost() === 0 && !s.revealed && !/第\s*\d+\s*格|[左右]邊|配置/.test(s.scene.all), P('失敗畫面不顯示鬼、不提示位置'), s.scene.endText);
   ok(await sceneBlocksGame(), P('失敗畫面蓋住遊戲，不能繼續施放'));
@@ -329,7 +376,7 @@ async function run(profile, browser) {
   await shot('7-cleared-flee');
   // 劇本 2-3：凸透鏡太大帶不走 → 撿起地上的一片小透鏡（不是大凸透鏡的碎片）
   const said = [];
-  for (const want of [['你', '但凸透鏡太大了，帶不走啊。'], [null, '你撿起地上的一片小透鏡。'], ['你', '咦，這個……'], ['你', '也可以吧。']]) {
+  for (const want of [['你', '想跑？追！'], ['你', '但凸透鏡太大了，帶不走啊。'], ['你', '咦，這個……'], [null, '你撿起地上的一片小透鏡。'], ['你', '這個也可以吧。']]) {
     await tapAt(vw * 0.5, vh * 0.5);
     s = await st();
     said.push(s.scene.text);
@@ -338,8 +385,9 @@ async function run(profile, browser) {
   ok(!said.some((t) => /碎片|碎掉|敲下/.test(t || '')), P('物理：小透鏡不是大凸透鏡的碎片（凸透鏡碎片仍會聚）'));
   await tapAt(vw * 0.5, vh * 0.5);
   s = await st();
-  ok(s.scene.endShown && /第二關過關/.test(s.scene.endText) && /第三關：荒野狩獵（已解鎖）/.test(s.scene.endText) && s.scene.buttons.join() === 'clearMenuBtn,againBtn', P('過關畫面：標題、第三關：荒野狩獵（已解鎖），「回關卡選單」＋「再玩一次」'), s.scene.endText);
+  ok(s.scene.endShown && /第二關過關/.test(s.scene.endText) && /第三關：荒野狩獵（已解鎖）/.test(s.scene.endText) && s.scene.buttons.join() === 'nextLevelBtn,clearMenuBtn,againBtn', P('過關畫面：標題、第三關：荒野狩獵（已解鎖），「前往第三關 ➜」＋「回關卡選單」＋「再玩一次」'), s.scene.endText);
   ok(await page.evaluate(() => document.getElementById('clearMenuBtn').getAttribute('href')) === '../index.html', P('過關畫面的「回關卡選單」連到入口頁'));
+  ok(await page.evaluate(() => document.getElementById('nextLevelBtn').getAttribute('href')) === '../concave-lens/index.html', P('過關畫面的「前往第三關 ➜」連到荒野狩獵（使用者 2026-11-21）'));
   ok(!/你花費/.test(s.scene.endText) && /成功把鬼趕出城堡。第三關：荒野狩獵（已解鎖）/.test(s.scene.endText) && (await page.evaluate(() => { const r = Leaderboard.getRun(); return r && r.mirrorMs == null && r.castleMs == null && r.convexMs > 0; })), P('排行榜：直接開第二關（沒有第一關成績）不顯示趕鬼時間、不記趕鬼時間（只記第二關成績）；過關文字照 2026-11-19 統一版'), s.scene.endText);
   await page.waitForTimeout(ARM_WAIT);
   await sceneButtons('過關畫面');
@@ -395,7 +443,7 @@ async function run(profile, browser) {
   await sealWrong('練習模式抓錯');
   s = await clearOnce('練習模式抓最後一隻');
   const runP = await page.evaluate(() => Leaderboard.getRun());
-  ok(s.screen === 'cleared' && !/你花費/.test(s.scene.endText) && runP && runP.castleMs == null && s.scene.buttons.join() === 'clearMenuBtn,againBtn', P('?practice=1：過關不顯示趕鬼時間、不記成績（就算本輪第一關已過）；「回關卡選單」＋「再玩一次」'), s.scene.endText);
+  ok(s.screen === 'cleared' && !/你花費/.test(s.scene.endText) && runP && runP.castleMs == null && s.scene.buttons.join() === 'nextLevelBtn,clearMenuBtn,againBtn', P('?practice=1：過關不顯示趕鬼時間、不記成績（就算本輪第一關已過）；「前往第三關」＋「回關卡選單」＋「再玩一次」'), s.scene.endText);
 
   // ---------- 每輪保證至少一題虛像題：跑很多輪統計（用 app 自己的發牌函式） ----------
   const stat = await page.evaluate(() => {
@@ -413,8 +461,8 @@ async function run(profile, browser) {
     return { N, missing, dup, pos, ids };
   });
   ok(stat.missing === 0 && stat.dup === 0, P('發牌統計 ' + stat.N + ' 輪：每輪都有虛像題、5 隻不重複'), '缺虛像題 ' + stat.missing + ' 輪');
-  ok(stat.pos.every((n) => n > stat.N * 0.05) && stat.pos[0] < stat.N * 0.6, P('發牌統計：第一題虛像題出現在第 1～5 隻都有（不固定第一或最後一題）'), stat.pos.join('/'));
-  ok(['J', 'K', 'L'].every((id) => stat.ids[id] > stat.N * 0.15), P('發牌統計：J、K、L 三題都會出現'), JSON.stringify(stat.ids));
+  ok(stat.pos[0] === 0 && stat.pos.slice(1).every((n) => n > stat.N * 0.05), P('發牌統計：第 1 隻一定不是虛像題（使用者 2026-11-21）；第一題虛像題出現在第 2～5 隻都有'), stat.pos.join('/'));
+  ok(['J', 'K', 'L', 'M', 'N', 'O'].every((id) => stat.ids[id] > stat.N * 0.15), P('發牌統計：J～O 六題虛像題都會出現'), JSON.stringify(stat.ids));
 
   // ---------- 自由練習模式不受影響 ----------
   await page.goto(URL + '?free=1');
