@@ -5,19 +5,25 @@
  * 兩個榜，各一個工作表（第一次寫入時自動建立）：
  *   castle：趕鬼時間（第一關＋第二關，毫秒，愈小愈好）
  *   hunt  ：荒野封印數（第三關 5 分鐘，隻，愈大愈好）
- * 欄位：A 暱稱、B 成績、C 更新時間。每個暱稱只留最佳一列。
+ * 欄位：A 暱稱、B 成績、C 更新時間、D 裝置代碼（2026-11-21 加）。
+ * 「同一個人」＝同一個裝置代碼＋同一個暱稱，只留最佳一列（使用者 2026-11-21：同名不同人要分開列）。
+ *   裝置代碼是前端第一次玩時隨機產生、存在那支手機瀏覽器裡的亂數（不含個人資料）。
+ *   沒有裝置代碼的舊資料列（2026-11-21 以前）：照舊以暱稱當同一個人。
  * 老師要刪掉不當暱稱：直接在試算表刪那一列即可。
  *
  * API（前端 prototype/shared/leaderboard.js）：
- *   GET  ?action=top           → {ok:true, castle:[{name,value,at}], hunt:[...]}（各前 TOP 名）
- *   POST body(text/plain JSON) {name, castleMs?, hunt?}
- *        → {ok:true, castle:{rank,best,improved}|null, hunt:{...}|null}
+ *   GET  ?action=page&board=castle|hunt&page=1&size=10[&device=&name=]
+ *        → {ok:true, board, total, page, size, pages, rows:[{rank,name,value,at,me}]}（me＝這一列就是 device＋name）
+ *   GET  ?action=rank&board=castle|hunt&device=&name= → {ok:true, board, rank(0＝不在榜上), page, total}
+ *   GET  ?action=top           → {ok:true, castle:[{name,value,at}], hunt:[...]}（各前 TOP 名；舊版前端用）
+ *   POST body(text/plain JSON) {name, device?, castleMs?, hunt?}
+ *        → {ok:true, castle:{rank,best,improved,page}|null, hunt:{...}|null}
  *   錯誤一律 {ok:false, error:'...'}（HTTP 200，Apps Script 不能自訂狀態碼）。
  *
  * 這個檔不依賴 Apps Script 以外的東西；tests/check-leaderboard.js 用假的 SpreadsheetApp 跑同一份程式。
  */
 
-var TOP = 10;
+var TOP = 10, PAGE_SIZE = 10, PAGE_MAX = 50;
 var NAME_MAX_W = 20;
 var BOARDS = {
   castle: { asc: true,  min: 30 * 1000, max: 24 * 3600 * 1000, integer: true },
@@ -26,8 +32,13 @@ var BOARDS = {
 
 function doGet(e) {
   var p = (e && e.parameter) || {};
-  if ((p.action || 'top') !== 'top') return json_({ ok: false, error: 'unknown action' });
-  return json_({ ok: true, castle: top_('castle'), hunt: top_('hunt') });
+  var action = p.action || 'top';
+  if (action === 'top') return json_({ ok: true, castle: top_('castle'), hunt: top_('hunt') });
+  if (!BOARDS[p.board]) return json_({ ok: false, error: 'bad board' });
+  var device = cleanDevice_(p.device), name = cleanName_(p.name || '');
+  if (action === 'page') return json_(page_(p.board, Number(p.page) || 1, Number(p.size) || PAGE_SIZE, device, name));
+  if (action === 'rank') return json_(rank_(p.board, device, name));
+  return json_({ ok: false, error: 'unknown action' });
 }
 
 function doPost(e) {
@@ -52,12 +63,14 @@ function submit_(body) {
     any = true;
   }
   if (!any) return { ok: false, error: 'nothing to submit' };
+  var device = cleanDevice_(body.device);
 
   var lock = LockService.getScriptLock();
-  lock.waitLock(10000);
+  // tryLock：等不到鎖回 {ok:false,error:'busy'}（waitLock 會丟例外，Apps Script 回 HTML 錯誤頁；PENDING 21）
+  if (!lock.tryLock(10000)) return { ok: false, error: 'busy' };
   try {
     var out = { ok: true, castle: null, hunt: null };
-    for (var k in entries) out[k] = upsert_(k, name, entries[k]);
+    for (var k in entries) out[k] = upsert_(k, name, entries[k], device);
     return out;
   } finally {
     lock.releaseLock();
@@ -103,6 +116,11 @@ function cleanName_(s) {
   return cutToWidth_(s, NAME_MAX_W).trim();
 }
 
+// 裝置代碼：前端隨機產生的英數字串；不合格式就當作沒有
+function cleanDevice_(s) { return typeof s === 'string' && /^[a-z0-9]{8,40}$/.test(s) ? s : ''; }
+// 誰算「同一個人」：有裝置代碼＝裝置＋暱稱；沒有（舊資料、舊版前端）＝暱稱
+function who_(name, device) { return device ? 'd:' + device + '|' + name : 'n:' + name; }
+
 function validValue_(key, v) {
   var b = BOARDS[key];
   if (typeof v !== 'number' || !isFinite(v)) return false;
@@ -115,7 +133,7 @@ function sheet_(key) {
   var sh = ss.getSheetByName(key);
   if (!sh) {
     sh = ss.insertSheet(key);
-    sh.appendRow(['name', key === 'castle' ? 'castleMs' : 'hunt', 'updatedAt']);
+    sh.appendRow(['name', key === 'castle' ? 'castleMs' : 'hunt', 'updatedAt', 'device']);
   }
   return sh;
 }
@@ -126,7 +144,8 @@ function rows_(key) {
   for (var i = 1; i < values.length; i++) {
     var r = values[i];
     if (r[0] === '' || r[0] === null) continue;
-    out.push({ row: i + 1, name: String(r[0]), value: Number(r[1]), at: Number(r[2]) || 0 });
+    var dev = r.length > 3 ? cleanDevice_(String(r[3] || '')) : '';
+    out.push({ row: i + 1, name: String(r[0]), value: Number(r[1]), at: Number(r[2]) || 0, device: dev, who: who_(String(r[0]), dev) });
   }
   return out;
 }
@@ -141,27 +160,44 @@ function sorted_(key, list) {
 
 function better_(key, a, b) { return BOARDS[key].asc ? a < b : a > b; }
 
-function upsert_(key, name, value) {
+function upsert_(key, name, value, device) {
   var sh = sheet_(key);
   var list = rows_(key);
-  var now = Date.now();
+  var now = Date.now(), me = who_(name, device || '');
   var mine = null;
-  for (var i = 0; i < list.length; i++) if (list[i].name === name) { mine = list[i]; break; }
+  for (var i = 0; i < list.length; i++) if (list[i].who === me) { mine = list[i]; break; }
   var improved = false;
   if (!mine) {
-    sh.appendRow([name, value, now]);
-    mine = { name: name, value: value, at: now };
+    sh.appendRow([name, value, now, device || '']);
+    mine = { name: name, value: value, at: now, who: me };
     list.push(mine);
     improved = true;
   } else if (better_(key, value, mine.value)) {
-    sh.getRange(mine.row, 1, 1, 3).setValues([[name, value, now]]);
+    sh.getRange(mine.row, 1, 1, 4).setValues([[name, value, now, device || '']]);
     mine.value = value; mine.at = now;
     improved = true;
   }
   var s = sorted_(key, list);
   var rank = 0;
-  for (var j = 0; j < s.length; j++) if (s[j].name === name) { rank = j + 1; break; }
-  return { rank: rank, best: mine.value, improved: improved };
+  for (var j = 0; j < s.length; j++) if (s[j].who === me) { rank = j + 1; break; }
+  return { rank: rank, best: mine.value, improved: improved, page: Math.ceil(rank / PAGE_SIZE) };
+}
+
+function page_(key, page, size, device, name) {
+  size = Math.max(1, Math.min(PAGE_MAX, Math.floor(size)));
+  var s = sorted_(key, rows_(key)), total = s.length, pages = Math.max(1, Math.ceil(total / size));
+  page = Math.max(1, Math.min(pages, Math.floor(page)));
+  var me = device && name ? who_(name, device) : '';
+  var rows = s.slice((page - 1) * size, page * size).map(function (r, i) {
+    return { rank: (page - 1) * size + i + 1, name: r.name, value: r.value, at: r.at, me: !!me && r.who === me };
+  });
+  return { ok: true, board: key, total: total, page: page, size: size, pages: pages, rows: rows };
+}
+
+function rank_(key, device, name) {
+  var s = sorted_(key, rows_(key)), me = device && name ? who_(name, device) : '', rank = 0;
+  if (me) for (var j = 0; j < s.length; j++) if (s[j].who === me) { rank = j + 1; break; }
+  return { ok: true, board: key, rank: rank, page: rank ? Math.ceil(rank / PAGE_SIZE) : 0, total: s.length };
 }
 
 function top_(key) {

@@ -28,7 +28,7 @@ function loadGas(opts) {
       getSheetByName: (n) => sheets[n] || null,
       insertSheet: (n) => (sheets[n] = makeSheet())
     }) },
-    LockService: { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) },
+    LockService: { getScriptLock: () => ({ waitLock() {}, tryLock() { return !(opts && opts.busy); }, releaseLock() {} }) },
     ContentService: {
       MimeType: { JSON: 'application/json' },
       createTextOutput: (s) => ({ text: s, setMimeType() { return this; } })

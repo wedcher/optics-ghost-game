@@ -166,8 +166,12 @@ const MIN = 60 * 1000;
     await page.reload();
     await page.waitForFunction(() => document.getElementById('mode').textContent !== '讀取中…');
     ok(/這支手機/.test(await page.textContent('#mode')), '排行榜頁顯示本機模式');
-    ok((await page.textContent('#castle li .vl')) === '11 分 0 秒' && (await page.textContent('#hunt li .vl')) === '5 隻', '本機排行顯示最佳成績');
-    ok(await page.$eval('#hunt li', (li) => li.classList.contains('me')), '自己的暱稱有標示');
+    ok((await page.textContent('#list li .vl')) === '11 分 0 秒', '本機排行：趕鬼時間分頁顯示最佳成績');
+    await page.tap('#tabHunt');
+    await page.waitForFunction(() => document.getElementById('tabHunt').classList.contains('on') && document.getElementById('mode').textContent !== '讀取中…');
+    ok((await page.textContent('#list li .vl')) === '5 隻', '本機排行：切到荒野封印分頁');
+    ok(await page.$eval('#list li', (li) => li.classList.contains('me')), '自己的暱稱有標示');
+    ok(/^[0-9]{1,2}[/][0-9]{1,2}$/.test(await page.textContent('#list li .dt')), '每一列有日期（月/日）', await page.textContent('#list li .dt'));
     await ctx.close();
   }
 
@@ -177,9 +181,15 @@ const MIN = 60 * 1000;
     for (let i = 0; i < 12; i++) gas.post(JSON.stringify({ name: '同學' + (i + 1), castleMs: (8 + i) * MIN + 7000, hunt: 12 - i }));
     const { ctx, page } = await newPage(true);
     ok(/所有玩家共用/.test(await page.textContent('#mode')), '共用模式說明');
-    ok((await page.$$('#castle li')).length === 10 && (await page.$$('#hunt li')).length === 10, '共用排行只顯示前 10');
-    ok((await page.textContent('#castle li .nm')) === '同學1' && (await page.textContent('#hunt li .vl')) === '12 隻', '共用排行順序');
+    const waitLoad = () => page.waitForFunction(() => document.getElementById('mode').textContent !== '讀取中…');
+    ok((await page.$$('#list li')).length === 10 && (await page.textContent('#pageInfo')) === '第 1／2 頁（共 12 人）', '共用排行：一頁 10 名，共 2 頁', await page.textContent('#pageInfo'));
+    ok((await page.textContent('#list li .nm')) === '同學1' && await page.isDisabled('#prev') && !(await page.isDisabled('#next')), '第 1 頁：第一名同學1；不能往前、可以往後');
     await page.screenshot({ path: path.join(SHOTS, 'leaderboard-page.png') });
+    await page.tap('#next'); await waitLoad();
+    ok((await page.$$('#list li')).length === 2 && (await page.textContent('#list li .rk')) === '11' && await page.isDisabled('#next'), '下一頁：第 11、12 名', await page.textContent('#pageInfo'));
+    await page.tap('#tabHunt'); await waitLoad();
+    ok((await page.textContent('#list li .vl')) === '12 隻' && (await page.textContent('#pageInfo')).startsWith('第 1／2 頁'), '切到荒野封印：回第 1 頁');
+    await page.tap('#tabCastle'); await waitLoad();
 
     await page.evaluate(() => Leaderboard.showResult({ castleMs: 7 * 60000, hunt: 2 }));
     ok(/最好的成績/.test(await page.textContent('#lbResult')), '共用模式結算提示');
@@ -189,7 +199,19 @@ const MIN = 60 * 1000;
     let m = await page.textContent('#lbMsg');
     ok(/趕鬼時間第 1 名/.test(m) && /荒野封印第 12 名/.test(m), '共用模式上傳後拿到名次', m);
     ok(gas.get().castle[0].name === '新人', '後端收到清理過的暱稱', gas.get().castle[0]);
+    const dev = await page.evaluate(() => Leaderboard.deviceId());
+    ok(/^[a-z0-9]{8,40}$/.test(dev) && gas.sheets.castle.rows.some((x) => x[0] === '新人' && x[3] === dev), '上傳帶裝置代碼，試算表 D 欄記下', dev);
+    ok(await page.evaluate(() => Leaderboard.deviceId()) === dev, '裝置代碼固定（存在這支手機）');
     await page.tap('#lbClose');
+    // 別支手機的同名玩家：分開列
+    gas.post(JSON.stringify({ name: '新人', device: 'otherdevice0001', castleMs: 30 * MIN }));
+    ok(gas.get({ action: 'page', board: 'castle', page: '1', size: '50' }).rows.filter((x) => x.name === '新人').length === 2, '同名不同手機：排行榜上兩筆');
+    // 找我的名次：荒野第 12 名 → 跳到第 2 頁並標示
+    await page.tap('#tabHunt'); await waitLoad();
+    await page.tap('#findMe');
+    await page.waitForFunction(() => /你是第/.test(document.getElementById('mode').textContent));
+    ok(/你是第 12 名/.test(await page.textContent('#mode')) && (await page.textContent('#pageInfo')).startsWith('第 2／2 頁') && (await page.textContent('#list li.me .nm')) === '新人', '找我的名次：跳到第 2 頁並標出自己', await page.textContent('#pageInfo'));
+    await page.screenshot({ path: path.join(SHOTS, 'leaderboard-findme.png') });
 
     await page.evaluate(() => Leaderboard.showResult({ castleMs: 9 * 60000, hunt: 1 }));
     await page.tap('#lbSubmit');
