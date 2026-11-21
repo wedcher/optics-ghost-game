@@ -1158,7 +1158,7 @@
     if (deck.slice(first).some(isVirtualCfg)) return;
     var rest = [];
     for (var r = 0; r < first; r++) if (isVirtualCfg(deck[r])) rest.push(r);
-    if (!rest.length) return; // 沒有虛像題配置（不會發生；check-geometry-convex 驗證有 J、K、L）
+    if (!rest.length) return; // 沒有虛像題配置（不會發生；check-geometry-convex 驗證有 J～O）
     var from = rest[Math.floor(Math.random() * rest.length)], to = first + Math.floor(Math.random() * n), tmp = deck[to];
     deck[to] = deck[from]; deck[from] = tmp;
   }
