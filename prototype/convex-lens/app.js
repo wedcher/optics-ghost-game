@@ -325,7 +325,11 @@
     g.beginPath(); g.arc(cx, cy, rad, 0, 7); g.clip();
     g.fillStyle = '#fff'; drawGhost(g, cx, py, hw, hh, sg, sg, '#fff', null);
     g.restore();
-    var d = g.getImageData(0, 0, N, N).data, n = 0;
+    // 鬼圖從別的網域載入時（例如試玩網址 raw.githack 會把圖片轉到別的網域），畫布被「污染」，讀像素會丟錯。
+    // 丟錯會讓整個 render 停住（透鏡拖不動、切布幕沒反應），所以一定要接住，改用外框估算（回傳 -1）。
+    var d;
+    try { d = g.getImageData(0, 0, N, N).data; } catch (e) { return -1; }
+    var n = 0;
     for (var i = 3; i < d.length; i += 4) if (d[i] > 60) n++;
     return n;
   }
@@ -362,7 +366,9 @@
       ctx.save(); ctx.fillStyle = col; ctx.globalAlpha = 0.9;
       drawGhost(ctx, cx, gpy, ghw, ghh, sg, sg, col, col);
       ctx.restore();
-      stats.lensImageVisible = lv.inView && ghostPixelsInLens(cx, cy, rad, gpy, ghw, ghh, sg) > 0;
+      var px = lv.inView ? ghostPixelsInLens(cx, cy, rad, gpy, ghw, ghh, sg) : 0;
+      // 讀不到像素（-1）：用外框估算——鬼圖的身體大約在外框內 2/3，進到鏡片圓裡才算看得到
+      stats.lensImageVisible = px < 0 ? Math.abs(gpy - cy) - 0.67 * ghh < rad : px > 0;
       if (!stats.lensImageVisible) { /* 像在鏡框外（或只有空白邊緣進來）：鏡片裡是空的，不寫字 */ }
       else if (virt) lensCaption(cx, cy, rad, A * c.h * K, !lv.markable ? 'far' : imageTooNear(lv) ? 'near' : null); // 回饋「虛像題 V2」：鏡框裡寫出像的性質
       else if (lv.eye !== 'realInFront') lensCaption(cx, cy, rad, A * c.h * K, 'far');
