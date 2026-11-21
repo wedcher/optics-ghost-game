@@ -184,9 +184,12 @@ async function run(profile, browser) {
     await tapAt(b.x + q.x, b.y + q.y);
     await press('#castBtn');
   };
+  // 抓錯用的格：透鏡所在的格；虛像題的鬼離透鏡不到 1 m，可能同一格 → 改抓隔壁格（2026-11-21：J 改 f=110 後透鏡在第 4 格＝答案）
+  const wrongCell = (c) => { const lc = Math.ceil(-c.lensX / 100); return lc !== c.targetCell ? lc : c.targetCell > 1 ? c.targetCell - 1 : c.targetCell + 1; };
   const sealWrong = async (label, shotName) => {
     const c = await toSealMode();
-    const wrong = Math.ceil(-c.lensX / 100); // 透鏡所在的格，一定不是目標格
+    // 透鏡所在的格；虛像題的鬼離透鏡不到 1 m，可能同一格 → 改抓隔壁格（2026-11-21：J 改 f=110 後透鏡在第 4 格＝答案）
+    const wrong = wrongCell(c);
     const before = await st();
     await castAt(wrong);
     const during = [];
@@ -326,7 +329,7 @@ async function run(profile, browser) {
   await sealWrong('第 2 次抓錯');
   ok((await st()).screen === 'play', P('剩 1 條命時還在抓鬼'));
   const c3 = await toSealMode();
-  await castAt(Math.ceil(-c3.lensX / 100));
+  await castAt(wrongCell(c3));
   await page.waitForTimeout(1700);
   s = await st();
   ok(s.screen === 'failed' && s.scene && s.scene.id === 'failed' && s.lives === 0 && s.heartsLeft === 0, P('第 3 次抓錯：命用完，出現失敗畫面'));

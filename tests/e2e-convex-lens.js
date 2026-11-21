@@ -739,7 +739,8 @@ async function run(profile, browser) {
     ok(lvInfo.lv.eye === 'virtual' && lvInfo.lv.m > 1 && lvInfo.lv.angMag > 1 && purple > 20, T('透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大'),
       'm=' + lvInfo.lv.m.toFixed(2) + '，視角放大 ' + lvInfo.lv.angMag.toFixed(2) + ' 倍，' + purple + ' px');
     const cap = await page.evaluate(() => { const H = window.__protoConvex; H.render(); return H.stats.lensCaption; });
-    ok(cap === '虛像（正立、放大）', T('鏡框裡寫「虛像（正立、放大）」（使用者答虛像題 V2）'), String(cap));
+    const nearLens = Math.abs(lvInfo.lv.v) < 60; // 像離透鏡 < 60 cm：多一行「建議標記別處」，仍可標記（使用者 2026-11-21）
+    ok(cap === '虛像（正立、放大）' + (nearLens ? '建議標記別處' : ''), T('鏡框裡寫「虛像（正立、放大）」；像離透鏡太近時多寫「建議標記別處」'), String(cap) + '，像離透鏡 ' + Math.round(Math.abs(lvInfo.lv.v)) + ' cm');
     await noLeak('看透鏡');
     await shotV('1-lens-view');
     // 透鏡越過鬼：透鏡裡和布幕上都沒有像

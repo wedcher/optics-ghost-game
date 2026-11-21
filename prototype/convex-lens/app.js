@@ -296,12 +296,18 @@
   // 字放不下一行就拆兩行、再不夠就縮小字（最小 11 px）。只說明像的性質，不含任何位置資訊。
   // 虛像不能標記（落在走廊外，或放大太多）時改寫 TOO_FAR_CAPTION（使用者 2026-11-21 指定文字）。
   var TOO_FAR_CAPTION = '成像太遠，無法標記。';
-  function lensCaption(cx, cy, rad, imgUp, tooFar) {
-    var lines = [tooFar ? TOO_FAR_CAPTION : VIRTUAL_CAPTION], size = Math.round(14 * FS), maxW = rad * 1.55;
+  // 虛像離透鏡太近（< NEAR_IMAGE_CM）時，側視圖上標記、透鏡、鬼會擠在一起不好畫線：
+  // 鏡片裡多寫一行 NEAR_HINT，但仍然可以標記（使用者 2026-11-21：「他如果硬要選，也給他選」）。
+  var NEAR_IMAGE_CM = 60, NEAR_HINT = '建議標記別處';
+  function imageTooNear(lv) { return lv.eye === 'virtual' && lv.markable && Math.abs(lv.v) < NEAR_IMAGE_CM; }
+  // kind：null＝一般虛像｜'far'＝成像太遠不能標記｜'near'＝可以標記但建議標記別處
+  function lensCaption(cx, cy, rad, imgUp, kind) {
+    var tooFar = kind === 'far', near = kind === 'near';
+    var lines = tooFar ? [TOO_FAR_CAPTION] : near ? [VIRTUAL_CAPTION, NEAR_HINT] : [VIRTUAL_CAPTION], size = Math.round(14 * FS), maxW = rad * 1.55;
     ctx.save();
     var fit = function () { ctx.font = '700 ' + size + 'px system-ui, sans-serif'; return lines.every(function (t) { return ctx.measureText(t).width <= maxW; }); };
-    if (!fit()) { lines = tooFar ? ['成像太遠，', '無法標記。'] : ['虛像', '（正立、放大）']; while (!fit() && size > 11) size--; }
-    var lh = size * 1.2, y0 = cy + (imgUp > 0 ? 1 : -1) * rad * 0.62 - (lines.length - 1) * lh / 2;
+    if (!fit()) { lines = tooFar ? ['成像太遠，', '無法標記。'] : near ? ['虛像', '（正立、放大）', NEAR_HINT] : ['虛像', '（正立、放大）']; while (!fit() && size > 11) size--; }
+    var lh = size * 1.2, y0 = cy + (imgUp > 0 ? 1 : -1) * rad * (lines.length > 2 ? 0.45 : 0.62) - (lines.length - 1) * lh / 2; // 三行時往中心移，免得被圓框切掉
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(8,10,24,.92)'; ctx.fillStyle = '#e7e0ff';
     lines.forEach(function (t, i) { ctx.strokeText(t, cx, y0 + i * lh); ctx.fillText(t, cx, y0 + i * lh); });
     ctx.restore();
@@ -334,7 +340,7 @@
       ctx.globalAlpha = 0.9;
       drawGhost(ctx, cx, cy - (lv.y / d) * K, WORLD.ghostHalfWidth * am / d * K, WORLD.ghostHalfHeight * am / d * K, virt ? 1 : -1, virt ? 1 : -1, ctx.fillStyle, virt ? VIRTUAL_COLOR : REAL_IMG_COLOR);
       ctx.restore();
-      if (virt) lensCaption(cx, cy, rad, lv.y / d * K, !lv.markable); // 回饋「虛像題 V2」：鏡框裡寫出像的性質
+      if (virt) lensCaption(cx, cy, rad, lv.y / d * K, !lv.markable ? 'far' : imageTooNear(lv) ? 'near' : null); // 回饋「虛像題 V2」：鏡框裡寫出像的性質
     } else if (!state.solved && lv.eye === 'blur') {
       var gr = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
       gr.addColorStop(0, 'rgba(157,255,216,.30)'); gr.addColorStop(1, 'rgba(157,255,216,.04)');
@@ -692,7 +698,7 @@
     var lv = lensViewNow();
     if (lv.eye === 'virtual' && lv.markable) {
       state.marker = { lensX: state.lensX, x: lv.x, y: lv.y, virtual: true };
-      setStatus('你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」');
+      setStatus('你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」' + (imageTooNear(lv) ? '（像離透鏡太近，畫線會擠在一起，' + NEAR_HINT + '。）' : ''));
       syncUI(); requestRender();
       return;
     }
