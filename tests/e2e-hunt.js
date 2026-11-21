@@ -148,7 +148,7 @@ const NOLIVES = ['法陣又落空了——荒野深處傳來一陣嘻嘻的笑�
   await seal(await wrong());
   s = await info();
   ok(s.lives === 2 && s.heartsLeft === 2 && s.screen === 'play', '抓錯：扣一顆 ❤️');
-  ok(!NO_POS.test(s.status.replace('失去一顆心', '')) && !/\d/.test(s.status), '抓錯訊息不含方向／距離／格號', s.status);
+  ok(!NO_POS.test(s.status.replace('失去一顆心', '').replace('沒有東西', '')) && !/\d/.test(s.status), '抓錯訊息不含方向／距離／格號', s.status);
 
   // 抓對 → 換下一組（不連續重複）。連抓 8 隻看順序
   const seq = [s.cfg];
