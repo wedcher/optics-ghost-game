@@ -191,6 +191,19 @@ const MIN = 60 * 1000;
     ok((await page.textContent('#list li .vl')) === '12 隻' && (await page.textContent('#pageInfo')).startsWith('第 1／2 頁'), '切到荒野封印：回第 1 頁');
     await page.tap('#tabCastle'); await waitLoad();
 
+    // 舊榜的回應晚到：不能用新榜的格式顯示（使用者 2026-11-21：荒野榜閃出「308087 隻」）
+    await page.evaluate(() => {
+      const orig = Leaderboard.fetchPage; window.__origFetchPage = orig;
+      Leaderboard.fetchPage = (board, pg) => orig.call(Leaderboard, board, pg).then((r) => new Promise((res) => setTimeout(() => res(r), board === 'castle' ? 500 : 0)));
+    });
+    await page.tap('#refresh');          // 趕鬼榜（慢）
+    await page.tap('#tabHunt');          // 馬上切到荒野榜（快）
+    await page.waitForTimeout(900);
+    const vls = await page.$$eval('#list li .vl', (a) => a.map((x) => x.textContent));
+    ok(vls.length > 0 && vls.every((v) => /^\d{1,2} 隻$/.test(v)), '切榜時舊榜的回應晚到：荒野榜只顯示「N 隻」，不會閃出趕鬼時間數字', vls.slice(0, 3).join(','));
+    await page.evaluate(() => { Leaderboard.fetchPage = window.__origFetchPage; });
+    await page.tap('#tabCastle'); await waitLoad();
+
     await page.evaluate(() => Leaderboard.showResult({ castleMs: 7 * 60000, hunt: 2 }));
     ok(/最好的成績/.test(await page.textContent('#lbResult')), '共用模式結算提示');
     await page.fill('#lbName', '<新人>');

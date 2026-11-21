@@ -73,17 +73,17 @@
   'use strict';
   var SUB = { castle: '第一關開始到第二關結束，愈短愈好', hunt: '5 分鐘荒野狩獵封印的鬼數（練習模式不算）' };
   var FMT = { castle: Leaderboard.formatTime, hunt: function (v) { return v + ' 隻'; } };
-  var st = { board: /[?&]board=hunt/.test(location.search) ? 'hunt' : 'castle', page: 1, pages: 1, mark: 0 };
+  var st = { board: /[?&]board=hunt/.test(location.search) ? 'hunt' : 'castle', page: 1, pages: 1, mark: 0, seq: 0 };
   function $(id) { return document.getElementById(id); }
   function fmtDate(at) { if (!at) return ''; var d = new Date(at); return (d.getMonth() + 1) + '/' + d.getDate(); }
-  function render(r) {
+  function render(r, board) {
     var ol = $('list');
     ol.textContent = '';
     if (!r.rows || !r.rows.length) { var e = document.createElement('li'); e.className = 'empty'; e.textContent = '還沒有人上榜'; ol.appendChild(e); }
     (r.rows || []).forEach(function (x) {
       var li = document.createElement('li');
       li.className = (x.rank <= 3 ? 'r' + x.rank : '') + (x.me || x.rank === st.mark ? ' me' : '');
-      [['rk', String(x.rank)], ['nm', x.name], ['vl', FMT[st.board](x.value)], ['dt', fmtDate(x.at)]].forEach(function (c) {
+      [['rk', String(x.rank)], ['nm', x.name], ['vl', FMT[board](x.value)], ['dt', fmtDate(x.at)]].forEach(function (c) {
         var sp = document.createElement('span'); sp.className = c[0]; sp.textContent = c[1]; li.appendChild(sp);
       });
       ol.appendChild(li);
@@ -97,8 +97,11 @@
     mode.className = 'mode'; mode.textContent = '讀取中…';
     $('sub').textContent = SUB[st.board];
     ['castle', 'hunt'].forEach(function (b) { var t = $(b === 'castle' ? 'tabCastle' : 'tabHunt'); t.classList.toggle('on', b === st.board); t.setAttribute('aria-selected', String(b === st.board)); });
-    return Leaderboard.fetchPage(st.board, page || 1).then(function (r) {
-      render(r);
+    // 回應回來時使用者可能已經切到另一個榜：只收最新一次要求的回應，格式也照「要求時」的榜（使用者 2026-11-21：荒野榜閃出 308087 隻）
+    var board = st.board, seq = ++st.seq;
+    return Leaderboard.fetchPage(board, page || 1).then(function (r) {
+      if (seq !== st.seq) return;
+      render(r, board);
       if (!r.ok) { mode.className = 'mode err'; mode.textContent = r.error || '讀取失敗'; return; }
       mode.textContent = r.mode === 'local' ? '還沒連上共用排行榜：這裡只顯示這支手機上的成績。'
         : r.legacy ? '排行榜後台還沒更新：目前只顯示前 10 名、不能翻頁。'
