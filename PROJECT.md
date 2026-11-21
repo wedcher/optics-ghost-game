@@ -522,6 +522,7 @@
 
 - **使用者手機實測 OK**：Android 安裝按鈕不再一直跳、笑聲音量、螺旋特效效能、製作與素材頁外觀、凸透鏡虛像題手感。
 - **使用者回報並已修**：「☰ 回關卡」跳的系統 `confirm()` 會讓 Android 離開全螢幕。改成頁面內確認視窗 `shared/confirm.js`（`GameConfirm.ask`，按鈕「回關卡選單／繼續玩」；選單「重新開始遊戲」同樣改成「重新開始／取消」）。三關與選單都已換，沒有剩下系統 `confirm()`／`alert()`。測試（第一關、排行榜、外框頁）已改成點頁面內按鈕。**還沒在實體手機驗證不會退出全螢幕。**
+- **使用者回報並已修：試玩網址上第一關過場（「房間裡明明沒人」、打碎鏡子、繼續抓鬼、過關）鏡面全黑。** 原因：過場背景是遊戲畫面快照（`toDataURL`）；raw.githack 把圖轉到別的網域，畫布被污染，快照丟錯，退回背景原圖，原圖鏡面本來就是暗的（和 `getImageData` 那次同一類問題）。修法：`plane-mirror/app.js` 的 `loadArt` 用 `crossOrigin='anonymous'` 載圖，載入失敗再退回不帶的重載。Claude 用本機模擬（圖轉到另一個 port）：圖伺服器有 CORS 標頭 → 背景是快照；沒有 → 仍退回暗的原圖。**raw.githack 的 CDN 有沒有送 CORS 標頭，雲端連不到、沒驗證**；若修完仍黑，要改做法（例如把背景快照改成直接用畫布）。第一關 e2e 310/310 過。
 - **檔案分工**：這個工作階段（`claude/jolly-wozniak-8fslus`）改了 `shared/confirm.js`（新）、三關 `app.js`／`index.html`、`prototype/index.html`、`tests/*`。
 
 ### 交接點（製作與素材頁，2026-11-21）

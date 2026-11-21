@@ -25,11 +25,22 @@
   var W = 0, H = 0, DPR = 1, S = 1, OX = 0, OY = 0; // 影像座標 → 畫布：x·S + OX
   var FS = 1; // 畫布文字的放大倍率：畫布短邊小（手機）時放大 1.25 倍，標準和凸、凹透鏡一致（見 layout）
 
+  // 圖用 crossOrigin='anonymous' 載入：試玩網址（raw.githack）會把圖轉到別的網域，沒有這個設定畫布會被「污染」，
+  // 過場背景的快照（toDataURL）就會丟錯、退回背景原圖——原圖的鏡面是暗的，過場裡鏡子變黑（使用者 2026-11-21）。
+  // 伺服器不給 CORS 標頭導致載入失敗時，退回不帶 crossOrigin 重載（至少圖還在，快照再退回原圖）。
   function loadArt(src) {
-    var a = { img: new Image(), ready: false };
-    a.img.onload = function () { a.ready = true; requestRender(); if (pendingIntro && introReady()) { pendingIntro = false; showIntro(); } };
-    a.img.onerror = function () { a.failed = true; if (pendingIntro && introReady()) { pendingIntro = false; showIntro(); } }; // 圖載不到：照樣開始（地磚退回程式畫的）
-    a.img.src = src;
+    var a = { img: null, ready: false }, retried = false;
+    function start(cors) {
+      var im = new Image();
+      if (cors) im.crossOrigin = 'anonymous';
+      im.onload = function () { a.ready = true; requestRender(); if (pendingIntro && introReady()) { pendingIntro = false; showIntro(); } };
+      im.onerror = function () {
+        if (cors && !retried) { retried = true; start(false); return; }
+        a.failed = true; if (pendingIntro && introReady()) { pendingIntro = false; showIntro(); } // 圖載不到：照樣開始（地磚退回程式畫的）
+      };
+      a.img = im; im.src = src;
+    }
+    start(true);
     return a;
   }
   var pendingIntro = false; // 開場要等圖都載好才出現（背景是遊戲畫面的快照）
