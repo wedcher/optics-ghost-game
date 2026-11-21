@@ -10,10 +10,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
 <!--
-  製作與素材頁（2026-11-21）：感謝名單與素材出處。
-  - 圖片：使用者 2026-11-21 確認「背景角色通通是 GPT」。
-  - 音效：Pixabay 兩段笑聲（作者名這個環境連不到 pixabay.com 查不到，先只寫標題＋連結，不猜）。
-  - 遊戲設計署名：等使用者決定怎麼寫，先放「（待填）」。
+  製作與素材頁：文字照使用者 2026-11-21 定稿（字少、不放連結）。
+  Pixabay 兩段笑聲的原始網址記在 PROJECT.md，頁面上不放。
 -->
 <style>
   html, body { margin:0; min-height:100%; background:#0d1020; color:#e8ebff;
@@ -23,15 +21,9 @@
   h1 { font-size:22px; margin:0; flex:1; }
   .btn { display:inline-flex; align-items:center; justify-content:center; min-height:46px; min-width:88px; padding:4px 16px;
     font:inherit; font-size:15px; color:#e8ebff; background:#232a4d; border:1px solid #3b4478; border-radius:12px; text-decoration:none; cursor:pointer; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; }
-  section { background:#171b33; border:1px solid #3b4478; border-radius:14px; padding:12px 14px; }
-  h2 { margin:0 0 6px; font-size:18px; }
-  p, li { font-size:15px; line-height:1.6; }
-  p { margin:0 0 6px; }
-  ul { margin:0; padding-left:20px; }
-  .sub { color:#9aa3cf; font-size:13px; }
-  .todo { color:#ffd166; }
-  a.src { display:inline-flex; align-items:center; min-height:44px; color:#b980ff; word-break:break-all; }
+  .credits { margin:0; background:#171b33; border:1px solid #3b4478; border-radius:14px; padding:6px 16px; }
+  .credits dt { margin:12px 0 2px; font-size:14px; color:#9aa3cf; }
+  .credits dd { margin:0 0 10px; font-size:18px; line-height:1.5; }
 </style>
 </head>
 <body>
@@ -40,32 +32,12 @@
     <h1>製作與素材</h1>
     <a class="btn" id="menuBtn" href="index.html">☰ 回選單</a>
   </header>
-  <div class="grid">
-    <section id="design">
-      <h2>遊戲設計</h2>
-      <p class="todo" data-todo="credit">（待填）</p>
-    </section>
-    <section id="art">
-      <h2>圖片</h2>
-      <p>背景與角色圖由 ChatGPT（OpenAI）生成：</p>
-      <ul>
-        <li>第一關鏡子房間、城堡走廊、荒野、古堡</li>
-        <li>信件、圓盤</li>
-        <li>女鬼、9 張小鬼</li>
-      </ul>
-    </section>
-    <section id="sfx">
-      <h2>音效</h2>
-      <p>笑聲取自 Pixabay，依 Pixabay Content License 使用，剪輯成約 1 秒：</p>
-      <ul>
-        <li>「Girl giggling」（第一關女鬼的笑聲）<br>
-          <a class="src" href="https://pixabay.com/sound-effects/people-girl-giggling-492887/" target="_blank" rel="noopener">pixabay.com/sound-effects/people-girl-giggling-492887</a></li>
-        <li>「Squaky giggle」（第二、三關小鬼的笑聲）<br>
-          <a class="src" href="https://pixabay.com/sound-effects/people-squaky-giggle-47742/" target="_blank" rel="noopener">pixabay.com/sound-effects/people-squaky-giggle-47742</a></li>
-      </ul>
-      <p class="sub">其他音效（鏘、碎玻璃、夜裡的怪聲）由程式即時合成。</p>
-    </section>
-  </div>
+  <dl class="credits">
+    <dt>遊戲設計</dt><dd>絕絕</dd>
+    <dt>背景與角色圖</dt><dd>ChatGPT</dd>
+    <dt>程式</dt><dd>Claude</dd>
+    <dt>音效</dt><dd>Pixabay「Girl giggling」「Squaky giggle」；其他音效程式合成</dd>
+  </dl>
 </main>
 <script src="shared/landscape.js"></script>
 </body>

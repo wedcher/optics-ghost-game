@@ -130,14 +130,15 @@ const T = {
   ok(!!(await page.$('a#creditsLink[href="credits.html"]')), '選單最下面有「製作與素材」入口');
   await Promise.all([page.waitForURL(/credits\.html$/), page.tap('#creditsLink')]);
   const cr = await page.evaluate(() => ({
+    rows: [...document.querySelectorAll('.credits dt')].map((dt) => dt.textContent + '：' + dt.nextElementSibling.textContent),
+    links: [...document.querySelectorAll('main a')].map((a) => a.getAttribute('href')),
+    btn: (() => { const b = document.getElementById('menuBtn').getBoundingClientRect(); return Math.min(b.width, b.height); })(),
     text: document.body.textContent,
-    sizes: [...document.querySelectorAll('.btn, a.src')].map((e) => Math.min(e.getBoundingClientRect().width, e.getBoundingClientRect().height)),
-    back: (document.getElementById('menuBtn') || {}).getAttribute && document.getElementById('menuBtn').getAttribute('href'),
     noHScroll: document.documentElement.scrollWidth <= window.innerWidth,
   }));
-  ok(/ChatGPT（OpenAI）/.test(cr.text) && /Girl giggling/.test(cr.text) && /Squaky giggle/.test(cr.text) && /Pixabay Content License/.test(cr.text) && /程式即時合成/.test(cr.text), '製作與素材：圖片、音效出處都有寫');
-  ok(cr.back === 'index.html' && /☰ 回選單/.test(cr.text), '製作與素材：「☰ 回選單」連回選單', cr.back);
-  ok(cr.sizes.length >= 3 && cr.sizes.every((s) => s >= 44), '製作與素材：按鈕與連結 ≥ 44 px', cr.sizes);
+  ok(JSON.stringify(cr.rows) === JSON.stringify(['遊戲設計：絕絕', '背景與角色圖：ChatGPT', '程式：Claude', '音效：Pixabay「Girl giggling」「Squaky giggle」；其他音效程式合成']), '製作與素材：四行文字照定稿', cr.rows);
+  ok(JSON.stringify(cr.links) === '["index.html"]', '製作與素材：除了回選單沒有其他連結', cr.links);
+  ok(/☰ 回選單/.test(cr.text) && cr.btn >= 44, '製作與素材：「☰ 回選單」≥ 44 px', cr.btn);
   ok(cr.noHScroll, '製作與素材：橫向手機沒有橫向捲動');
   await page.screenshot({ path: path.join(SHOTS, 'credits.png') });
   await Promise.all([page.waitForURL(/prototype\/index\.html$/), page.tap('#menuBtn')]);
