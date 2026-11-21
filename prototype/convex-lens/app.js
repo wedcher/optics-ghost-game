@@ -300,13 +300,15 @@
   // 鏡片裡多寫一行 NEAR_HINT，但仍然可以標記（使用者 2026-11-21：「他如果硬要選，也給他選」）。
   var NEAR_IMAGE_CM = 60, NEAR_HINT = '建議標記別處';
   function imageTooNear(lv) { return lv.eye === 'virtual' && lv.markable && Math.abs(lv.v) < NEAR_IMAGE_CM; }
-  // kind：null＝一般虛像｜'far'＝成像太遠不能標記｜'near'＝可以標記但建議標記別處
+  // 看到倒立實像時鏡片上的字（使用者 2026-11-21）
+  var REAL_CAPTION = '目前為實像，請改用布幕';
+  // kind：null＝一般虛像｜'far'＝成像太遠不能標記｜'near'＝可以標記但建議標記別處｜'real'＝倒立實像
   function lensCaption(cx, cy, rad, imgUp, kind) {
-    var tooFar = kind === 'far', near = kind === 'near';
-    var lines = tooFar ? [TOO_FAR_CAPTION] : near ? [VIRTUAL_CAPTION, NEAR_HINT] : [VIRTUAL_CAPTION], size = Math.round(14 * FS), maxW = rad * 1.55;
+    var tooFar = kind === 'far', near = kind === 'near', real = kind === 'real';
+    var lines = real ? [REAL_CAPTION] : tooFar ? [TOO_FAR_CAPTION] : near ? [VIRTUAL_CAPTION, NEAR_HINT] : [VIRTUAL_CAPTION], size = Math.round(14 * FS), maxW = rad * 1.55;
     ctx.save();
     var fit = function () { ctx.font = '700 ' + size + 'px system-ui, sans-serif'; return lines.every(function (t) { return ctx.measureText(t).width <= maxW; }); };
-    if (!fit()) { lines = tooFar ? ['成像太遠，', '無法標記。'] : near ? ['虛像', '（正立、放大）', NEAR_HINT] : ['虛像', '（正立、放大）']; while (!fit() && size > 11) size--; }
+    if (!fit()) { lines = real ? ['目前為實像，', '請改用布幕'] : tooFar ? ['成像太遠，', '無法標記。'] : near ? ['虛像', '（正立、放大）', NEAR_HINT] : ['虛像', '（正立、放大）']; while (!fit() && size > 11) size--; }
     var lh = size * 1.2, y0 = cy + (imgUp > 0 ? 1 : -1) * rad * (lines.length > 2 ? 0.45 : 0.62) - (lines.length - 1) * lh / 2; // 三行時往中心移，免得被圓框切掉
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(8,10,24,.92)'; ctx.fillStyle = '#e7e0ff';
     lines.forEach(function (t, i) { ctx.strokeText(t, cx, y0 + i * lh); ctx.fillText(t, cx, y0 + i * lh); });
@@ -371,7 +373,7 @@
       stats.lensImageVisible = px < 0 ? Math.abs(gpy - cy) - 0.67 * ghh < rad : px > 0;
       if (!stats.lensImageVisible) { /* 像在鏡框外（或只有空白邊緣進來）：鏡片裡是空的，不寫字 */ }
       else if (virt) lensCaption(cx, cy, rad, A * c.h * K, !lv.markable ? 'far' : imageTooNear(lv) ? 'near' : null); // 回饋「虛像題 V2」：鏡框裡寫出像的性質
-      else if (lv.eye !== 'realInFront') lensCaption(cx, cy, rad, A * c.h * K, 'far');
+      else lensCaption(cx, cy, rad, A * c.h * K, lv.eye === 'realInFront' ? 'real' : 'far');
     } else if (!state.solved && lv.eye === 'blur') {
       var gr = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
       gr.addColorStop(0, 'rgba(157,255,216,.30)'); gr.addColorStop(1, 'rgba(157,255,216,.04)');
@@ -728,7 +730,7 @@
     render(); // 確保 stats.lensImageVisible 是現在的透鏡位置
     setStatus(lv.eye !== 'blur' && lv.eye !== 'none' && !stats.lensImageVisible ? '透鏡裡看不到鬼的像。移動透鏡試試。'
       : lv.eye === 'virtual' || lv.eye === 'infinity' || lv.eye === 'behind' ? TOO_FAR_CAPTION + '再移動看看。'
-      : lv.eye === 'realInFront' ? '現在看到的是鬼的倒立實像，難以判斷距離，請改用布幕。' // 使用者 2026-11-21 定的文字：實像只在布幕上標記
+      : lv.eye === 'realInFront' ? '現在看到的是鬼的倒立實像。實像可以投在布幕上，請改用布幕找清楚的像。' // 使用者 2026-11-21 定的文字：實像只在布幕上標記
       : lv.eye === 'none' ? '透鏡裡看不到鬼的像。移動透鏡試試。'
       : '透鏡裡模糊一片，看不清楚。移動透鏡試試。');
   }
