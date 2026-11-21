@@ -112,7 +112,8 @@
    *         'blur'：實像落在眼睛前後 25 cm 內 → 放大到極大、對不了焦，只看到一團光（只有實像題會發生）
    * A：從眼睛看，物上高 1 cm 的點的視角（弧度；正＝正立）。A = f ÷ (d·f − u·(d − f))，d＝透鏡到眼睛。
    *    虛像、實像在眼前或眼後、像在無限遠都適用（像在無限遠時 A = 1/f）。
-   * inView：像有沒有一部分落在鏡片的視野裡（鬼離主軸很遠時，像可能整個在鏡框外，鏡片裡是空的；2026-11-21）。
+   * inView：像的外框有沒有碰到鏡片的視野（鬼離主軸很遠時，像可能整個在鏡框外，鏡片裡是空的；2026-11-21）。
+   *         只是必要條件：鬼圖的邊緣多半是空白，app.js 另外數實際畫進鏡片的像素（stats.lensImageVisible）。
    * x、y：像點（走廊座標）。markable：虛像可以標記（在走廊內、P 落在鏡片口徑內）。'infinity'／'behind' 一律不能標記。
    * angMag：從眼睛看，像的視角 ÷ 不用透鏡直接看鬼的視角。
    */
@@ -121,6 +122,7 @@
     if (!(u > 5)) return { eye: 'none', u: u };
     var A = f / (d * f - u * (d - f));
     var img = Optics.thinLensImage(f, u, h);
+    // 鬼的外框有沒有碰到鏡片視野（必要條件）。鬼圖不會塞滿外框，真的看不看得到由 app.js 照實際畫出的像素判斷
     var inView = Math.abs(A * h) - Math.abs(A) * WORLD.ghostHalfHeight < WORLD.lensRadius / d;
     if (!img || Math.abs(u - f) < 0.5) return { eye: 'infinity', u: u, A: A, angMag: Math.abs(A) * (eye - objX), markable: false, inView: inView };
     var x = lensX + img.dImg, y = img.m * h, out = { u: u, v: img.dImg, m: img.m, x: x, y: y, A: A, inView: inView };

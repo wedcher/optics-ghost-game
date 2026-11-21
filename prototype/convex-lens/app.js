@@ -313,6 +313,22 @@
     ctx.restore();
     stats.lensCaption = lines.join('');
   }
+  // 數鬼的像實際畫進鏡片圓裡的像素（縮小到 48×48 的離屏畫布；不畫光暈）。鬼圖邊緣多半是空白，不能只看外框（2026-11-21）
+  var lensProbe = null;
+  function ghostPixelsInLens(cx, cy, rad, py, hw, hh, sg) {
+    var N = 48;
+    if (!lensProbe) { lensProbe = document.createElement('canvas'); lensProbe.width = lensProbe.height = N; }
+    var g = lensProbe.getContext('2d'), s = N / (2 * rad);
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, N, N);
+    g.save();
+    g.setTransform(s, 0, 0, s, -(cx - rad) * s, -(cy - rad) * s);
+    g.beginPath(); g.arc(cx, cy, rad, 0, 7); g.clip();
+    g.fillStyle = '#fff'; drawGhost(g, cx, py, hw, hh, sg, sg, '#fff', null);
+    g.restore();
+    var d = g.getImageData(0, 0, N, N).data, n = 0;
+    for (var i = 3; i < d.length; i += 4) if (d[i] > 60) n++;
+    return n;
+  }
   function renderLensView(r) {
     var c = cfg(), pad = 10;
     ctx.save();
@@ -331,6 +347,7 @@
     var K = maxR / angR;
     var rad = angR * K;
     var lv = lensViewNow();
+    stats.lensImageVisible = false;
     // 鏡片（正面看是圓形；木框＋玻璃）
     ctx.fillStyle = '#5a4630'; ctx.beginPath(); ctx.arc(cx, cy, rad + 5, 0, 7); ctx.fill();
     ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, rad, 0, 7); ctx.clip();
@@ -341,10 +358,12 @@
     // 位置、大小一律用視角 A（configs.lensView）：A > 0 正立，A < 0 倒立。
     if (!state.solved && (lv.eye === 'virtual' || lv.eye === 'realInFront' || lv.eye === 'infinity' || lv.eye === 'behind')) {
       var A = lv.A, sg = A > 0 ? 1 : -1, virt = lv.eye === 'virtual', col = virt ? VIRTUAL_COLOR : REAL_IMG_COLOR;
+      var gpy = cy - A * c.h * K, ghw = WORLD.ghostHalfWidth * Math.abs(A) * K, ghh = WORLD.ghostHalfHeight * Math.abs(A) * K;
       ctx.save(); ctx.fillStyle = col; ctx.globalAlpha = 0.9;
-      drawGhost(ctx, cx, cy - A * c.h * K, WORLD.ghostHalfWidth * Math.abs(A) * K, WORLD.ghostHalfHeight * Math.abs(A) * K, sg, sg, col, col);
+      drawGhost(ctx, cx, gpy, ghw, ghh, sg, sg, col, col);
       ctx.restore();
-      if (!lv.inView) { /* 像整個在鏡框外：鏡片裡是空的，不寫字 */ }
+      stats.lensImageVisible = lv.inView && ghostPixelsInLens(cx, cy, rad, gpy, ghw, ghh, sg) > 0;
+      if (!stats.lensImageVisible) { /* 像在鏡框外（或只有空白邊緣進來）：鏡片裡是空的，不寫字 */ }
       else if (virt) lensCaption(cx, cy, rad, A * c.h * K, !lv.markable ? 'far' : imageTooNear(lv) ? 'near' : null); // 回饋「虛像題 V2」：鏡框裡寫出像的性質
       else if (lv.eye !== 'realInFront') lensCaption(cx, cy, rad, A * c.h * K, 'far');
     } else if (!state.solved && lv.eye === 'blur') {
@@ -700,9 +719,10 @@
       return;
     }
     // 像整個落在鏡框外（鬼離主軸很遠）：鏡片裡是空的，不能說「看到」（2026-11-21，配置 B 開場）
-    setStatus(lv.inView === false && lv.eye !== 'blur' ? '透鏡裡看不到鬼的像。移動透鏡試試。'
+    render(); // 確保 stats.lensImageVisible 是現在的透鏡位置
+    setStatus(lv.eye !== 'blur' && lv.eye !== 'none' && !stats.lensImageVisible ? '透鏡裡看不到鬼的像。移動透鏡試試。'
       : lv.eye === 'virtual' || lv.eye === 'infinity' || lv.eye === 'behind' ? TOO_FAR_CAPTION + '再移動看看。'
-      : lv.eye === 'realInFront' ? '透鏡裡看到的是倒立的像——那不是虛像。要標記倒立的實像，請改「看布幕」。'
+      : lv.eye === 'realInFront' ? '現在看到的是鬼的倒立實像，難以判斷距離，請改用布幕。' // 使用者 2026-11-21 定的文字：實像只在布幕上標記
       : lv.eye === 'none' ? '透鏡裡看不到鬼的像。移動透鏡試試。'
       : '透鏡裡模糊一片，看不清楚。移動透鏡試試。');
   }
