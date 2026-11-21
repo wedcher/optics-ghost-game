@@ -344,7 +344,8 @@
       ctx.save(); ctx.fillStyle = col; ctx.globalAlpha = 0.9;
       drawGhost(ctx, cx, cy - A * c.h * K, WORLD.ghostHalfWidth * Math.abs(A) * K, WORLD.ghostHalfHeight * Math.abs(A) * K, sg, sg, col, col);
       ctx.restore();
-      if (virt) lensCaption(cx, cy, rad, A * c.h * K, !lv.markable ? 'far' : imageTooNear(lv) ? 'near' : null); // 回饋「虛像題 V2」：鏡框裡寫出像的性質
+      if (!lv.inView) { /* 像整個在鏡框外：鏡片裡是空的，不寫字 */ }
+      else if (virt) lensCaption(cx, cy, rad, A * c.h * K, !lv.markable ? 'far' : imageTooNear(lv) ? 'near' : null); // 回饋「虛像題 V2」：鏡框裡寫出像的性質
       else if (lv.eye !== 'realInFront') lensCaption(cx, cy, rad, A * c.h * K, 'far');
     } else if (!state.solved && lv.eye === 'blur') {
       var gr = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
@@ -698,7 +699,9 @@
       syncUI(); requestRender();
       return;
     }
-    setStatus(lv.eye === 'virtual' || lv.eye === 'infinity' || lv.eye === 'behind' ? TOO_FAR_CAPTION + '再移動看看。'
+    // 像整個落在鏡框外（鬼離主軸很遠）：鏡片裡是空的，不能說「看到」（2026-11-21，配置 B 開場）
+    setStatus(lv.inView === false && lv.eye !== 'blur' ? '透鏡裡看不到鬼的像。移動透鏡試試。'
+      : lv.eye === 'virtual' || lv.eye === 'infinity' || lv.eye === 'behind' ? TOO_FAR_CAPTION + '再移動看看。'
       : lv.eye === 'realInFront' ? '透鏡裡看到的是倒立的像——那不是虛像。要標記倒立的實像，請改「看布幕」。'
       : lv.eye === 'none' ? '透鏡裡看不到鬼的像。移動透鏡試試。'
       : '透鏡裡模糊一片，看不清楚。移動透鏡試試。');

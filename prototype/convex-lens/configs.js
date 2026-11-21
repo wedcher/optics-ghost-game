@@ -112,6 +112,7 @@
    *         'blur'：實像落在眼睛前後 25 cm 內 → 放大到極大、對不了焦，只看到一團光（只有實像題會發生）
    * A：從眼睛看，物上高 1 cm 的點的視角（弧度；正＝正立）。A = f ÷ (d·f − u·(d − f))，d＝透鏡到眼睛。
    *    虛像、實像在眼前或眼後、像在無限遠都適用（像在無限遠時 A = 1/f）。
+   * inView：像有沒有一部分落在鏡片的視野裡（鬼離主軸很遠時，像可能整個在鏡框外，鏡片裡是空的；2026-11-21）。
    * x、y：像點（走廊座標）。markable：虛像可以標記（在走廊內、P 落在鏡片口徑內）。'infinity'／'behind' 一律不能標記。
    * angMag：從眼睛看，像的視角 ÷ 不用透鏡直接看鬼的視角。
    */
@@ -120,12 +121,13 @@
     if (!(u > 5)) return { eye: 'none', u: u };
     var A = f / (d * f - u * (d - f));
     var img = Optics.thinLensImage(f, u, h);
-    if (!img || Math.abs(u - f) < 0.5) return { eye: 'infinity', u: u, A: A, angMag: Math.abs(A) * (eye - objX), markable: false };
-    var x = lensX + img.dImg, y = img.m * h, out = { u: u, v: img.dImg, m: img.m, x: x, y: y, A: A };
+    var inView = Math.abs(A * h) - Math.abs(A) * WORLD.ghostHalfHeight < WORLD.lensRadius / d;
+    if (!img || Math.abs(u - f) < 0.5) return { eye: 'infinity', u: u, A: A, angMag: Math.abs(A) * (eye - objX), markable: false, inView: inView };
+    var x = lensX + img.dImg, y = img.m * h, out = { u: u, v: img.dImg, m: img.m, x: x, y: y, A: A, inView: inView };
     if (img.isVirtual) out.eye = 'virtual';
     else out.eye = x < eye - 25 ? 'realInFront' : x > eye + 25 ? 'behind' : 'blur';
     out.angMag = Math.abs(img.m) * (eye - objX) / Math.abs(eye - x);
-    out.markable = out.eye === 'virtual' && x >= -WORLD.corridorLength && Math.abs(y) <= WORLD.virtualMaxY;
+    out.markable = out.eye === 'virtual' && inView && x >= -WORLD.corridorLength && Math.abs(y) <= WORLD.virtualMaxY;
     return out;
   }
 
@@ -240,9 +242,9 @@
       var v2 = lensView(c.f, c.object.x, c.h, x2);
       if (v2.u < c.f - 0.5 || v2.eye === 'none') continue;
       past++;
-      if (!((v2.eye === 'infinity' || v2.eye === 'behind') && v2.A > 0 && !v2.markable)) pastBad.push(x2 + ':' + v2.eye);
+      if (!((v2.eye === 'infinity' || v2.eye === 'behind') && v2.A > 0 && !v2.markable && v2.inView)) pastBad.push(x2 + ':' + v2.eye + (v2.inView ? '' : '(鏡框外)'));
     }
-    ok(pastBad.length === 0, T('透鏡推到焦點上或焦點外：隔著透鏡看到正立的像（像在無限遠或布幕後面），不能標記'), past + ' 個位置' + (pastBad.length ? '，不符 ' + pastBad.slice(0, 5).join(',') : ''));
+    ok(pastBad.length === 0, T('透鏡推到焦點上或焦點外：隔著透鏡看得到正立的像（像在無限遠或布幕後面、在鏡框內），不能標記'), past + ' 個位置' + (pastBad.length ? '，不符 ' + pastBad.slice(0, 5).join(',') : ''));
     ok(true, T('（資訊）透鏡範圍和實像題一樣；能越過鬼的位置'), behind ? behind + ' 個（越過時布幕和透鏡裡都看不到像）' : '0 個（鬼在透鏡最左端之外）');
     var vw = c.virtualWindow;
     ok(vw && vw.to - vw.from >= 40, T('看得到可標記虛像的透鏡範圍夠寬（≥ 40 cm）'), vw ? vw.from + '～' + vw.to : '無');
