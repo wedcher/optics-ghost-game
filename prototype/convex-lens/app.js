@@ -319,13 +319,16 @@
     ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip();
     ctx.fillStyle = '#0a0b16'; ctx.fillRect(r.x, r.y, r.w, r.h);
     var k = Math.min((r.w - 2 * pad) / (2 * WORLD.wallHalfWidth), (r.h - 2 * pad - 18) / (2 * WORLD.axisHeight));
-    var foot = Math.round(34 * FS);                              // 底部一列：直接看鬼的大小（對照）
+    // 底部原本有「← 直接看」對照小鬼，使用者 2026-11-21 拿掉（鬼裸眼不可見；大小又會透露距離，findings V5）
+    var foot = 0;
     var cx = r.x + r.w / 2, cy = r.y + 22 + (r.h - 22 - foot) / 2;
     // 鏡框半徑上限：那一欄放得下多大就多大（使用者 2026-11-20 要透鏡和像大一點；原本限制不比布幕寬）
     var maxR = Math.min(r.w / 2 - 16, (r.h - 22 - foot) / 2 - 6);
-    var eye = WORLD.eyeX, D = eye - c.object.x, dLens = eye - state.lensX;
-    var angR = WORLD.lensRadius / dLens, naked = WORLD.ghostHalfHeight / D;
-    var K = Math.min(maxR * 0.3 / naked, maxR / angR);          // 視角（正切）→ 畫面 px；直接看鬼時鬼的半高 = 鏡框上限的 30%
+    var eye = WORLD.eyeX, dLens = eye - state.lensX;
+    var angR = WORLD.lensRadius / dLens;
+    // 視角（正切）→ 畫面 px：鏡框永遠撐滿上限。原本會依「直接看鬼的大小」縮小鏡框（隨鬼的距離變，會透露距離），2026-11-21 拿掉。
+    // 像和鏡框的比例照物理算，不受影響。
+    var K = maxR / angR;
     var rad = angR * K;
     var lv = lensViewNow();
     // 鏡片（正面看是圓形；木框＋玻璃）
@@ -355,15 +358,6 @@
       var my = cy - (state.marker.y / (eye - state.marker.x)) * K;
       drawMarker(cx, my);
     }
-    // 對照：不用透鏡、直接看鬼時看起來的大小（灰色虛線，底部一列）
-    var rw = WORLD.ghostHalfWidth / D * K, rh = naked * K, fy = r.y + r.h - foot / 2;
-    ctx.save(); ctx.globalAlpha = 0.45;
-    if (!(window.GhostSprite && window.GhostSprite.draw(ctx, r.x + 10 + rw, fy, rw, rh, 1, 1, null))) {
-      ctx.globalAlpha = 1; ctx.strokeStyle = 'rgba(200,205,230,.85)'; ctx.setLineDash([4, 3]); ctx.lineWidth = 1.5;
-      ghostPath(ctx, r.x + 10 + rw, fy, rw, rh, 1, 1); ctx.stroke();
-    }
-    ctx.restore();
-    label('← 直接看', r.x + 10 + rw * 2.6, fy, '#aab3e6', 'left');
     label('隔著凸透鏡看', r.x + 8, r.y + 12, '#aab3e6', 'left');
     ctx.restore();
   }

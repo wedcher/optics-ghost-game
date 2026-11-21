@@ -767,6 +767,8 @@ async function run(profile, browser) {
     await press('#lookScreen');
     ok(!(await st()).marker, T('切到「看布幕」：虛像標記取消'));
     ok(await page.evaluate(() => { const H = window.__protoConvex; H.render(); return H.stats.lensCaption; }) === null, T('看布幕時沒有「虛像」字樣'));
+    await press('#markBtn'); // 透鏡還在同一個位置（可能就是虛像離透鏡太近的位置），但現在看的是布幕
+    ok(!/建議標記別處/.test((await st()).status), T('看布幕時按標記：不會出現「建議標記別處」（只在看透鏡時才有）'), '「' + (await st()).status + '」');
     await press('#lookLens');
     await press('#markBtn');
     ok(!!(await st()).marker, T('切回「看透鏡」可以重新標記'));
