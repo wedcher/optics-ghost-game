@@ -337,13 +337,15 @@
     var gg = ctx.createRadialGradient(cx - rad * 0.3, cy - rad * 0.35, rad * 0.05, cx, cy, rad);
     gg.addColorStop(0, '#26304f'); gg.addColorStop(1, '#141a30');
     ctx.fillStyle = gg; ctx.fillRect(cx - rad, cy - rad, 2 * rad, 2 * rad);
-    if (!state.solved && (lv.eye === 'virtual' || lv.eye === 'realInFront')) {
-      var d = eye - lv.x, am = Math.abs(lv.m), virt = lv.eye === 'virtual';
-      ctx.save(); ctx.globalAlpha = 0.78; ctx.fillStyle = virt ? VIRTUAL_COLOR : REAL_IMG_COLOR;
-      ctx.globalAlpha = 0.9;
-      drawGhost(ctx, cx, cy - (lv.y / d) * K, WORLD.ghostHalfWidth * am / d * K, WORLD.ghostHalfHeight * am / d * K, virt ? 1 : -1, virt ? 1 : -1, ctx.fillStyle, virt ? VIRTUAL_COLOR : REAL_IMG_COLOR);
+    // 看得清楚的像：虛像、眼前的倒立實像、在無限遠（物在焦點上）、在眼睛後面（使用者 2026-11-21：照物理畫，不再是一團淡光）。
+    // 位置、大小一律用視角 A（configs.lensView）：A > 0 正立，A < 0 倒立。
+    if (!state.solved && (lv.eye === 'virtual' || lv.eye === 'realInFront' || lv.eye === 'infinity' || lv.eye === 'behind')) {
+      var A = lv.A, sg = A > 0 ? 1 : -1, virt = lv.eye === 'virtual', col = virt ? VIRTUAL_COLOR : REAL_IMG_COLOR;
+      ctx.save(); ctx.fillStyle = col; ctx.globalAlpha = 0.9;
+      drawGhost(ctx, cx, cy - A * c.h * K, WORLD.ghostHalfWidth * Math.abs(A) * K, WORLD.ghostHalfHeight * Math.abs(A) * K, sg, sg, col, col);
       ctx.restore();
-      if (virt) lensCaption(cx, cy, rad, lv.y / d * K, !lv.markable ? 'far' : imageTooNear(lv) ? 'near' : null); // 回饋「虛像題 V2」：鏡框裡寫出像的性質
+      if (virt) lensCaption(cx, cy, rad, A * c.h * K, !lv.markable ? 'far' : imageTooNear(lv) ? 'near' : null); // 回饋「虛像題 V2」：鏡框裡寫出像的性質
+      else if (lv.eye !== 'realInFront') lensCaption(cx, cy, rad, A * c.h * K, 'far');
     } else if (!state.solved && lv.eye === 'blur') {
       var gr = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
       gr.addColorStop(0, 'rgba(157,255,216,.30)'); gr.addColorStop(1, 'rgba(157,255,216,.04)');
@@ -696,7 +698,7 @@
       syncUI(); requestRender();
       return;
     }
-    setStatus(lv.eye === 'virtual' ? TOO_FAR_CAPTION + '再移動看看。'
+    setStatus(lv.eye === 'virtual' || lv.eye === 'infinity' || lv.eye === 'behind' ? TOO_FAR_CAPTION + '再移動看看。'
       : lv.eye === 'realInFront' ? '透鏡裡看到的是倒立的像——那不是虛像。要標記倒立的實像，請改「看布幕」。'
       : lv.eye === 'none' ? '透鏡裡看不到鬼的像。移動透鏡試試。'
       : '透鏡裡模糊一片，看不清楚。移動透鏡試試。');
