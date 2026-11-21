@@ -3,6 +3,8 @@
  *
  *   Sfx.clang()       金屬圓盤落地的「鏘——！」（第一關第一次丟圓盤）
  *   Sfx.nightNoise()  半夜隔壁房間傳來的怪聲：悶悶的敲牆聲 → 長長的木頭嘎吱聲 → 拖東西的聲音（第一關開場）
+ *   Sfx.giggle(kind)  鬼的竊笑（音檔，2026-11-21 使用者在 Pixabay 挑的）：'ghost' 第一關女鬼（三段隨機一段）、'minion' 第二三關小鬼。
+ *                     原檔在 docs/concepts/sfx-originals/，剪成 1 秒內、單聲道、音量對齊。回傳 false＝不能播（各關退回合成音）。
  *
  * 都是單聲道、沒有方向，不帶任何位置線索。
  * 瀏覽器要使用者點過畫面才能出聲；這兩個音效都在點擊之後才會播放（換句、點地板）。
@@ -118,5 +120,24 @@
     } catch (e) { /* 沒有音效也不影響 */ }
   }
 
-  root.Sfx = { clang: clang, nightNoise: nightNoise };
+  // ---- 竊笑音檔 ----
+  var base = 'sfx/';
+  try { var cs = document.currentScript && document.currentScript.src; if (cs) base = cs.replace(/[^\/]*$/, '') + 'sfx/'; } catch (e) { /* 預設路徑 */ }
+  var GIGGLES = { ghost: ['ghost-giggle-1.mp3', 'ghost-giggle-2.mp3', 'ghost-giggle-3.mp3'], minion: ['minion-giggle.mp3'] };
+  var pool = {}, lastPick = {};
+  function giggle(kind) {
+    var list = GIGGLES[kind] || GIGGLES.ghost;
+    try {
+      if (typeof Audio === 'undefined') return false;
+      var i = Math.floor(Math.random() * list.length);
+      if (list.length > 1 && i === lastPick[kind]) i = (i + 1) % list.length; // 不連續播同一段
+      lastPick[kind] = i;
+      var key = kind + i, a = pool[key];
+      if (!a) { a = pool[key] = new Audio(base + list[i]); a.preload = 'auto'; }
+      a.currentTime = 0; a.volume = 0.9;
+      var p = a.play(); if (p && p.catch) p.catch(function () { /* 瀏覽器還不讓出聲：安靜失敗 */ });
+      return true;
+    } catch (e) { return false; }
+  }
+  root.Sfx = { clang: clang, nightNoise: nightNoise, giggle: giggle };
 })(window);

@@ -25,6 +25,7 @@
   a.card.dev { border-style:dashed; }
   .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
   .row a.card { text-align:center; }
+  #installBtn { display:block; width:100%; margin-top:12px; min-height:48px; font:inherit; font-size:15px; color:#e8ebff; background:#171b33; border:1px dashed #3b4478; border-radius:12px; cursor:pointer; }
   #resetBtn { min-height:48px; font:inherit; font-size:15px; color:#e8ebff; background:#232a4d; border:1px solid #3b4478; border-radius:12px; cursor:pointer; }
   #fsTip { position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(5,6,14,.86); }
   #fsTip .box { max-width:520px; width:100%; padding:20px; border:1px solid #b980ff; border-radius:16px; background:#1d1436; line-height:1.65; font-size:16px; }
@@ -41,6 +42,7 @@
     <a class="card" id="lbLink" href="leaderboard.html"><strong>排行榜</strong></a>
     <button id="resetBtn" type="button">重新開始遊戲<br>（清除過關紀錄）</button>
   </div>
+  <button id="installBtn" type="button" hidden>📲 安裝到手機（全螢幕、沒有網址列）</button>
 </main>
 <script src="shared/landscape.js"></script>
 <script src="shared/install-hint.js"></script>
@@ -65,11 +67,11 @@
 
   var items = [];
   if (!cleared('mirror')) items.push({ id: 'start', href: 'plane-mirror/index.html', title: '開始遊戲', sub: '古堡邀請，充滿鏡子的房間', main: true });
-  else items.push({ id: 'mirror', href: 'plane-mirror/index.html', title: '第一關：充滿鏡子的房間', sub: '鏡子中，有一個女鬼' });
+  else items.push({ id: 'mirror', href: 'plane-mirror/index.html', title: '第一關：鏡子房間', sub: '鏡子中，有一個女鬼' });
   if (cleared('mirror')) items.push({ id: 'mirror-practice', href: 'plane-mirror/index.html?practice=1', title: '第一關：練習模式', sub: '扣命、不計時、不列入排行' });
-  if (unlocked('convex')) items.push({ id: 'convex', href: 'convex-lens/index.html', title: '第二關：走廊的凸透鏡', sub: '城堡裡到處都是鬼，請趕走他們', main: !cleared('convex') });
+  if (unlocked('convex')) items.push({ id: 'convex', href: 'convex-lens/index.html', title: '第二關：城堡走廊', sub: '城堡裡到處都是鬼，請趕走他們', main: !cleared('convex') });
   if (cleared('convex')) items.push({ id: 'convex-practice', href: 'convex-lens/index.html?practice=1', title: '第二關：練習模式', sub: '扣命、不計時、不列入排行' });
-  if (unlocked('concave')) items.push({ id: 'concave', href: 'concave-lens/index.html', title: '第三關：荒野狩獵，小凹透鏡派上用場', sub: '趁天亮前，多封印幾隻', main: !cleared('concave') });
+  if (unlocked('concave')) items.push({ id: 'concave', href: 'concave-lens/index.html', title: '第三關：荒野狩獵', sub: '趁天亮前，多封印幾隻', main: !cleared('concave') });
   if (cleared('concave')) items.push({ id: 'concave-practice', href: 'concave-lens/index.html?practice=1', title: '第三關：練習模式（不計時）', sub: '不列入排行' });
   if (all) {
     items.push({ id: 'mirror-free', href: 'plane-mirror/index.html?free=1', title: '平面鏡 — 自由練習（開發用）', sub: '沒有過場、不計命；可指定鏡子數與鬼的位置、開 Debug。', dev: true });
@@ -115,6 +117,13 @@
     document.body.appendChild(tip);
     document.getElementById('fsTipGo').addEventListener('click', function () { location.href = start.href; });
   });
+
+  // 「安裝到手機」：自動提示只在第一次跳（shared/install-hint.js），之後從這裡打開（使用者 2026-11-21）。已安裝就不顯示。
+  var ib = document.getElementById('installBtn');
+  if (window.InstallHint && !window.InstallHint.installed()) {
+    ib.hidden = false;
+    ib.addEventListener('click', function () { window.InstallHint.open(); });
+  }
 
   document.getElementById('resetBtn').addEventListener('click', function () {
     if (window.confirm('清除這台裝置上的過關紀錄，從第一關重新開始？（趕鬼時間也會重新計算）')) {

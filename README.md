@@ -57,5 +57,5 @@
 - `docs/visual-handoff.md`：畫面、氛圍與互動體驗的交接文件。
 - `docs/concepts/`：概念圖（非定稿，以文字規格為準）。
 - `docs/prototype-findings.md`（凹透鏡）、`docs/prototype-findings-convex.md`（凸透鏡）、`docs/prototype-findings-mirror.md`（平面鏡）：各原型的實測紀錄與已知問題。
-- `prototype/index.html`：原型入口（平面鏡、凸透鏡、凹透鏡）。線上試玩：<https://wedcher.github.io/optics-ghost-game/>。
+- `prototype/game.html`：遊戲外框頁（2026-11-21），選單與三關都在它的 iframe 裡換頁，Android 全螢幕不會因換頁退出；網站根目錄轉到這裡。`prototype/index.html` 是選單（平面鏡、凸透鏡、凹透鏡）。線上試玩：<https://wedcher.github.io/optics-ghost-game/>。
 - `prompts/`：每一輪 AI 任務單。

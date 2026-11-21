@@ -516,7 +516,7 @@ async function run(profile, browser) {
     ok((await st()).selectedCell === wrongCell, T('點地板格可選取（虛像所在的第 ' + wrongCell + ' 格）'));
     if (first) {
       const rb = await rowButtons('#analysisControls');
-      ok(rb.labels.join('|') === '回探索|選格封印|畫線|復原|清除|施放封印法陣' && (rb.oneRow || profile.name === 'phone-portrait'), T('選格封印模式：「施放封印法陣」接在同一排最後'), rb.labels.join('、'));
+      ok(rb.labels.join('|') === '回探索|選格封印|畫線|復原|清除|丟圓盤封印' && (rb.oneRow || profile.name === 'phone-portrait'), T('選格封印模式：「丟圓盤封印」接在同一排最後'), rb.labels.join('、'));
     }
     // C3：還沒抓到鬼之前，再點一次同一格取消選取
     await tap(wp.x, wp.y);

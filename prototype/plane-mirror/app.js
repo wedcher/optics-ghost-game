@@ -27,14 +27,17 @@
 
   function loadArt(src) {
     var a = { img: new Image(), ready: false };
-    a.img.onload = function () { a.ready = true; requestRender(); if (pendingIntro && artReady()) { pendingIntro = false; showIntro(); } };
-    a.img.onerror = function () { a.failed = true; if (pendingIntro && artReady()) { pendingIntro = false; showIntro(); } }; // 圖載不到：照樣開始（地磚退回程式畫的）
+    a.img.onload = function () { a.ready = true; requestRender(); if (pendingIntro && introReady()) { pendingIntro = false; showIntro(); } };
+    a.img.onerror = function () { a.failed = true; if (pendingIntro && introReady()) { pendingIntro = false; showIntro(); } }; // 圖載不到：照樣開始（地磚退回程式畫的）
     a.img.src = src;
     return a;
   }
   var pendingIntro = false; // 開場要等圖都載好才出現（背景是遊戲畫面的快照）
   function artReady() { return ART.intact.ready && ART.broken.ready && ART.ghost.ready && ART.ghostBack.ready && (typeof floorTex === "undefined" || floorTex.ready || floorTex.failed); }
-  var ART = { intact: loadArt('assets/room-intact.jpg'), broken: loadArt('assets/room-broken.jpg'), ghost: loadArt('assets/ghost.webp'), ghostBack: loadArt('assets/ghost-back.webp') };
+  // 開場第一幕是古堡圖：等它也載好才開始，免得先看到黑畫面再跳出古堡（使用者 2026-11-21）
+  function introReady() { return artReady() && (!ART.castle || ART.castle.ready || ART.castle.failed); }
+  var ART = { intact: loadArt('assets/room-intact.jpg'), broken: loadArt('assets/room-broken.jpg'), ghost: loadArt('assets/ghost.webp'), ghostBack: loadArt('assets/ghost-back.webp'),
+    castle: (!FREE && !PRACTICE && window.StoryArt) ? loadArt(window.StoryArt.get('castle')) : null };
   // 測試用：把鬼畫成單一顏色的剪影，測試才能用顏色數「鬼出現在哪裡」（見 __protoMirror.setMask）
   var ghostMask = {};
   function maskImage(key) {
@@ -88,7 +91,7 @@
   function newGhost() {
     state.ghost = pickGhost();
     history.push(state.ghost);
-    state.selected = null; state.revealed = false; state.cast = null; state.busy = false;
+    state.selected = null; state.revealed = false; state.revealAt = 0; state.cast = null; state.busy = false;
     stats.ghostRevealed = false;
   }
 
@@ -408,7 +411,7 @@
     });
     // 人形：遠的先畫
     var sprites = [{ quad: playerQuad(), draw: function () { drawSprite(T, playerQuad(), playerPainter); } }];
-    if (state.ghost) sprites.push({ quad: C.ghostQuad(R, state.ghost), draw: function () { drawGhost(T, state.revealed ? 1 : 0.95); } });
+    if (state.ghost) sprites.push({ quad: C.ghostQuad(R, state.ghost), draw: function () { drawGhost(T, state.revealed ? ghostFade : 0.95); } }); // 封印後跟著本體一起淡出（物理：像是本體反射的光）
     sprites.forEach(function (s) { var q = proj(T, s.quad.bl); s.d = q ? q.depth : -1; });
     sprites.sort(function (a, b) { return b.d - a.d; });
     sprites.forEach(function (s) { if (s.d > 0) s.draw(); });
@@ -570,8 +573,10 @@
 
   // ---------- 主畫面 ----------
   var CAST_GROW = 800, CAST_FADE = 600;
+  var ghostFade = 1; // 封印後鬼（本體＋鏡中的像）的透明度
   function render() {
     var now = performance.now(), animating = false;
+    ghostFade = state.revealed && state.revealAt && window.SealFx ? window.SealFx.ghostAlpha((now - state.revealAt) / 1000) : 1;
     stats.brokenTextured = false;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -614,7 +619,15 @@
       drawMagicCircle(state.cast.cell, alpha, 1 - Math.pow(1 - grow, 3), now / 900);
       if (state.cast.ok || t < CAST_GROW + CAST_FADE) animating = true;
     }
-    if (state.revealed && state.ghost) drawGhost(C.IDENTITY, 1);
+    if (state.revealed && state.ghost) {
+      // 封印特效（使用者 2026-11-21）：紫色螺旋往上纏繞女鬼，收緊後女鬼與鏡中的像一起淡出
+      var gq = C.cellCenter(state.ghost.col, state.ghost.row), gt = (now - (state.revealAt || now)) / 1000;
+      var fx = window.SealFx && { cx: gq.x, cz: gq.z, r: 0.5, h: R.ghost.height * 1.15, line: 2.6 / S, glow: 10 * DPR,
+        project: function (x, y, z) { return C.project(cam, { x: x, y: y, z: z }); } };
+      if (fx) window.SealFx.draw(ctx, fx, gt, 'back');
+      drawGhost(C.IDENTITY, ghostFade);
+      if (fx && window.SealFx.draw(ctx, fx, gt, 'front')) animating = true;
+    }
 
     if (state.debug) drawDebug();
     if (flash > 0) { ctx.fillStyle = 'rgba(255,255,255,' + flash.toFixed(3) + ')'; ctx.fillRect(0, 0, IW, IH); }
@@ -702,9 +715,12 @@
     if (moved || !canAct()) return;
     var p = toImage(e), cell = cellAt(p);
     if (cell) {
-      state.selected = cell; stats.lastPick = C.cellId(cell.col, cell.row);
-      if (!discTaught) { showThrow(); syncUI(); requestRender(); return; }
-      setStatus(MSG.selected);
+      // 重複點同一格取消選取（使用者 2026-11-21；第一次也只是選格，按「就是這裡！」才播丟圓盤劇情）
+      if (state.selected && sameCell(state.selected, cell)) { state.selected = null; setStatus(MSG.deselected); }
+      else {
+        state.selected = cell; stats.lastPick = C.cellId(cell.col, cell.row);
+        setStatus(MSG.selected); pulse($('castBtn'));
+      }
     } else {
       var m = mirrorAt(p);
       if (m) {
@@ -719,7 +735,8 @@
   var MSG = {
     start: '鬼躲在房間裡，只有鏡子照得出牠。看鏡中的像，推出牠真正站在哪一格，再點那一格地板。',
     startOne: '只剩一面鏡子了。看鏡中的像，推出鬼真正站在哪一格，再點那一格地板。',
-    selected: '選好了就按「展開封印法陣」；想改就點別格。',
+    selected: '選好了。想改就點別格。',
+    deselected: '已取消選取。', // 封印按鈕會閃微光提醒（使用者 2026-11-21）
     mirrorTap: '鏡子裡的是像，封印不到。你看到的是鬼，還是鬼的像？請點地板的格子。',
     brokenTap: '這面鏡子已經碎了，照不出東西。',
     casting: '法陣展開中……',
@@ -739,7 +756,7 @@
     syncUI(); requestRender();
     setTimeout(function () {
       if (ok) {
-        state.revealed = true; stats.ghostRevealed = true; state.busy = false; state.sealed++;
+        state.revealed = true; state.revealAt = performance.now(); stats.ghostRevealed = true; state.busy = false; state.sealed++;
         if (FREE) setStatus('抓到了！鬼就站在這一格。');
         else if (state.sealed >= R.catchesTotal) setStatus('第 ' + R.catchesTotal + ' 次抓到牠了！鬼再也待不住了……');
         else if (state.sealed === R.catchesTwoMirrors && state.phase === 1) setStatus('又抓到了！（封印 ' + state.sealed + '／' + R.catchesTotal + '）鬼氣得渾身發抖……');
@@ -764,7 +781,15 @@
     }, CAST_GROW);
   }
 
-  // ---------- 第一次丟圓盤（第一次點地板） ----------
+  // 選好格子後，封印按鈕閃一下微光（使用者 2026-11-21：比多寫一句提示有效；三關一致）
+  function pulse(el) {
+    if (!el || !el.animate) return;
+    try {
+      el.animate([{ boxShadow: '0 0 0 0 rgba(255,226,140,0)' }, { boxShadow: '0 0 16px 5px rgba(255,226,140,.9)' }, { boxShadow: '0 0 0 0 rgba(255,226,140,0)' }],
+        { duration: 800, iterations: 2, easing: 'ease-in-out' });
+    } catch (e) { /* 不支援就不閃 */ }
+  }
+  // ---------- 第一次丟圓盤（按「就是這裡！」） ----------
   var AFTER_THROW_MS = 900;
   function showThrow() {
     if (LB) LB.pauseLevel(); // 關卡中的劇情過場不算趕鬼時間
@@ -829,6 +854,7 @@
   }
   // 抓錯時的短笑聲：單聲道、沒有方向，不能拿來定位
   function giggle() {
+    if (window.Sfx && window.Sfx.giggle && window.Sfx.giggle('ghost')) return; // 真的笑聲音檔（使用者 2026-11-21）；不能播才用下面的合成音
     try {
       audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
       var t0 = audioCtx.currentTime;
@@ -848,6 +874,7 @@
     $('sealCount').textContent = (PRACTICE ? '練習　' : '') + '封印 ' + state.sealed + '／' + R.catchesTotal;
     $('hud').hidden = FREE;
     $('castBtn').hidden = state.revealed;
+    $('castBtn').textContent = discTaught ? '丟圓盤封印' : '就是這裡！'; // 第一次還不知道有圓盤（使用者 2026-11-21）
     $('castBtn').disabled = !state.selected || !canAct();
     $('nextBtn').hidden = !state.revealed;
     $('nextBtn').textContent = FREE ? '換一個位置 ➜' : state.sealed >= R.catchesTotal ? '過關 ➜' : '繼續 ➜';
@@ -885,6 +912,7 @@
     return url;
   }
   function showIntro() {
+    setTimeout(function () { var cv = document.getElementById('introCover'); if (cv) cv.remove(); }, 60); // 過場已蓋上，拿掉黑幕
     var A = window.StoryArt, room = snapshot('intro', { phase: 1, ghost: state.ghost });
     scene = window.StoryScene.show({
       id: 'intro', background: room,
@@ -895,13 +923,17 @@
         { letter: '如果你能看見牠們，代表牠們也已經發現你了。', letterOnArt: !A.placeholder('letter') },
         { letter: '別相信眼睛看到的位置。', letterOnArt: !A.placeholder('letter') },
         { letter: '找到牠真正所在之處，才能封印牠。', letterOnArt: !A.placeholder('letter') },
-        { text: '有一個古老金屬圓盤壓在信件上面。' },
+        { text: '有一個古老金屬圓盤壓在信件上面。', image: A.get('disc') }, // 背景圖的圓盤被對話框擋住，對話框裡附圓盤圖（使用者 2026-11-21）
         { background: 'black', text: '半夜，有一間房間不斷傳出奇怪的聲響。', onShow: function () { if (window.Sfx) window.Sfx.nightNoise(); } },
         { background: room, speaker: '你', text: '房間裡……明明沒有人啊？' },
-        { speaker: '你', text: '等等，鏡子裡有東西！' }
+        { speaker: '你', text: '等等，鏡子裡有東西！' },
+        // 使用者 2026-11-21 新增（Google 劇本）
+        { speaker: '女鬼', text: '嘻嘻', image: 'assets/story-ghost-face.webp', onShow: function () { giggle(); } },
+        { speaker: '你', text: '是鬼！我看到牠了。那封信就是在說鬼嗎？' },
+        { speaker: '你', text: '信上說要先找到牠的位置？' }
       ],
       title: '第一關：鏡子房間',
-      note: '鬼只有在鏡子裡才看得到。請推算出牠真正所在的位置，再展開封印法陣。3 條命，要抓到牠 ' + R.catchesTotal + ' 次；抓錯會失去一顆心。',
+      note: '鬼只有在鏡子裡才看得到。請推算出牠真正所在的位置，再展開封印法陣。3 顆❤️，要抓到牠 ' + R.catchesTotal + ' 次；抓錯扣一❤️。',
       buttons: [{ id: 'startBtn', label: '開始抓鬼', primary: true, onClick: function () { closeScene(); if (LB) LB.startLevel('mirror'); syncUI(); requestRender(); } }]
     });
   }
@@ -935,7 +967,8 @@
     if (LB) LB.cancelLevel(); // 命用完的那一次不算；重新挑戰從 0 起算
     scene = window.StoryScene.show({
       id: 'fail', background: snapshot('fail', { phase: state.phase, ghost: state.ghost }),
-      title: '封印失敗', note: '❤️用完了……還沒成功抓住鬼。',
+      lines: [{ speaker: '你', text: '等我休息一下，再來抓你。' }], // 使用者 2026-11-21
+      title: '封印失敗', note: '鬼還躲在房間裡。請重新挑戰。',
       buttons: [
         { id: 'retryBtn', label: '重新挑戰', primary: true, onClick: function () { closeScene(); resetLevel(); if (LB) LB.startLevel('mirror'); } },
         { id: 'failMenuBtn', label: '回關卡選單', href: '../index.html' }
@@ -985,8 +1018,13 @@
   $('zoomIn').addEventListener('click', function () { setZoom(view.zoom + 1); });
   $('zoomOut').addEventListener('click', function () { setZoom(view.zoom - 1); });
   $('zoomFit').addEventListener('click', function () { setZoom(0); });
-  $('castBtn').addEventListener('click', cast);
+  $('castBtn').addEventListener('click', function () {
+    if (!discTaught) { if (state.selected && canAct()) { showThrow(); syncUI(); requestRender(); } return; } // 第一次：先播劇情，劇情結束才丟到選好的格子
+    cast();
+  });
   $('nextBtn').addEventListener('click', next);
+  // 「☰ 回關卡」先確認（和第二、三關一致；使用者 2026-11-21）
+  $('menuLink').addEventListener('click', function (e) { if (!window.confirm('回到關卡選單？這一關目前的進度不會保留。')) e.preventDefault(); });
 
   window.addEventListener('resize', layout);
   if (window.ResizeObserver) new ResizeObserver(layout).observe($('stage'));
@@ -1015,5 +1053,13 @@
   $('title').hidden = !FREE;
   // 練習模式要先通過第一關；網址直接開就只顯示「還沒通過第一關」＋【回關卡選單】（使用者 2026-11-21；shared/progress.js）
   if (PRACTICE && window.GameProgress) { var gateScene = window.GameProgress.showGate('mirror', true); if (gateScene) scene = gateScene; }
-  if (!FREE && !PRACTICE) { if (artReady()) showIntro(); else pendingIntro = true; }
+  // 開場 bug（使用者 2026-11-21）：等圖載入的那段時間，底下的遊戲畫面（鏡子房間＋鏡中女鬼）會先露出來。
+  // 開場前先用黑幕蓋住，開場過場出現後再拿掉。
+  if (!FREE && !PRACTICE) {
+    var cover = document.createElement('div');
+    cover.id = 'introCover';
+    cover.style.cssText = 'position:fixed;inset:0;z-index:450;background:#07080f';
+    document.body.appendChild(cover);
+    if (introReady()) showIntro(); else pendingIntro = true;
+  }
 })();

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>光學抓鬼</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<!--
+  外框頁（使用者 2026-11-21）：選單、排行榜與三關都在這一頁的 iframe 裡換頁。
+  - 全螢幕切在這一頁上（shared/fullscreen.js），換頁時不會退出全螢幕，Android 就不會每次跳「滑動結束全螢幕」。
+  - 手機直拿時由這一頁整個轉 90°（shared/landscape.js），框裡的頁面看到的已經是橫的畫面，不會再轉一次。
+  - 「安裝到手機」提示只有最外層頁面收得到瀏覽器的安裝事件，所以也由這一頁負責（shared/install-hint.js）。
+  - 網址後面的 #… 記住框裡目前是哪一頁，重新整理會回到同一頁。
+  直接開各關卡的網址照舊可以玩（各頁自己處理全螢幕與轉向）。
+-->
+<style>
+  html, body { margin:0; height:100%; background:#0d1020; overflow:hidden; }
+  #game { position:absolute; inset:0; width:100%; height:100%; border:0; display:block; background:#0d1020; }
+</style>
+</head>
+<body>
+<iframe id="game" title="光學抓鬼" allow="fullscreen; autoplay" allowfullscreen></iframe>
+<script src="shared/landscape.js"></script>
+<script src="shared/fullscreen.js"></script>
+<script src="shared/install-hint.js"></script>
+<script>
+(function () {
+  'use strict';
+  var frame = document.getElementById('game');
+  // 只接受遊戲自己的頁面（避免 #… 被拿來開別的網址）
+  var OK = /^(index\.html|leaderboard\.html|(plane-mirror|convex-lens|concave-lens)\/index\.html)(\?[\w=&.-]*)?$/;
+  var want = '';
+  try { want = decodeURIComponent(location.hash.slice(1)); } catch (e) { want = ''; }
+  frame.src = OK.test(want) ? want : 'index.html';
+  var base = location.href.replace(/[#?].*$/, '').replace(/[^\/]*$/, '');
+  frame.addEventListener('load', function () {
+    try {
+      var u = frame.contentWindow.location.href, rel = u.indexOf(base) === 0 ? u.slice(base.length) : '';
+      if (rel && OK.test(rel)) history.replaceState(null, '', '#' + rel);
+      document.title = frame.contentDocument.title || '光學抓鬼';
+      frame.contentWindow.focus();
+    } catch (e) { /* ignore */ }
+  });
+  window.GameShell = { isShell: true, frame: frame };
+})();
+</script>
+</body>
+</html>

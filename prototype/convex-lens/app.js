@@ -636,9 +636,15 @@
         drawMagicCircle(cc.x, cc.y + tileH * 0.4, rx * Math.min(1, t / 0.5), 1, t * 1.5);
         if (t > 0.7) {
           var gp = w2s(c.object);
+          // 封印特效（使用者 2026-11-21）：紫色螺旋從法陣往上纏繞鬼；第二三關鬼留著不消失（讓學生復盤）
+          var ghh = Math.max(10, WORLD.ghostHalfHeight * s), floorY = cc.y + tileH * 0.4;
+          var vfx = window.SealFx && { cx: gp.x, cz: 0, r: rx * 0.72, h: Math.max(20, floorY - (gp.y - ghh)) * 1.08, line: 2.4, glow: 10,
+            project: function (x, y, z) { return { x: x, y: floorY - y + z * 0.28, depth: -z }; } };
+          if (vfx) window.SealFx.draw(ctx, vfx, t - 0.7, 'back');
           ctx.save(); ctx.globalAlpha = Math.min(1, (t - 0.7) / 0.5);
-          drawGhostSolid(ctx, gp.x, gp.y, Math.max(7, WORLD.ghostHalfWidth * s), Math.max(10, WORLD.ghostHalfHeight * s));
+          drawGhostSolid(ctx, gp.x, gp.y, Math.max(7, WORLD.ghostHalfWidth * s), ghh);
           ctx.restore();
+          if (vfx) window.SealFx.draw(ctx, vfx, t - 0.7, 'front');
           label('鬼本體', gp.x, gp.y - Math.max(10, WORLD.ghostHalfHeight * s) - 12, GHOST_COLOR);
           stats.ghostRevealed = true;
         }
@@ -817,10 +823,10 @@
       // 還沒抓到鬼之前，再點一次已選的格就取消選取（和第三關一致）；抓到之後上面已經 return，不能改
       if (state.selectedCell === k) {
         state.selectedCell = null; state.seal = null;
-        setStatus('已取消選取。再點一個地板格，然後按「施放封印法陣」。');
+        setStatus('已取消選取。');
       } else {
         state.selectedCell = k; state.seal = null;
-        setStatus('已選第 ' + k + ' 格。確定的話按「施放封印法陣」；再點一次同一格可以取消。');
+        setStatus('已選第 ' + k + ' 格。'); pulse($('castBtn')); // 文字縮短；封印按鈕閃微光提醒（使用者 2026-11-21）
       }
       syncUI(); requestRender();
       return;
@@ -868,10 +874,10 @@
           // 扣命只看「抓錯」這件事本身，訊息與畫面都不帶任何位置線索
           level.lives--;
           flashHud();
-          setStatus('法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。');
+          setStatus('法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。');
           if (level.lives <= 0) failLevel();
         } else {
-          setStatus('法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。');
+          setStatus('法陣裡沒有東西……再檢查你的光線作圖。');
         }
       }
       syncUI(); requestRender();
@@ -880,6 +886,7 @@
 
   var audioCtx = null;
   function giggle() {
+    if (window.Sfx && window.Sfx.giggle && window.Sfx.giggle('minion')) return; // 真的笑聲音檔（使用者 2026-11-21）；不能播才用下面的合成音
     try {
       audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
       var t0 = audioCtx.currentTime;
@@ -1012,6 +1019,14 @@
   if (window.GhostSprite) window.GhostSprite.onLoad(function () { requestRender(); }); // 小鬼圖載入後重畫
   ['gesturestart', 'gesturechange'].forEach(function (n) { document.addEventListener(n, function (e) { e.preventDefault(); }); });
 
+  // 選好格子後，封印按鈕閃一下微光（使用者 2026-11-21：比多寫一句提示有效；三關一致）
+  function pulse(el) {
+    if (!el || !el.animate) return;
+    try {
+      el.animate([{ boxShadow: '0 0 0 0 rgba(255,226,140,0)' }, { boxShadow: '0 0 16px 5px rgba(255,226,140,.9)' }, { boxShadow: '0 0 0 0 rgba(255,226,140,0)' }],
+        { duration: 800, iterations: 2, easing: 'ease-in-out' });
+    } catch (e) { /* 不支援就不閃 */ }
+  }
   function setStatus(t) { $('status').textContent = t; }
 
   var bannerTimer = null;
@@ -1102,7 +1117,8 @@
         { speaker: '你', text: '可是這裡沒有鏡子。' },
         { speaker: '你', text: '咦？這裡怎麼有一個這麼大的凸透鏡？' }
       ],
-      note: '走廊裡鬼影重重。請抓到 ' + LEVEL_GOAL + ' 隻鬼；抓錯會失去一顆心。',
+      title: '第二關：城堡走廊',
+      note: '走廊裡鬼影重重。3 顆❤️，請抓到 ' + LEVEL_GOAL + ' 隻鬼；抓錯扣一❤️。',
       buttons: [{ id: 'startHuntBtn', label: '開始抓鬼', primary: true, onClick: startHunt }]
     });
   }
@@ -1121,7 +1137,8 @@
     closeScene();
     level.scene = window.StoryScene.show({
       id: 'failed', background: INTRO_BG,
-      title: '❤️用完了……', // 命用完的文字統一用 ❤️（CONFIRMED 劇本修訂）
+      lines: [{ speaker: '你', text: '等我休息一下，再來抓你們。' }], // 使用者 2026-11-21
+      title: '驅逐失敗', // 使用者 2026-11-21：第一關「封印失敗」、第二關「驅逐失敗」
       note: '鬼還躲在走廊裡。這次封印了 ' + level.sealed + ' 隻。重新挑戰會從頭算起。',
       buttons: [
         { id: 'retryBtn', label: '重新挑戰', primary: true, onClick: startHunt },
@@ -1149,10 +1166,11 @@
       // （凸透鏡的碎片仍是會聚的，不會變成第三關的凹透鏡；CONFIRMED「劇本修訂」物理）。
       lines: [
         { text: '剩下的鬼一哄而散，逃出了城堡！' },
+        { speaker: '你', text: '想跑？追！' },
         { speaker: '你', text: '但凸透鏡太大了，帶不走啊。' },
-        { text: '你撿起地上的一片小透鏡。' },
         { speaker: '你', text: '咦，這個……' },
-        { speaker: '你', text: '也可以吧。' }
+        { text: '你撿起地上的一片小透鏡。' },
+        { speaker: '你', text: '這個也可以吧。' }
       ],
       title: '第二關過關！',
       note: note,
@@ -1188,12 +1206,24 @@
     deck = Cfg.all.map(function (_, i) { return i; });
     for (var i = deck.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = deck[i]; deck[i] = deck[j]; deck[j] = t; }
     var n = Math.min(LEVEL_GOAL, deck.length), first = deck.length - n;
-    if (deck.slice(first).some(isVirtualCfg)) return;
-    var rest = [];
-    for (var r = 0; r < first; r++) if (isVirtualCfg(deck[r])) rest.push(r);
-    if (!rest.length) return; // 沒有虛像題配置（不會發生；check-geometry-convex 驗證有 J～O）
-    var from = rest[Math.floor(Math.random() * rest.length)], to = first + Math.floor(Math.random() * n), tmp = deck[to];
-    deck[to] = deck[from]; deck[from] = tmp;
+    var L = deck.length - 1; // deck.pop() 從尾巴發，deck[L] 是第一隻鬼
+    if (!deck.slice(first).some(isVirtualCfg)) {
+      var rest = [];
+      for (var r = 0; r < first; r++) if (isVirtualCfg(deck[r])) rest.push(r);
+      if (rest.length) { // 沒有虛像題配置不會發生（check-geometry-convex 驗證有 J～O）
+        // 換進第 2～5 隻的位置（第一隻不放虛像題，見下）
+        var from = rest[Math.floor(Math.random() * rest.length)], to = first + Math.floor(Math.random() * Math.max(1, n - 1)), tmp = deck[to];
+        deck[to] = deck[from]; deck[from] = tmp;
+      }
+    }
+    // 使用者 2026-11-21：第一隻鬼不出純虛像題（先學會在布幕上找實像）。和同一輪裡的實像題對調，虛像題仍留在前 5 隻裡。
+    if (isVirtualCfg(deck[L])) {
+      var swap = [];
+      for (var k = first; k < L; k++) if (!isVirtualCfg(deck[k])) swap.push(k);
+      if (!swap.length) for (k = 0; k < first; k++) if (!isVirtualCfg(deck[k])) swap.push(k);
+      var w = swap[Math.floor(Math.random() * swap.length)], t2 = deck[w];
+      deck[w] = deck[L]; deck[L] = t2;
+    }
   }
 
   // 透鏡的起始位置：離兩個清晰位置都夠遠，否則一開場布幕上就幾乎是清楚的像（等於不用對焦）。
@@ -1263,7 +1293,7 @@
     animating = true;
     (function tick() {
       render();
-      if ((state.seal && performance.now() - state.seal.t0 < 2200) || replayRunning()) requestAnimationFrame(tick);
+      if ((state.seal && performance.now() - state.seal.t0 < (state.seal.success ? 3800 : 2200)) || replayRunning()) requestAnimationFrame(tick);
       else { animating = false; requestRender(); } // 再畫一張：重現剛結束，學生的線恢復原色
     })();
   }
@@ -1303,7 +1333,7 @@
     layout();
   });
   $('modeDraw').addEventListener('click', function () { state.mode = 'draw'; setStatus('畫線：從標示點拖曳，或依序點兩個點連線。'); syncUI(); requestRender(); });
-  $('modeSeal').addEventListener('click', function () { if (state.solved) return; state.mode = 'seal'; state.pending = null; setStatus('封印模式：點一個地板格（整個直欄都可點），再按「施放封印法陣」。'); syncUI(); requestRender(); });
+  $('modeSeal').addEventListener('click', function () { if (state.solved) return; state.mode = 'seal'; state.pending = null; setStatus('點選地板，選擇封印位置，重複點選取消選擇。'); syncUI(); requestRender(); });
   $('menuBtn').addEventListener('click', function () { if (window.confirm('回到關卡選單？這一關目前的進度不會保留。')) location.href = '../index.html'; });
   $('undoBtn').addEventListener('click', function () { if (state.pending) state.pending = null; else state.lines.pop(); syncUI(); requestRender(); });
   $('clearBtn').addEventListener('click', function () { state.lines = []; state.pending = null; setStatus('已清除所有線。'); syncUI(); requestRender(); });

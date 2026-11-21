@@ -157,14 +157,17 @@ async function levelFlow(profile, browser) {
   ok(await page.evaluate(() => ['castle', 'letter', 'disc'].every((k) => !StoryArt.placeholder(k)) && StoryScene.minionArt.length === 9), '開場、信件、圓盤用正式圖，雜魚圖 9 張（2026-11-19）');
   await shot('mirror-1-intro');
   // 劇本修訂（2026-11-17）：古堡（「有一天……」＋受邀，2026-11-18 加第一句）→ 信（旁白 + 信上 3 句 + 圓盤）→ 黑畫面（怪聲）→ 房間 2 句，共 10 句
-  const INTRO_LINES = 10;
-  const expect = { 1: 'castle', 3: 'letter', 4: 'letter', 5: 'letter', 7: 'black', 8: 'room' };
+  // 2026-11-21：圓盤那句附圓盤圖；進房間後加「女鬼：嘻嘻」（附臉）＋兩句，共 13 句
+  const INTRO_LINES = 13;
+  const expect = { 1: 'castle', 3: 'letter', 4: 'letter', 5: 'letter', 6: 'discImg', 7: 'black', 8: 'room', 10: 'ghostFace' };
   for (let i = 1; i < INTRO_LINES; i++) {
     await t.tapAt(vp.width / 2, vp.height / 2);
     s = await info();
     ok(s.scene.line === i && !s.scene.ended, '點畫面換到第 ' + (i + 1) + ' 句');
     if (expect[i] === 'letter') ok(s.scene.letter && await page.isHidden('.story-dialog'), '第 ' + (i + 1) + ' 句：信上的字疊在信紙上，對話框收起');
     if (expect[i] === 'castle') ok(s.scene.bg === 'image' && !s.scene.letter, '第 ' + (i + 1) + ' 句：還是古堡外觀');
+    if (expect[i] === 'discImg') ok(s.scene.image && /圓盤/.test(await page.textContent('.story-text')), '第 ' + (i + 1) + ' 句：圓盤那句對話框附圓盤圖');
+    if (expect[i] === 'ghostFace') ok(s.scene.image && (await page.textContent('.story-speaker')) === '女鬼' && (await page.textContent('.story-text')) === '嘻嘻', '第 ' + (i + 1) + ' 句：女鬼：嘻嘻（附臉）');
     if (expect[i] === 'black') ok(s.scene.bg === 'black' && !s.scene.letter, '第 ' + (i + 1) + ' 句：黑畫面（半夜怪聲），信收起');
     if (expect[i] === 'room') {
       bg = await bgInfo();
@@ -207,12 +210,20 @@ async function levelFlow(profile, browser) {
   ok(s.stats.mirrorTaps === 1 && s.lives === 3 && s.selected === null && s.stats.casts === 0, '點鏡中的像：不扣命、不選格、不施放');
   ok(/像/.test(s.status) && /地板/.test(s.status), '點鏡中的像：提醒那是像，要點地板', s.status);
 
-  // ---- 第一次點地板：丟圓盤（劇本修訂 1-1.5）。選格標示不會出現在鏡子裡 ----
+  // ---- 第一次點地板：只選格，按「就是這裡！」才播丟圓盤劇情（使用者 2026-11-21）。選格標示不會出現在鏡子裡 ----
   const before = await pixels();
   const wrong1 = await t.otherCell(s.ghost, 0);
+  ok((await page.textContent('#castBtn')).trim() === '就是這裡！', '第一次：按鈕叫「就是這裡！」');
   await t.tapCell(wrong1);
   s = await info();
-  ok(s.selected === wrong1 && s.scene && s.scene.id === 'throw' && s.scene.line === 0, '第一次點地板：選到那一格，並播「丟圓盤」對話', s.selected + ' ' + wrong1 + ' ' + JSON.stringify(s.scene));
+  ok(s.selected === wrong1 && s.scene === null && s.stats.casts === 0, '第一次點地板：只選格，不播劇情、不施放', s.selected + ' ' + JSON.stringify(s.scene));
+  await t.tapCell(wrong1);
+  s = await info();
+  ok(s.selected === null && s.scene === null, '重複點同一格：取消選取');
+  await t.tapCell(wrong1);
+  await press('#castBtn');
+  s = await info();
+  ok(s.selected === wrong1 && s.scene && s.scene.id === 'throw' && s.scene.line === 0, '按「就是這裡！」：播「丟圓盤」對話', s.selected + ' ' + wrong1 + ' ' + JSON.stringify(s.scene));
   {
     const e0 = await page.evaluate(() => Leaderboard.levelElapsed());
     await page.waitForTimeout(250);
@@ -366,6 +377,9 @@ async function levelFlow(profile, browser) {
   const after = await pixels();
   ok(after.ghostOut < EDGE_PX, '拍完過場背景後，遊戲畫面沒有被改動（房間裡仍沒有鬼）');
   ok(!LEAK_WORDS.test(await page.textContent('.story-end')), '失敗畫面沒有位置資訊');
+  ok((await page.textContent('.story-text')) === '等我休息一下，再來抓你。' && (await page.textContent('.story-speaker')) === '你', '失敗畫面先說「等我休息一下，再來抓你。」（使用者 2026-11-21）');
+  await t.tapAt(vp.width / 2, vp.height / 2);
+  ok(await page.isVisible('#retryBtn') && /鬼還躲在房間裡。請重新挑戰。/.test(await page.textContent('.story-end')), '點一下後出現「封印失敗」＋「鬼還躲在房間裡。請重新挑戰。」');
   await page.waitForTimeout(ARM_WAIT);
   await press('#retryBtn');
   s = await info();
@@ -406,6 +420,11 @@ async function practiceMode(profile, browser) {
   const mb = await page.evaluate(() => { const r = document.getElementById('menuLink').getBoundingClientRect(); return { right: innerWidth - r.right, top: r.top, w: r.width, h: r.height }; });
   ok(mb.right < 16 && mb.top < 16 && mb.h >= 44, '「☰ 回關卡」在右上角、高度 ≥ 44', JSON.stringify(mb));
   ok((await page.textContent('#menuLink')).trim() === '☰ 回關卡', '按鈕字樣是「☰ 回關卡」');
+  let dlg = null;
+  page.once('dialog', (d) => { dlg = d.message(); d.dismiss(); });
+  const urlBefore = page.url();
+  await page.click('#menuLink'); await page.waitForTimeout(150);
+  ok(/回到關卡選單/.test(dlg || '') && page.url() === urlBefore, '「☰ 回關卡」先跳確認，按取消留在關卡（使用者 2026-11-21，和第二、三關一致）', dlg);
   ok(t.errors.length === 0, '沒有 JS 錯誤或載入失敗', t.errors.join(' | '));
   await page.context().close();
 }

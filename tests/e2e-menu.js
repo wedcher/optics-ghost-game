@@ -35,11 +35,11 @@ function ok(c, label, detail) {
 const KEY = 'opticsGhost.progress.v1';
 const T = {
   start: ['開始遊戲', '古堡邀請，充滿鏡子的房間', 'plane-mirror/index.html'],
-  mirror: ['第一關：充滿鏡子的房間', '鏡子中，有一個女鬼', 'plane-mirror/index.html'],
+  mirror: ['第一關：鏡子房間', '鏡子中，有一個女鬼', 'plane-mirror/index.html'],
   'mirror-practice': ['第一關：練習模式', null, 'plane-mirror/index.html?practice=1'],
-  convex: ['第二關：走廊的凸透鏡', '城堡裡到處都是鬼，請趕走他們', 'convex-lens/index.html'],
+  convex: ['第二關：城堡走廊', '城堡裡到處都是鬼，請趕走他們', 'convex-lens/index.html'],
   'convex-practice': ['第二關：練習模式', null, 'convex-lens/index.html?practice=1'],
-  concave: ['第三關：荒野狩獵，小凹透鏡派上用場', '趁天亮前，多封印幾隻', 'concave-lens/index.html'],
+  concave: ['第三關：荒野狩獵', '趁天亮前，多封印幾隻', 'concave-lens/index.html'],
   'concave-practice': ['第三關：練習模式（不計時）', null, 'concave-lens/index.html?practice=1'],
 };
 

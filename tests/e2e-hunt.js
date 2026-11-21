@@ -41,8 +41,8 @@ function ok(cond, label, detail) {
 }
 const NO_POS = /[左右前後遠近東西南北]|太|靠|第\s*\d|格/;
 
-const INTRO = ['你追出城堡，眼前是一片漆黑的荒野。', '鬼影四散，一轉眼就消失在夜色裡。', '又看不到了……', '還好出門前帶了這片透鏡。',
-  '咦？等等，鬼怎麼變小了？', '這是一片凹透鏡。', '天亮之前，能抓幾隻就抓幾隻！'];
+const INTRO = ['你追出城堡，眼前是一片漆黑的荒野。', '鬼影四散，一轉眼就消失在夜色裡。', '又看不到鬼了……', '還好出門前帶了這片透鏡。',
+  '咦？等等，鬼怎麼變小了？', '邊緣厚，中間薄，這是一片凹透鏡。', '天亮之前，能抓幾隻就抓幾隻！'];
 const TIMEUP = ['東邊的天空漸漸亮了起來。', '剩下的鬼趁著晨霧，躲得無影無蹤。', '呼……天亮了，今晚就到這裡吧。'];
 const NOLIVES = ['法陣又落空了——荒野深處傳來一陣嘻嘻的笑聲。', '可惡……下次一定把你們全部抓回來！'];
 
@@ -117,7 +117,7 @@ const NOLIVES = ['法陣又落空了——荒野深處傳來一陣嘻嘻的笑�
   const intro = await readScene();
   ok(JSON.stringify(intro) === JSON.stringify(INTRO), '開場台詞照劇本 3-1（逐句）', intro.join(' / '));
   const end = await page.evaluate(() => { const e = document.querySelector('.story-end'); return { h: e.querySelector('h2').textContent, p: e.querySelector('p').textContent, b: Array.from(e.querySelectorAll('.story-btn')).map((x) => x.id + ':' + x.textContent) }; });
-  ok(end.h === '荒野狩獵' && /限時 5 分鐘/.test(end.p) && /3 條命/.test(end.p) && end.b.join() === 'startHuntBtn:開始狩獵', '開場結尾：標題「荒野狩獵」、說明、【開始狩獵】', JSON.stringify(end));
+  ok(end.h === '第三關：荒野狩獵' && /限時 5 分鐘/.test(end.p) && /3 顆❤️/.test(end.p) && end.b.join() === 'startHuntBtn:開始狩獵', '開場結尾：標題「第三關：荒野狩獵」、說明、【開始狩獵】', JSON.stringify(end));
   await page.waitForTimeout(400);
   await press('#startHuntBtn', 200);
 
