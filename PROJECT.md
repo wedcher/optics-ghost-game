@@ -524,6 +524,8 @@
 
 - **✅ 2026-11-21 晚：直接開 `prototype/index.html` 會自動轉到外框頁**（`game.html#index.html` ＋原本的 `?…`）。起因：使用者在 Android 用 Chrome「分享連結」，給出的是框裡那一頁的網址（`prototype/index.html`），別人打開就繞過外框頁、換頁會退出全螢幕。例外：自動化測試（`navigator.webdriver`）與 `?noshell=1` 不轉。只做選單頁；三關、排行榜的網址照舊可直接開。選單 48／外框頁 17／排行榜 62 過；用非 webdriver 的瀏覽器驗證過轉址。給別人網址仍建議給根網址 `https://wedcher.github.io/optics-ghost-game/`。
 
+- **✅ 2026-11-21 晚：「前往第二關跳出網址列」「回關卡橫→直→橫」使用者重試後都沒有了。** 原因不確定：可能是當時玩的不是外框頁（舊網址／舊暫存），也可能是「框內不重複鎖橫向」的修法生效，兩者可能都有份。以後給網址一律用根網址 `https://wedcher.github.io/optics-ghost-game/`；若再發生，先問使用者當時用哪個網址。
+
 ### 交接點（確認視窗改頁面內，2026-11-21 晚，分支 `claude/jolly-wozniak-8fslus`）
 
 - **使用者手機實測 OK**：Android 安裝按鈕不再一直跳、笑聲音量、螺旋特效效能、製作與素材頁外觀、凸透鏡虛像題手感。
