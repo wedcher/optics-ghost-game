@@ -294,11 +294,13 @@
   var VIRTUAL_CAPTION = '虛像（正立、放大）';
   // 鏡框裡的「虛像（正立、放大）」字樣（使用者 2026-11-18 答虛像題 V2）。放在鏡片裡、和像相反的那一半，
   // 字放不下一行就拆兩行、再不夠就縮小字（最小 11 px）。只說明像的性質，不含任何位置資訊。
-  function lensCaption(cx, cy, rad, imgUp) {
-    var lines = [VIRTUAL_CAPTION], size = Math.round(14 * FS), maxW = rad * 1.55;
+  // 虛像不能標記（落在走廊外，或放大太多）時改寫 TOO_FAR_CAPTION（使用者 2026-11-21 指定文字）。
+  var TOO_FAR_CAPTION = '成像太遠，無法標記。';
+  function lensCaption(cx, cy, rad, imgUp, tooFar) {
+    var lines = [tooFar ? TOO_FAR_CAPTION : VIRTUAL_CAPTION], size = Math.round(14 * FS), maxW = rad * 1.55;
     ctx.save();
     var fit = function () { ctx.font = '700 ' + size + 'px system-ui, sans-serif'; return lines.every(function (t) { return ctx.measureText(t).width <= maxW; }); };
-    if (!fit()) { lines = ['虛像', '（正立、放大）']; while (!fit() && size > 11) size--; }
+    if (!fit()) { lines = tooFar ? ['成像太遠，', '無法標記。'] : ['虛像', '（正立、放大）']; while (!fit() && size > 11) size--; }
     var lh = size * 1.2, y0 = cy + (imgUp > 0 ? 1 : -1) * rad * 0.62 - (lines.length - 1) * lh / 2;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(8,10,24,.92)'; ctx.fillStyle = '#e7e0ff';
     lines.forEach(function (t, i) { ctx.strokeText(t, cx, y0 + i * lh); ctx.fillText(t, cx, y0 + i * lh); });
@@ -332,7 +334,7 @@
       ctx.globalAlpha = 0.9;
       drawGhost(ctx, cx, cy - (lv.y / d) * K, WORLD.ghostHalfWidth * am / d * K, WORLD.ghostHalfHeight * am / d * K, virt ? 1 : -1, virt ? 1 : -1, ctx.fillStyle, virt ? VIRTUAL_COLOR : REAL_IMG_COLOR);
       ctx.restore();
-      if (virt) lensCaption(cx, cy, rad, lv.y / d * K); // 回饋「虛像題 V2」：鏡框裡寫出像的性質
+      if (virt) lensCaption(cx, cy, rad, lv.y / d * K, !lv.markable); // 回饋「虛像題 V2」：鏡框裡寫出像的性質
     } else if (!state.solved && lv.eye === 'blur') {
       var gr = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
       gr.addColorStop(0, 'rgba(157,255,216,.30)'); gr.addColorStop(1, 'rgba(157,255,216,.04)');
@@ -694,7 +696,7 @@
       syncUI(); requestRender();
       return;
     }
-    setStatus(lv.eye === 'virtual' ? '透鏡裡的鬼放大得太厲害，看不清全貌。稍微移動透鏡再試。'
+    setStatus(lv.eye === 'virtual' ? TOO_FAR_CAPTION + '再移動看看。'
       : lv.eye === 'realInFront' ? '透鏡裡看到的是倒立的像——那不是虛像。要標記倒立的實像，請改「看布幕」。'
       : lv.eye === 'none' ? '透鏡裡看不到鬼的像。移動透鏡試試。'
       : '透鏡裡模糊一片，看不清楚。移動透鏡試試。');

@@ -55,10 +55,10 @@
     { id: 'G', f: 180, targetCell: 8, h: 55 },
     { id: 'H', f: 150, targetCell: 7, h: 45 },
     { id: 'I', f: 200, targetCell: 9, h: -50 },
-    // J～L：虛像題（D < 4f）。布幕上永遠不會有清楚的像，只能隔著透鏡看到正立、放大的虛像
-    { id: 'J', f: 200, targetCell: 4, h: 30, kind: 'virtual' },
-    { id: 'K', f: 220, targetCell: 5, h: -30, kind: 'virtual' },
-    { id: 'L', f: 210, targetCell: 7, h: -30, kind: 'virtual' }
+    // J～L：虛像題（D < 4f）。2026-11-21 改成短焦距：隔著透鏡看，像占鏡片的比例從約 0.33 提高到約 0.4～0.6（使用者：要像放大鏡）。布幕上永遠不會有清楚的像，只能隔著透鏡看到正立、放大的虛像
+    { id: 'J', f: 110, targetCell: 4, h: 20, kind: 'virtual' },
+    { id: 'K', f: 120, targetCell: 5, h: -20, kind: 'virtual' },
+    { id: 'L', f: 170, targetCell: 7, h: -30, kind: 'virtual' }
   ];
 
   var floor = Optics.makeFloorRow(WORLD.cellWidth, WORLD.cellCount);
