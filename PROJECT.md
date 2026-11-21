@@ -480,6 +480,17 @@
   - 第二、三波開工時自己在這裡加一行。做完的把自己那行拿掉。
   - `PROJECT.md` 和 `docs/playtest-feedback-2026-11-18.md` 大家都會改：只改自己那段，收工前先 `git pull`。
 
+### ▶ 下一個工作階段從這裡接（2026-11-21 晚，工作階段 `claude/amazing-lamport-4kx8tr` 收工）
+
+- **最新程式**：分支 `claude/amazing-lamport-4kx8tr`（commit `5dca361` 之後），**還沒併進 main**。已包含：凸透鏡虛像題（另一工作階段 `cool-mendel`）、11-20 三件事、小鬼圖、跳關擋回選單、第二批（文字統一、第一關首抓流程、螺旋特效、笑聲音效、外框頁、安裝提示）、荒野時間到不踢人、過關直接進下一關、選格封印變紫、排行榜改版。`npm test` 全過。
+- **試玩網址**：固定 `https://raw.githack.com/wedcher/optics-ghost-game/claude/amazing-lamport-4kx8tr/index.html`（推新版後可能要等幾分鐘）；或指定版本 `https://raw.githack.com/wedcher/optics-ghost-game/<commit>/index.html`。
+- **等使用者做／回覆**：
+  1. **重新部署排行榜 `Code.gs`**（步驟在 `docs/leaderboard.md`「2026-11-21 改版要重新部署一次」；併 main 前用分支網址取 Code.gs）。沒部署前排行榜頁顯示舊的前 10 名並寫「排行榜後台還沒更新」。
+  2. **手機試玩**後回饋；確認後才併進 main（推 main 要使用者本人說，不能只靠別的工作階段轉述）。
+  3. 實機要看：外框頁裡 Android 全螢幕不會因換頁退出、「安裝到手機」叫出安裝視窗、笑聲音量、螺旋特效效能、排行榜翻頁與找名次。
+- **另一個工作階段**：「光學抓鬼：製作與素材頁」（`session_01HvGmyWa7LXvU1ABFVyqn8L`）在做 `prototype/credits.html` 與選單入口；圖片署名 ChatGPT（OpenAI），程式是否寫「與 Claude（Anthropic）協作」、遊戲設計署名等使用者回覆。使用者說會自己去那個分頁處理。它改 `prototype/index.html`（選單入口）、`game.html` 的 `OK` 正則、`tests/e2e-menu.js`、`tests/e2e-shell.js`，合併時要注意。
+- **Google 劇本**《光學抓鬼遊戲 劇本初稿》已對齊遊戲、`→` 已清；使用者之後改台詞照舊用 `→` 標，改完叫 Claude 讀。
+
 ### 交接點（2026-11-21，試玩網址版）
 
 - **這輪在分支 `claude/amazing-lamport-4kx8tr`，還沒併進 main**：等使用者用試玩網址確認後才併（CONFIRMED「試玩流程」）。分支內容：
