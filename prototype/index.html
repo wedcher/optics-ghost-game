@@ -25,6 +25,7 @@
   a.card.dev { border-style:dashed; }
   .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
   .row a.card { text-align:center; }
+  #creditsLink { margin-top:12px; text-align:center; }
   #installBtn { display:block; width:100%; margin-top:12px; min-height:48px; font:inherit; font-size:15px; color:#e8ebff; background:#171b33; border:1px dashed #3b4478; border-radius:12px; cursor:pointer; }
   #resetBtn { min-height:48px; font:inherit; font-size:15px; color:#e8ebff; background:#232a4d; border:1px solid #3b4478; border-radius:12px; cursor:pointer; }
   #fsTip { position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(5,6,14,.86); }
@@ -43,6 +44,7 @@
     <button id="resetBtn" type="button">重新開始遊戲<br>（清除過關紀錄）</button>
   </div>
   <button id="installBtn" type="button" hidden>📲 安裝到手機（全螢幕、沒有網址列）</button>
+  <a class="card" id="creditsLink" href="credits.html"><strong>製作與素材</strong></a>
 </main>
 <script src="shared/landscape.js"></script>
 <script src="shared/install-hint.js"></script>

@@ -78,7 +78,7 @@ const T = {
   ok(!!(await page.$('a.card[href="leaderboard.html"]')) && !!(await page.$('#resetBtn')), '排行榜入口與「重新開始遊戲」保留');
   ok(!(await page.$('#menu a.card.dev')), '開發用自由練習不放進一般選單');
   ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), '橫向手機沒有橫向捲動');
-  const sz = await page.$$eval('#menu a.card, #lbLink, #resetBtn', (els) => els.map((e) => Math.min(e.getBoundingClientRect().width, e.getBoundingClientRect().height)));
+  const sz = await page.$$eval('#menu a.card, #lbLink, #resetBtn, #creditsLink', (els) => els.map((e) => Math.min(e.getBoundingClientRect().width, e.getBoundingClientRect().height)));
   ok(sz.every((s) => s >= 44), '選單按鈕 ≥ 44 px', sz);
   await page.screenshot({ path: path.join(SHOTS, 'menu-first.png') });
 
@@ -125,10 +125,28 @@ const T = {
   await Promise.all([page.waitForURL(/plane-mirror\/index\.html$/), page.tap('a.card[data-item="mirror"]')]);
   ok(true, '「第一關」「練習模式」等其他入口不跳教學');
 
+  // ---------- 製作與素材頁 ----------
+  await menuAt(null);
+  ok(!!(await page.$('a#creditsLink[href="credits.html"]')), '選單最下面有「製作與素材」入口');
+  await Promise.all([page.waitForURL(/credits\.html$/), page.tap('#creditsLink')]);
+  const cr = await page.evaluate(() => ({
+    text: document.body.textContent,
+    sizes: [...document.querySelectorAll('.btn, a.src')].map((e) => Math.min(e.getBoundingClientRect().width, e.getBoundingClientRect().height)),
+    back: (document.getElementById('menuBtn') || {}).getAttribute && document.getElementById('menuBtn').getAttribute('href'),
+    noHScroll: document.documentElement.scrollWidth <= window.innerWidth,
+  }));
+  ok(/ChatGPT（OpenAI）/.test(cr.text) && /Girl giggling/.test(cr.text) && /Squaky giggle/.test(cr.text) && /Pixabay Content License/.test(cr.text) && /程式即時合成/.test(cr.text), '製作與素材：圖片、音效出處都有寫');
+  ok(cr.back === 'index.html' && /☰ 回選單/.test(cr.text), '製作與素材：「☰ 回選單」連回選單', cr.back);
+  ok(cr.sizes.length >= 3 && cr.sizes.every((s) => s >= 44), '製作與素材：按鈕與連結 ≥ 44 px', cr.sizes);
+  ok(cr.noHScroll, '製作與素材：橫向手機沒有橫向捲動');
+  await page.screenshot({ path: path.join(SHOTS, 'credits.png') });
+  await Promise.all([page.waitForURL(/prototype\/index\.html$/), page.tap('#menuBtn')]);
+  ok(true, '製作與素材：按「☰ 回選單」回得去');
+
   // ---------- G3 不再有轉向提示 ----------
   const pctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
   const pp = await pctx.newPage();
-  for (const u of ['/prototype/index.html', '/prototype/plane-mirror/index.html', '/prototype/convex-lens/index.html', '/prototype/concave-lens/index.html', '/prototype/leaderboard.html']) {
+  for (const u of ['/prototype/index.html', '/prototype/plane-mirror/index.html', '/prototype/convex-lens/index.html', '/prototype/concave-lens/index.html', '/prototype/leaderboard.html', '/prototype/credits.html']) {
     await pp.goto(BASE + u);
     ok(!(await pp.$('#rotateHint')), '直拿手機不出現「請橫放」提示：' + u);
   }

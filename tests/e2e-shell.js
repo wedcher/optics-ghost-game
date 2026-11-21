@@ -75,6 +75,10 @@ const IPHONE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleW
     await page.waitForFunction(() => { const f = document.getElementById('game'); return f.contentWindow && /plane-mirror\/index\.html/.test(f.contentWindow.location.href); });
     ok(true, '#plane-mirror/index.html：重新整理回到第一關');
     await page.goto('about:blank');
+    await page.goto(BASE + 'game.html#credits.html');
+    await page.waitForFunction(() => { const f = document.getElementById('game'); return f.contentWindow && /prototype\/credits\.html/.test(f.contentWindow.location.href); });
+    ok(true, '#credits.html：重新整理留在「製作與素材」頁');
+    await page.goto('about:blank');
     await page.goto(BASE + 'game.html#https://example.com/');
     await page.waitForFunction(() => { const f = document.getElementById('game'); return f.contentWindow && /prototype\/index\.html/.test(f.contentWindow.location.href); });
     ok(true, '#後面是別的網址：不理它，改開選單');
