@@ -149,5 +149,9 @@
       }
     }).observe(document.head || root, { childList: true });
   }
-  window.GameLandscape.lock();
+  // 外框頁裡的各頁不要自己鎖橫向：由外框頁鎖（進全螢幕後 fullscreen.js 呼叫）。框裡每換一頁就再呼叫一次 lock()，
+  // 這頁不是全螢幕的主體，Chrome 會拒絕、可能順便放掉外框頁已經鎖好的橫向，換頁瞬間手機就橫→直→橫閃一下（使用者 2026-11-21 回報）。
+  var inShell = false;
+  try { inShell = window.top !== window && !!window.top.GameShell; } catch (e) { /* 不同網域 */ }
+  if (!inShell) window.GameLandscape.lock();
 })();

@@ -520,6 +520,8 @@
 
 - **✅ 2026-11-21 晚：已併進 main**（使用者說「那就不確認了，直接併」；PR https://github.com/wedcher/optics-ghost-game/pull/12 ，merge commit `c701ad3`）。`claude/amazing-lamport-4kx8tr`、`claude/laughing-archimedes-1653ni` 等舊分支可以刪。GitHub Pages 要等一兩分鐘更新；**要用正式網址再看一次第一關過場鏡面（黑畫面修法）**。
 
+- **使用者 2026-11-21 晚試正式版回報（Android）**：①第一關過場鏡面有圖了 ✅。②按「前往第二關 ➜」後跳出瀏覽器網址列（退出全螢幕）。③「回關卡」確認視窗是遊戲內的 ✅，但回到選單時畫面橫→直→橫閃一下（手機是橫拿）。**②③雲端都重現不了（只能在實機看）**。Claude 的推測（未證實）：框裡每換一頁，`landscape.js` 結尾都再呼叫一次 `screen.orientation.lock()`，框裡的頁面不是全螢幕主體，Chrome 拒絕時可能放掉外框頁鎖好的橫向 → 換頁閃一下、甚至連帶退出全螢幕。已改：在外框頁裡的各頁不再自己呼叫 lock（只由外框頁在進全螢幕後鎖）。轉向 73/73、外框頁 17/17 過。**若使用者重試仍會退出全螢幕，下一步要加偵測（記錄 `fullscreenchange`／`orientation lock` 的結果顯示在畫面上）而不是再猜。**
+
 ### 交接點（確認視窗改頁面內，2026-11-21 晚，分支 `claude/jolly-wozniak-8fslus`）
 
 - **使用者手機實測 OK**：Android 安裝按鈕不再一直跳、笑聲音量、螺旋特效效能、製作與素材頁外觀、凸透鏡虛像題手感。
