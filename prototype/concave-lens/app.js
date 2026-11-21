@@ -45,7 +45,7 @@
   var LB = HUNT ? window.Leaderboard : null;
   var level = { on: !FREE, screen: 'play', lives: LEVEL_LIVES, sealed: 0, scene: null };
   // 倒數用牆上時間（Date.now）：App 切到背景、螢幕關掉時照樣在走（和趕鬼時間一樣，使用者 2026-11-19 確認不暫停）
-  var hunt = { deadline: null, over: false, pendingEnd: null, lowShown: false, timer: null };
+  var hunt = { deadline: null, over: false, lastGhost: false, lowShown: false, timer: null };
 
   var state = {
     cfgIndex: 0,
@@ -814,14 +814,13 @@
           level.lives--;
           flashHud();
           setStatus('法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。');
-          if (level.lives <= 0 && !hunt.pendingEnd) { if (HUNT) endHunt('lives'); else failLevel(); }
+          if (level.lives <= 0) { if (HUNT) endHunt('lives'); else failLevel(); }
         } else {
           setStatus('法陣裡沒有東西……再檢查你的光線作圖。');
         }
       }
+      if (success && HUNT && hunt.lastGhost) setStatus('封印成功！時間到了，這是最後一隻。看完光路，按「結束狩獵 ➜」結算。');
       syncUI(); requestRender();
-      // 法陣展開時剛好時間到：等這一次的結果出來（抓到也算）再結束
-      if (hunt.pendingEnd) endHunt(hunt.pendingEnd);
     }, 1500);
   }
 
@@ -991,7 +990,7 @@
     $('modeSeal').hidden = state.solved; // 抓到鬼之後選格不能再改（C3），只留畫線
     $('toExplore').hidden = state.solved; // 破關後不能回探索：那會把法陣和現身的鬼清掉，而且探索畫面沒有「下一組配置」
     $('nextBtn').hidden = !state.solved;
-    $('nextBtn').textContent = level.on ? '下一隻鬼 ➜' : '下一組配置';
+    $('nextBtn').textContent = !level.on ? '下一組配置' : (HUNT && hunt.lastGhost ? '結束狩獵 ➜' : '下一隻鬼 ➜');
     $('nextBtn').classList.toggle('primary', level.on);
     $('replayBtn').hidden = !state.solved;
     // 關卡模式：左上角是愛心與封印數（和第二關一樣）；配置選單與 Debug 是開發工具，只在 ?free=1 出現
@@ -1079,7 +1078,7 @@
     closeScene();
     var old = document.getElementById('lbResult'); if (old) old.remove();
     level.screen = 'play'; level.lives = LEVEL_LIVES; level.sealed = 0;
-    hunt.over = false; hunt.pendingEnd = null; hunt.lowShown = false;
+    hunt.over = false; hunt.lastGhost = false; hunt.lowShown = false;
     hunt.deadline = HUNT ? Date.now() + HUNT_MS : null;
     clearInterval(hunt.timer); hunt.timer = HUNT ? setInterval(tickHunt, 250) : null;
     resetRound(nextConfig());
@@ -1101,14 +1100,18 @@
     syncTimer();
     // 最後 30 秒：只提示時間，不帶任何和鬼的位置有關的東西
     if (ms <= HUNT_LOW_MS && ms > 0 && !hunt.lowShown) { hunt.lowShown = true; showBanner('天快亮了！剩下 30 秒。', 2600); }
-    if (ms > 0) return;
-    if (state.seal && !state.seal.done) { hunt.pendingEnd = 'time'; return; } // 法陣展開中：等結果
-    endHunt('time');
+    if (ms > 0 || hunt.lastGhost) return;
+    // 使用者 2026-11-21：時間到不把人踢走（抓到一半很嘔）。正在抓的這一隻可以抓完，只是不能再開下一隻：
+    // 抓到後「下一隻鬼 ➜」變成「結束狩獵 ➜」；這一隻抓到之前命用完，照樣是命用完結束。
+    hunt.lastGhost = true;
+    if (state.solved) setStatus('天亮了！這一隻已經封印，按「結束狩獵 ➜」結算。');
+    else { showBanner('天亮了！抓完這一隻就結束。', 3000); setStatus('天亮了！抓完這一隻就結束。'); }
+    syncUI();
   }
   /** 狩獵結束：reason = 'time'（時間到）或 'lives'（命用完）。 */
   function endHunt(reason) {
     if (hunt.over) return;
-    hunt.over = true; hunt.pendingEnd = null;
+    hunt.over = true; hunt.lastGhost = false;
     clearInterval(hunt.timer); hunt.timer = null;
     level.screen = 'ended'; level.endReason = reason;
     state.drag = null; state.pending = null;
@@ -1245,7 +1248,7 @@
   $('undoBtn').addEventListener('click', function () { if (state.pending) state.pending = null; else state.lines.pop(); syncUI(); requestRender(); });
   $('clearBtn').addEventListener('click', function () { state.lines = []; state.pending = null; setStatus('已清除所有線。'); syncUI(); requestRender(); });
   $('castBtn').addEventListener('click', castSeal);
-  $('nextBtn').addEventListener('click', function () { resetRound(nextConfig()); });
+  $('nextBtn').addEventListener('click', function () { if (HUNT && hunt.lastGhost) { endHunt('time'); return; } resetRound(nextConfig()); });
   $('replayBtn').addEventListener('click', function () { if (state.solved) startReplay(); });
   $('zoomIn').addEventListener('click', function () { setZoom(state.zoomIdx + 1); });
   $('zoomOut').addEventListener('click', function () { setZoom(state.zoomIdx - 1); });
