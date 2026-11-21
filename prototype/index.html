@@ -5,6 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>光學抓鬼 — 選單</title>
 <link rel="manifest" href="manifest.webmanifest">
+<script>
+  // 直接開這一頁（例如手機「分享連結」給的是框裡這一頁的網址）就轉到外框頁，才有全螢幕不退出、直拿轉向等功能。
+  // 自動化測試（webdriver）與 ?noshell=1 不轉。
+  (function () {
+    try {
+      if (window.top === window && !navigator.webdriver && !/[?&]noshell=1/.test(location.search)) {
+        location.replace('game.html#index.html' + location.search);
+      }
+    } catch (e) { /* 留在這一頁照樣能玩 */ }
+  })();
+</script>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
