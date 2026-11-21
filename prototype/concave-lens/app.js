@@ -160,6 +160,8 @@
   }
 
   function drawGhostShape(c, px, py, hw, hh) {
+    // 使用者給的小鬼圖（shared/ghost-sprite.js）；圖還沒載入才用下面的程式畫鬼
+    if (window.GhostSprite && window.GhostSprite.draw(c, px, py, hw, hh, 1, 1, 'rgba(120,255,200,.75)')) return;
     c.save();
     c.shadowColor = 'rgba(120,255,200,.9)';
     c.shadowBlur = Math.max(4, hw * 0.6);
@@ -945,6 +947,7 @@
   canvas.addEventListener('pointercancel', function (e) { endPointer(e, true); });
   canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
   // iOS Safari 會忽略 user-scalable=no；擋掉頁面層級的雙指縮放手勢
+  if (window.GhostSprite) window.GhostSprite.onLoad(function () { requestRender(); }); // 小鬼圖載入後重畫
   ['gesturestart', 'gesturechange'].forEach(function (n) { document.addEventListener(n, function (e) { e.preventDefault(); }); });
 
   function setStatus(t) { $('status').textContent = t; }
@@ -1140,6 +1143,7 @@
 
   function resetRound(idx) {
     state.cfgIndex = idx;
+    if (window.GhostSprite) window.GhostSprite.pick(); // 每一隻鬼換一張小鬼圖
     state.phase = 'explore'; state.facing = 0; state.lensUp = false; state.marker = null;
     state.mode = 'draw'; state.pending = null; state.lines = []; state.drag = null;
     state.selectedCell = null; state.seal = null; state.solved = false; state.attempts = 0; state.replay = null;
@@ -1251,7 +1255,10 @@
 
   state.cfgIndex = -1; // 讓第一副牌不會因為「和上一組相同」被調換
   resetRound(level.on ? nextConfig() : 0);
-  if (HUNT) showIntro(); // 正式狩獵：先看開場，按【開始狩獵】才開始倒數；練習模式直接開始
+  // 跳過還沒過關的關卡（網址直接開）→ 只顯示「還沒通過第 N 關」＋【回關卡選單】（使用者 2026-11-21；shared/progress.js）
+  var gateScene = level.on && window.GameProgress ? window.GameProgress.showGate('concave', PRACTICE, INTRO_BG) : null;
+  if (gateScene) { level.screen = 'gate'; level.scene = gateScene; }
+  else if (HUNT) showIntro(); // 正式狩獵：先看開場，按【開始狩獵】才開始倒數；練習模式直接開始
   if (bg.settled) exposeHooks();
   else bgWaiters.push(function () { render(); exposeHooks(); });
 })();

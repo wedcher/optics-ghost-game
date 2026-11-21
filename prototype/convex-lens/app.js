@@ -190,7 +190,14 @@
     e(hw * 1.22, -hh * 0.05, hw * 0.24, hw * 0.24); // 小手（在鬼自己的右側）
   }
 
+  /** 畫鬼（本體或像）：先用小鬼圖（shared/ghost-sprite.js），圖還沒載入才用程式畫的輪廓。 */
+  function drawGhost(c, px, py, hw, hh, sx, sy, fill, glow) {
+    if (window.GhostSprite && window.GhostSprite.draw(c, px, py, hw, hh, sx, sy, glow)) return;
+    c.fillStyle = fill; ghostPath(c, px, py, hw, hh, sx, sy); c.fill('evenodd');
+  }
+
   function drawGhostSolid(c, px, py, hw, hh) {
+    if (window.GhostSprite && window.GhostSprite.draw(c, px, py, hw, hh, 1, 1, 'rgba(120,255,200,.75)')) return;
     c.save();
     c.shadowColor = 'rgba(120,255,200,.9)'; c.shadowBlur = Math.max(4, hw * 0.6);
     c.fillStyle = GHOST_COLOR;
@@ -264,8 +271,7 @@
         ctx.globalAlpha = n === 1 ? 1 : 1 / n;
         for (var i = 0; i < n; i++) {
           var rr = n === 1 ? 0 : b * Math.sqrt((i + 0.5) / n), th = i * 2.399963;
-          ghostPath(ctx, px + rr * Math.cos(th), py + rr * Math.sin(th), hw, hh, -1, -1); // 倒立且左右相反
-          ctx.fill('evenodd');
+          drawGhost(ctx, px + rr * Math.cos(th), py + rr * Math.sin(th), hw, hh, -1, -1, GHOST_COLOR, null); // 倒立且左右相反
         }
       }
       ctx.restore();
@@ -323,8 +329,9 @@
     if (!state.solved && (lv.eye === 'virtual' || lv.eye === 'realInFront')) {
       var d = eye - lv.x, am = Math.abs(lv.m), virt = lv.eye === 'virtual';
       ctx.save(); ctx.globalAlpha = 0.78; ctx.fillStyle = virt ? VIRTUAL_COLOR : REAL_IMG_COLOR;
-      ghostPath(ctx, cx, cy - (lv.y / d) * K, WORLD.ghostHalfWidth * am / d * K, WORLD.ghostHalfHeight * am / d * K, virt ? 1 : -1, virt ? 1 : -1);
-      ctx.fill('evenodd'); ctx.restore();
+      ctx.globalAlpha = 0.9;
+      drawGhost(ctx, cx, cy - (lv.y / d) * K, WORLD.ghostHalfWidth * am / d * K, WORLD.ghostHalfHeight * am / d * K, virt ? 1 : -1, virt ? 1 : -1, ctx.fillStyle, virt ? VIRTUAL_COLOR : REAL_IMG_COLOR);
+      ctx.restore();
       if (virt) lensCaption(cx, cy, rad, lv.y / d * K); // 回饋「虛像題 V2」：鏡框裡寫出像的性質
     } else if (!state.solved && lv.eye === 'blur') {
       var gr = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
@@ -342,8 +349,12 @@
     }
     // 對照：不用透鏡、直接看鬼時看起來的大小（灰色虛線，底部一列）
     var rw = WORLD.ghostHalfWidth / D * K, rh = naked * K, fy = r.y + r.h - foot / 2;
-    ctx.save(); ctx.strokeStyle = 'rgba(200,205,230,.85)'; ctx.setLineDash([4, 3]); ctx.lineWidth = 1.5;
-    ghostPath(ctx, r.x + 10 + rw, fy, rw, rh, 1, 1); ctx.stroke(); ctx.restore();
+    ctx.save(); ctx.globalAlpha = 0.45;
+    if (!(window.GhostSprite && window.GhostSprite.draw(ctx, r.x + 10 + rw, fy, rw, rh, 1, 1, null))) {
+      ctx.globalAlpha = 1; ctx.strokeStyle = 'rgba(200,205,230,.85)'; ctx.setLineDash([4, 3]); ctx.lineWidth = 1.5;
+      ghostPath(ctx, r.x + 10 + rw, fy, rw, rh, 1, 1); ctx.stroke();
+    }
+    ctx.restore();
     label('← 直接看', r.x + 10 + rw * 2.6, fy, '#aab3e6', 'left');
     label('隔著凸透鏡看', r.x + 8, r.y + 12, '#aab3e6', 'left');
     ctx.restore();
@@ -616,8 +627,8 @@
         ctx.save(); ctx.globalAlpha = 0.7 * Math.min(1, (tau - spec.imageAt) / 0.5);
         ctx.fillStyle = vm ? VIRTUAL_COLOR : GHOST_COLOR;
         // 實像：倒立，上下、左右都相反（和布幕正面視圖、課本一致），畫在布幕左邊。虛像：正立，畫在虛像的位置
-        if (vm) ghostPath(ctx, ip.x, ip.y, ihw, ihh, 1, 1); else ghostPath(ctx, ip.x - ihw - 4, ip.y, ihw, ihh, -1, -1);
-        ctx.fill('evenodd');
+        if (vm) drawGhost(ctx, ip.x, ip.y, ihw, ihh, 1, 1, ctx.fillStyle, VIRTUAL_COLOR);
+        else drawGhost(ctx, ip.x - ihw - 4, ip.y, ihw, ihh, -1, -1, ctx.fillStyle, GHOST_COLOR);
         ctx.restore();
       }
       window.RayReplay.draw(ctx, w2s, spec, tau, clipRect);
@@ -718,11 +729,8 @@
         { a: Q, b: { x: 0, y: Q.y }, start: 1.0, end: 2.2, kind: 'ray' }
       ],
       points: [{ p: I, start: 2.2 }],
-      captions: [
-        { start: 0, text: '鬼身上發出三條光線' },
-        { start: 1.0, text: '經過凸透鏡：平行的折向焦點 F′，過光心的直走，過焦點 F 的變平行' },
-        { start: 2.2, text: '實際光路 → 光線會聚 → 實像位置' }
-      ]
+      // 使用者 2026-11-21：和第三關一樣，整段一直顯示同一句，只換重點（重點的顏色＝畫面上對應的線或點）
+      captions: replayCaptions([0, 1.0, 2.2], ['實際光路', ' → ', '光線會聚', ' → ', '實像位置'])
     };
   }
   // 虛像：三條主光線折射後發散，一路走到布幕（布幕上不會聚成像）；
@@ -752,13 +760,16 @@
         { a: Q, b: I, start: 2.2, end: 3.2, kind: 'extension' }
       ],
       points: [{ p: I, start: 3.2 }],
-      captions: [
-        { start: 0, text: '鬼身上發出三條光線' },
-        { start: 1.0, text: '鬼在焦點內：折射後的光線彼此分開，布幕上不會聚成像' },
-        { start: 2.2, text: '從布幕這邊看，光線像是從同一點發出（反向延長的虛線）' },
-        { start: 3.2, text: '虛線交點 → 正立、放大的虛像，和鬼在透鏡同一側' }
-      ]
+      captions: replayCaptions([0, 2.2, 3.2], ['實際光路', ' → ', '反向延長', ' → ', '虛像位置'])
     };
+  }
+  // 重現說明：一句分三段（第 0、2、4 段），times[i] 起第 i 段亮起來；顏色＝實線光線／反向延長虛線／像的標示點
+  function replayCaptions(times, parts) {
+    var RR = window.RayReplay, virt = parts[2] === '反向延長';
+    return times.map(function (t, i) {
+      return { start: t, hi: i * 2, parts: parts,
+        colors: [RR.RAY_COLOR, null, virt ? RR.EXT_COLOR : RR.RAY_COLOR, null, RR.POINT_COLOR] };
+    });
   }
   function replayRunning() { return !!state.replay && (performance.now() - state.replay.t0) / 1000 < replaySpec().duration + 0.3; }
   function startReplay() { $('banner').hidden = true; state.replay = { t0: performance.now() }; animate(); }
@@ -963,6 +974,7 @@
   canvas.addEventListener('pointerup', function (e) { endPointer(e, false); });
   canvas.addEventListener('pointercancel', function (e) { endPointer(e, true); });
   canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  if (window.GhostSprite) window.GhostSprite.onLoad(function () { requestRender(); }); // 小鬼圖載入後重畫
   ['gesturestart', 'gesturechange'].forEach(function (n) { document.addEventListener(n, function (e) { e.preventDefault(); }); });
 
   function setStatus(t) { $('status').textContent = t; }
@@ -1164,6 +1176,7 @@
 
   function resetRound(idx) {
     state.cfgIndex = idx; roundsStarted++;
+    if (window.GhostSprite) window.GhostSprite.pick(); // 每一隻鬼換一張小鬼圖
     state.phase = 'observe'; state.lensX = startLensX(Cfg.all[idx]); state.marker = null; state.look = 'screen';
     state.mode = 'draw'; state.pending = null; state.lines = []; state.drag = null;
     state.selectedCell = null; state.seal = null; state.solved = false; state.attempts = 0; state.replay = null;
@@ -1282,6 +1295,9 @@
   };
 
   resetRound(nextRandomConfig()); // 一開始也隨機，不固定從配置 A 開始
-  if (PRACTICE) startHunt(); // 練習模式：不跑開場過場，直接開始抓鬼
+  // 跳過還沒過關的關卡（網址直接開）→ 只顯示「還沒通過第 N 關」＋【回關卡選單】（使用者 2026-11-21；shared/progress.js）
+  var gateScene = level.on && window.GameProgress ? window.GameProgress.showGate('convex', PRACTICE, INTRO_BG) : null;
+  if (gateScene) { level.screen = 'gate'; level.scene = gateScene; }
+  else if (PRACTICE) startHunt(); // 練習模式：不跑開場過場，直接開始抓鬼
   else if (level.on) showIntro();
 })();

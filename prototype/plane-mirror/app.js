@@ -1013,5 +1013,7 @@
   resetLevel();
   // 關卡名稱不顯示（使用者 2026-11-19：三關一致，都不寫關卡名稱；右上角留給「☰ 回關卡」）。自由練習（開發用）照舊顯示。
   $('title').hidden = !FREE;
+  // 練習模式要先通過第一關；網址直接開就只顯示「還沒通過第一關」＋【回關卡選單】（使用者 2026-11-21；shared/progress.js）
+  if (PRACTICE && window.GameProgress) { var gateScene = window.GameProgress.showGate('mirror', true); if (gateScene) scene = gateScene; }
   if (!FREE && !PRACTICE) { if (artReady()) showIntro(); else pendingIntro = true; }
 })();

@@ -53,6 +53,8 @@ const NOLIVES = ['法陣又落空了——荒野深處傳來一陣嘻嘻的笑�
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 812, height: 375 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
   await context.route('**/shared/leaderboard-config.js', (r) => r.fulfill({ contentType: 'text/javascript', body: "window.LEADERBOARD_URL = '';" }));
+  await context.addInitScript(() => { try { const k = 'opticsGhost.progress.v1', o = JSON.parse(localStorage.getItem(k) || '{}'); o.mirror = true; o.convex = true; localStorage.setItem(k, JSON.stringify(o)); } catch (e) {} }); // 跳關會被擋回選單（2026-11-21）：先標前面的關卡已過關
+  await context.addInitScript(() => { window.__ghostArtOff = true; }); // 鬼用程式畫的單色輪廓，才能用顏色數像素（小鬼圖另外檢查）
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));

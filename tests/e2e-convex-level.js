@@ -56,6 +56,7 @@ const ARM_WAIT = 420; // 結尾按鈕出現後 350 ms 內不接受點擊
 async function run(profile, browser) {
   console.log('\n===== ' + profile.name + ' ' + profile.viewport.width + '×' + profile.viewport.height + (profile.touch ? ' touch' : ' mouse') + ' =====');
   const context = await browser.newContext({ viewport: profile.viewport, hasTouch: profile.touch, isMobile: profile.touch, deviceScaleFactor: profile.dsf });
+  await context.addInitScript(() => { window.__ghostArtOff = true; }); // 鬼用程式畫的單色輪廓，才能用顏色數像素（小鬼圖另外檢查）
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -210,6 +211,29 @@ async function run(profile, browser) {
     return s;
   };
 
+  // ---------- 沒過第一關就用網址進第二關 → 引導回選單（使用者 2026-11-21） ----------
+  await page.goto(URL);
+  await page.waitForSelector('.story[data-scene="gate"]');
+  let g = await st();
+  ok(g.screen === 'gate' && g.scene.buttons.join(',') === 'gateMenuBtn' && /還沒通過第一關/.test(g.scene.all) && await sceneBlocksGame(), P('沒過第一關：只顯示「還沒通過第一關」與「回關卡選單」，遊戲點不到'), g.scene.all.replace(/\s+/g, ' '));
+  await shot('0-gate');
+  // 其他跳關的網址也一樣擋（第二關練習要先過第二關、第三關要先過第二關、第一關練習要先過第一關）
+  const gateAt = async (u, title) => {
+    await page.goto(u);
+    await page.waitForSelector('.story[data-scene="gate"]', { timeout: 5000 }).catch(() => {});
+    const t = await page.evaluate(() => { const sc = document.querySelector('.story[data-scene="gate"]'); return sc ? sc.innerText.replace(/\s+/g, ' ') : ''; });
+    ok(t.includes(title) && t.includes('回關卡選單'), P('跳關擋回選單：' + u.replace(/^.*prototype\//, '')), t);
+  };
+  const ROOT_URL = URL.replace(/convex-lens\/index\.html$/, '');
+  await gateAt(URL + '?practice=1', '還沒通過第二關');
+  await gateAt(ROOT_URL + 'concave-lens/index.html', '還沒通過第二關');
+  await gateAt(ROOT_URL + 'concave-lens/index.html?practice=1', '還沒通過第三關');
+  await gateAt(ROOT_URL + 'plane-mirror/index.html?practice=1', '還沒通過第一關');
+  await page.goto(URL + '?unlock=1');
+  await page.waitForSelector('.story');
+  ok((await st()).screen === 'intro', P('?unlock=1（老師／開發）不擋'));
+  await page.evaluate(() => window.GameProgress.markCleared('mirror')); // 之後照正常流程：第一關已過關
+
   // ---------- 開場過場 ----------
   await load();
   let s = await st();
@@ -288,7 +312,12 @@ async function run(profile, browser) {
   ok(s.nextText === '下一隻鬼 ➜' && s.screen === 'play', P('抓對後按鈕是「下一隻鬼 ➜」'));
   if (profile.name === 'phone-landscape') await rowCheck('封印成功後（812×375）', 'analysisControls', ['畫線', '復原', '清除', '光路重現', '下一隻鬼 ➜']);
   const prevCfg = s.cfg;
+  const art = () => page.evaluate(() => ({ loaded: window.GhostSprite.loaded(), calls: window.GhostSprite.calls(), idx: window.GhostSprite.index() }));
+  const art1 = await art();
+  ok(art1.loaded === 9 && art1.calls > 0, P('小鬼圖 9 張都載入，鬼本體與像都經過小鬼圖繪製'), JSON.stringify(art1));
   await press('#nextBtn', 120);
+  const art2 = await art();
+  ok(art2.idx !== art1.idx, P('下一隻鬼換一張小鬼圖'), art1.idx + ' → ' + art2.idx);
   s = await st();
   ok(s.cfg !== prevCfg && s.phase === 'observe' && !s.marker && s.lines === 0 && !s.solved && s.lives === 2 && s.sealed === 1, P('下一隻鬼：換配置、回到觀察、命數與封印數保留'));
   ok(await countGhost() === 0, P('下一隻鬼開始時畫面上沒有鬼本體'));

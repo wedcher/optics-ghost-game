@@ -63,6 +63,7 @@ async function run(profile, browser) {
   const context = await browser.newContext({
     viewport: profile.viewport, hasTouch: profile.touch, isMobile: profile.touch, deviceScaleFactor: profile.dsf
   });
+  await context.addInitScript(() => { window.__ghostArtOff = true; }); // 鬼用程式畫的單色輪廓，才能用顏色數像素（小鬼圖另外檢查）
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);
   const errors = [];
@@ -545,6 +546,7 @@ async function run(profile, browser) {
     await page.waitForTimeout(1750);
     s = await st();
     ok(s.solved && await countColor(GHOST) > 20, T('封印作圖交點所在格 → 成功並顯形'));
+    if (first) { const art = await page.evaluate(() => ({ loaded: window.GhostSprite.loaded(), calls: window.GhostSprite.calls() })); ok(art.loaded === 9 && art.calls > 0, T('小鬼圖 9 張都載入，鬼都經過小鬼圖繪製'), JSON.stringify(art)); }
     if (first) await shot('8-seal-success');
     // 光路重現的說明：整段同一句，重點依序是 實際光路 → 反向延長 → 虛像位置（使用者 2026-11-20）
     const caps = await page.evaluate(() => {
@@ -674,6 +676,8 @@ async function runLevel(browser, query) {
   const name = practice ? 'level-practice' : 'level';
   console.log('\n===== ' + name + ' 812×375 touch ' + query + ' =====');
   const context = await browser.newContext({ viewport: { width: 812, height: 375 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
+  await context.addInitScript(() => { try { const k = 'opticsGhost.progress.v1', o = JSON.parse(localStorage.getItem(k) || '{}'); o.mirror = true; o.convex = true; o.concave = true; localStorage.setItem(k, JSON.stringify(o)); } catch (e) {} }); // 跳關會被擋回選單（2026-11-21）：先標前面的關卡已過關
+  await context.addInitScript(() => { window.__ghostArtOff = true; }); // 鬼用程式畫的單色輪廓，才能用顏色數像素（小鬼圖另外檢查）
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -750,8 +754,9 @@ async function runLevel(browser, query) {
   s = await info();
   ok(s.lives === 0 && s.heartsLeft === 0 && s.screen === 'failed' && s.scene && s.scene.id === 'failed', P('命用完：出現失敗畫面'));
   ok(s.scene && /❤️用完了/.test(s.scene.text) && !(await page.$('#lbResult')), P('失敗標題「❤️用完了……」、沒有結算／暱稱畫面'));
-  ok(await page.evaluate(() => { const r = JSON.parse(localStorage.getItem('ogg.run.v2') || 'null'); return !r || r.hunt == null; }) && await page.evaluate(() => !GameProgress.isCleared('concave')),
-    P('練習模式不記荒野封印數、不算完成荒野狩獵'));
+  // 練習模式要先通過第三關才進得來（跳關擋回選單，2026-11-21），所以這裡只檢查不記封印數（不再檢查「不算完成」）
+  ok(await page.evaluate(() => { const r = JSON.parse(localStorage.getItem('ogg.run.v2') || 'null'); return !r || r.hunt == null; }),
+    P('練習模式不記荒野封印數'));
   ok(s.scene && s.scene.buttons.join() === 'retryBtn,failMenuBtn' && s.scene.menuHref === '../index.html', P('失敗畫面有「重新挑戰」與「回關卡選單」'), s.scene && s.scene.buttons.join());
   const cellsHidden = await page.evaluate(() => { const c = window.__proto.cfg(); return c.targetCell; });
   ok(s.scene && !/[左右前後遠近]|格/.test(s.scene.text) && !s.scene.text.includes('第 ' + cellsHidden), P('失敗畫面的文字不洩漏位置'), s.scene && s.scene.text.replace(/\s+/g, ' '));

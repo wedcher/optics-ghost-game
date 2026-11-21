@@ -51,6 +51,7 @@ const LEAK_WORDS = /[左右前後遠近]|第\s*\d|[欄排]|c\dr\d/; // 抓錯的
 
 async function open(profile, browser, query) {
   const context = await browser.newContext({ viewport: profile.viewport, hasTouch: profile.touch, isMobile: profile.touch, deviceScaleFactor: profile.dsf });
+  if (/practice=1/.test(query)) await context.addInitScript(() => { try { const k = 'opticsGhost.progress.v1', o = JSON.parse(localStorage.getItem(k) || '{}'); o.mirror = true; localStorage.setItem(k, JSON.stringify(o)); } catch (e) {} }); // 跳關會被擋回選單（2026-11-21）：先標前面的關卡已過關
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));

@@ -71,6 +71,7 @@ async function run(profile, browser) {
   const context = await browser.newContext({
     viewport: profile.viewport, hasTouch: profile.touch, isMobile: profile.touch, deviceScaleFactor: profile.dsf
   });
+  await context.addInitScript(() => { window.__ghostArtOff = true; }); // 鬼用程式畫的單色輪廓，才能用顏色數像素（小鬼圖另外檢查）
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);
   const errors = [];
