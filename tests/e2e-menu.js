@@ -136,7 +136,7 @@ const T = {
     text: document.body.textContent,
     noHScroll: document.documentElement.scrollWidth <= window.innerWidth,
   }));
-  ok(JSON.stringify(cr.rows) === JSON.stringify(['遊戲設計：絕絕', '背景與角色圖：ChatGPT', '程式：Claude', '音效：Pixabay「Girl giggling」「Squaky giggle」；其他音效程式合成']), '製作與素材：四行文字照定稿', cr.rows);
+  ok(JSON.stringify(cr.rows) === JSON.stringify(['遊戲設計：絕絕', '背景與角色圖：ChatGPT', '程式：Claude', '女鬼聲音：Pixabay「Girl giggling」', '小鬼聲音：Pixabay「Squaky giggle」', '其他音效：程式合成']), '製作與素材：文字照定稿', cr.rows);
   ok(JSON.stringify(cr.links) === '["index.html"]', '製作與素材：除了回選單沒有其他連結', cr.links);
   ok(/☰ 回選單/.test(cr.text) && cr.btn >= 44, '製作與素材：「☰ 回選單」≥ 44 px', cr.btn);
   ok(cr.noHScroll, '製作與素材：橫向手機沒有橫向捲動');

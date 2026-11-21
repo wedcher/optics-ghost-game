@@ -132,7 +132,7 @@
 - **正式美術圖已換上（2026-11-19）**：原圖在 `docs/concepts/古堡外觀.png`、`信件.png`、`圓盤.png`、`雜魚00～08.png`（雜魚09 使用者說不用）。轉成手機用的 webp：`plane-mirror/assets/story-castle.webp`、`story-letter.webp`（信件圖＋圓盤合成，照劇本「圓盤壓在信件上面」）、`story-disc.webp`（對話框小圖）、`shared/art/minion-00～08.webp`（第一關、第二關過關時逃散的小鬼，取代 placeholder）。信上的三句字照舊用 HTML 寫在圖中的信紙上（`story-scene.js` 的 `letterOnArt`）。暫代圖程式保留在 `story-art.js`，圖載不到時才用。
 - **第二關「看凸透鏡」（使用者 2026-11-21）**：①拿掉底下「← 直接看」對照小鬼（鬼裸眼不可見；大小又透露距離），鏡框改成固定撐滿那一欄；②虛像不能標記時寫「成像太遠，無法標記。」（狀態列加「再移動看看。」）；③虛像離透鏡 < 60 cm 時提示「建議標記別處」但**仍可標記**，**只在看透鏡時出現**，看布幕不會；④實像題**維持允許**改看透鏡標記虛像（V1／V4 不變）；⑤虛像題 J、K、L **改短焦距定案**（J 110、K 120、L 170），使用者手機實測 OK；⑥「拉近看」（讓鬼塞滿鏡片）**先不做**；⑦舊的三題虛像題加回來當 **M、N、O**（f 200／220／210，第 4／5／7 格），虛像題共 6 題、全部 15 題；⑧「知道是虛像就猜焦點內的格子」**先不處理**；⑨「看透鏡」時鬼在焦點上或焦點外**照物理畫**：看到清楚、正立的像（像在無限遠或布幕後面），寫「成像太遠，無法標記。」，不再是一團淡光（只有實像題的像落在眼睛前後 25 cm 內才是一團光）。細節見文末「交接點（凸透鏡虛像太小，2026-11-21）」。
 - **第一關地磚貼圖已換上（2026-11-20）**：使用者給的石磚圖存成 `docs/concepts/地磚.png`，遊戲用 `plane-mirror/assets/floor-tile.webp`（512×512）。一格貼一張，用分塊仿射做透視貼圖；直接看、各面鏡子、鏡中鏡各算一次後快取（`app.js` 的 `floorLayer`）。隔一格壓暗（西洋棋盤，鏡中好數格），格線改成磚邊的銅色、細一點。圖載不到就退回程式畫的地板。**還沒在實體手機上看效能**（第一次畫面出現前要多算一下貼圖）。
-- **製作與素材頁（2026-11-21，使用者定稿）**：`prototype/credits.html`，選單最下面有入口。字少、**不放外部連結**，四行：遊戲設計：絕絕／背景與角色圖：ChatGPT／程式：Claude／音效：Pixabay「Girl giggling」「Squaky giggle」；其他音效程式合成。（兩段笑聲出處只記在這裡：「Girl giggling」pixabay.com/sound-effects/people-girl-giggling-492887，上傳者 `u_2rfb4q2b10`；「Squaky giggle」pixabay.com/sound-effects/people-squaky-giggle-47742，上傳者 `freesound_community`，頁面標原作者 Artist：Ceebee90 (Freesound)。使用者 2026-11-21 用本機查到。）
+- **製作與素材頁（2026-11-21，使用者定稿）**：`prototype/credits.html`，選單最下面有入口。字少、**不放外部連結**、不寫作者名：遊戲設計：絕絕／背景與角色圖：ChatGPT／程式：Claude／女鬼聲音：Pixabay「Girl giggling」／小鬼聲音：Pixabay「Squaky giggle」／其他音效：程式合成。（兩段笑聲出處只記在這裡：「Girl giggling」pixabay.com/sound-effects/people-girl-giggling-492887，上傳者 `u_2rfb4q2b10`；「Squaky giggle」pixabay.com/sound-effects/people-squaky-giggle-47742，上傳者 `freesound_community`，頁面標原作者 Artist：Ceebee90 (Freesound)。使用者 2026-11-21 用本機查到。）
 
 ## DO NOT RE-DERIVE
 
@@ -211,7 +211,7 @@
 13. ~~第一關等使用者試玩後決定~~（2026-11-17 使用者都已回覆，見 CONFIRMED；以下保留原題目）（`docs/prototype-findings-mirror.md`）：選格黃框與法陣不出現在鏡子裡可以嗎（ISSUE 5）；鬼的像在正面鏡裡沒有左右相反要不要調整（ISSUE 6）；鏡中要不要畫玩家自己的剪影（ISSUE 7）；鏡中鏡的第二個像要不要留（ISSUE 8）；台詞（第 13 點）；背景圖要不要重畫成落地鏡、玩家站近一點（ISSUE 1～3）。
 
 ---
-28. ~~製作與素材頁的署名~~ 2026-11-21 使用者定稿（見 CONFIRMED）。Pixabay 作者名 2026-11-21 使用者查到（記在 CONFIRMED「製作與素材頁」）；**要不要加到頁面上，待使用者決定**，目前頁面沒寫。
+28. ~~製作與素材頁的署名~~ 2026-11-21 使用者定稿（見 CONFIRMED）。Pixabay 作者名 2026-11-21 使用者查到（記在 CONFIRMED「製作與素材頁」）；使用者把音效拆成「女鬼聲音」「小鬼聲音」兩行；作者名目前沒放上頁面。
 
 ## NOW — Sprint 01
 
@@ -506,7 +506,7 @@
 ### 交接點（製作與素材頁，2026-11-21）
 
 - **分支**：從 `claude/amazing-lamport-4kx8tr`（cbf06a7）開出 `claude/credits-page-8743`，還沒併進任何分支。commit hash 見使用者回覆／`git log`。
-- **改了哪些檔案**：新增 `prototype/credits.html`；`prototype/index.html`（最下面加「製作與素材」入口 `#creditsLink`）；`prototype/game.html`（`OK` 正則加 `credits.html`，重新整理會留在這頁）；`tests/e2e-menu.js`（入口、連得到、四行文字、沒有外部連結、按鈕 ≥ 44 px、回選單、直拿不出現轉向提示）；`tests/e2e-shell.js`（`#credits.html`）；截圖 `docs/screenshots/credits.png`。
+- **改了哪些檔案**：新增 `prototype/credits.html`；`prototype/index.html`（最下面加「製作與素材」入口 `#creditsLink`）；`prototype/game.html`（`OK` 正則加 `credits.html`，重新整理會留在這頁）；`tests/e2e-menu.js`（入口、連得到、文字照定稿、沒有外部連結、按鈕 ≥ 44 px、回選單、直拿不出現轉向提示）；`tests/e2e-shell.js`（`#credits.html`）；截圖 `docs/screenshots/credits.png`。
 - 署名已照使用者定稿改好（CONFIRMED），頁面沒有外部連結。
 - **還沒在實體手機驗證**：頁面外觀。
 - **檔案分工**：這個工作階段已收工，不佔檔案。
