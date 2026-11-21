@@ -1052,6 +1052,9 @@
     $('lookLens').setAttribute('aria-pressed', String(state.look === 'lens'));
     $('modeDraw').classList.toggle('on', state.mode === 'draw');
     $('modeSeal').classList.toggle('on', state.mode === 'seal');
+    // 畫出第二條線後（兩條線才有交點），「選格封印」變紫色提醒；變紫後這一隻鬼都維持（使用者 2026-11-21）
+    if (state.lines.length >= 2) state.sealHint = true;
+    $('modeSeal').classList.toggle('primary', !!state.sealHint && state.mode !== 'seal');
     // 一排：重新對焦｜選格封印｜畫線｜復原｜清除，再加上該階段的動作鈕（封印模式：施放；封印成功後：光路重現、下一隻）
     $('castBtn').hidden = state.mode !== 'seal' || state.solved;
     $('modeSeal').hidden = state.solved; // 抓到鬼之後選格不能再改，只留畫線
@@ -1176,7 +1179,8 @@
       note: note,
       // 過關後回選單，由選單進下一關；或「再玩一次」整關重來（命、封印數、牌堆都重置）。和第一關一致（2026-11-18 定案）
       buttons: [
-        { id: 'clearMenuBtn', label: '回關卡選單', primary: true, href: MENU_URL },
+        { id: 'nextLevelBtn', label: '前往第三關 ➜', primary: true, href: '../concave-lens/index.html' }, // 使用者 2026-11-21：可直接進下一關
+        { id: 'clearMenuBtn', label: '回關卡選單', href: MENU_URL },
         { id: 'againBtn', label: '再玩一次', onClick: startHunt }
       ]
     });
@@ -1243,7 +1247,7 @@
     state.cfgIndex = idx; roundsStarted++;
     if (window.GhostSprite) window.GhostSprite.pick(); // 每一隻鬼換一張小鬼圖
     state.phase = 'observe'; state.lensX = startLensX(Cfg.all[idx]); state.marker = null; state.look = 'screen';
-    state.mode = 'draw'; state.pending = null; state.lines = []; state.drag = null;
+    state.mode = 'draw'; state.pending = null; state.lines = []; state.drag = null; state.sealHint = false;
     state.selectedCell = null; state.seal = null; state.solved = false; state.attempts = 0; state.replay = null;
     state.zoomIdx = 0;
     $('configSel').value = String(idx);

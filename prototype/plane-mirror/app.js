@@ -988,7 +988,8 @@
       title: '第一關過關！', note: '鬼逃進了走廊。第二關：城堡走廊（已解鎖）', // 使用者 2026-11-19 統一三關過關文字
       buttons: [
         // 過關後一律回選單、由選單進下一關（使用者 2026-11-18 回饋 Q3：換頁一定會離開全螢幕，不從這裡直接跳第二關）
-        { id: 'clearMenuBtn', label: '回關卡選單', primary: true, href: '../index.html' },
+        { id: 'nextLevelBtn', label: '前往第二關 ➜', primary: true, href: '../convex-lens/index.html' }, // 使用者 2026-11-21：外框頁不再退出全螢幕，改回可直接進下一關
+        { id: 'clearMenuBtn', label: '回關卡選單', href: '../index.html' },
         { id: 'againBtn', label: '再玩一次', onClick: function () { closeScene(); resetLevel(); if (LB) LB.startLevel('mirror'); } }
       ]
     });

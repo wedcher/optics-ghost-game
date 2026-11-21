@@ -385,8 +385,9 @@ async function run(profile, browser) {
   ok(!said.some((t) => /碎片|碎掉|敲下/.test(t || '')), P('物理：小透鏡不是大凸透鏡的碎片（凸透鏡碎片仍會聚）'));
   await tapAt(vw * 0.5, vh * 0.5);
   s = await st();
-  ok(s.scene.endShown && /第二關過關/.test(s.scene.endText) && /第三關：荒野狩獵（已解鎖）/.test(s.scene.endText) && s.scene.buttons.join() === 'clearMenuBtn,againBtn', P('過關畫面：標題、第三關：荒野狩獵（已解鎖），「回關卡選單」＋「再玩一次」'), s.scene.endText);
+  ok(s.scene.endShown && /第二關過關/.test(s.scene.endText) && /第三關：荒野狩獵（已解鎖）/.test(s.scene.endText) && s.scene.buttons.join() === 'nextLevelBtn,clearMenuBtn,againBtn', P('過關畫面：標題、第三關：荒野狩獵（已解鎖），「前往第三關 ➜」＋「回關卡選單」＋「再玩一次」'), s.scene.endText);
   ok(await page.evaluate(() => document.getElementById('clearMenuBtn').getAttribute('href')) === '../index.html', P('過關畫面的「回關卡選單」連到入口頁'));
+  ok(await page.evaluate(() => document.getElementById('nextLevelBtn').getAttribute('href')) === '../concave-lens/index.html', P('過關畫面的「前往第三關 ➜」連到荒野狩獵（使用者 2026-11-21）'));
   ok(!/你花費/.test(s.scene.endText) && /成功把鬼趕出城堡。第三關：荒野狩獵（已解鎖）/.test(s.scene.endText) && (await page.evaluate(() => { const r = Leaderboard.getRun(); return r && r.mirrorMs == null && r.castleMs == null && r.convexMs > 0; })), P('排行榜：直接開第二關（沒有第一關成績）不顯示趕鬼時間、不記趕鬼時間（只記第二關成績）；過關文字照 2026-11-19 統一版'), s.scene.endText);
   await page.waitForTimeout(ARM_WAIT);
   await sceneButtons('過關畫面');
@@ -442,7 +443,7 @@ async function run(profile, browser) {
   await sealWrong('練習模式抓錯');
   s = await clearOnce('練習模式抓最後一隻');
   const runP = await page.evaluate(() => Leaderboard.getRun());
-  ok(s.screen === 'cleared' && !/你花費/.test(s.scene.endText) && runP && runP.castleMs == null && s.scene.buttons.join() === 'clearMenuBtn,againBtn', P('?practice=1：過關不顯示趕鬼時間、不記成績（就算本輪第一關已過）；「回關卡選單」＋「再玩一次」'), s.scene.endText);
+  ok(s.screen === 'cleared' && !/你花費/.test(s.scene.endText) && runP && runP.castleMs == null && s.scene.buttons.join() === 'nextLevelBtn,clearMenuBtn,againBtn', P('?practice=1：過關不顯示趕鬼時間、不記成績（就算本輪第一關已過）；「前往第三關」＋「回關卡選單」＋「再玩一次」'), s.scene.endText);
 
   // ---------- 每輪保證至少一題虛像題：跑很多輪統計（用 app 自己的發牌函式） ----------
   const stat = await page.evaluate(() => {

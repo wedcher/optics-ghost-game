@@ -983,6 +983,9 @@
     $('toAnalysis').classList.toggle('primary', !!state.marker);
     $('modeDraw').classList.toggle('on', state.mode === 'draw');
     $('modeSeal').classList.toggle('on', state.mode === 'seal');
+    // 畫出第二條線後（兩條線才有交點），「選格封印」變紫色提醒；變紫後這一隻鬼都維持（使用者 2026-11-21）
+    if (state.lines.length >= 2) state.sealHint = true;
+    $('modeSeal').classList.toggle('primary', !!state.sealHint && state.mode !== 'seal');
     $('undoBtn').disabled = !state.lines.length && !state.pending;
     $('clearBtn').disabled = !state.lines.length && !state.pending;
     $('castBtn').disabled = state.selectedCell == null || state.solved || !!(state.seal && !state.seal.done);
@@ -1163,7 +1166,7 @@
     state.cfgIndex = idx;
     if (window.GhostSprite) window.GhostSprite.pick(); // 每一隻鬼換一張小鬼圖
     state.phase = 'explore'; state.facing = 0; state.lensUp = false; state.marker = null;
-    state.mode = 'draw'; state.pending = null; state.lines = []; state.drag = null;
+    state.mode = 'draw'; state.pending = null; state.lines = []; state.drag = null; state.sealHint = false;
     state.selectedCell = null; state.seal = null; state.solved = false; state.attempts = 0; state.replay = null;
     state.zoomIdx = 0;
     $('configSel').value = String(idx);

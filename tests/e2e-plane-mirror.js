@@ -357,6 +357,7 @@ async function levelFlow(profile, browser) {
   await page.waitForTimeout(ARM_WAIT);
   ok(!(await page.isVisible('#toLevel2Btn')), '過關畫面沒有【前往第二關】（一律回選單，2026-11-18 回饋 Q3）');
   ok(await page.isVisible('#clearMenuBtn') && /\.\.\/index\.html$/.test(await page.getAttribute('#clearMenuBtn', 'href')), '過關畫面有【回關卡選單】');
+  ok(await page.isVisible('#nextLevelBtn') && /convex-lens\/index\.html$/.test(await page.getAttribute('#nextLevelBtn', 'href')), '過關畫面有【前往第二關 ➜】（使用者 2026-11-21）');
   await shot('mirror-8-clear');
   await press('#againBtn');
   s = await info();

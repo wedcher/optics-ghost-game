@@ -355,12 +355,14 @@ async function run(profile, browser) {
     let a = await snap('I'), b = await snap('O');
     await tap(a.x - 6, a.y + (a.wy > 0 ? -6 : 6)); await tap(b.x - 7, b.y + (c.h > 0 ? 6 : -6));
     ok((await st()).lines === 1, T('線 1：實像 ↔ 光心 O（點擊偏約 9px 仍吸附）'));
+    ok(await page.evaluate(() => !document.getElementById('modeSeal').classList.contains('primary')), T('只有一條線：「選格封印」還不是紫色'));
     // 線 2：實像 ↔ 像側焦點 F′，延長後交透鏡於 P
     a = await snap('I'); b = await snap('F2');
     await tap(a.x - 5, a.y + (a.wy > 0 ? -6 : 6)); await tap(b.x + 6, b.y + (c.h > 0 ? 6 : -6));
     s = await st();
     const pts = await page.evaluate(() => window.__protoConvex.snapPoints());
     const Pp = pts.find((q) => q.id === 'P');
+    ok(await page.evaluate(() => document.getElementById('modeSeal').classList.contains('primary')), T('畫出第二條線：「選格封印」變紫色提醒（使用者 2026-11-21）'));
     ok(s.lines === 2 && Pp && Math.abs(Pp.x - sp.lensX) < 1e-9 && Math.abs(Pp.y - c.object.y) < 1e-6, T('線 2：實像 ↔ F′，延長後在透鏡上產生可吸附的 P（高度 = 物高）'), Pp ? 'P.y=' + Pp.y.toFixed(3) : 'no P');
     // 線 3：過 P 平行主軸
     a = await snap('P');
