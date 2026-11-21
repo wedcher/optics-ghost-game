@@ -59,6 +59,8 @@ const IPHONE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleW
     await page.waitForFunction(() => { const d = document.getElementById('game').contentDocument; return d && d.querySelector('.story'); });
     ok(await page.evaluate(() => window.__shellMark) === 42, '從選單進第二關：在框裡換頁，外框頁沒有重新載入（全螢幕不會退出）', page.url());
     await frame().evaluate(() => document.getElementById('menuBtn').click()); // 開場過場蓋著，直接觸發按鈕
+    ok(await frame().evaluate(() => !document.getElementById('gameConfirm').hidden), '「☰ 回關卡」跳頁面內確認（不用系統視窗，全螢幕不會退出）');
+    await frame().evaluate(() => document.getElementById('gcOk').click());
     await page.waitForFunction(() => /#index\.html$/.test(location.hash));
     ok(await page.evaluate(() => window.__shellMark) === 42, '「☰ 回關卡」回選單：還是同一個外框頁');
     ok(await frame().evaluate(() => !!(window.InstallHint && window.InstallHint === window.top.InstallHint)), '框裡的選單用外框頁的 InstallHint');

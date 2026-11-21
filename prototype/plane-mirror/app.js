@@ -1025,7 +1025,7 @@
   });
   $('nextBtn').addEventListener('click', next);
   // 「☰ 回關卡」先確認（和第二、三關一致；使用者 2026-11-21）
-  $('menuLink').addEventListener('click', function (e) { if (!window.confirm('回到關卡選單？這一關目前的進度不會保留。')) e.preventDefault(); });
+  $('menuLink').addEventListener('click', function (e) { e.preventDefault(); var href = this.href; GameConfirm.ask({ text: '回到關卡選單？這一關目前的進度不會保留。', ok: '回關卡選單', cancel: '繼續玩' }, function () { location.href = href; }); });
 
   window.addEventListener('resize', layout);
   if (window.ResizeObserver) new ResizeObserver(layout).observe($('stage'));

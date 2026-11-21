@@ -421,11 +421,14 @@ async function practiceMode(profile, browser) {
   const mb = await page.evaluate(() => { const r = document.getElementById('menuLink').getBoundingClientRect(); return { right: innerWidth - r.right, top: r.top, w: r.width, h: r.height }; });
   ok(mb.right < 16 && mb.top < 16 && mb.h >= 44, '「☰ 回關卡」在右上角、高度 ≥ 44', JSON.stringify(mb));
   ok((await page.textContent('#menuLink')).trim() === '☰ 回關卡', '按鈕字樣是「☰ 回關卡」');
-  let dlg = null;
-  page.once('dialog', (d) => { dlg = d.message(); d.dismiss(); });
+  let sysDlg = false;
+  page.once('dialog', (d) => { sysDlg = true; d.dismiss(); });
   const urlBefore = page.url();
   await page.click('#menuLink'); await page.waitForTimeout(150);
-  ok(/回到關卡選單/.test(dlg || '') && page.url() === urlBefore, '「☰ 回關卡」先跳確認，按取消留在關卡（使用者 2026-11-21，和第二、三關一致）', dlg);
+  const dlg = (await page.isVisible('#gameConfirm')) ? await page.textContent('#gameConfirm .gc-text') : null;
+  ok(/回到關卡選單/.test(dlg || '') && !sysDlg && page.url() === urlBefore, '「☰ 回關卡」先跳頁面內確認（不用系統視窗，才不會退出全螢幕），還沒離開關卡', dlg);
+  await page.click('#gcCancel'); await page.waitForTimeout(100);
+  ok(!(await page.isVisible('#gameConfirm')) && page.url() === urlBefore, '按「繼續玩」：視窗收起、留在關卡');
   ok(t.errors.length === 0, '沒有 JS 錯誤或載入失敗', t.errors.join(' | '));
   await page.context().close();
 }

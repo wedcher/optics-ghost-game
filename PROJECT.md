@@ -518,6 +518,12 @@
   - **還沒在實體手機驗證**：外框頁裡的全螢幕不退出、Android 安裝按鈕叫出安裝視窗、笑聲音量、螺旋特效的效能。
 - **檔案分工**：這個工作階段（`claude/amazing-lamport-4kx8tr`）改三關 `app.js`／`index.html`、`shared/*`、`prototype/index.html`、新外框頁、`tests/*`、`PROJECT.md`。其他工作階段要改這些檔案前先問使用者。
 
+### 交接點（確認視窗改頁面內，2026-11-21 晚，分支 `claude/jolly-wozniak-8fslus`）
+
+- **使用者手機實測 OK**：Android 安裝按鈕不再一直跳、笑聲音量、螺旋特效效能、製作與素材頁外觀、凸透鏡虛像題手感。
+- **使用者回報並已修**：「☰ 回關卡」跳的系統 `confirm()` 會讓 Android 離開全螢幕。改成頁面內確認視窗 `shared/confirm.js`（`GameConfirm.ask`，按鈕「回關卡選單／繼續玩」；選單「重新開始遊戲」同樣改成「重新開始／取消」）。三關與選單都已換，沒有剩下系統 `confirm()`／`alert()`。測試（第一關、排行榜、外框頁）已改成點頁面內按鈕。**還沒在實體手機驗證不會退出全螢幕。**
+- **檔案分工**：這個工作階段（`claude/jolly-wozniak-8fslus`）改了 `shared/confirm.js`（新）、三關 `app.js`／`index.html`、`prototype/index.html`、`tests/*`。
+
 ### 交接點（製作與素材頁，2026-11-21）
 
 - **分支**：在 `claude/credits-page-8743` 做，2026-11-21 使用者看過後併進 `claude/amazing-lamport-4kx8tr`（還沒進 main，跟著試玩分支一起併）。
