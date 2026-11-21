@@ -88,7 +88,7 @@
   PASS  [phone-landscape] 配置A·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置A·放大像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置A·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置A·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置A·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置A·放大像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置A·放大像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置A·放大像 錯誤封印後：吸附點裡沒有物點
@@ -110,7 +110,7 @@
   PASS  [phone-landscape] 配置A·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
   PASS  [phone-landscape] 配置A·放大像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置A·放大像 光路重現：結束時標出像點  — 139 px（重現前 66）
-  PASS  [phone-landscape] 配置A·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置A·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置A·放大像 封印後：「選格封印」收起、回到畫線模式
   PASS  [phone-landscape] 配置A·放大像 封印後：鬼本體（物點）成為吸附點
   PASS  [phone-landscape] 配置A·放大像 封印後：從鬼本體拖到 O 可以畫線
@@ -120,8 +120,8 @@
   PASS  [phone-landscape] 配置A·放大像 封印後點別的格：選格不變
   PASS  [phone-landscape] 配置A·放大像 Debug overlay 顯示物點／焦距／目標格／清晰位置
   PASS  [phone-landscape] 配置A·放大像 關閉 Debug 後面板清空
-  PASS  [phone-landscape] 配置A·放大像 「下一組配置」不會連續出同一組  — 0→7→1→10→2→3→0→8→11→5→6→4→2→4→10→1→3→6→0→8→11→7→5→9
-  PASS  [phone-landscape] 配置A·放大像 「下一組配置」每一輪內每組各出一次、不重複  — 2,4,10,1,3,6,0,8,11,7,5,9
+  PASS  [phone-landscape] 配置A·放大像 「下一組配置」不會連續出同一組  — 0→6→12→3→11→4→2→0→10→9→7→1→13→8→14→7→4→6→8→10→12→13→5→3→2→14→0→11→1→9
+  PASS  [phone-landscape] 配置A·放大像 「下一組配置」每一輪內每組各出一次、不重複  — 7,4,6,8,10,12,13,5,3,2,14,0,11,1,9
   PASS  [phone-landscape] 配置A·放大像 換配置後回到觀察階段，標記與作圖線都清空
   PASS  [phone-landscape] 配置A·縮小像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置A·縮小像 開始觀察：DOM／文字／Debug 圖層沒有答案
@@ -187,7 +187,7 @@
   PASS  [phone-landscape] 配置A·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置A·縮小像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置A·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置A·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置A·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置A·縮小像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置A·縮小像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置A·縮小像 錯誤封印後：吸附點裡沒有物點
@@ -275,7 +275,7 @@
   PASS  [phone-landscape] 配置B·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置B·放大像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置B·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置B·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置B·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置B·放大像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置B·放大像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置B·放大像 錯誤封印後：吸附點裡沒有物點
@@ -359,7 +359,7 @@
   PASS  [phone-landscape] 配置B·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置B·縮小像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置B·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置B·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置B·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置B·縮小像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置B·縮小像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置B·縮小像 錯誤封印後：吸附點裡沒有物點
@@ -381,7 +381,7 @@
   PASS  [phone-landscape] 配置B·縮小像 光路重現 t=3.20s：全部光線都畫出來了  — 6/6 個取樣點在畫面內
   PASS  [phone-landscape] 配置B·縮小像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置B·縮小像 光路重現：結束時標出像點  — 132 px（重現前 68）
-  PASS  [phone-landscape] 配置B·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置B·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置C·放大像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置C·放大像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置C·放大像 開始觀察：吸附點裡沒有物點
@@ -447,7 +447,7 @@
   PASS  [phone-landscape] 配置C·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置C·放大像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置C·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置C·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置C·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置C·放大像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置C·放大像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置C·放大像 錯誤封印後：吸附點裡沒有物點
@@ -469,7 +469,7 @@
   PASS  [phone-landscape] 配置C·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
   PASS  [phone-landscape] 配置C·放大像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置C·放大像 光路重現：結束時標出像點  — 135 px（重現前 62）
-  PASS  [phone-landscape] 配置C·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置C·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 配置C·縮小像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置C·縮小像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置C·縮小像 開始觀察：吸附點裡沒有物點
@@ -534,7 +534,7 @@
   PASS  [phone-landscape] 配置C·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置C·縮小像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置C·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置C·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置C·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置C·縮小像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置C·縮小像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置C·縮小像 錯誤封印後：吸附點裡沒有物點
@@ -622,7 +622,7 @@
   PASS  [phone-landscape] 配置D·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置D·放大像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置D·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置D·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置D·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置D·放大像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置D·放大像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置D·放大像 錯誤封印後：吸附點裡沒有物點
@@ -644,7 +644,7 @@
   PASS  [phone-landscape] 配置D·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置D·放大像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置D·放大像 光路重現：結束時標出像點  — 138 px（重現前 67）
-  PASS  [phone-landscape] 配置D·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [phone-landscape] 配置D·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置D·縮小像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置D·縮小像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置D·縮小像 開始觀察：吸附點裡沒有物點
@@ -700,7 +700,7 @@
   PASS  [phone-landscape] 配置D·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置D·縮小像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置D·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置D·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置D·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置D·縮小像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置D·縮小像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置D·縮小像 錯誤封印後：吸附點裡沒有物點
@@ -786,7 +786,7 @@
   PASS  [phone-landscape] 配置E·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置E·放大像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置E·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置E·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置E·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置E·放大像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置E·放大像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置E·放大像 錯誤封印後：吸附點裡沒有物點
@@ -808,7 +808,7 @@
   PASS  [phone-landscape] 配置E·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
   PASS  [phone-landscape] 配置E·放大像 光路重現：畫面上方有說明文字框
   PASS  [phone-landscape] 配置E·放大像 光路重現：結束時標出像點  — 137 px（重現前 66）
-  PASS  [phone-landscape] 配置E·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置E·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
   PASS  [phone-landscape] 配置E·縮小像 開始觀察：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置E·縮小像 開始觀察：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置E·縮小像 開始觀察：吸附點裡沒有物點
@@ -870,7 +870,7 @@
   PASS  [phone-landscape] 配置E·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置E·縮小像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置E·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置E·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置E·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置E·縮小像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置E·縮小像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置E·縮小像 錯誤封印後：吸附點裡沒有物點
@@ -957,7 +957,7 @@
   PASS  [phone-landscape] 配置F·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置F·放大像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置F·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置F·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置F·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置F·放大像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置F·放大像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置F·放大像 錯誤封印後：吸附點裡沒有物點
@@ -1041,7 +1041,7 @@
   PASS  [phone-landscape] 配置F·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置F·縮小像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置F·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置F·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置F·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置F·縮小像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置F·縮小像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置F·縮小像 錯誤封印後：吸附點裡沒有物點
@@ -1128,7 +1128,7 @@
   PASS  [phone-landscape] 配置G·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置G·放大像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置G·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置G·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置G·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置G·放大像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置G·放大像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置G·放大像 錯誤封印後：吸附點裡沒有物點
@@ -1215,7 +1215,7 @@
   PASS  [phone-landscape] 配置G·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置G·縮小像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置G·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置G·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置G·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置G·縮小像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置G·縮小像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置G·縮小像 錯誤封印後：吸附點裡沒有物點
@@ -1302,7 +1302,7 @@
   PASS  [phone-landscape] 配置H·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置H·放大像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置H·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置H·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置H·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置H·放大像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置H·放大像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置H·放大像 錯誤封印後：吸附點裡沒有物點
@@ -1380,7 +1380,7 @@
   PASS  [phone-landscape] 配置H·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置H·縮小像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置H·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置H·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置H·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置H·縮小像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置H·縮小像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置H·縮小像 錯誤封印後：吸附點裡沒有物點
@@ -1467,7 +1467,7 @@
   PASS  [phone-landscape] 配置I·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置I·放大像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置I·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置I·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置I·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置I·放大像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置I·放大像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置I·放大像 錯誤封印後：吸附點裡沒有物點
@@ -1554,7 +1554,7 @@
   PASS  [phone-landscape] 配置I·縮小像 封印透鏡所在格 → 失敗
   PASS  [phone-landscape] 配置I·縮小像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-landscape] 配置I·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 配置I·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-landscape] 配置I·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-landscape] 配置I·縮小像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-landscape] 配置I·縮小像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-landscape] 配置I·縮小像 錯誤封印後：吸附點裡沒有物點
@@ -1579,28 +1579,29 @@
   PASS  [phone-landscape] 配置I·縮小像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置J·虛像題 開場：看布幕、沒有標記
   PASS  [phone-landscape] 配置J·虛像題 開始觀察：畫面、文字、Debug 都沒有鬼本體或答案
-  PASS  [phone-landscape] 配置J·虛像題 透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光  — 最小模糊比 4.30
+  PASS  [phone-landscape] 配置J·虛像題 透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光  — 最小模糊比 1.85
   PASS  [phone-landscape] 配置J·虛像題 看布幕時按「標記」被拒絕（布幕上沒有清楚的像）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
   PASS  [phone-landscape] 配置J·虛像題 看布幕時沒有畫虛像
   PASS  [phone-landscape] 配置J·虛像題 按「看透鏡」切換畫面（兩個並排按鈕，狀態正確）
-  PASS  [phone-landscape] 配置J·虛像題 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.60，視角放大 1.42 倍，5487 px
-  PASS  [phone-landscape] 配置J·虛像題 鏡框裡寫「虛像（正立、放大）」（使用者答虛像題 V2）  — 虛像（正立、放大）
+  PASS  [phone-landscape] 配置J·虛像題 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.69，視角放大 1.55 倍，8166 px
+  PASS  [phone-landscape] 配置J·虛像題 鏡框裡寫「虛像（正立、放大）」；像離透鏡太近時多寫「建議標記別處」  — 虛像（正立、放大），像離透鏡 76 cm
   PASS  [phone-landscape] 配置J·虛像題 看透鏡：畫面、文字、Debug 都沒有鬼本體或答案
   PASS  [phone-landscape] 配置J·虛像題 透鏡越過鬼：透鏡裡、布幕上都看不到像，不能標記
-  PASS  [phone-landscape] 配置J·虛像題 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-395, 48)，透鏡 -275.0
+  PASS  [phone-landscape] 配置J·虛像題 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-381, 34)，透鏡 -305.0
   PASS  [phone-landscape] 配置J·虛像題 標記後出現台詞  — 「你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」」
   PASS  [phone-landscape] 配置J·虛像題 畫面上有標記
   PASS  [phone-landscape] 配置J·虛像題 切到「看布幕」：虛像標記取消
   PASS  [phone-landscape] 配置J·虛像題 看布幕時沒有「虛像」字樣
+  PASS  [phone-landscape] 配置J·虛像題 看布幕時按標記：不會出現「建議標記別處」（只在看透鏡時才有）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
   PASS  [phone-landscape] 配置J·虛像題 切回「看透鏡」可以重新標記
   PASS  [phone-landscape] 虛像題／看透鏡已標記：所有控制項都在畫面內  — canvas 812×240
   PASS  [phone-landscape] 虛像題／看透鏡已標記：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-landscape] 虛像題／看透鏡已標記：頁面不需捲動
   PASS  [phone-landscape] 虛像題／看透鏡已標記：畫布仍有足夠空間（≥300×150）  — 812×240
   PASS  [phone-landscape] 配置J·虛像題 切到側視分析
-  PASS  [phone-landscape] 配置J·虛像題 虛像標記在透鏡左邊；所有吸附點都在布幕前面（F′ 在布幕後面就不出現）  — O(-275) F(-475) F′(-75) 虛像(-395)
+  PASS  [phone-landscape] 配置J·虛像題 虛像標記在透鏡左邊；所有吸附點都在布幕前面（F′ 在布幕後面就不出現）  — O(-305) F(-415) F′(-195) 虛像(-381)
   PASS  [phone-landscape] 配置J·虛像題 分析開始：畫面、文字、Debug 都沒有鬼本體或答案
-  PASS  [phone-landscape] 配置J·虛像題 線 1：從虛像標記拉水平線，交透鏡於 P  — P.y=48.00
+  PASS  [phone-landscape] 配置J·虛像題 線 1：從虛像標記拉水平線，交透鏡於 P  — P.y=33.85
   PASS  [phone-landscape] 配置J·虛像題 「標記→水平得 P → P 連 F → 標記連 O」交點 = 鬼，落在目標格  — 誤差 0.0e+0 cm，格 4（parallel,line,line）
   PASS  [phone-landscape] 配置J·虛像題 學生畫的線一律實線（沒有實線／虛線切換）
   PASS  [phone-landscape] 配置J·虛像題 畫完三條線：畫面、文字、Debug 都沒有鬼本體或答案
@@ -1609,47 +1610,48 @@
   PASS  [phone-landscape] 配置J·虛像題 過關訊息說明透鏡裡看到的是虛像  — 「封印成功！鬼被迫顯形——透鏡裡看到的只是牠的虛像，本體和虛像都在透鏡的另一邊。看看光是怎麼走的。」
   PASS  [phone-landscape] 配置J·虛像題 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [phone-landscape] 配置J·虛像題 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
-  PASS  [phone-landscape] 配置J·虛像題 光路重現：虛像：像距為負、放大率 > 1（正立、放大）  — v=-120.0，m=1.60
+  PASS  [phone-landscape] 配置J·虛像題 光路重現：虛像：像距為負、放大率 > 1（正立、放大）  — v=-76.2，m=1.69
   PASS  [phone-landscape] 配置J·虛像題 光路重現：六段實際光線（實線）＋三段反向延長線（虛線）
   PASS  [phone-landscape] 配置J·虛像題 光路重現：三條光線都從鬼本體出發
   PASS  [phone-landscape] 配置J·虛像題 光路重現：平行主軸的光線折射後朝 F′ 的方向走
   PASS  [phone-landscape] 配置J·虛像題 光路重現：過光心的光線不偏折
   PASS  [phone-landscape] 配置J·虛像題 光路重現：從 F 方向來的光線折射後平行主光軸，打在鏡片內
   PASS  [phone-landscape] 配置J·虛像題 光路重現：折射後的光線發散，到布幕（或地板／天花板）為止，沒有會聚成像
-  PASS  [phone-landscape] 配置J·虛像題 光路重現：三條反向延長線交在虛像（= 玩家的標記）  — (-395.0, 48.0)
-  PASS  [phone-landscape] 配置J·虛像題 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 8/8 個取樣點在畫面內
-  PASS  [phone-landscape] 配置J·虛像題 光路重現 t=1.60s：光線依序長出（走到的亮、沒走到的不亮）  — 8/8 個取樣點在畫面內
-  PASS  [phone-landscape] 配置J·虛像題 光路重現 t=2.70s：光線依序長出（走到的亮、沒走到的不亮）  — 8/8 個取樣點在畫面內
-  PASS  [phone-landscape] 配置J·虛像題 光路重現 t=4.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
+  PASS  [phone-landscape] 配置J·虛像題 光路重現：三條反向延長線交在虛像（= 玩家的標記）  — (-381.2, 33.8)
+  PASS  [phone-landscape] 配置J·虛像題 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 6/6 個取樣點在畫面內
+  PASS  [phone-landscape] 配置J·虛像題 光路重現 t=1.60s：光線依序長出（走到的亮、沒走到的不亮）  — 6/6 個取樣點在畫面內
+  PASS  [phone-landscape] 配置J·虛像題 光路重現 t=2.70s：光線依序長出（走到的亮、沒走到的不亮）  — 6/6 個取樣點在畫面內
+  PASS  [phone-landscape] 配置J·虛像題 光路重現 t=4.20s：全部光線都畫出來了  — 6/6 個取樣點在畫面內
   PASS  [phone-landscape] 配置J·虛像題 光路重現：畫面上方有說明文字框
-  PASS  [phone-landscape] 配置J·虛像題 光路重現：結束時標出像點  — 132 px（重現前 70）
+  PASS  [phone-landscape] 配置J·虛像題 光路重現：結束時標出像點  — 142 px（重現前 52）
   PASS  [phone-landscape] 配置J·虛像題 光路重現：反向延長線用另一種顏色的虛線
   PASS  [phone-landscape] 配置J·虛像題 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置K·虛像題 開場：看布幕、沒有標記
   PASS  [phone-landscape] 配置K·虛像題 開始觀察：畫面、文字、Debug 都沒有鬼本體或答案
-  PASS  [phone-landscape] 配置K·虛像題 透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光  — 最小模糊比 3.91
+  PASS  [phone-landscape] 配置K·虛像題 透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光  — 最小模糊比 0.59
   PASS  [phone-landscape] 配置K·虛像題 看布幕時按「標記」被拒絕（布幕上沒有清楚的像）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
   PASS  [phone-landscape] 配置K·虛像題 看布幕時沒有畫虛像
   PASS  [phone-landscape] 配置K·虛像題 按「看透鏡」切換畫面（兩個並排按鈕，狀態正確）
-  PASS  [phone-landscape] 配置K·虛像題 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.57，視角放大 1.43 倍，6099 px
-  PASS  [phone-landscape] 配置K·虛像題 鏡框裡寫「虛像（正立、放大）」（使用者答虛像題 V2）  — 虛像（正立、放大）
+  PASS  [phone-landscape] 配置K·虛像題 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.71，視角放大 1.59 倍，8758 px
+  PASS  [phone-landscape] 配置K·虛像題 鏡框裡寫「虛像（正立、放大）」；像離透鏡太近時多寫「建議標記別處」  — 虛像（正立、放大），像離透鏡 86 cm
   PASS  [phone-landscape] 配置K·虛像題 看透鏡：畫面、文字、Debug 都沒有鬼本體或答案
   PASS  [phone-landscape] 配置K·虛像題 透鏡越過鬼：透鏡裡、布幕上都看不到像，不能標記
-  PASS  [phone-landscape] 配置K·虛像題 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-496, -47)，透鏡 -370.0
+  PASS  [phone-landscape] 配置K·虛像題 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-486, -34)，透鏡 -400.0
   PASS  [phone-landscape] 配置K·虛像題 標記後出現台詞  — 「你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」」
   PASS  [phone-landscape] 配置K·虛像題 畫面上有標記
   PASS  [phone-landscape] 配置K·虛像題 切到「看布幕」：虛像標記取消
   PASS  [phone-landscape] 配置K·虛像題 看布幕時沒有「虛像」字樣
+  PASS  [phone-landscape] 配置K·虛像題 看布幕時按標記：不會出現「建議標記別處」（只在看透鏡時才有）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
   PASS  [phone-landscape] 配置K·虛像題 切回「看透鏡」可以重新標記
   PASS  [phone-landscape] 虛像題／看透鏡已標記：所有控制項都在畫面內  — canvas 812×240
   PASS  [phone-landscape] 虛像題／看透鏡已標記：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-landscape] 虛像題／看透鏡已標記：頁面不需捲動
   PASS  [phone-landscape] 虛像題／看透鏡已標記：畫布仍有足夠空間（≥300×150）  — 812×240
   PASS  [phone-landscape] 配置K·虛像題 切到側視分析
-  PASS  [phone-landscape] 配置K·虛像題 虛像標記在透鏡左邊；所有吸附點都在布幕前面（F′ 在布幕後面就不出現）  — O(-370) F(-590) F′(-150) 虛像(-496)
+  PASS  [phone-landscape] 配置K·虛像題 虛像標記在透鏡左邊；所有吸附點都在布幕前面（F′ 在布幕後面就不出現）  — O(-400) F(-520) F′(-280) 虛像(-486)
   PASS  [phone-landscape] 配置K·虛像題 分析開始：畫面、文字、Debug 都沒有鬼本體或答案
-  PASS  [phone-landscape] 配置K·虛像題 線 1：從虛像標記拉水平線，交透鏡於 P  — P.y=-47.14
-  PASS  [phone-landscape] 配置K·虛像題 「標記→水平得 P → P 連 F → 標記連 O」交點 = 鬼，落在目標格  — 誤差 0.0e+0 cm，格 5（parallel,line,line）
+  PASS  [phone-landscape] 配置K·虛像題 線 1：從虛像標記拉水平線，交透鏡於 P  — P.y=-34.29
+  PASS  [phone-landscape] 配置K·虛像題 「標記→水平得 P → P 連 F → 標記連 O」交點 = 鬼，落在目標格  — 誤差 3.6e-15 cm，格 5（parallel,line,line）
   PASS  [phone-landscape] 配置K·虛像題 學生畫的線一律實線（沒有實線／虛線切換）
   PASS  [phone-landscape] 配置K·虛像題 畫完三條線：畫面、文字、Debug 都沒有鬼本體或答案
   PASS  [phone-landscape] 配置K·虛像題 選目標格
@@ -1657,46 +1659,47 @@
   PASS  [phone-landscape] 配置K·虛像題 過關訊息說明透鏡裡看到的是虛像  — 「封印成功！鬼被迫顯形——透鏡裡看到的只是牠的虛像，本體和虛像都在透鏡的另一邊。看看光是怎麼走的。」
   PASS  [phone-landscape] 配置K·虛像題 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [phone-landscape] 配置K·虛像題 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
-  PASS  [phone-landscape] 配置K·虛像題 光路重現：虛像：像距為負、放大率 > 1（正立、放大）  — v=-125.7，m=1.57
+  PASS  [phone-landscape] 配置K·虛像題 光路重現：虛像：像距為負、放大率 > 1（正立、放大）  — v=-85.7，m=1.71
   PASS  [phone-landscape] 配置K·虛像題 光路重現：六段實際光線（實線）＋三段反向延長線（虛線）
   PASS  [phone-landscape] 配置K·虛像題 光路重現：三條光線都從鬼本體出發
   PASS  [phone-landscape] 配置K·虛像題 光路重現：平行主軸的光線折射後朝 F′ 的方向走
   PASS  [phone-landscape] 配置K·虛像題 光路重現：過光心的光線不偏折
   PASS  [phone-landscape] 配置K·虛像題 光路重現：從 F 方向來的光線折射後平行主光軸，打在鏡片內
   PASS  [phone-landscape] 配置K·虛像題 光路重現：折射後的光線發散，到布幕（或地板／天花板）為止，沒有會聚成像
-  PASS  [phone-landscape] 配置K·虛像題 光路重現：三條反向延長線交在虛像（= 玩家的標記）  — (-495.7, -47.1)
-  PASS  [phone-landscape] 配置K·虛像題 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 8/8 個取樣點在畫面內
-  PASS  [phone-landscape] 配置K·虛像題 光路重現 t=1.60s：光線依序長出（走到的亮、沒走到的不亮）  — 8/8 個取樣點在畫面內
-  PASS  [phone-landscape] 配置K·虛像題 光路重現 t=2.70s：光線依序長出（走到的亮、沒走到的不亮）  — 8/8 個取樣點在畫面內
-  PASS  [phone-landscape] 配置K·虛像題 光路重現 t=4.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
+  PASS  [phone-landscape] 配置K·虛像題 光路重現：三條反向延長線交在虛像（= 玩家的標記）  — (-485.7, -34.3)
+  PASS  [phone-landscape] 配置K·虛像題 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 6/6 個取樣點在畫面內
+  PASS  [phone-landscape] 配置K·虛像題 光路重現 t=1.60s：光線依序長出（走到的亮、沒走到的不亮）  — 6/6 個取樣點在畫面內
+  PASS  [phone-landscape] 配置K·虛像題 光路重現 t=2.70s：光線依序長出（走到的亮、沒走到的不亮）  — 6/6 個取樣點在畫面內
+  PASS  [phone-landscape] 配置K·虛像題 光路重現 t=4.20s：全部光線都畫出來了  — 6/6 個取樣點在畫面內
   PASS  [phone-landscape] 配置K·虛像題 光路重現：畫面上方有說明文字框
-  PASS  [phone-landscape] 配置K·虛像題 光路重現：結束時標出像點  — 136 px（重現前 70）
+  PASS  [phone-landscape] 配置K·虛像題 光路重現：結束時標出像點  — 139 px（重現前 62）
   PASS  [phone-landscape] 配置K·虛像題 光路重現：反向延長線用另一種顏色的虛線
   PASS  [phone-landscape] 配置K·虛像題 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置L·虛像題 開場：看布幕、沒有標記
   PASS  [phone-landscape] 配置L·虛像題 開始觀察：畫面、文字、Debug 都沒有鬼本體或答案
-  PASS  [phone-landscape] 配置L·虛像題 透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光  — 最小模糊比 2.03
+  PASS  [phone-landscape] 配置L·虛像題 透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光  — 最小模糊比 0.42
   PASS  [phone-landscape] 配置L·虛像題 看布幕時按「標記」被拒絕（布幕上沒有清楚的像）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
   PASS  [phone-landscape] 配置L·虛像題 看布幕時沒有畫虛像
   PASS  [phone-landscape] 配置L·虛像題 按「看透鏡」切換畫面（兩個並排按鈕，狀態正確）
-  PASS  [phone-landscape] 配置L·虛像題 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.75，視角放大 1.59 倍，8261 px
-  PASS  [phone-landscape] 配置L·虛像題 鏡框裡寫「虛像（正立、放大）」（使用者答虛像題 V2）  — 虛像（正立、放大）
+  PASS  [phone-landscape] 配置L·虛像題 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.79，視角放大 1.64 倍，9365 px
+  PASS  [phone-landscape] 配置L·虛像題 鏡框裡寫「虛像（正立、放大）」；像離透鏡太近時多寫「建議標記別處」  — 虛像（正立、放大），像離透鏡 134 cm
   PASS  [phone-landscape] 配置L·虛像題 看透鏡：畫面、文字、Debug 都沒有鬼本體或答案
-  PASS  [phone-landscape] 配置L·虛像題 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-718, -53)，透鏡 -560.0
+  PASS  [phone-landscape] 配置L·虛像題 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-709, -54)，透鏡 -575.0
   PASS  [phone-landscape] 配置L·虛像題 標記後出現台詞  — 「你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」」
   PASS  [phone-landscape] 配置L·虛像題 畫面上有標記
   PASS  [phone-landscape] 配置L·虛像題 切到「看布幕」：虛像標記取消
   PASS  [phone-landscape] 配置L·虛像題 看布幕時沒有「虛像」字樣
+  PASS  [phone-landscape] 配置L·虛像題 看布幕時按標記：不會出現「建議標記別處」（只在看透鏡時才有）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
   PASS  [phone-landscape] 配置L·虛像題 切回「看透鏡」可以重新標記
   PASS  [phone-landscape] 虛像題／看透鏡已標記：所有控制項都在畫面內  — canvas 812×240
   PASS  [phone-landscape] 虛像題／看透鏡已標記：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-landscape] 虛像題／看透鏡已標記：頁面不需捲動
   PASS  [phone-landscape] 虛像題／看透鏡已標記：畫布仍有足夠空間（≥300×150）  — 812×240
   PASS  [phone-landscape] 配置L·虛像題 切到側視分析
-  PASS  [phone-landscape] 配置L·虛像題 虛像標記在透鏡左邊；所有吸附點都在布幕前面（F′ 在布幕後面就不出現）  — O(-560) F(-770) F′(-350) 虛像(-718)
+  PASS  [phone-landscape] 配置L·虛像題 虛像標記在透鏡左邊；所有吸附點都在布幕前面（F′ 在布幕後面就不出現）  — O(-575) F(-745) F′(-405) 虛像(-709)
   PASS  [phone-landscape] 配置L·虛像題 分析開始：畫面、文字、Debug 都沒有鬼本體或答案
-  PASS  [phone-landscape] 配置L·虛像題 線 1：從虛像標記拉水平線，交透鏡於 P  — P.y=-52.50
-  PASS  [phone-landscape] 配置L·虛像題 「標記→水平得 P → P 連 F → 標記連 O」交點 = 鬼，落在目標格  — 誤差 0.0e+0 cm，格 7（parallel,line,line）
+  PASS  [phone-landscape] 配置L·虛像題 線 1：從虛像標記拉水平線，交透鏡於 P  — P.y=-53.68
+  PASS  [phone-landscape] 配置L·虛像題 「標記→水平得 P → P 連 F → 標記連 O」交點 = 鬼，落在目標格  — 誤差 3.6e-15 cm，格 7（parallel,line,line）
   PASS  [phone-landscape] 配置L·虛像題 學生畫的線一律實線（沒有實線／虛線切換）
   PASS  [phone-landscape] 配置L·虛像題 畫完三條線：畫面、文字、Debug 都沒有鬼本體或答案
   PASS  [phone-landscape] 配置L·虛像題 選目標格
@@ -1704,35 +1707,182 @@
   PASS  [phone-landscape] 配置L·虛像題 過關訊息說明透鏡裡看到的是虛像  — 「封印成功！鬼被迫顯形——透鏡裡看到的只是牠的虛像，本體和虛像都在透鏡的另一邊。看看光是怎麼走的。」
   PASS  [phone-landscape] 配置L·虛像題 封印成功後自動播放光路重現，並出現「光路重現」按鈕
   PASS  [phone-landscape] 配置L·虛像題 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
-  PASS  [phone-landscape] 配置L·虛像題 光路重現：虛像：像距為負、放大率 > 1（正立、放大）  — v=-157.5，m=1.75
+  PASS  [phone-landscape] 配置L·虛像題 光路重現：虛像：像距為負、放大率 > 1（正立、放大）  — v=-134.2，m=1.79
   PASS  [phone-landscape] 配置L·虛像題 光路重現：六段實際光線（實線）＋三段反向延長線（虛線）
   PASS  [phone-landscape] 配置L·虛像題 光路重現：三條光線都從鬼本體出發
   PASS  [phone-landscape] 配置L·虛像題 光路重現：平行主軸的光線折射後朝 F′ 的方向走
   PASS  [phone-landscape] 配置L·虛像題 光路重現：過光心的光線不偏折
   PASS  [phone-landscape] 配置L·虛像題 光路重現：從 F 方向來的光線折射後平行主光軸，打在鏡片內
   PASS  [phone-landscape] 配置L·虛像題 光路重現：折射後的光線發散，到布幕（或地板／天花板）為止，沒有會聚成像
-  PASS  [phone-landscape] 配置L·虛像題 光路重現：三條反向延長線交在虛像（= 玩家的標記）  — (-717.5, -52.5)
+  PASS  [phone-landscape] 配置L·虛像題 光路重現：三條反向延長線交在虛像（= 玩家的標記）  — (-709.2, -53.7)
   PASS  [phone-landscape] 配置L·虛像題 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
   PASS  [phone-landscape] 配置L·虛像題 光路重現 t=1.60s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
   PASS  [phone-landscape] 配置L·虛像題 光路重現 t=2.70s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
   PASS  [phone-landscape] 配置L·虛像題 光路重現 t=4.20s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
   PASS  [phone-landscape] 配置L·虛像題 光路重現：畫面上方有說明文字框
-  PASS  [phone-landscape] 配置L·虛像題 光路重現：結束時標出像點  — 133 px（重現前 74）
+  PASS  [phone-landscape] 配置L·虛像題 光路重現：結束時標出像點  — 134 px（重現前 65）
   PASS  [phone-landscape] 配置L·虛像題 光路重現：反向延長線用另一種顏色的虛線
   PASS  [phone-landscape] 配置L·虛像題 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置M·虛像題 開場：看布幕、沒有標記
+  PASS  [phone-landscape] 配置M·虛像題 開始觀察：畫面、文字、Debug 都沒有鬼本體或答案
+  PASS  [phone-landscape] 配置M·虛像題 透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光  — 最小模糊比 4.30
+  PASS  [phone-landscape] 配置M·虛像題 看布幕時按「標記」被拒絕（布幕上沒有清楚的像）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
+  PASS  [phone-landscape] 配置M·虛像題 看布幕時沒有畫虛像
+  PASS  [phone-landscape] 配置M·虛像題 按「看透鏡」切換畫面（兩個並排按鈕，狀態正確）
+  PASS  [phone-landscape] 配置M·虛像題 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.60，視角放大 1.42 倍，5487 px
+  PASS  [phone-landscape] 配置M·虛像題 鏡框裡寫「虛像（正立、放大）」；像離透鏡太近時多寫「建議標記別處」  — 虛像（正立、放大），像離透鏡 120 cm
+  PASS  [phone-landscape] 配置M·虛像題 看透鏡：畫面、文字、Debug 都沒有鬼本體或答案
+  PASS  [phone-landscape] 配置M·虛像題 透鏡越過鬼：透鏡裡、布幕上都看不到像，不能標記
+  PASS  [phone-landscape] 配置M·虛像題 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-395, 48)，透鏡 -275.0
+  PASS  [phone-landscape] 配置M·虛像題 標記後出現台詞  — 「你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」」
+  PASS  [phone-landscape] 配置M·虛像題 畫面上有標記
+  PASS  [phone-landscape] 配置M·虛像題 切到「看布幕」：虛像標記取消
+  PASS  [phone-landscape] 配置M·虛像題 看布幕時沒有「虛像」字樣
+  PASS  [phone-landscape] 配置M·虛像題 看布幕時按標記：不會出現「建議標記別處」（只在看透鏡時才有）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
+  PASS  [phone-landscape] 配置M·虛像題 切回「看透鏡」可以重新標記
+  PASS  [phone-landscape] 虛像題／看透鏡已標記：所有控制項都在畫面內  — canvas 812×240
+  PASS  [phone-landscape] 虛像題／看透鏡已標記：按鈕點擊區 ≥ 40×40 px
+  PASS  [phone-landscape] 虛像題／看透鏡已標記：頁面不需捲動
+  PASS  [phone-landscape] 虛像題／看透鏡已標記：畫布仍有足夠空間（≥300×150）  — 812×240
+  PASS  [phone-landscape] 配置M·虛像題 切到側視分析
+  PASS  [phone-landscape] 配置M·虛像題 虛像標記在透鏡左邊；所有吸附點都在布幕前面（F′ 在布幕後面就不出現）  — O(-275) F(-475) F′(-75) 虛像(-395)
+  PASS  [phone-landscape] 配置M·虛像題 分析開始：畫面、文字、Debug 都沒有鬼本體或答案
+  PASS  [phone-landscape] 配置M·虛像題 線 1：從虛像標記拉水平線，交透鏡於 P  — P.y=48.00
+  PASS  [phone-landscape] 配置M·虛像題 「標記→水平得 P → P 連 F → 標記連 O」交點 = 鬼，落在目標格  — 誤差 0.0e+0 cm，格 4（parallel,line,line）
+  PASS  [phone-landscape] 配置M·虛像題 學生畫的線一律實線（沒有實線／虛線切換）
+  PASS  [phone-landscape] 配置M·虛像題 畫完三條線：畫面、文字、Debug 都沒有鬼本體或答案
+  PASS  [phone-landscape] 配置M·虛像題 選目標格
+  PASS  [phone-landscape] 配置M·虛像題 封印成功並顯形
+  PASS  [phone-landscape] 配置M·虛像題 過關訊息說明透鏡裡看到的是虛像  — 「封印成功！鬼被迫顯形——透鏡裡看到的只是牠的虛像，本體和虛像都在透鏡的另一邊。看看光是怎麼走的。」
+  PASS  [phone-landscape] 配置M·虛像題 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [phone-landscape] 配置M·虛像題 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
+  PASS  [phone-landscape] 配置M·虛像題 光路重現：虛像：像距為負、放大率 > 1（正立、放大）  — v=-120.0，m=1.60
+  PASS  [phone-landscape] 配置M·虛像題 光路重現：六段實際光線（實線）＋三段反向延長線（虛線）
+  PASS  [phone-landscape] 配置M·虛像題 光路重現：三條光線都從鬼本體出發
+  PASS  [phone-landscape] 配置M·虛像題 光路重現：平行主軸的光線折射後朝 F′ 的方向走
+  PASS  [phone-landscape] 配置M·虛像題 光路重現：過光心的光線不偏折
+  PASS  [phone-landscape] 配置M·虛像題 光路重現：從 F 方向來的光線折射後平行主光軸，打在鏡片內
+  PASS  [phone-landscape] 配置M·虛像題 光路重現：折射後的光線發散，到布幕（或地板／天花板）為止，沒有會聚成像
+  PASS  [phone-landscape] 配置M·虛像題 光路重現：三條反向延長線交在虛像（= 玩家的標記）  — (-395.0, 48.0)
+  PASS  [phone-landscape] 配置M·虛像題 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 8/8 個取樣點在畫面內
+  PASS  [phone-landscape] 配置M·虛像題 光路重現 t=1.60s：光線依序長出（走到的亮、沒走到的不亮）  — 8/8 個取樣點在畫面內
+  PASS  [phone-landscape] 配置M·虛像題 光路重現 t=2.70s：光線依序長出（走到的亮、沒走到的不亮）  — 8/8 個取樣點在畫面內
+  PASS  [phone-landscape] 配置M·虛像題 光路重現 t=4.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
+  PASS  [phone-landscape] 配置M·虛像題 光路重現：畫面上方有說明文字框
+  PASS  [phone-landscape] 配置M·虛像題 光路重現：結束時標出像點  — 132 px（重現前 70）
+  PASS  [phone-landscape] 配置M·虛像題 光路重現：反向延長線用另一種顏色的虛線
+  PASS  [phone-landscape] 配置M·虛像題 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置N·虛像題 開場：看布幕、沒有標記
+  PASS  [phone-landscape] 配置N·虛像題 開始觀察：畫面、文字、Debug 都沒有鬼本體或答案
+  PASS  [phone-landscape] 配置N·虛像題 透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光  — 最小模糊比 3.91
+  PASS  [phone-landscape] 配置N·虛像題 看布幕時按「標記」被拒絕（布幕上沒有清楚的像）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
+  PASS  [phone-landscape] 配置N·虛像題 看布幕時沒有畫虛像
+  PASS  [phone-landscape] 配置N·虛像題 按「看透鏡」切換畫面（兩個並排按鈕，狀態正確）
+  PASS  [phone-landscape] 配置N·虛像題 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.57，視角放大 1.43 倍，6099 px
+  PASS  [phone-landscape] 配置N·虛像題 鏡框裡寫「虛像（正立、放大）」；像離透鏡太近時多寫「建議標記別處」  — 虛像（正立、放大），像離透鏡 126 cm
+  PASS  [phone-landscape] 配置N·虛像題 看透鏡：畫面、文字、Debug 都沒有鬼本體或答案
+  PASS  [phone-landscape] 配置N·虛像題 透鏡越過鬼：透鏡裡、布幕上都看不到像，不能標記
+  PASS  [phone-landscape] 配置N·虛像題 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-496, -47)，透鏡 -370.0
+  PASS  [phone-landscape] 配置N·虛像題 標記後出現台詞  — 「你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」」
+  PASS  [phone-landscape] 配置N·虛像題 畫面上有標記
+  PASS  [phone-landscape] 配置N·虛像題 切到「看布幕」：虛像標記取消
+  PASS  [phone-landscape] 配置N·虛像題 看布幕時沒有「虛像」字樣
+  PASS  [phone-landscape] 配置N·虛像題 看布幕時按標記：不會出現「建議標記別處」（只在看透鏡時才有）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
+  PASS  [phone-landscape] 配置N·虛像題 切回「看透鏡」可以重新標記
+  PASS  [phone-landscape] 虛像題／看透鏡已標記：所有控制項都在畫面內  — canvas 812×240
+  PASS  [phone-landscape] 虛像題／看透鏡已標記：按鈕點擊區 ≥ 40×40 px
+  PASS  [phone-landscape] 虛像題／看透鏡已標記：頁面不需捲動
+  PASS  [phone-landscape] 虛像題／看透鏡已標記：畫布仍有足夠空間（≥300×150）  — 812×240
+  PASS  [phone-landscape] 配置N·虛像題 切到側視分析
+  PASS  [phone-landscape] 配置N·虛像題 虛像標記在透鏡左邊；所有吸附點都在布幕前面（F′ 在布幕後面就不出現）  — O(-370) F(-590) F′(-150) 虛像(-496)
+  PASS  [phone-landscape] 配置N·虛像題 分析開始：畫面、文字、Debug 都沒有鬼本體或答案
+  PASS  [phone-landscape] 配置N·虛像題 線 1：從虛像標記拉水平線，交透鏡於 P  — P.y=-47.14
+  PASS  [phone-landscape] 配置N·虛像題 「標記→水平得 P → P 連 F → 標記連 O」交點 = 鬼，落在目標格  — 誤差 0.0e+0 cm，格 5（parallel,line,line）
+  PASS  [phone-landscape] 配置N·虛像題 學生畫的線一律實線（沒有實線／虛線切換）
+  PASS  [phone-landscape] 配置N·虛像題 畫完三條線：畫面、文字、Debug 都沒有鬼本體或答案
+  PASS  [phone-landscape] 配置N·虛像題 選目標格
+  PASS  [phone-landscape] 配置N·虛像題 封印成功並顯形
+  PASS  [phone-landscape] 配置N·虛像題 過關訊息說明透鏡裡看到的是虛像  — 「封印成功！鬼被迫顯形——透鏡裡看到的只是牠的虛像，本體和虛像都在透鏡的另一邊。看看光是怎麼走的。」
+  PASS  [phone-landscape] 配置N·虛像題 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [phone-landscape] 配置N·虛像題 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
+  PASS  [phone-landscape] 配置N·虛像題 光路重現：虛像：像距為負、放大率 > 1（正立、放大）  — v=-125.7，m=1.57
+  PASS  [phone-landscape] 配置N·虛像題 光路重現：六段實際光線（實線）＋三段反向延長線（虛線）
+  PASS  [phone-landscape] 配置N·虛像題 光路重現：三條光線都從鬼本體出發
+  PASS  [phone-landscape] 配置N·虛像題 光路重現：平行主軸的光線折射後朝 F′ 的方向走
+  PASS  [phone-landscape] 配置N·虛像題 光路重現：過光心的光線不偏折
+  PASS  [phone-landscape] 配置N·虛像題 光路重現：從 F 方向來的光線折射後平行主光軸，打在鏡片內
+  PASS  [phone-landscape] 配置N·虛像題 光路重現：折射後的光線發散，到布幕（或地板／天花板）為止，沒有會聚成像
+  PASS  [phone-landscape] 配置N·虛像題 光路重現：三條反向延長線交在虛像（= 玩家的標記）  — (-495.7, -47.1)
+  PASS  [phone-landscape] 配置N·虛像題 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 8/8 個取樣點在畫面內
+  PASS  [phone-landscape] 配置N·虛像題 光路重現 t=1.60s：光線依序長出（走到的亮、沒走到的不亮）  — 8/8 個取樣點在畫面內
+  PASS  [phone-landscape] 配置N·虛像題 光路重現 t=2.70s：光線依序長出（走到的亮、沒走到的不亮）  — 8/8 個取樣點在畫面內
+  PASS  [phone-landscape] 配置N·虛像題 光路重現 t=4.20s：全部光線都畫出來了  — 8/8 個取樣點在畫面內
+  PASS  [phone-landscape] 配置N·虛像題 光路重現：畫面上方有說明文字框
+  PASS  [phone-landscape] 配置N·虛像題 光路重現：結束時標出像點  — 136 px（重現前 70）
+  PASS  [phone-landscape] 配置N·虛像題 光路重現：反向延長線用另一種顏色的虛線
+  PASS  [phone-landscape] 配置N·虛像題 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [phone-landscape] 配置O·虛像題 開場：看布幕、沒有標記
+  PASS  [phone-landscape] 配置O·虛像題 開始觀察：畫面、文字、Debug 都沒有鬼本體或答案
+  PASS  [phone-landscape] 配置O·虛像題 透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光  — 最小模糊比 2.03
+  PASS  [phone-landscape] 配置O·虛像題 看布幕時按「標記」被拒絕（布幕上沒有清楚的像）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
+  PASS  [phone-landscape] 配置O·虛像題 看布幕時沒有畫虛像
+  PASS  [phone-landscape] 配置O·虛像題 按「看透鏡」切換畫面（兩個並排按鈕，狀態正確）
+  PASS  [phone-landscape] 配置O·虛像題 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.75，視角放大 1.59 倍，8261 px
+  PASS  [phone-landscape] 配置O·虛像題 鏡框裡寫「虛像（正立、放大）」；像離透鏡太近時多寫「建議標記別處」  — 虛像（正立、放大），像離透鏡 158 cm
+  PASS  [phone-landscape] 配置O·虛像題 看透鏡：畫面、文字、Debug 都沒有鬼本體或答案
+  PASS  [phone-landscape] 配置O·虛像題 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-718, -53)，透鏡 -560.0
+  PASS  [phone-landscape] 配置O·虛像題 標記後出現台詞  — 「你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」」
+  PASS  [phone-landscape] 配置O·虛像題 畫面上有標記
+  PASS  [phone-landscape] 配置O·虛像題 切到「看布幕」：虛像標記取消
+  PASS  [phone-landscape] 配置O·虛像題 看布幕時沒有「虛像」字樣
+  PASS  [phone-landscape] 配置O·虛像題 看布幕時按標記：不會出現「建議標記別處」（只在看透鏡時才有）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
+  PASS  [phone-landscape] 配置O·虛像題 切回「看透鏡」可以重新標記
+  PASS  [phone-landscape] 虛像題／看透鏡已標記：所有控制項都在畫面內  — canvas 812×240
+  PASS  [phone-landscape] 虛像題／看透鏡已標記：按鈕點擊區 ≥ 40×40 px
+  PASS  [phone-landscape] 虛像題／看透鏡已標記：頁面不需捲動
+  PASS  [phone-landscape] 虛像題／看透鏡已標記：畫布仍有足夠空間（≥300×150）  — 812×240
+  PASS  [phone-landscape] 配置O·虛像題 切到側視分析
+  PASS  [phone-landscape] 配置O·虛像題 虛像標記在透鏡左邊；所有吸附點都在布幕前面（F′ 在布幕後面就不出現）  — O(-560) F(-770) F′(-350) 虛像(-718)
+  PASS  [phone-landscape] 配置O·虛像題 分析開始：畫面、文字、Debug 都沒有鬼本體或答案
+  PASS  [phone-landscape] 配置O·虛像題 線 1：從虛像標記拉水平線，交透鏡於 P  — P.y=-52.50
+  PASS  [phone-landscape] 配置O·虛像題 「標記→水平得 P → P 連 F → 標記連 O」交點 = 鬼，落在目標格  — 誤差 0.0e+0 cm，格 7（parallel,line,line）
+  PASS  [phone-landscape] 配置O·虛像題 學生畫的線一律實線（沒有實線／虛線切換）
+  PASS  [phone-landscape] 配置O·虛像題 畫完三條線：畫面、文字、Debug 都沒有鬼本體或答案
+  PASS  [phone-landscape] 配置O·虛像題 選目標格
+  PASS  [phone-landscape] 配置O·虛像題 封印成功並顯形
+  PASS  [phone-landscape] 配置O·虛像題 過關訊息說明透鏡裡看到的是虛像  — 「封印成功！鬼被迫顯形——透鏡裡看到的只是牠的虛像，本體和虛像都在透鏡的另一邊。看看光是怎麼走的。」
+  PASS  [phone-landscape] 配置O·虛像題 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [phone-landscape] 配置O·虛像題 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
+  PASS  [phone-landscape] 配置O·虛像題 光路重現：虛像：像距為負、放大率 > 1（正立、放大）  — v=-157.5，m=1.75
+  PASS  [phone-landscape] 配置O·虛像題 光路重現：六段實際光線（實線）＋三段反向延長線（虛線）
+  PASS  [phone-landscape] 配置O·虛像題 光路重現：三條光線都從鬼本體出發
+  PASS  [phone-landscape] 配置O·虛像題 光路重現：平行主軸的光線折射後朝 F′ 的方向走
+  PASS  [phone-landscape] 配置O·虛像題 光路重現：過光心的光線不偏折
+  PASS  [phone-landscape] 配置O·虛像題 光路重現：從 F 方向來的光線折射後平行主光軸，打在鏡片內
+  PASS  [phone-landscape] 配置O·虛像題 光路重現：折射後的光線發散，到布幕（或地板／天花板）為止，沒有會聚成像
+  PASS  [phone-landscape] 配置O·虛像題 光路重現：三條反向延長線交在虛像（= 玩家的標記）  — (-717.5, -52.5)
+  PASS  [phone-landscape] 配置O·虛像題 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
+  PASS  [phone-landscape] 配置O·虛像題 光路重現 t=1.60s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
+  PASS  [phone-landscape] 配置O·虛像題 光路重現 t=2.70s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
+  PASS  [phone-landscape] 配置O·虛像題 光路重現 t=4.20s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
+  PASS  [phone-landscape] 配置O·虛像題 光路重現：畫面上方有說明文字框
+  PASS  [phone-landscape] 配置O·虛像題 光路重現：結束時標出像點  — 133 px（重現前 74）
+  PASS  [phone-landscape] 配置O·虛像題 光路重現：反向延長線用另一種顏色的虛線
+  PASS  [phone-landscape] 配置O·虛像題 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 配置B·實像題改標虛像 開場：看布幕、沒有標記
   PASS  [phone-landscape] 配置B·實像題改標虛像 開始觀察：畫面、文字、Debug 都沒有鬼本體或答案
   PASS  [phone-landscape] 配置B·實像題改標虛像 看布幕時按「標記」被拒絕（布幕上沒有清楚的像）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
   PASS  [phone-landscape] 配置B·實像題改標虛像 看布幕時沒有畫虛像
   PASS  [phone-landscape] 配置B·實像題改標虛像 按「看透鏡」切換畫面（兩個並排按鈕，狀態正確）
-  PASS  [phone-landscape] 配置B·實像題改標虛像 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.43，視角放大 1.39 倍，7284 px
-  PASS  [phone-landscape] 配置B·實像題改標虛像 鏡框裡寫「虛像（正立、放大）」（使用者答虛像題 V2）  — 虛像（正立、放大）
+  PASS  [phone-landscape] 配置B·實像題改標虛像 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.43，視角放大 1.39 倍，7283 px
+  PASS  [phone-landscape] 配置B·實像題改標虛像 鏡框裡寫「虛像（正立、放大）」；像離透鏡太近時多寫「建議標記別處」  — 虛像（正立、放大），像離透鏡 64 cm
   PASS  [phone-landscape] 配置B·實像題改標虛像 看透鏡：畫面、文字、Debug 都沒有鬼本體或答案
   PASS  [phone-landscape] 配置B·實像題改標虛像 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-669, -86)，透鏡 -605.0
   PASS  [phone-landscape] 配置B·實像題改標虛像 標記後出現台詞  — 「你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」」
   PASS  [phone-landscape] 配置B·實像題改標虛像 畫面上有標記
   PASS  [phone-landscape] 配置B·實像題改標虛像 切到「看布幕」：虛像標記取消
   PASS  [phone-landscape] 配置B·實像題改標虛像 看布幕時沒有「虛像」字樣
+  PASS  [phone-landscape] 配置B·實像題改標虛像 看布幕時按標記：不會出現「建議標記別處」（只在看透鏡時才有）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
   PASS  [phone-landscape] 配置B·實像題改標虛像 切回「看透鏡」可以重新標記
   PASS  [phone-landscape] 虛像題／看透鏡已標記：所有控制項都在畫面內  — canvas 812×240
   PASS  [phone-landscape] 虛像題／看透鏡已標記：按鈕點擊區 ≥ 40×40 px
@@ -1771,15 +1921,16 @@
   PASS  [phone-landscape] 配置E·實像題改標虛像 看布幕時按「標記」被拒絕（布幕上沒有清楚的像）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
   PASS  [phone-landscape] 配置E·實像題改標虛像 看布幕時沒有畫虛像
   PASS  [phone-landscape] 配置E·實像題改標虛像 按「看透鏡」切換畫面（兩個並排按鈕，狀態正確）
-  PASS  [phone-landscape] 配置E·實像題改標虛像 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.29，視角放大 1.27 倍，6421 px
-  PASS  [phone-landscape] 配置E·實像題改標虛像 鏡框裡寫「虛像（正立、放大）」（使用者答虛像題 V2）  — 虛像（正立、放大）
+  PASS  [phone-landscape] 配置E·實像題改標虛像 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.29，視角放大 1.27 倍，6523 px
+  PASS  [phone-landscape] 配置E·實像題改標虛像 鏡框裡寫「虛像（正立、放大）」；像離透鏡太近時多寫「建議標記別處」  — 虛像（正立、放大）建議標記別處，像離透鏡 32 cm
   PASS  [phone-landscape] 配置E·實像題改標虛像 看透鏡：畫面、文字、Debug 都沒有鬼本體或答案
   PASS  [phone-landscape] 配置E·實像題改標虛像 透鏡越過鬼：透鏡裡、布幕上都看不到像，不能標記
   PASS  [phone-landscape] 配置E·實像題改標虛像 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-457, -78)，透鏡 -425.0
-  PASS  [phone-landscape] 配置E·實像題改標虛像 標記後出現台詞  — 「你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」」
+  PASS  [phone-landscape] 配置E·實像題改標虛像 標記後出現台詞  — 「你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」（像離透鏡太近，畫線會擠在一起，建議標記別處。）」
   PASS  [phone-landscape] 配置E·實像題改標虛像 畫面上有標記
   PASS  [phone-landscape] 配置E·實像題改標虛像 切到「看布幕」：虛像標記取消
   PASS  [phone-landscape] 配置E·實像題改標虛像 看布幕時沒有「虛像」字樣
+  PASS  [phone-landscape] 配置E·實像題改標虛像 看布幕時按標記：不會出現「建議標記別處」（只在看透鏡時才有）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
   PASS  [phone-landscape] 配置E·實像題改標虛像 切回「看透鏡」可以重新標記
   PASS  [phone-landscape] 虛像題／看透鏡已標記：所有控制項都在畫面內  — canvas 812×240
   PASS  [phone-landscape] 虛像題／看透鏡已標記：按鈕點擊區 ≥ 40×40 px
@@ -1818,15 +1969,16 @@
   PASS  [phone-landscape] 配置F·實像題改標虛像 看布幕時按「標記」被拒絕（布幕上沒有清楚的像）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
   PASS  [phone-landscape] 配置F·實像題改標虛像 看布幕時沒有畫虛像
   PASS  [phone-landscape] 配置F·實像題改標虛像 按「看透鏡」切換畫面（兩個並排按鈕，狀態正確）
-  PASS  [phone-landscape] 配置F·實像題改標虛像 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.37，視角放大 1.34 倍，6765 px
-  PASS  [phone-landscape] 配置F·實像題改標虛像 鏡框裡寫「虛像（正立、放大）」（使用者答虛像題 V2）  — 虛像（正立、放大）
+  PASS  [phone-landscape] 配置F·實像題改標虛像 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.37，視角放大 1.34 倍，6866 px
+  PASS  [phone-landscape] 配置F·實像題改標虛像 鏡框裡寫「虛像（正立、放大）」；像離透鏡太近時多寫「建議標記別處」  — 虛像（正立、放大）建議標記別處，像離透鏡 48 cm
   PASS  [phone-landscape] 配置F·實像題改標虛像 看透鏡：畫面、文字、Debug 都沒有鬼本體或答案
   PASS  [phone-landscape] 配置F·實像題改標虛像 透鏡越過鬼：透鏡裡、布幕上都看不到像，不能標記
   PASS  [phone-landscape] 配置F·實像題改標虛像 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-563, 68)，透鏡 -515.0
-  PASS  [phone-landscape] 配置F·實像題改標虛像 標記後出現台詞  — 「你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」」
+  PASS  [phone-landscape] 配置F·實像題改標虛像 標記後出現台詞  — 「你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」（像離透鏡太近，畫線會擠在一起，建議標記別處。）」
   PASS  [phone-landscape] 配置F·實像題改標虛像 畫面上有標記
   PASS  [phone-landscape] 配置F·實像題改標虛像 切到「看布幕」：虛像標記取消
   PASS  [phone-landscape] 配置F·實像題改標虛像 看布幕時沒有「虛像」字樣
+  PASS  [phone-landscape] 配置F·實像題改標虛像 看布幕時按標記：不會出現「建議標記別處」（只在看透鏡時才有）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
   PASS  [phone-landscape] 配置F·實像題改標虛像 切回「看透鏡」可以重新標記
   PASS  [phone-landscape] 虛像題／看透鏡已標記：所有控制項都在畫面內  — canvas 812×240
   PASS  [phone-landscape] 虛像題／看透鏡已標記：按鈕點擊區 ≥ 40×40 px
@@ -1866,13 +2018,14 @@
   PASS  [phone-landscape] 配置H·實像題改標虛像 看布幕時沒有畫虛像
   PASS  [phone-landscape] 配置H·實像題改標虛像 按「看透鏡」切換畫面（兩個並排按鈕，狀態正確）
   PASS  [phone-landscape] 配置H·實像題改標虛像 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.58，視角放大 1.51 倍，8178 px
-  PASS  [phone-landscape] 配置H·實像題改標虛像 鏡框裡寫「虛像（正立、放大）」（使用者答虛像題 V2）  — 虛像（正立、放大）
+  PASS  [phone-landscape] 配置H·實像題改標虛像 鏡框裡寫「虛像（正立、放大）」；像離透鏡太近時多寫「建議標記別處」  — 虛像（正立、放大），像離透鏡 87 cm
   PASS  [phone-landscape] 配置H·實像題改標虛像 看透鏡：畫面、文字、Debug 都沒有鬼本體或答案
   PASS  [phone-landscape] 配置H·實像題改標虛像 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-682, 71)，透鏡 -595.0
   PASS  [phone-landscape] 配置H·實像題改標虛像 標記後出現台詞  — 「你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」」
   PASS  [phone-landscape] 配置H·實像題改標虛像 畫面上有標記
   PASS  [phone-landscape] 配置H·實像題改標虛像 切到「看布幕」：虛像標記取消
   PASS  [phone-landscape] 配置H·實像題改標虛像 看布幕時沒有「虛像」字樣
+  PASS  [phone-landscape] 配置H·實像題改標虛像 看布幕時按標記：不會出現「建議標記別處」（只在看透鏡時才有）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
   PASS  [phone-landscape] 配置H·實像題改標虛像 切回「看透鏡」可以重新標記
   PASS  [phone-landscape] 虛像題／看透鏡已標記：所有控制項都在畫面內  — canvas 812×240
   PASS  [phone-landscape] 虛像題／看透鏡已標記：按鈕點擊區 ≥ 40×40 px
@@ -1903,7 +2056,7 @@
   PASS  [phone-landscape] 配置H·實像題改標虛像 光路重現 t=2.70s：光線依序長出（走到的亮、沒走到的不亮）  — 10/10 個取樣點在畫面內
   PASS  [phone-landscape] 配置H·實像題改標虛像 光路重現 t=4.20s：全部光線都畫出來了  — 10/10 個取樣點在畫面內
   PASS  [phone-landscape] 配置H·實像題改標虛像 光路重現：畫面上方有說明文字框
-  PASS  [phone-landscape] 配置H·實像題改標虛像 光路重現：結束時標出像點  — 130 px（重現前 72）
+  PASS  [phone-landscape] 配置H·實像題改標虛像 光路重現：結束時標出像點  — 130 px（重現前 71）
   PASS  [phone-landscape] 配置H·實像題改標虛像 光路重現：反向延長線用另一種顏色的虛線
   PASS  [phone-landscape] 配置H·實像題改標虛像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [phone-landscape] 沒有 JS 錯誤
@@ -1981,10 +2134,10 @@
   PASS  [phone-portrait] 配置A·放大像 放開：留下通過兩個標示點的直線（手指沒有碰到第二個點）
   PASS  [phone-portrait] 配置A·放大像 選格封印模式下，從標示點拖曳不會畫線
   PASS  [phone-portrait] 配置A·放大像 沒有「連線」「平行線」「實線／虛線」按鈕：畫線模式下拖曳與點兩點都能畫（回饋 V2）
-  PASS  [phone-portrait] 分析／封印：所有控制項都在畫面內  — canvas 375×595
+  PASS  [phone-portrait] 分析／封印：所有控制項都在畫面內  — canvas 375×600
   PASS  [phone-portrait] 分析／封印：按鈕點擊區 ≥ 40×40 px
   PASS  [phone-portrait] 分析／封印：頁面不需捲動
-  PASS  [phone-portrait] 分析／封印：畫布仍有足夠空間（≥300×150）  — 375×595
+  PASS  [phone-portrait] 分析／封印：畫布仍有足夠空間（≥300×150）  — 375×600
   PASS  [phone-portrait] 配置A·放大像 封印模式下點擊不會畫線
   PASS  [phone-portrait] 配置A·放大像 封印前再點同一格（透鏡下方）：取消選取
   PASS  [phone-portrait] 配置A·放大像 點地板格可選取（透鏡所在的第 6 格）
@@ -1994,7 +2147,7 @@
   PASS  [phone-portrait] 配置A·放大像 封印透鏡所在格 → 失敗
   PASS  [phone-portrait] 配置A·放大像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [phone-portrait] 配置A·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-portrait] 配置A·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [phone-portrait] 配置A·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [phone-portrait] 配置A·放大像 錯誤封印後：畫面上沒有鬼本體
   PASS  [phone-portrait] 配置A·放大像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [phone-portrait] 配置A·放大像 錯誤封印後：吸附點裡沒有物點
@@ -2021,29 +2174,30 @@
   PASS  [phone-portrait] 配置A·放大像 封印後：鬼本體（物點）成為吸附點
   PASS  [phone-portrait] 配置A·放大像 封印後：從鬼本體拖到 O 可以畫線
   PASS  [phone-portrait] 配置A·放大像 封印後畫的線：重現播完後是原色黃線、畫在重現光線上面（看得見）  — 5/5 個取樣點是黃色
-  PASS  [phone-portrait] 配置A·放大像 光路重現播放中，學生的線暫時壓淡  — replay age 112 ms
+  PASS  [phone-portrait] 配置A·放大像 光路重現播放中，學生的線暫時壓淡  — replay age 119 ms
   PASS  [phone-portrait] 配置A·放大像 重現播完，學生的線恢復原色
   PASS  [phone-portrait] 配置A·放大像 封印後點別的格：選格不變
   PASS  [phone-portrait] 配置A·放大像 Debug overlay 顯示物點／焦距／目標格／清晰位置
   PASS  [phone-portrait] 配置A·放大像 關閉 Debug 後面板清空
-  PASS  [phone-portrait] 配置A·放大像 「下一組配置」不會連續出同一組  — 0→7→2→5→10→11→4→8→0→9→3→1→2→1→4→6→5→7→8→3→0→10→9→11
-  PASS  [phone-portrait] 配置A·放大像 「下一組配置」每一輪內每組各出一次、不重複  — 2,1,4,6,5,7,8,3,0,10,9,11
+  PASS  [phone-portrait] 配置A·放大像 「下一組配置」不會連續出同一組  — 0→13→4→1→0→10→12→3→6→5→14→9→2→8→7→11→7→0→3→4→14→13→2→10→12→1→6→9→5→8
+  PASS  [phone-portrait] 配置A·放大像 「下一組配置」每一輪內每組各出一次、不重複  — 11,7,0,3,4,14,13,2,10,12,1,6,9,5,8
   PASS  [phone-portrait] 配置A·放大像 換配置後回到觀察階段，標記與作圖線都清空
   PASS  [phone-portrait] 配置J·虛像題 開場：看布幕、沒有標記
   PASS  [phone-portrait] 配置J·虛像題 開始觀察：畫面、文字、Debug 都沒有鬼本體或答案
-  PASS  [phone-portrait] 配置J·虛像題 透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光  — 最小模糊比 4.30
+  PASS  [phone-portrait] 配置J·虛像題 透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光  — 最小模糊比 1.85
   PASS  [phone-portrait] 配置J·虛像題 看布幕時按「標記」被拒絕（布幕上沒有清楚的像）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
   PASS  [phone-portrait] 配置J·虛像題 看布幕時沒有畫虛像
   PASS  [phone-portrait] 配置J·虛像題 按「看透鏡」切換畫面（兩個並排按鈕，狀態正確）
-  PASS  [phone-portrait] 配置J·虛像題 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.60，視角放大 1.42 倍，22220 px
-  PASS  [phone-portrait] 配置J·虛像題 鏡框裡寫「虛像（正立、放大）」（使用者答虛像題 V2）  — 虛像（正立、放大）
+  PASS  [phone-portrait] 配置J·虛像題 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.69，視角放大 1.55 倍，42953 px
+  PASS  [phone-portrait] 配置J·虛像題 鏡框裡寫「虛像（正立、放大）」；像離透鏡太近時多寫「建議標記別處」  — 虛像（正立、放大），像離透鏡 76 cm
   PASS  [phone-portrait] 配置J·虛像題 看透鏡：畫面、文字、Debug 都沒有鬼本體或答案
   PASS  [phone-portrait] 配置J·虛像題 透鏡越過鬼：透鏡裡、布幕上都看不到像，不能標記
-  PASS  [phone-portrait] 配置J·虛像題 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-395, 48)，透鏡 -275.0
+  PASS  [phone-portrait] 配置J·虛像題 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-381, 34)，透鏡 -305.0
   PASS  [phone-portrait] 配置J·虛像題 標記後出現台詞  — 「你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」」
   PASS  [phone-portrait] 配置J·虛像題 畫面上有標記
   PASS  [phone-portrait] 配置J·虛像題 切到「看布幕」：虛像標記取消
   PASS  [phone-portrait] 配置J·虛像題 看布幕時沒有「虛像」字樣
+  PASS  [phone-portrait] 配置J·虛像題 看布幕時按標記：不會出現「建議標記別處」（只在看透鏡時才有）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
   PASS  [phone-portrait] 配置J·虛像題 切回「看透鏡」可以重新標記
   PASS  [phone-portrait] 虛像題／看透鏡已標記：所有控制項都在畫面內  — canvas 375×647
   PASS  [phone-portrait] 虛像題／看透鏡已標記：按鈕點擊區 ≥ 40×40 px
@@ -2137,7 +2291,7 @@
   PASS  [desktop] 配置A·縮小像 封印透鏡所在格 → 失敗
   PASS  [desktop] 配置A·縮小像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [desktop] 配置A·縮小像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [desktop] 配置A·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [desktop] 配置A·縮小像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [desktop] 配置A·縮小像 錯誤封印後：畫面上沒有鬼本體
   PASS  [desktop] 配置A·縮小像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [desktop] 配置A·縮小像 錯誤封印後：吸附點裡沒有物點
@@ -2164,13 +2318,13 @@
   PASS  [desktop] 配置A·縮小像 封印後：鬼本體（物點）成為吸附點
   PASS  [desktop] 配置A·縮小像 封印後：從鬼本體拖到 O 可以畫線
   PASS  [desktop] 配置A·縮小像 封印後畫的線：重現播完後是原色黃線、畫在重現光線上面（看得見）  — 5/5 個取樣點是黃色
-  PASS  [desktop] 配置A·縮小像 光路重現播放中，學生的線暫時壓淡  — replay age 112 ms
+  PASS  [desktop] 配置A·縮小像 光路重現播放中，學生的線暫時壓淡  — replay age 117 ms
   PASS  [desktop] 配置A·縮小像 重現播完，學生的線恢復原色
   PASS  [desktop] 配置A·縮小像 封印後點別的格：選格不變
   PASS  [desktop] 配置A·縮小像 Debug overlay 顯示物點／焦距／目標格／清晰位置
   PASS  [desktop] 配置A·縮小像 關閉 Debug 後面板清空
-  PASS  [desktop] 配置A·縮小像 「下一組配置」不會連續出同一組  — 0→7→3→10→8→0→4→2→6→1→9→5→1→10→3→9→5→7→6→0→2→11→8→4
-  PASS  [desktop] 配置A·縮小像 「下一組配置」每一輪內每組各出一次、不重複  — 1,10,3,9,5,7,6,0,2,11,8,4
+  PASS  [desktop] 配置A·縮小像 「下一組配置」不會連續出同一組  — 0→11→2→12→0→7→3→1→13→6→9→8→4→10→14→5→13→1→12→2→8→6→11→4→9→3→10→14→0→7
+  PASS  [desktop] 配置A·縮小像 「下一組配置」每一輪內每組各出一次、不重複  — 5,13,1,12,2,8,6,11,4,9,3,10,14,0,7
   PASS  [desktop] 配置A·縮小像 換配置後回到觀察階段，標記與作圖線都清空
   PASS  [desktop] 配置C·放大像 開始觀察：畫面上沒有鬼本體
   PASS  [desktop] 配置C·放大像 開始觀察：DOM／文字／Debug 圖層沒有答案
@@ -2235,7 +2389,7 @@
   PASS  [desktop] 配置C·放大像 封印透鏡所在格 → 失敗
   PASS  [desktop] 配置C·放大像 封印失敗後自動切回「畫線」（使用者 2026-11-20）
   PASS  [desktop] 配置C·放大像 錯誤封印全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [desktop] 配置C·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　再檢查你的光線作圖。」
+  PASS  [desktop] 配置C·放大像 錯誤訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……再檢查你的光線作圖。」
   PASS  [desktop] 配置C·放大像 錯誤封印後：畫面上沒有鬼本體
   PASS  [desktop] 配置C·放大像 錯誤封印後：DOM／文字／Debug 圖層沒有答案
   PASS  [desktop] 配置C·放大像 錯誤封印後：吸附點裡沒有物點
@@ -2257,54 +2411,55 @@
   PASS  [desktop] 配置C·放大像 光路重現 t=3.20s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
   PASS  [desktop] 配置C·放大像 光路重現：畫面上方有說明文字框
   PASS  [desktop] 配置C·放大像 光路重現：結束時標出像點  — 29 px（重現前 16）
-  PASS  [desktop] 配置C·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
-  PASS  [desktop] 配置L·虛像題 開場：看布幕、沒有標記
-  PASS  [desktop] 配置L·虛像題 開始觀察：畫面、文字、Debug 都沒有鬼本體或答案
-  PASS  [desktop] 配置L·虛像題 透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光  — 最小模糊比 2.03
-  PASS  [desktop] 配置L·虛像題 看布幕時按「標記」被拒絕（布幕上沒有清楚的像）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
-  PASS  [desktop] 配置L·虛像題 看布幕時沒有畫虛像
-  PASS  [desktop] 配置L·虛像題 按「看透鏡」切換畫面（兩個並排按鈕，狀態正確）
-  PASS  [desktop] 配置L·虛像題 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.75，視角放大 1.59 倍，9726 px
-  PASS  [desktop] 配置L·虛像題 鏡框裡寫「虛像（正立、放大）」（使用者答虛像題 V2）  — 虛像（正立、放大）
-  PASS  [desktop] 配置L·虛像題 看透鏡：畫面、文字、Debug 都沒有鬼本體或答案
-  PASS  [desktop] 配置L·虛像題 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-718, -53)，透鏡 -560.0
-  PASS  [desktop] 配置L·虛像題 標記後出現台詞  — 「你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」」
-  PASS  [desktop] 配置L·虛像題 畫面上有標記
-  PASS  [desktop] 配置L·虛像題 切到「看布幕」：虛像標記取消
-  PASS  [desktop] 配置L·虛像題 看布幕時沒有「虛像」字樣
-  PASS  [desktop] 配置L·虛像題 切回「看透鏡」可以重新標記
+  PASS  [desktop] 配置C·放大像 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 22 次
+  PASS  [desktop] 配置O·虛像題 開場：看布幕、沒有標記
+  PASS  [desktop] 配置O·虛像題 開始觀察：畫面、文字、Debug 都沒有鬼本體或答案
+  PASS  [desktop] 配置O·虛像題 透鏡範圍 -620～-80（和實像題相同），整段布幕上都是模糊的光  — 最小模糊比 2.03
+  PASS  [desktop] 配置O·虛像題 看布幕時按「標記」被拒絕（布幕上沒有清楚的像）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
+  PASS  [desktop] 配置O·虛像題 看布幕時沒有畫虛像
+  PASS  [desktop] 配置O·虛像題 按「看透鏡」切換畫面（兩個並排按鈕，狀態正確）
+  PASS  [desktop] 配置O·虛像題 透鏡在鬼和焦點之間：透鏡裡看到正立、放大的虛像，看起來比直接看鬼大  — m=1.75，視角放大 1.59 倍，9725 px
+  PASS  [desktop] 配置O·虛像題 鏡框裡寫「虛像（正立、放大）」；像離透鏡太近時多寫「建議標記別處」  — 虛像（正立、放大），像離透鏡 158 cm
+  PASS  [desktop] 配置O·虛像題 看透鏡：畫面、文字、Debug 都沒有鬼本體或答案
+  PASS  [desktop] 配置O·虛像題 看到虛像時可標記：標記打在虛像的位置（透鏡左邊），透鏡不會被自動移動  — 標記 (-718, -53)，透鏡 -560.0
+  PASS  [desktop] 配置O·虛像題 標記後出現台詞  — 「你：「這是，正立、放大、虛像，鬼與像都在透鏡對面。」」
+  PASS  [desktop] 配置O·虛像題 畫面上有標記
+  PASS  [desktop] 配置O·虛像題 切到「看布幕」：虛像標記取消
+  PASS  [desktop] 配置O·虛像題 看布幕時沒有「虛像」字樣
+  PASS  [desktop] 配置O·虛像題 看布幕時按標記：不會出現「建議標記別處」（只在看透鏡時才有）  — 「牆上的光還是一團模糊。移動透鏡，或改「看透鏡」。」
+  PASS  [desktop] 配置O·虛像題 切回「看透鏡」可以重新標記
   PASS  [desktop] 虛像題／看透鏡已標記：所有控制項都在畫面內  — canvas 1280×640
   PASS  [desktop] 虛像題／看透鏡已標記：按鈕點擊區 ≥ 40×40 px
   PASS  [desktop] 虛像題／看透鏡已標記：頁面不需捲動
   PASS  [desktop] 虛像題／看透鏡已標記：畫布仍有足夠空間（≥300×150）  — 1280×640
-  PASS  [desktop] 配置L·虛像題 切到側視分析
-  PASS  [desktop] 配置L·虛像題 虛像標記在透鏡左邊；所有吸附點都在布幕前面（F′ 在布幕後面就不出現）  — O(-560) F(-770) F′(-350) 虛像(-718)
-  PASS  [desktop] 配置L·虛像題 分析開始：畫面、文字、Debug 都沒有鬼本體或答案
-  PASS  [desktop] 配置L·虛像題 線 1：從虛像標記拉水平線，交透鏡於 P  — P.y=-52.50
-  PASS  [desktop] 配置L·虛像題 「標記→水平得 P → P 連 F → 標記連 O」交點 = 鬼，落在目標格  — 誤差 0.0e+0 cm，格 7（parallel,line,line）
-  PASS  [desktop] 配置L·虛像題 學生畫的線一律實線（沒有實線／虛線切換）
-  PASS  [desktop] 配置L·虛像題 畫完三條線：畫面、文字、Debug 都沒有鬼本體或答案
-  PASS  [desktop] 配置L·虛像題 選目標格
-  PASS  [desktop] 配置L·虛像題 封印成功並顯形
-  PASS  [desktop] 配置L·虛像題 過關訊息說明透鏡裡看到的是虛像  — 「封印成功！鬼被迫顯形——透鏡裡看到的只是牠的虛像，本體和虛像都在透鏡的另一邊。看看光是怎麼走的。」
-  PASS  [desktop] 配置L·虛像題 封印成功後自動播放光路重現，並出現「光路重現」按鈕
-  PASS  [desktop] 配置L·虛像題 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
-  PASS  [desktop] 配置L·虛像題 光路重現：虛像：像距為負、放大率 > 1（正立、放大）  — v=-157.5，m=1.75
-  PASS  [desktop] 配置L·虛像題 光路重現：六段實際光線（實線）＋三段反向延長線（虛線）
-  PASS  [desktop] 配置L·虛像題 光路重現：三條光線都從鬼本體出發
-  PASS  [desktop] 配置L·虛像題 光路重現：平行主軸的光線折射後朝 F′ 的方向走
-  PASS  [desktop] 配置L·虛像題 光路重現：過光心的光線不偏折
-  PASS  [desktop] 配置L·虛像題 光路重現：從 F 方向來的光線折射後平行主光軸，打在鏡片內
-  PASS  [desktop] 配置L·虛像題 光路重現：折射後的光線發散，到布幕（或地板／天花板）為止，沒有會聚成像
-  PASS  [desktop] 配置L·虛像題 光路重現：三條反向延長線交在虛像（= 玩家的標記）  — (-717.5, -52.5)
-  PASS  [desktop] 配置L·虛像題 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [desktop] 配置L·虛像題 光路重現 t=1.60s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [desktop] 配置L·虛像題 光路重現 t=2.70s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
-  PASS  [desktop] 配置L·虛像題 光路重現 t=4.20s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
-  PASS  [desktop] 配置L·虛像題 光路重現：畫面上方有說明文字框
-  PASS  [desktop] 配置L·虛像題 光路重現：結束時標出像點  — 31 px（重現前 16）
-  PASS  [desktop] 配置L·虛像題 光路重現：反向延長線用另一種顏色的虛線
-  PASS  [desktop] 配置L·虛像題 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
+  PASS  [desktop] 配置O·虛像題 切到側視分析
+  PASS  [desktop] 配置O·虛像題 虛像標記在透鏡左邊；所有吸附點都在布幕前面（F′ 在布幕後面就不出現）  — O(-560) F(-770) F′(-350) 虛像(-718)
+  PASS  [desktop] 配置O·虛像題 分析開始：畫面、文字、Debug 都沒有鬼本體或答案
+  PASS  [desktop] 配置O·虛像題 線 1：從虛像標記拉水平線，交透鏡於 P  — P.y=-52.50
+  PASS  [desktop] 配置O·虛像題 「標記→水平得 P → P 連 F → 標記連 O」交點 = 鬼，落在目標格  — 誤差 0.0e+0 cm，格 7（parallel,line,line）
+  PASS  [desktop] 配置O·虛像題 學生畫的線一律實線（沒有實線／虛線切換）
+  PASS  [desktop] 配置O·虛像題 畫完三條線：畫面、文字、Debug 都沒有鬼本體或答案
+  PASS  [desktop] 配置O·虛像題 選目標格
+  PASS  [desktop] 配置O·虛像題 封印成功並顯形
+  PASS  [desktop] 配置O·虛像題 過關訊息說明透鏡裡看到的是虛像  — 「封印成功！鬼被迫顯形——透鏡裡看到的只是牠的虛像，本體和虛像都在透鏡的另一邊。看看光是怎麼走的。」
+  PASS  [desktop] 配置O·虛像題 封印成功後自動播放光路重現，並出現「光路重現」按鈕
+  PASS  [desktop] 配置O·虛像題 封印成功後：返回觀察的按鈕收起，只留「光路重現」與「下一組配置」
+  PASS  [desktop] 配置O·虛像題 光路重現：虛像：像距為負、放大率 > 1（正立、放大）  — v=-157.5，m=1.75
+  PASS  [desktop] 配置O·虛像題 光路重現：六段實際光線（實線）＋三段反向延長線（虛線）
+  PASS  [desktop] 配置O·虛像題 光路重現：三條光線都從鬼本體出發
+  PASS  [desktop] 配置O·虛像題 光路重現：平行主軸的光線折射後朝 F′ 的方向走
+  PASS  [desktop] 配置O·虛像題 光路重現：過光心的光線不偏折
+  PASS  [desktop] 配置O·虛像題 光路重現：從 F 方向來的光線折射後平行主光軸，打在鏡片內
+  PASS  [desktop] 配置O·虛像題 光路重現：折射後的光線發散，到布幕（或地板／天花板）為止，沒有會聚成像
+  PASS  [desktop] 配置O·虛像題 光路重現：三條反向延長線交在虛像（= 玩家的標記）  — (-717.5, -52.5)
+  PASS  [desktop] 配置O·虛像題 光路重現 t=0.50s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
+  PASS  [desktop] 配置O·虛像題 光路重現 t=1.60s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
+  PASS  [desktop] 配置O·虛像題 光路重現 t=2.70s：光線依序長出（走到的亮、沒走到的不亮）  — 12/12 個取樣點在畫面內
+  PASS  [desktop] 配置O·虛像題 光路重現 t=4.20s：全部光線都畫出來了  — 12/12 個取樣點在畫面內
+  PASS  [desktop] 配置O·虛像題 光路重現：畫面上方有說明文字框
+  PASS  [desktop] 配置O·虛像題 光路重現：結束時標出像點  — 31 px（重現前 16）
+  PASS  [desktop] 配置O·虛像題 光路重現：反向延長線用另一種顏色的虛線
+  PASS  [desktop] 配置O·虛像題 「光路重現」按鈕可重播，動畫持續重畫  — 350 ms 內重畫 21 次
   PASS  [desktop] 沒有 JS 錯誤
 
-ALL PASS: 2308/2308 checks
+ALL PASS: 2463/2463 checks

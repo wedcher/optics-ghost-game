@@ -12,7 +12,7 @@
   PASS  [phone-landscape] 點畫面任何地方換下一句（第 2 句）  — 「可是這裡沒有鏡子。」
   PASS  [phone-landscape] 第 3 句；【開始抓鬼】還沒出現  — 「咦？這裡怎麼有一個這麼大的凸透鏡？」
   PASS  [phone-landscape] 最後一句之後換成【開始抓鬼】；剛出現的瞬間連點不會誤觸
-  PASS  [phone-landscape] 開始前說明規則（劇本 2-1）：抓到 5 隻、抓錯失去一顆心  — 走廊裡鬼影重重。請抓到 5 隻鬼；抓錯會失去一顆心。開始抓鬼
+  PASS  [phone-landscape] 開場結尾：標題「第二關：城堡走廊」、3 顆❤️、抓到 5 隻、抓錯扣一❤️（2026-11-21）  — 第二關：城堡走廊走廊裡鬼影重重。3 顆❤️，請抓到 5 隻鬼；抓錯扣一❤️。開始抓鬼
   PASS  [phone-landscape] 開始抓鬼：按鈕都在畫面內、≥ 44×44、點得到，頁面不捲動  — startHuntBtn 200×62
   PASS  [phone-landscape] 按【開始抓鬼】進入抓鬼介面
   PASS  [phone-landscape] 開始時 3 顆愛心、封印 0／5
@@ -33,69 +33,71 @@
   PASS  [phone-landscape] 光路分析・畫線（812×375）：只排一排  — 323,323,323,323,323
   PASS  [phone-landscape] 光路分析・畫線（812×375）：每顆 ≥ 44×44 px、文字沒被截斷  — 重新對焦 155×46、選格封印 155×46、畫線 155×46、復原 155×46、清除 155×46
   PASS  [phone-landscape] 光路分析沒有「連線」按鈕（V2）
-  PASS  [phone-landscape] 光路分析・選格封印（812×375）：按鈕與順序  — 重新對焦｜選格封印｜畫線｜復原｜清除｜施放封印法陣
+  PASS  [phone-landscape] 光路分析・選格封印（812×375）：按鈕與順序  — 重新對焦｜選格封印｜畫線｜復原｜清除｜丟圓盤封印
   PASS  [phone-landscape] 光路分析・選格封印（812×375）：只排一排  — 323,323,323,323,323,323
-  PASS  [phone-landscape] 光路分析・選格封印（812×375）：每顆 ≥ 44×44 px、文字沒被截斷  — 重新對焦 117×46、選格封印 117×46、畫線 117×46、復原 117×46、清除 117×46、施放封印法陣 184×46
+  PASS  [phone-landscape] 光路分析・選格封印（812×375）：每顆 ≥ 44×44 px、文字沒被截斷  — 重新對焦 117×46、選格封印 117×46、畫線 117×46、復原 117×46、清除 117×46、丟圓盤封印 184×46
   PASS  [phone-landscape] 第 1 次抓錯：抓錯扣一顆心  — 3 → 2 條命
   PASS  [phone-landscape] 第 1 次抓錯：封印數不變、還是同一隻鬼
   PASS  [phone-landscape] 第 1 次抓錯：全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 第 1 次抓錯：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
+  PASS  [phone-landscape] 第 1 次抓錯：訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。」
   PASS  [phone-landscape] 抓鬼／封印：愛心、封印數與控制項都在畫面內，畫布仍夠大  — canvas 812×269
   PASS  [phone-landscape] 抓鬼／封印：愛心在左上角  — (8, 3)
   PASS  [phone-landscape] 抓鬼／封印：右上角按鈕字樣「☰ 回關卡」  — ☰ 回關卡
   PASS  [phone-landscape] 抓鬼／封印：「☰ 回關卡」在右上角（G1）  — 離右邊 8 px、離上面 3 px、82×40
-  PASS  [phone-landscape] 抓對第 1 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 1／5（配置 A）
+  PASS  [phone-landscape] 抓對第 1 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 1／5（配置 I）
   PASS  [phone-landscape] 抓對第 1 隻：左上角顯示「封印 1／5」
   PASS  [phone-landscape] 抓對後按鈕是「下一隻鬼 ➜」
   PASS  [phone-landscape] 封印成功後（812×375）：按鈕與順序  — 畫線｜復原｜清除｜光路重現｜下一隻鬼 ➜
   PASS  [phone-landscape] 封印成功後（812×375）：只排一排  — 323,323,323,323,323
   PASS  [phone-landscape] 封印成功後（812×375）：每顆 ≥ 44×44 px、文字沒被截斷  — 畫線 126×46、復原 126×46、清除 126×46、光路重現 199×46、下一隻鬼 ➜ 199×46
-  PASS  [phone-landscape] 小鬼圖 9 張都載入，鬼本體與像都經過小鬼圖繪製  — {"loaded":9,"calls":181,"idx":3}
-  PASS  [phone-landscape] 下一隻鬼換一張小鬼圖  — 3 → 2
+  PASS  [phone-landscape] 小鬼圖 9 張都載入，鬼本體與像都經過小鬼圖繪製  — {"loaded":9,"calls":181,"idx":5}
+  PASS  [phone-landscape] 下一隻鬼換一張小鬼圖  — 5 → 3
   PASS  [phone-landscape] 下一隻鬼：換配置、回到觀察、命數與封印數保留
   PASS  [phone-landscape] 下一隻鬼開始時畫面上沒有鬼本體
   PASS  [phone-landscape] 第 2 次抓錯：抓錯扣一顆心  — 2 → 1 條命
   PASS  [phone-landscape] 第 2 次抓錯：封印數不變、還是同一隻鬼
   PASS  [phone-landscape] 第 2 次抓錯：全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 第 2 次抓錯：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
+  PASS  [phone-landscape] 第 2 次抓錯：訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。」
   PASS  [phone-landscape] 剩 1 條命時還在抓鬼
   PASS  [phone-landscape] 第 3 次抓錯：命用完，出現失敗畫面
-  PASS  [phone-landscape] 失敗標題用 ❤️（劇本修訂：命的文字統一用 ❤️）  — ❤️用完了……鬼還躲在走廊裡。這次封印了 1 隻。重新挑戰會從頭算起。重新挑戰回關卡選單
+  PASS  [phone-landscape] 失敗畫面先說「等我休息一下，再來抓你們。」（使用者 2026-11-21）  — 等我休息一下，再來抓你們。
+  PASS  [phone-landscape] 失敗標題「驅逐失敗」（使用者 2026-11-21）  — 驅逐失敗鬼還躲在走廊裡。這次封印了 1 隻。重新挑戰會從頭算起。重新挑戰回關卡選單
   PASS  [phone-landscape] 失敗畫面有「重新挑戰」與「回關卡選單」
-  PASS  [phone-landscape] 失敗畫面不顯示鬼、不提示位置  — ❤️用完了……鬼還躲在走廊裡。這次封印了 1 隻。重新挑戰會從頭算起。重新挑戰回關卡選單
+  PASS  [phone-landscape] 失敗畫面不顯示鬼、不提示位置  — 驅逐失敗鬼還躲在走廊裡。這次封印了 1 隻。重新挑戰會從頭算起。重新挑戰回關卡選單
   PASS  [phone-landscape] 失敗畫面蓋住遊戲，不能繼續施放
   PASS  [phone-landscape] 「回關卡選單」連到原型入口  — ../index.html
   PASS  [phone-landscape] 失敗畫面：按鈕都在畫面內、≥ 44×44、點得到，頁面不捲動  — retryBtn 200×62、failMenuBtn 150×62
   PASS  [phone-landscape] 重新挑戰：直接回到抓鬼，不再播開場
   PASS  [phone-landscape] 重新挑戰：命數與封印數重置
   PASS  [phone-landscape] 重新挑戰：回到觀察，標記／作圖／選格都清空，畫面上沒有鬼
-  PASS  [phone-landscape] 抓對第 1 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 1／5（配置 L）
+  PASS  [phone-landscape] 抓對第 1 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 1／5（配置 E）
   PASS  [phone-landscape] 抓對第 1 隻：左上角顯示「封印 1／5」
   PASS  [phone-landscape] 第 1 隻之後還沒過關
-  PASS  [phone-landscape] 抓對第 2 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 2／5（配置 C）
+  PASS  [phone-landscape] 抓對第 2 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 2／5（配置 H）
   PASS  [phone-landscape] 抓對第 2 隻：左上角顯示「封印 2／5」
   PASS  [phone-landscape] 第 2 隻之後還沒過關
   PASS  [phone-landscape] 過關途中抓錯一次：抓錯扣一顆心  — 3 → 2 條命
   PASS  [phone-landscape] 過關途中抓錯一次：封印數不變、還是同一隻鬼
   PASS  [phone-landscape] 過關途中抓錯一次：全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 過關途中抓錯一次：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
-  PASS  [phone-landscape] 抓對第 3 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 3／5（配置 J）
+  PASS  [phone-landscape] 過關途中抓錯一次：訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。」
+  PASS  [phone-landscape] 抓對第 3 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 3／5（配置 K）
   PASS  [phone-landscape] 抓對第 3 隻：左上角顯示「封印 3／5」
   PASS  [phone-landscape] 第 3 隻之後還沒過關
-  PASS  [phone-landscape] 抓對第 4 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 4／5（配置 H）
+  PASS  [phone-landscape] 抓對第 4 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 4／5（配置 G）
   PASS  [phone-landscape] 抓對第 4 隻：左上角顯示「封印 4／5」
   PASS  [phone-landscape] 第 4 隻之後還沒過關
-  PASS  [phone-landscape] 抓對第 5 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 F）
+  PASS  [phone-landscape] 抓對第 5 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 M）
   PASS  [phone-landscape] 抓對第 5 隻：左上角顯示「封印 5／5」
-  PASS  [phone-landscape] 5 隻鬼是 5 組不同的配置，隨機出題  — 11→2→9→7→5
-  PASS  [phone-landscape] 這一輪 5 隻裡至少有一題虛像題  — 11→2→9→7→5
+  PASS  [phone-landscape] 5 隻鬼是 5 組不同的配置，隨機出題  — 4→7→10→6→12
+  PASS  [phone-landscape] 這一輪 5 隻裡至少有一題虛像題  — 4→7→10→6→12
   PASS  [phone-landscape] 抓滿 5 隻：按鈕變成「過關 ➜」，先讓玩家看完顯形與光路重現
   PASS  [phone-landscape] 按「過關 ➜」進入過關演出
   PASS  [phone-landscape] 過關演出：鬼一哄而散（旁白）  — 7 隻逃散的鬼
+  PASS  [phone-landscape] 過關演出：你：「想跑？追！」  — 「想跑？追！」（你）
   PASS  [phone-landscape] 過關演出：你：「但凸透鏡太大了，帶不走啊。」  — 「但凸透鏡太大了，帶不走啊。」（你）
-  PASS  [phone-landscape] 過關演出：旁白：「你撿起地上的一片小透鏡。」  — 「你撿起地上的一片小透鏡。」（旁白）
   PASS  [phone-landscape] 過關演出：你：「咦，這個……」  — 「咦，這個……」（你）
-  PASS  [phone-landscape] 過關演出：你：「也可以吧。」  — 「也可以吧。」（你）
+  PASS  [phone-landscape] 過關演出：旁白：「你撿起地上的一片小透鏡。」  — 「你撿起地上的一片小透鏡。」（旁白）
+  PASS  [phone-landscape] 過關演出：你：「這個也可以吧。」  — 「這個也可以吧。」（你）
   PASS  [phone-landscape] 物理：小透鏡不是大凸透鏡的碎片（凸透鏡碎片仍會聚）
   PASS  [phone-landscape] 過關畫面：標題、第三關：荒野狩獵（已解鎖），「回關卡選單」＋「再玩一次」  — 第二關過關！成功把鬼趕出城堡。第三關：荒野狩獵（已解鎖）回關卡選單再玩一次
   PASS  [phone-landscape] 過關畫面的「回關卡選單」連到入口頁
@@ -103,39 +105,39 @@
   PASS  [phone-landscape] 過關畫面：按鈕都在畫面內、≥ 44×44、點得到，頁面不捲動  — clearMenuBtn 200×62、againBtn 150×62
   PASS  [phone-landscape] 「再玩一次」：直接回到抓鬼，命數與封印數重置
   PASS  [phone-landscape] 「再玩一次」：回到觀察，標記／作圖／選格都清空
-  PASS  [phone-landscape] 「再玩一次」：重洗牌堆，這輪 5 隻不重複、含虛像題  — 9→5→4→7→6
+  PASS  [phone-landscape] 「再玩一次」：重洗牌堆，這輪 5 隻不重複、含虛像題  — 6→11→9→5→7
   PASS  [phone-landscape] 排行榜：按「開始抓鬼」／重新挑戰後第二關在計時
-  PASS  [phone-landscape] 跳關後抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 I）
+  PASS  [phone-landscape] 跳關後抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 H）
   PASS  [phone-landscape] 跳關後抓最後一隻：左上角顯示「封印 5／5」
   PASS  [phone-landscape] 排行榜：只有第二關成績（?unlock=1 跳關）第二關過關不算趕鬼時間  — 第二關過關！成功把鬼趕出城堡。第三關：荒野狩獵（已解鎖）回關卡選單再玩一次
-  PASS  [phone-landscape] 第一關已過關後抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 B）
+  PASS  [phone-landscape] 第一關已過關後抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 E）
   PASS  [phone-landscape] 第一關已過關後抓最後一隻：左上角顯示「封印 5／5」
   PASS  [phone-landscape] 排行榜：趕鬼時間＝第一關成績＋第二關這次的遊玩時間，過關說明「你花費＿＿，把鬼趕出城堡。第三關：荒野狩獵（已解鎖）」  — 第二關過關！你花費10 分 3 秒，把鬼趕出城堡。第三關：荒野狩獵（已解鎖）回關卡選單再玩一次
   PASS  [phone-landscape] 再玩一次抓錯 1：抓錯扣一顆心  — 3 → 2 條命
   PASS  [phone-landscape] 再玩一次抓錯 1：封印數不變、還是同一隻鬼
   PASS  [phone-landscape] 再玩一次抓錯 1：全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 再玩一次抓錯 1：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
+  PASS  [phone-landscape] 再玩一次抓錯 1：訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。」
   PASS  [phone-landscape] 再玩一次抓錯 2：抓錯扣一顆心  — 2 → 1 條命
   PASS  [phone-landscape] 再玩一次抓錯 2：封印數不變、還是同一隻鬼
   PASS  [phone-landscape] 再玩一次抓錯 2：全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 再玩一次抓錯 2：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
+  PASS  [phone-landscape] 再玩一次抓錯 2：訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。」
   PASS  [phone-landscape] 再玩一次抓錯 3：抓錯扣一顆心  — 1 → 0 條命
   PASS  [phone-landscape] 再玩一次抓錯 3：封印數不變、還是同一隻鬼
   PASS  [phone-landscape] 再玩一次抓錯 3：全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 再玩一次抓錯 3：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
-  PASS  [phone-landscape] 排行榜：再玩一次命用完，保留上次過關的成績  — {"mirrorMs":600000,"convexMs":2557,"castleMs":602557,"hunt":null}
+  PASS  [phone-landscape] 再玩一次抓錯 3：訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。」
+  PASS  [phone-landscape] 排行榜：再玩一次命用完，保留上次過關的成績  — {"mirrorMs":600000,"convexMs":2576,"castleMs":602576,"hunt":null}
   PASS  [phone-landscape] ?practice=1：不播開場，直接抓鬼；有愛心、沒有開發工具
   PASS  [phone-landscape] ?practice=1：左上角標「練習」  — 練習　封印 0／5
   PASS  [phone-landscape] 練習模式抓錯：抓錯扣一顆心  — 3 → 2 條命
   PASS  [phone-landscape] 練習模式抓錯：封印數不變、還是同一隻鬼
   PASS  [phone-landscape] 練習模式抓錯：全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [phone-landscape] 練習模式抓錯：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
-  PASS  [phone-landscape] 練習模式抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 A）
+  PASS  [phone-landscape] 練習模式抓錯：訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。」
+  PASS  [phone-landscape] 練習模式抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 G）
   PASS  [phone-landscape] 練習模式抓最後一隻：左上角顯示「練習　封印 5／5」
   PASS  [phone-landscape] ?practice=1：過關不顯示趕鬼時間、不記成績（就算本輪第一關已過）；「回關卡選單」＋「再玩一次」  — 第二關過關！成功把鬼趕出城堡。回關卡選單再玩一次
   PASS  [phone-landscape] 發牌統計 3000 輪：每輪都有虛像題、5 隻不重複  — 缺虛像題 0 輪
-  PASS  [phone-landscape] 發牌統計：第一題虛像題出現在第 1～5 隻都有（不固定第一或最後一題）  — 833/673/608/490/396
-  PASS  [phone-landscape] 發牌統計：J、K、L 三題都會出現  — {"J":1418,"L":1428,"K":1386}
+  PASS  [phone-landscape] 發牌統計：第 1 隻一定不是虛像題（使用者 2026-11-21）；第一題虛像題出現在第 2～5 隻都有  — 0/1549/807/438/206
+  PASS  [phone-landscape] 發牌統計：J～O 六題虛像題都會出現  — {"J":1002,"N":966,"L":1043,"K":1051,"M":1019,"O":1020}
   PASS  [phone-landscape] ?free=1：沒有過場與愛心，保留配置選單與 Debug
   PASS  [phone-landscape] 沒有 JS 錯誤、沒有載入失敗的檔案
   PASS  [desktop] 沒過第一關：只顯示「還沒通過第一關」與「回關卡選單」，遊戲點不到  — 還沒通過第一關 關卡要照順序過關（趕鬼時間也從第一關算起）。請回關卡選單，先完成第一關。 回關卡選單
@@ -152,7 +154,7 @@
   PASS  [desktop] 點畫面任何地方換下一句（第 2 句）  — 「可是這裡沒有鏡子。」
   PASS  [desktop] 第 3 句；【開始抓鬼】還沒出現  — 「咦？這裡怎麼有一個這麼大的凸透鏡？」
   PASS  [desktop] 最後一句之後換成【開始抓鬼】；剛出現的瞬間連點不會誤觸
-  PASS  [desktop] 開始前說明規則（劇本 2-1）：抓到 5 隻、抓錯失去一顆心  — 走廊裡鬼影重重。請抓到 5 隻鬼；抓錯會失去一顆心。開始抓鬼
+  PASS  [desktop] 開場結尾：標題「第二關：城堡走廊」、3 顆❤️、抓到 5 隻、抓錯扣一❤️（2026-11-21）  — 第二關：城堡走廊走廊裡鬼影重重。3 顆❤️，請抓到 5 隻鬼；抓錯扣一❤️。開始抓鬼
   PASS  [desktop] 開始抓鬼：按鈕都在畫面內、≥ 44×44、點得到，頁面不捲動  — startHuntBtn 200×62
   PASS  [desktop] 按【開始抓鬼】進入抓鬼介面
   PASS  [desktop] 開始時 3 顆愛心、封印 0／5
@@ -167,7 +169,7 @@
   PASS  [desktop] 第 1 次抓錯：抓錯扣一顆心  — 3 → 2 條命
   PASS  [desktop] 第 1 次抓錯：封印數不變、還是同一隻鬼
   PASS  [desktop] 第 1 次抓錯：全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [desktop] 第 1 次抓錯：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
+  PASS  [desktop] 第 1 次抓錯：訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。」
   PASS  [desktop] 抓鬼／封印：愛心、封印數與控制項都在畫面內，畫布仍夠大  — canvas 1280×688
   PASS  [desktop] 抓鬼／封印：愛心在左上角  — (8, 6)
   PASS  [desktop] 抓鬼／封印：右上角按鈕字樣「☰ 回關卡」  — ☰ 回關卡
@@ -175,52 +177,54 @@
   PASS  [desktop] 抓對第 1 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 1／5（配置 G）
   PASS  [desktop] 抓對第 1 隻：左上角顯示「封印 1／5」
   PASS  [desktop] 抓對後按鈕是「下一隻鬼 ➜」
-  PASS  [desktop] 小鬼圖 9 張都載入，鬼本體與像都經過小鬼圖繪製  — {"loaded":9,"calls":180,"idx":1}
-  PASS  [desktop] 下一隻鬼換一張小鬼圖  — 1 → 2
+  PASS  [desktop] 小鬼圖 9 張都載入，鬼本體與像都經過小鬼圖繪製  — {"loaded":9,"calls":145,"idx":8}
+  PASS  [desktop] 下一隻鬼換一張小鬼圖  — 8 → 2
   PASS  [desktop] 下一隻鬼：換配置、回到觀察、命數與封印數保留
   PASS  [desktop] 下一隻鬼開始時畫面上沒有鬼本體
   PASS  [desktop] 第 2 次抓錯：抓錯扣一顆心  — 2 → 1 條命
   PASS  [desktop] 第 2 次抓錯：封印數不變、還是同一隻鬼
   PASS  [desktop] 第 2 次抓錯：全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [desktop] 第 2 次抓錯：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
+  PASS  [desktop] 第 2 次抓錯：訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。」
   PASS  [desktop] 剩 1 條命時還在抓鬼
   PASS  [desktop] 第 3 次抓錯：命用完，出現失敗畫面
-  PASS  [desktop] 失敗標題用 ❤️（劇本修訂：命的文字統一用 ❤️）  — ❤️用完了……鬼還躲在走廊裡。這次封印了 1 隻。重新挑戰會從頭算起。重新挑戰回關卡選單
+  PASS  [desktop] 失敗畫面先說「等我休息一下，再來抓你們。」（使用者 2026-11-21）  — 等我休息一下，再來抓你們。
+  PASS  [desktop] 失敗標題「驅逐失敗」（使用者 2026-11-21）  — 驅逐失敗鬼還躲在走廊裡。這次封印了 1 隻。重新挑戰會從頭算起。重新挑戰回關卡選單
   PASS  [desktop] 失敗畫面有「重新挑戰」與「回關卡選單」
-  PASS  [desktop] 失敗畫面不顯示鬼、不提示位置  — ❤️用完了……鬼還躲在走廊裡。這次封印了 1 隻。重新挑戰會從頭算起。重新挑戰回關卡選單
+  PASS  [desktop] 失敗畫面不顯示鬼、不提示位置  — 驅逐失敗鬼還躲在走廊裡。這次封印了 1 隻。重新挑戰會從頭算起。重新挑戰回關卡選單
   PASS  [desktop] 失敗畫面蓋住遊戲，不能繼續施放
   PASS  [desktop] 「回關卡選單」連到原型入口  — ../index.html
   PASS  [desktop] 失敗畫面：按鈕都在畫面內、≥ 44×44、點得到，頁面不捲動  — retryBtn 200×62、failMenuBtn 150×62
   PASS  [desktop] 重新挑戰：直接回到抓鬼，不再播開場
   PASS  [desktop] 重新挑戰：命數與封印數重置
   PASS  [desktop] 重新挑戰：回到觀察，標記／作圖／選格都清空，畫面上沒有鬼
-  PASS  [desktop] 抓對第 1 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 1／5（配置 L）
+  PASS  [desktop] 抓對第 1 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 1／5（配置 F）
   PASS  [desktop] 抓對第 1 隻：左上角顯示「封印 1／5」
   PASS  [desktop] 第 1 隻之後還沒過關
-  PASS  [desktop] 抓對第 2 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 2／5（配置 A）
+  PASS  [desktop] 抓對第 2 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 2／5（配置 O）
   PASS  [desktop] 抓對第 2 隻：左上角顯示「封印 2／5」
   PASS  [desktop] 第 2 隻之後還沒過關
   PASS  [desktop] 過關途中抓錯一次：抓錯扣一顆心  — 3 → 2 條命
   PASS  [desktop] 過關途中抓錯一次：封印數不變、還是同一隻鬼
   PASS  [desktop] 過關途中抓錯一次：全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [desktop] 過關途中抓錯一次：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
-  PASS  [desktop] 抓對第 3 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 3／5（配置 H）
+  PASS  [desktop] 過關途中抓錯一次：訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。」
+  PASS  [desktop] 抓對第 3 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 3／5（配置 B）
   PASS  [desktop] 抓對第 3 隻：左上角顯示「封印 3／5」
   PASS  [desktop] 第 3 隻之後還沒過關
-  PASS  [desktop] 抓對第 4 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 4／5（配置 B）
+  PASS  [desktop] 抓對第 4 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 4／5（配置 K）
   PASS  [desktop] 抓對第 4 隻：左上角顯示「封印 4／5」
   PASS  [desktop] 第 4 隻之後還沒過關
-  PASS  [desktop] 抓對第 5 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 E）
+  PASS  [desktop] 抓對第 5 隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 C）
   PASS  [desktop] 抓對第 5 隻：左上角顯示「封印 5／5」
-  PASS  [desktop] 5 隻鬼是 5 組不同的配置，隨機出題  — 11→0→7→1→4
-  PASS  [desktop] 這一輪 5 隻裡至少有一題虛像題  — 11→0→7→1→4
+  PASS  [desktop] 5 隻鬼是 5 組不同的配置，隨機出題  — 5→14→1→10→2
+  PASS  [desktop] 這一輪 5 隻裡至少有一題虛像題  — 5→14→1→10→2
   PASS  [desktop] 抓滿 5 隻：按鈕變成「過關 ➜」，先讓玩家看完顯形與光路重現
   PASS  [desktop] 按「過關 ➜」進入過關演出
   PASS  [desktop] 過關演出：鬼一哄而散（旁白）  — 7 隻逃散的鬼
+  PASS  [desktop] 過關演出：你：「想跑？追！」  — 「想跑？追！」（你）
   PASS  [desktop] 過關演出：你：「但凸透鏡太大了，帶不走啊。」  — 「但凸透鏡太大了，帶不走啊。」（你）
-  PASS  [desktop] 過關演出：旁白：「你撿起地上的一片小透鏡。」  — 「你撿起地上的一片小透鏡。」（旁白）
   PASS  [desktop] 過關演出：你：「咦，這個……」  — 「咦，這個……」（你）
-  PASS  [desktop] 過關演出：你：「也可以吧。」  — 「也可以吧。」（你）
+  PASS  [desktop] 過關演出：旁白：「你撿起地上的一片小透鏡。」  — 「你撿起地上的一片小透鏡。」（旁白）
+  PASS  [desktop] 過關演出：你：「這個也可以吧。」  — 「這個也可以吧。」（你）
   PASS  [desktop] 物理：小透鏡不是大凸透鏡的碎片（凸透鏡碎片仍會聚）
   PASS  [desktop] 過關畫面：標題、第三關：荒野狩獵（已解鎖），「回關卡選單」＋「再玩一次」  — 第二關過關！成功把鬼趕出城堡。第三關：荒野狩獵（已解鎖）回關卡選單再玩一次
   PASS  [desktop] 過關畫面的「回關卡選單」連到入口頁
@@ -228,40 +232,40 @@
   PASS  [desktop] 過關畫面：按鈕都在畫面內、≥ 44×44、點得到，頁面不捲動  — clearMenuBtn 200×62、againBtn 150×62
   PASS  [desktop] 「再玩一次」：直接回到抓鬼，命數與封印數重置
   PASS  [desktop] 「再玩一次」：回到觀察，標記／作圖／選格都清空
-  PASS  [desktop] 「再玩一次」：重洗牌堆，這輪 5 隻不重複、含虛像題  — 5→6→1→11→9
+  PASS  [desktop] 「再玩一次」：重洗牌堆，這輪 5 隻不重複、含虛像題  — 5→7→10→14→9
   PASS  [desktop] 排行榜：按「開始抓鬼」／重新挑戰後第二關在計時
-  PASS  [desktop] 跳關後抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 I）
+  PASS  [desktop] 跳關後抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 B）
   PASS  [desktop] 跳關後抓最後一隻：左上角顯示「封印 5／5」
   PASS  [desktop] 排行榜：只有第二關成績（?unlock=1 跳關）第二關過關不算趕鬼時間  — 第二關過關！成功把鬼趕出城堡。第三關：荒野狩獵（已解鎖）回關卡選單再玩一次
-  PASS  [desktop] 第一關已過關後抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 E）
+  PASS  [desktop] 第一關已過關後抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 C）
   PASS  [desktop] 第一關已過關後抓最後一隻：左上角顯示「封印 5／5」
   PASS  [desktop] 排行榜：趕鬼時間＝第一關成績＋第二關這次的遊玩時間，過關說明「你花費＿＿，把鬼趕出城堡。第三關：荒野狩獵（已解鎖）」  — 第二關過關！你花費10 分 2 秒，把鬼趕出城堡。第三關：荒野狩獵（已解鎖）回關卡選單再玩一次
   PASS  [desktop] 再玩一次抓錯 1：抓錯扣一顆心  — 3 → 2 條命
   PASS  [desktop] 再玩一次抓錯 1：封印數不變、還是同一隻鬼
   PASS  [desktop] 再玩一次抓錯 1：全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [desktop] 再玩一次抓錯 1：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
+  PASS  [desktop] 再玩一次抓錯 1：訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。」
   PASS  [desktop] 再玩一次抓錯 2：抓錯扣一顆心  — 2 → 1 條命
   PASS  [desktop] 再玩一次抓錯 2：封印數不變、還是同一隻鬼
   PASS  [desktop] 再玩一次抓錯 2：全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [desktop] 再玩一次抓錯 2：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
+  PASS  [desktop] 再玩一次抓錯 2：訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。」
   PASS  [desktop] 再玩一次抓錯 3：抓錯扣一顆心  — 1 → 0 條命
   PASS  [desktop] 再玩一次抓錯 3：封印數不變、還是同一隻鬼
   PASS  [desktop] 再玩一次抓錯 3：全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [desktop] 再玩一次抓錯 3：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
-  PASS  [desktop] 排行榜：再玩一次命用完，保留上次過關的成績  — {"mirrorMs":600000,"convexMs":2437,"castleMs":602437,"hunt":null}
+  PASS  [desktop] 再玩一次抓錯 3：訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。」
+  PASS  [desktop] 排行榜：再玩一次命用完，保留上次過關的成績  — {"mirrorMs":600000,"convexMs":2471,"castleMs":602471,"hunt":null}
   PASS  [desktop] ?practice=1：不播開場，直接抓鬼；有愛心、沒有開發工具
   PASS  [desktop] ?practice=1：左上角標「練習」  — 練習　封印 0／5
   PASS  [desktop] 練習模式抓錯：抓錯扣一顆心  — 3 → 2 條命
   PASS  [desktop] 練習模式抓錯：封印數不變、還是同一隻鬼
   PASS  [desktop] 練習模式抓錯：全程不顯示鬼  — 動畫取樣 0/0/0
-  PASS  [desktop] 練習模式抓錯：訊息不含方向／距離／格號線索  — 「法陣落空，裡面什麼也沒有……（嘻）　扣一❤️。再檢查你的光線作圖。」
-  PASS  [desktop] 練習模式抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 B）
+  PASS  [desktop] 練習模式抓錯：訊息不含方向／距離／格號線索  — 「法陣裡沒有東西……扣一❤️。再檢查你的光線作圖。」
+  PASS  [desktop] 練習模式抓最後一隻：抓對，封印數 +1、不扣命、鬼顯形  — 封印 5／5（配置 F）
   PASS  [desktop] 練習模式抓最後一隻：左上角顯示「練習　封印 5／5」
   PASS  [desktop] ?practice=1：過關不顯示趕鬼時間、不記成績（就算本輪第一關已過）；「回關卡選單」＋「再玩一次」  — 第二關過關！成功把鬼趕出城堡。回關卡選單再玩一次
   PASS  [desktop] 發牌統計 3000 輪：每輪都有虛像題、5 隻不重複  — 缺虛像題 0 輪
-  PASS  [desktop] 發牌統計：第一題虛像題出現在第 1～5 隻都有（不固定第一或最後一題）  — 872/681/585/481/381
-  PASS  [desktop] 發牌統計：J、K、L 三題都會出現  — {"L":1385,"K":1439,"J":1443}
+  PASS  [desktop] 發牌統計：第 1 隻一定不是虛像題（使用者 2026-11-21）；第一題虛像題出現在第 2～5 隻都有  — 0/1584/796/409/211
+  PASS  [desktop] 發牌統計：J～O 六題虛像題都會出現  — {"J":1047,"N":986,"L":1046,"K":1014,"O":1013,"M":996}
   PASS  [desktop] ?free=1：沒有過場與愛心，保留配置選單與 Debug
   PASS  [desktop] 沒有 JS 錯誤、沒有載入失敗的檔案
 
-ALL PASS: 265/265 checks
+ALL PASS: 269/269 checks

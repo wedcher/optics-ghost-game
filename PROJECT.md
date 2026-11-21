@@ -497,6 +497,7 @@
   - 竊笑聲：`shared/sfx/ghost-giggle-1..3.mp3`（女鬼，三段隨機）、`minion-giggle.mp3`（小鬼，剪掉後段像風聲的爆音）；單聲道、峰值 -3 dB。原檔移到 `docs/concepts/sfx-originals/`。`Sfx.giggle(kind)`，不能播才退回合成音。
   - 外框頁 `prototype/game.html`（iframe；網站根目錄與 manifest `start_url` 都改到它）；全螢幕切在外框頁（`fullscreen.js` 框裡的頁面請外框頁切）；直拿時外框頁整個轉 90°，框裡不再轉；`#…` 記住目前頁面（只接受遊戲自己的頁面）。
   - 安裝提示只在第一次自動跳（`opticsGhost.installTip.v1`），選單最下面「📲 安裝到手機」按鈕（已安裝不顯示），提示條在外框頁。新測試 `tests/e2e-shell.js`（15 項，已加進 `npm test`）。
+  - `npm test` 全過（2026-11-21）：凹幾何 277、凸幾何 397、平面鏡幾何 338、凹 e2e 1479、荒野狩獵 39、凸 e2e 2463、第二關 269、第一關 306、排行榜後端 52、排行榜 e2e 53、選單 41、轉向 73、外框頁 15。
   - **還沒在實體手機驗證**：外框頁裡的全螢幕不退出、Android 安裝按鈕叫出安裝視窗、笑聲音量、螺旋特效的效能。
 - **檔案分工**：這個工作階段（`claude/amazing-lamport-4kx8tr`）改三關 `app.js`／`index.html`、`shared/*`、`prototype/index.html`、新外框頁、`tests/*`、`PROJECT.md`。其他工作階段要改這些檔案前先問使用者。
 
