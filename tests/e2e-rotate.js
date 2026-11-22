@@ -81,15 +81,18 @@ async function noScroll(page, where) {
 // 元素內的遊戲座標 → 螢幕座標
 const toClient = (page, sel, p) => page.evaluate(({ sel, p }) => window.GameLandscape.toClient(p, document.querySelector(sel)), { sel, p });
 // 用 CDP 送一串觸控（螢幕座標），模擬手指拖曳
-async function touchPath(cdp, page, pts) {
+async function touchPath(cdp, page, pts, opt) {
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: pts[0].x, y: pts[0].y, id: 1 }] });
   for (let i = 1; i < pts.length; i++) for (let k = 1; k <= 5; k++) {
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: pts[i - 1].x + (pts[i].x - pts[i - 1].x) * k / 5, y: pts[i - 1].y + (pts[i].y - pts[i - 1].y) * k / 5, id: 1 }] });
   }
+  // hold：放開前手指先停住。放開時手指還在動，Chromium 會啟動甩動（fling），之後第一次點擊只用來停住甩動、
+  // 不產生 click（就算捲動已經到底、看不出在動也一樣）。2026-11-22 查到：選單滑動後點卡片進關一直逾時就是這個。
+  if (opt && opt.hold) await page.waitForTimeout(opt.hold);
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   await page.waitForTimeout(80);
 }
-// headless Chromium：CDP 觸控拖曳結束後緊接的第一次點擊不會產生 click（測試工具的現象，見其他 e2e）。點一下狀態列消耗掉。
+// headless Chromium：CDP 觸控拖曳結束後緊接的第一次點擊不會產生 click（放開時手指還在動 → 甩動，見 touchPath 的 hold）。點一下狀態列消耗掉。
 async function eatClick(page) { await page.tap('#status'); await page.waitForTimeout(40); }
 
 async function mirror(browser) {
@@ -210,7 +213,7 @@ async function pages(browser) {
     const inView = () => page.evaluate(() => { const b = document.getElementById('resetBtn').getBoundingClientRect(); return b.left >= 0 && b.right <= innerWidth && b.top >= 0 && b.bottom <= innerHeight; });
     const hidden0 = !(await inView());
     // 遊戲座標 (x, y) → 螢幕：遊戲的「往上」= 螢幕的往右
-    await touchPath(cdp, page, [{ x: 60, y: 420 }, { x: 330, y: 420 }]);
+    await touchPath(cdp, page, [{ x: 60, y: 420 }, { x: 330, y: 420 }], { hold: 150 });
     await page.waitForTimeout(400);
     const sc = await page.evaluate(() => ({ main: document.querySelector('main').scrollTop, body: document.body.scrollTop, win: window.scrollY + window.scrollX }));
     ok(hidden0 && sc.main > 0 && sc.body === 0 && sc.win === 0 && await inView(), '選單：手指往遊戲上方滑可以捲到最下面的「重新開始遊戲」（捲的是 <main>，頁面不動）', JSON.stringify(sc));

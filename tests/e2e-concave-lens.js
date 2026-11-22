@@ -88,6 +88,9 @@ async function run(profile, browser) {
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: b.x + x0, y: b.y + y0, id: 1 }] });
       for (let i = 1; i <= 6; i++) {
         await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: b.x + x0 + (x1 - x0) * i / 6, y: b.y + y0 + (y1 - y0) * i / 6, id: 1 }] });
+        // 照手指速度拖（每步約一幀）。一口氣送完等於速度無限大，Chromium 會當成甩動（fling），
+        // 之後第一次點按鈕只用來「停住甩動」、不產生 click（2026-11-22 查到：凹透鏡配置 F／H 的 C4「復原」失敗就是這個）。
+        await page.waitForTimeout(16);
       }
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     } else {
@@ -582,9 +585,8 @@ async function run(profile, browser) {
         ok((await st()).lines === n0 + 2, T('C4 封印後從標示點拖曳 → 畫出水平線'));
       }
       if (first) await shot('8b-draw-after-seal');
-      // 照真人速度按：拖曳畫線（CDP 觸控）剛結束就點按鈕，手機模擬偶爾不產生 click（2026-11-19 配置 F、H 抓到），先等一下
-      await page.waitForTimeout(400); await press('#undoBtn');
-      if (e2) { await page.waitForTimeout(400); await press('#undoBtn'); }
+      await press('#undoBtn');
+      if (e2) await press('#undoBtn');
       ok((await st()).lines === n0, T('C4 封印後「復原」也能用'));
     }
 
