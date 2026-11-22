@@ -14,7 +14,7 @@
   - 全螢幕切在這一頁上（shared/fullscreen.js），換頁時不會退出全螢幕，Android 就不會每次跳「滑動結束全螢幕」。
   - 手機直拿時由這一頁整個轉 90°（shared/landscape.js），框裡的頁面看到的已經是橫的畫面，不會再轉一次。
   - 「安裝到手機」提示只有最外層頁面收得到瀏覽器的安裝事件，所以也由這一頁負責（shared/install-hint.js）。
-  - 網址後面的 #… 記住框裡目前是哪一頁，重新整理會回到同一頁。
+  - 網址後面的 #… 記住框裡目前是哪一頁：按「重新整理」回到同一頁；貼網址、點連結、點收藏打開則一律先到主選單。
   直接開關卡、排行榜、製作頁的網址，會被 shared/shell-redirect.js 轉到這一頁的選單（使用者 2026-11-22；?noshell=1 與自動化測試不轉）。
 -->
 <style>
@@ -31,11 +31,14 @@
 (function () {
   'use strict';
   var frame = document.getElementById('game');
-  // 只接受遊戲自己的頁面（避免 #… 被拿來開別的網址）
+  // 使用者 2026-11-22：貼網址、點連結、點收藏打開 → 一律先到主選單；只有按「重新整理」才回到網址 # 記的那一頁（玩到一半不小心整理不會被踢回選單）。
   var OK = /^(index\.html|leaderboard\.html|credits\.html|(plane-mirror|convex-lens|concave-lens)\/index\.html)(\?[\w=&.-]*)?$/;
+  var isReload = false;
+  try { var nav = performance.getEntriesByType('navigation')[0]; isReload = !!nav && nav.type === 'reload'; } catch (e) { isReload = false; }
   var want = '';
   try { want = decodeURIComponent(location.hash.slice(1)); } catch (e) { want = ''; }
-  frame.src = OK.test(want) ? want : 'index.html';
+  // 只接受遊戲自己的頁面（避免 #… 被拿來開別的網址）
+  frame.src = (isReload && OK.test(want)) ? want : 'index.html';
   var base = location.href.replace(/[#?].*$/, '').replace(/[^\/]*$/, '');
   frame.addEventListener('load', function () {
     try {

@@ -71,19 +71,28 @@ const IPHONE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleW
     await page.screenshot({ path: path.join(SHOTS, 'shell-install.png') });
     await page.tap('#installNo');
     ok(await page.evaluate(() => !document.getElementById('installHint')), '「知道了」收起提示條');
-    // #… 只接受遊戲自己的頁面
-    await page.goto('about:blank'); // 只改 # 不會重新載入頁面
-    await page.goto(BASE + 'game.html#plane-mirror/index.html');
-    await page.waitForFunction(() => { const f = document.getElementById('game'); return f.contentWindow && /plane-mirror\/index\.html/.test(f.contentWindow.location.href); });
-    ok(true, '#plane-mirror/index.html：重新整理回到第一關');
-    await page.goto('about:blank');
-    await page.goto(BASE + 'game.html#credits.html');
-    await page.waitForFunction(() => { const f = document.getElementById('game'); return f.contentWindow && /prototype\/credits\.html/.test(f.contentWindow.location.href); });
-    ok(true, '#credits.html：重新整理留在「製作與素材」頁');
+    // 貼網址／點連結／點收藏（新開）：不管 # 後面是什麼，一律回主選單；重新整理才回到同一頁（使用者 2026-11-22）
+    const inFrame = (re) => page.waitForFunction((src) => { const f = document.getElementById('game'); return f.contentWindow && new RegExp(src).test(f.contentWindow.location.href); }, re.source);
+    for (const h of ['plane-mirror/index.html', 'convex-lens/index.html', 'concave-lens/index.html?practice=1', 'credits.html', 'https://example.com/']) {
+      await page.goto('about:blank');
+      await page.goto(BASE + 'game.html#' + h);
+      await inFrame(/prototype\/index\.html/);
+      ok(true, '#' + h + '：新開網址一律回主選單');
+    }
+    for (const [h, re] of [['plane-mirror/index.html', /plane-mirror\/index\.html/], ['concave-lens/index.html?practice=1', /concave-lens\/index\.html\?practice=1/], ['credits.html', /prototype\/credits\.html/]]) {
+      await page.goto('about:blank');
+      await page.goto(BASE + 'game.html#' + h);
+      await inFrame(/prototype\/index\.html/);
+      await page.evaluate((x) => { history.replaceState(null, '', '#' + x); }, h);
+      await page.reload();
+      await inFrame(re);
+      ok(true, '#' + h + '：按重新整理回到同一頁');
+    }
     await page.goto('about:blank');
     await page.goto(BASE + 'game.html#https://example.com/');
-    await page.waitForFunction(() => { const f = document.getElementById('game'); return f.contentWindow && /prototype\/index\.html/.test(f.contentWindow.location.href); });
-    ok(true, '#後面是別的網址：不理它，改開選單');
+    await page.reload();
+    await inFrame(/prototype\/index\.html/);
+    ok(true, '重新整理但 # 是別的網址：不理它，開選單');
     ok(errors.length === 0, '沒有 JS 錯誤', errors.join(' | '));
     await ctx.close();
   }
