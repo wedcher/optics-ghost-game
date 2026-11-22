@@ -952,6 +952,10 @@
   canvas.addEventListener('pointerup', function (e) { endPointer(e, false); });
   canvas.addEventListener('pointercancel', function (e) { endPointer(e, true); });
   canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  // 拖曳時不讓瀏覽器啟動甩動（fling）：畫布本來就 touch-action:none 不捲動，但快甩放開後瀏覽器仍進入約一秒的「甩動中」，
+  // 那段時間第一次點按鈕只拿去停住甩動、不算點擊（使用者手機實測：快甩畫線後按「復原」要按兩下，2026-11-22）。
+  // 只擋畫布上的 touchmove；pointer 事件（畫線、平移、點格子）照常，全螢幕的進入／離開都不受影響。
+  canvas.addEventListener('touchmove', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
   // iOS Safari 會忽略 user-scalable=no；擋掉頁面層級的雙指縮放手勢
   if (window.GhostSprite) window.GhostSprite.onLoad(function () { requestRender(); }); // 小鬼圖載入後重畫
   ['gesturestart', 'gesturechange'].forEach(function (n) { document.addEventListener(n, function (e) { e.preventDefault(); }); });

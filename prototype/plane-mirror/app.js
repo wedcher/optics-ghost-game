@@ -742,6 +742,10 @@
     syncUI(); requestRender();
   });
   canvas.addEventListener('pointercancel', function () { down = null; });
+  // 拖曳時不讓瀏覽器啟動甩動（fling）：畫布本來就 touch-action:none 不捲動，但快甩放開後瀏覽器仍進入約一秒的「甩動中」，
+  // 那段時間第一次點按鈕只拿去停住甩動、不算點擊（使用者手機實測：快甩畫線後按「復原」要按兩下，2026-11-22）。
+  // 只擋畫布上的 touchmove；pointer 事件（畫線、平移、點格子）照常，全螢幕的進入／離開都不受影響。
+  canvas.addEventListener('touchmove', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
 
   var MSG = {
     start: '鬼躲在房間裡，只有鏡子照得出牠。看鏡中的像，推出牠真正站在哪一格，再點那一格地板。',

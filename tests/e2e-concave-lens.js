@@ -88,9 +88,6 @@ async function run(profile, browser) {
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: b.x + x0, y: b.y + y0, id: 1 }] });
       for (let i = 1; i <= 6; i++) {
         await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: b.x + x0 + (x1 - x0) * i / 6, y: b.y + y0 + (y1 - y0) * i / 6, id: 1 }] });
-        // 照手指速度拖（每步約一幀）。一口氣送完等於速度無限大，Chromium 會當成甩動（fling），
-        // 之後第一次點按鈕只用來「停住甩動」、不產生 click（2026-11-22 查到：凹透鏡配置 F／H 的 C4「復原」失敗就是這個）。
-        await page.waitForTimeout(16);
       }
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     } else {
@@ -386,9 +383,8 @@ async function run(profile, browser) {
           }
           await page.waitForTimeout(40); if (mid) out = await mid();
           await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-          // headless Chromium：用 CDP 模擬的拖曳結束後，緊接的第一次點擊不會產生 click（平移拖曳也一樣，是測試工具的現象）。
-          // 先在標題列空白處點一下把它消耗掉。
-          await page.waitForTimeout(40); await page.touchscreen.tap(4, 4);
+          // 拖完不必先點空白處：畫布擋掉了甩動，緊接著點按鈕第一下就有效（2026-11-22 前要先點一下消耗掉）。
+          await page.waitForTimeout(40);
         } else {
           await page.mouse.move(cb.x + pts[0][0], cb.y + pts[0][1]); await page.mouse.down();
           for (let i = 1; i < pts.length; i++) await page.mouse.move(cb.x + pts[i][0], cb.y + pts[i][1], { steps: 4 });
@@ -585,9 +581,10 @@ async function run(profile, browser) {
         ok((await st()).lines === n0 + 2, T('C4 封印後從標示點拖曳 → 畫出水平線'));
       }
       if (first) await shot('8b-draw-after-seal');
+      // 拖曳 helper 是一口氣送完 touchMove（等於快甩）：拖完馬上按「復原」第一下就要有效（使用者手機實測快甩後要按兩下，2026-11-22 修）
       await press('#undoBtn');
       if (e2) await press('#undoBtn');
-      ok((await st()).lines === n0, T('C4 封印後「復原」也能用'));
+      ok((await st()).lines === n0, T('C4 封印後「復原」也能用（快甩畫線後馬上按，第一下就有效）'));
     }
 
     // ---------- 光路重現 ----------

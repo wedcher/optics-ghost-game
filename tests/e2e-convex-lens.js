@@ -433,9 +433,8 @@ async function run(profile, browser) {
           }
           await page.waitForTimeout(40); if (mid) out = await mid();
           await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-          // headless Chromium：用 CDP 模擬的拖曳結束後，緊接的第一次點擊不會產生 click（平移拖曳也一樣，是測試工具的現象）。
-          // 先在標題列空白處點一下把它消耗掉。
-          await page.waitForTimeout(40); await page.touchscreen.tap(4, 4);
+          // 拖完不必先點空白處：畫布擋掉了甩動，緊接著點按鈕第一下就有效（2026-11-22 前要先點一下消耗掉）。
+          await page.waitForTimeout(40);
         } else {
           await page.mouse.move(cb.x + pts[0][0], cb.y + pts[0][1]); await page.mouse.down();
           for (let i = 1; i < pts.length; i++) await page.mouse.move(cb.x + pts[i][0], cb.y + pts[i][1], { steps: 4 });

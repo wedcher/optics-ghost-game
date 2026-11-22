@@ -88,12 +88,11 @@ async function touchPath(cdp, page, pts, opt) {
   }
   // hold：放開前手指先停住。放開時手指還在動，Chromium 會啟動甩動（fling），之後第一次點擊只用來停住甩動、
   // 不產生 click（就算捲動已經到底、看不出在動也一樣）。2026-11-22 查到：選單滑動後點卡片進關一直逾時就是這個。
+  // 三關的畫布已經擋掉甩動（各關 app.js 的 touchmove），拖完直接點按鈕就有效，所以那邊不用 hold、也不用先點空白處。
   if (opt && opt.hold) await page.waitForTimeout(opt.hold);
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   await page.waitForTimeout(80);
 }
-// headless Chromium：CDP 觸控拖曳結束後緊接的第一次點擊不會產生 click（放開時手指還在動 → 甩動，見 touchPath 的 hold）。點一下狀態列消耗掉。
-async function eatClick(page) { await page.tap('#status'); await page.waitForTimeout(40); }
 
 async function mirror(browser) {
   console.log('\n===== 第一關 鏡子房間（直拿 390×844） =====');
@@ -137,7 +136,6 @@ async function mirror(browser) {
   const before = await page.evaluate(() => window.__protoMirror.canvasInfo());
   const a = await toClient(page, '#view', { x: info.W * 0.5, y: info.H * 0.5 }), b = await toClient(page, '#view', { x: info.W * 0.5 + 60, y: info.H * 0.5 });
   await touchPath(cdp, page, [a, b]);
-  await eatClick(page);
   const after = await page.evaluate(() => window.__protoMirror.canvasInfo());
   ok(after.OX - before.OX > 40 && Math.abs(after.OY - before.OY) < 5, '第一關：手指往遊戲的右邊拖，畫面往右平移（x、y 沒對調）', 'ΔOX=' + (after.OX - before.OX).toFixed(0) + ' ΔOY=' + (after.OY - before.OY).toFixed(0));
   await page.tap('#zoomFit'); await page.waitForTimeout(60);
@@ -189,7 +187,6 @@ async function lens(browser, o) {
   const [d1, d2] = o.dragLine;
   a = await snapC(d1); b = await snapC(d2);
   await touchPath(cdp, page, [a, b]);
-  await eatClick(page);
   const r = await page.evaluate(({ H, d1, d2 }) => {
     const s = window[H].state, l = s.lines[s.lines.length - 1], pts = window[H].snapPoints();
     const A = pts.find((p) => p.id === d1), B = pts.find((p) => p.id === d2);
