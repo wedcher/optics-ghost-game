@@ -125,6 +125,29 @@ const IPHONE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleW
     await ctx.close();
   }
 
+  // ---------- 直接開任何一頁：都轉進外框的選單（使用者 2026-11-22） ----------
+  {
+    // 自動化瀏覽器預設不轉（navigator.webdriver），這裡假裝成真的手機瀏覽器
+    const ctx = await browser.newContext({ viewport: { width: 812, height: 375 }, hasTouch: true, isMobile: true });
+    await ctx.addInitScript(() => { try { Object.defineProperty(navigator, 'webdriver', { get: () => false }); localStorage.setItem('opticsGhost.installTip.v1', '1'); } catch (e) {} });
+    const pages = ['index.html', 'plane-mirror/index.html', 'convex-lens/index.html', 'concave-lens/index.html', 'leaderboard.html', 'credits.html'];
+    for (const p of pages) {
+      const page = await ctx.newPage();
+      await page.goto(BASE + p);
+      await page.waitForFunction(() => /game\.html/.test(location.pathname), null, { timeout: 5000 }).catch(() => {});
+      await page.waitForFunction(() => { const f = document.getElementById('game'); return f && f.contentDocument && f.contentDocument.querySelector('a.card'); }, null, { timeout: 5000 }).catch(() => {});
+      const r = await page.evaluate(() => ({ path: location.pathname, hash: location.hash, menu: !!(document.getElementById('game') && document.getElementById('game').contentDocument.querySelector('a.card')) }));
+      ok(/game\.html$/.test(r.path) && r.hash === '#index.html' && r.menu, '直接開 ' + p + ' → 轉進外框的選單', r);
+      await page.close();
+    }
+    // ?noshell=1 不轉
+    const page = await ctx.newPage();
+    await page.goto(BASE + 'convex-lens/index.html?noshell=1');
+    await page.waitForTimeout(500);
+    ok(await page.evaluate(() => /convex-lens/.test(location.pathname)), '?noshell=1 不轉，留在關卡頁');
+    await ctx.close();
+  }
+
   await browser.close();
   server.close();
   console.log('\n' + (failures === 0 ? 'ALL PASS' : 'FAILED') + ': ' + (checks - failures) + '/' + checks + ' checks');
