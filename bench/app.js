@@ -182,7 +182,7 @@
   /** 自動畫的三條主光線（「示範光路」與分析的「對答案」）。 */
   function drawRays() {
     var f = F(), u = U(), R = C.lensRadius, yo = srcY(), k = G.k, xl = C.lensX, xEnd = st.screenX, ana = st.mode === 'ana', lw = ana ? 3 : 1.8;
-    var im = O.image(f, u), list = O.rays(f, u, yo, R);
+    var im = O.image(f, u), list = O.rays(f, u, yo, ana ? Infinity : R);
     var colors = { parallel: '#ffe066', center: '#7ee0a0', focus: '#ff9f6b' };
     ctx.save(); ctx.beginPath(); ctx.rect(0, 0, G.leftW, G.H); ctx.clip();
     ctx.beginPath(); ctx.arc(X(st.objX), PY(yo), 3.5, 0, 6.283); ctx.fillStyle = '#ffe066'; ctx.fill();
@@ -281,7 +281,7 @@
     if (st.marker) pts.push({ id: 'I', label: st.marker.virtual ? '虛像' : '實像', x: st.marker.x, y: st.marker.y });
     st.lines.forEach(function (l) {
       var p = atX(geom(l), xl);
-      if (!p || Math.abs(p.y) > C.lensRadius * 3) return;
+      if (!p || Math.abs(p.y) > anaLensHalfPx() / G.ky) return;
       for (var i = 0; i < pts.length; i++) if (Math.hypot(pts[i].x - p.x, pts[i].y - p.y) < 0.15) return;
       pts.push({ id: 'P', label: 'P', x: xl, y: p.y });
     });
@@ -333,6 +333,9 @@
     sync();
   }
 
+  /** 分析畫面的透鏡高度（px）：照課本把透鏡當一整面平面畫，幾乎撐滿畫面；實驗桌視角才是真實口徑。 */
+  function anaLensHalfPx() { return (G.H - BAR_H - 8) / 2 - 10; }
+
   function drawAnalysis() {
     var k = G.k, f = C.f, xl = C.lensX, R = C.lensRadius, ay = PY(0), fs = Math.max(14, k * 2.4), convex = st.lens === 'convex';
     ctx.fillStyle = '#0d1530'; ctx.fillRect(0, 0, G.leftW, G.H);
@@ -347,7 +350,7 @@
     var sx = X(st.screenX), hh = C.screen.h / 2;
     line(sx, PY(hh), sx, PY(-hh), '#e6e9f5', 5); text('光屏', sx, PY(hh) - 6, '#e6e9f5', Math.max(12, k * 1.6), 'center');
     // 透鏡（又高又細）
-    lensShape(X(xl), ay, 8, R * G.ky, 2);
+    lensShape(X(xl), ay, 9, anaLensHalfPx(), 2);
     // 物（燈具側面）
     drawLampBoxes();
     // 學生畫的線（粗）與兩線交點
