@@ -138,6 +138,8 @@
 - **第一關地磚貼圖已換上（2026-11-20）**：使用者給的石磚圖存成 `docs/concepts/地磚.png`，遊戲用 `plane-mirror/assets/floor-tile.webp`（512×512）。一格貼一張，用分塊仿射做透視貼圖；直接看、各面鏡子、鏡中鏡各算一次後快取（`app.js` 的 `floorLayer`）。隔一格壓暗（西洋棋盤，鏡中好數格），格線改成磚邊的銅色、細一點。圖載不到就退回程式畫的地板。**還沒在實體手機上看效能**（第一次畫面出現前要多算一下貼圖）。
 - **製作與素材頁（2026-11-21，使用者定稿）**：`prototype/credits.html`，選單最下面有入口。字少、**不放外部連結**、音效寫 Pixabay 上傳者帳號：遊戲設計：絕絕／背景與角色圖：ChatGPT／程式：Claude／女鬼聲音：Pixabay「u_2rfb4q2b10」／小鬼聲音：Pixabay「freesound_community」／其他音效：程式合成。（兩段笑聲出處只記在這裡：「Girl giggling」pixabay.com/sound-effects/people-girl-giggling-492887，上傳者 `u_2rfb4q2b10`；「Squaky giggle」pixabay.com/sound-effects/people-squaky-giggle-47742，上傳者 `freesound_community`，頁面標原作者 Artist：Ceebee90 (Freesound)；原檔 freesound.org/people/Ceebee90/sounds/421025（「squaky giggle.m4a」，2018-03-08），授權 **Creative Commons 0**，轉貼、修改、商用都不用署名。使用者 2026-11-21 用本機查到。）
 
+- **實驗桌模擬器（使用者 2026-11-23 提出，已做第一版）**：學校實驗儀器找不到，另做純模擬器（凸／凹透鏡、燈具與光屏可拖曳、指尖燈 L 形物體、側面圖標 F 與 2F）。獨立在 `bench/`，不碰遊戲檔案；定案與預設值見 `docs/bench-simulator.md`。**使用者可能之後把它搬到新 repo（不同網址）**。
+
 ## DO NOT RE-DERIVE
 
 除非有新證據／實測失敗，不要反覆重新討論下列已決定事項：
@@ -651,3 +653,10 @@ Sprint 01 通過後，不停留在美化凹透鏡：
   - **測試**：拿掉所有「拖完先點空白處」的繞道（`e2e-convex-lens.js`、`e2e-concave-lens.js` 的平移拖曳、`e2e-rotate.js` 的 `eatClick`），凹透鏡拖曳改回一口氣送完（＝快甩）。對照：拿掉 app 修正時凹透鏡失敗 154 項、凸透鏡失敗 207 項；有修正全過。`e2e-rotate.js` 有沒有修正都會過（抓不到這個問題）。
   - **實體手機驗證通過（使用者 2026-11-22）**：快甩後按「復原」第一下就有效；畫線、平移手感不變；沒有跳出全螢幕。三項都 PASS。
 - **檔案分工**：這個工作階段已收工，不佔檔案。
+
+### 交接點（實驗桌模擬器，2026-11-23，分支 `claude/awesome-mccarthy-xqaq2v`）
+
+- 做了：`bench/`（`index.html`、`app.js`、`optics.js`、`config.js`）、`tests/check-bench.js`（`npm run check:bench`，55 項）、`docs/bench-simulator.md`。headless 實測：拖曳、凸／凹透鏡、虛像、光屏模糊都正常。
+- **還沒做／還沒驗證**：實體手機（拖曳手感、觸控範圍）；學生自己畫光線的工具；側面圖縮放。
+- 下一步：使用者在手機試玩後回報（物體造型、尺寸、預設值）；決定是否搬到新 repo。
+- **檔案分工**：這個工作階段只新增 `bench/*`、`tests/check-bench.js`、`docs/bench-simulator.md`，並動了 `package.json`（加一行 script）與 `PROJECT.md`；沒動遊戲本體檔案。

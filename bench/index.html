@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>光學實驗桌</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0d14; color: #dde2f5; overflow: hidden;
+    font-family: "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif; -webkit-user-select: none; user-select: none; }
+  #bar { display: flex; flex-wrap: nowrap; gap: 6px; align-items: center; padding: 4px 8px; height: 36px; box-sizing: border-box;
+    background: #151827; border-bottom: 1px solid #262b40; overflow-x: auto; white-space: nowrap; }
+  #bar .hint { font-size: 12px; color: #8d96bd; margin-left: auto; padding-left: 8px; }
+  button { font: inherit; font-size: 13px; color: #dde2f5; background: #20253b; border: 1px solid #343b5c; border-radius: 8px;
+    min-height: 28px; padding: 2px 10px; cursor: pointer; touch-action: manipulation; }
+  button[aria-pressed="true"] { background: #3a4a9a; border-color: #6c80ff; color: #fff; }
+  .seg { display: inline-flex; }
+  .seg button:first-child { border-radius: 8px 0 0 8px; }
+  .seg button:last-child { border-radius: 0 8px 8px 0; border-left: 0; }
+  #c { display: block; width: 100%; height: calc(100% - 36px); touch-action: none; }
+  #portrait { display: none; position: fixed; inset: 0; background: #0b0d14; z-index: 9; align-items: center; justify-content: center;
+    text-align: center; font-size: 18px; line-height: 1.6; padding: 24px; }
+  @media (orientation: portrait) and (max-width: 700px) { #portrait { display: flex; } }
+</style>
+</head>
+<body>
+<div id="bar">
+  <span class="seg"><button id="b-convex" aria-pressed="true">凸透鏡</button><button id="b-concave" aria-pressed="false">凹透鏡</button></span>
+  <button id="t-rays" aria-pressed="true">光路</button>
+  <button id="t-data" aria-pressed="true">數據</button>
+  <button id="t-back" aria-pressed="false">光屏：透鏡側看</button>
+  <button id="b-reset">重設</button>
+  <span class="hint">拖曳燈具、光屏的底座</span>
+</div>
+<canvas id="c"></canvas>
+<div id="portrait">請把手機橫過來使用<br>（光具座很長，橫放才看得清楚）</div>
+<script src="config.js"></script>
+<script src="optics.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
