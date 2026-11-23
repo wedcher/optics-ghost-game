@@ -16,13 +16,13 @@ var c1 = O.image(-f, 20); eq(c1.dImg, -20 / 3, '凹透鏡虛像位置', 1e-9); e
 
 // 光屏：像距 15、物距 30 時剛好清楚；從透鏡這側看只有上下顛倒
 var sb = O.screenSpot(f, 30, 15, R, blue, wr, false);
-eq(sb.blur, 0, '光屏在像上時不模糊'); eq(sb.y, -1.125, '藍燈（上）→ 在下'); eq(sb.r, 0.375, '藍燈（右）→ 仍在右（透鏡側看）');
+eq(sb.blur, 0, '光屏在像上時不模糊'); eq(sb.y, -blue.y / 2, '藍燈（上）→ 在下'); eq(sb.r, blue.r / 2, '藍燈（右）→ 仍在右（透鏡側看）');
 var sr = O.screenSpot(f, 30, 15, R, red, wr, false);
-eq(sr.r, -0.375, '紅燈（左）→ 仍在左'); eq(sr.y, -0.375, '紅燈（下排）→ 在光軸下方');
+eq(sr.r, red.r / 2, '紅燈（左）→ 仍在左'); eq(sr.y, -red.y / 2, '紅燈（下排）→ 在光軸下方');
 var sg = O.screenSpot(f, 30, 15, R, green, wr, false);
-eq(sg.r, 0.375, '綠燈（右）'); eq(sg.y, -0.375, '綠燈（下排）');
+eq(sg.r, green.r / 2, '綠燈（右）'); eq(sg.y, -green.y / 2, '綠燈（下排）');
 // 從光屏背面看：左右也反
-eq(O.screenSpot(f, 30, 15, R, blue, wr, true).r, -0.375, '背面看：藍燈跑到左邊');
+eq(O.screenSpot(f, 30, 15, R, blue, wr, true).r, -blue.r / 2, '背面看：藍燈跑到左邊');
 // 光屏離開像的位置會模糊；到 2f 處：|1 − s/f + s/u| 以 s=20,u=30 → 0.333…
 ok(O.screenSpot(f, 30, 20, R, blue, wr, false).blur > 0.9, '光屏偏離像 → 模糊');
 // 物在焦點上：平行光，模糊圓 = 口徑
@@ -57,7 +57,7 @@ var rc = O.rays(-f, 20, yo, R), imc = O.image(-f, 20);
 rc.forEach(function (r) { if (!r.blocked) eq(r.yP + r.slope * imc.dImg, imc.m * yo, '凹透鏡：反向延長通過像點 ' + r.name, 1e-9); });
 
 // 範圍：燈窗在 u ≥ 4、光屏在可動範圍內，F、2F 都在桌面上
-ok(C.lensX - C.range.objMax >= 4, '物距最小 ≥ 4'); ok(C.lensX - 2 * f >= 0 && C.lensX + 2 * f <= C.benchLength, '2F 兩側都在桌面上');
+ok(C.lensX - C.range.objMax >= 4, '物距最小 ≥ 4'); ok(C.lensX - C.range.objMin >= 2 * f, '物距最大 ≥ 2f（能放到 2f 以外）'); ok(C.lensX - 2 * f >= 0 && C.lensX + 2 * f <= C.benchLength, '2F 兩側都在桌面上');
 ok(C.range.screenMax <= C.benchLength, '光屏範圍在桌面內');
 
 console.log(n + ' checks, ' + fails + ' failed'); process.exit(fails ? 1 : 0);

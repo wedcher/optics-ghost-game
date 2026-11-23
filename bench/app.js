@@ -39,19 +39,22 @@
   }
 
   // ---------- 版面 ----------
+  var BAR_H = 36;
   function layout() {
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var W = canvas.clientWidth, H = canvas.clientHeight;
     if (!W || !H) return false;
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    var top = C.axisH + 10, bottom = 6.5;               // 尺上緣以上／以下要放得下的公分數
-    var k = Math.min(W / (C.benchLength + 4), (H * 0.56) / (top + bottom));
-    G.W = W; G.H = H; G.k = k;
-    G.x0 = (W - C.benchLength * k) / 2;
-    G.baseY = 6 + top * k;
-    G.sideH = 6 + (top + bottom) * k;
-    var py = G.sideH + 6, ph = H - py - 4, gap = 6, pw = (W - 8 - 2 * gap) / 3;
-    G.panels = [0, 1, 2].map(function (i) { return { x: 4 + i * (pw + gap), y: py, w: pw, h: ph }; });
+    var rightW = Math.max(190, Math.min(300, W * 0.28)), leftW = W - rightW - 8;
+    var top = C.axisH + C.screen.h / 2 + 3, bottom = 6.5;          // 尺上緣以上／以下要放得下的公分數
+    var availH = H - BAR_H - 8;
+    var k = Math.min(leftW / (C.benchLength + 4), availH / (top + bottom));
+    G.W = W; G.H = H; G.k = k; G.leftW = leftW;
+    G.x0 = (leftW - C.benchLength * k) / 2;
+    G.baseY = BAR_H + 4 + (availH - (top + bottom) * k) / 2 + top * k;   // 側面圖在左欄裡上下置中
+    var gap = 6, ph = (H - 8 - 2 * gap) / 3, px = leftW + 4;
+    G.panels = [0, 1, 2].map(function (i) { return { x: px, y: 4 + i * (ph + gap), w: rightW, h: ph }; });
+    $('bar').style.width = leftW + 'px';
     return true;
   }
 
@@ -97,10 +100,10 @@
 
   function drawLensStand() {
     var k = G.k, R = C.lensRadius, xc = C.lensX, cy = Y(C.axisH);
-    base(xc, 6); pole(xc, C.axisH - R - 0.4);
-    var cw = 1.9 * k; rr(X(xc) - cw / 2, Y(C.axisH - R - 0.4) - 1, cw, 0.9 * k, 2); ctx.fillStyle = '#9aa0b0'; ctx.fill(); ctx.strokeStyle = '#444'; ctx.stroke();
-    knob(X(xc) + 0.95 * k + 3, Y(C.axisH - R - 0.4) + 2);
-    var hw = 0.55 * k, r = R * k;
+    base(xc, 7); pole(xc, C.axisH - R - 0.4);
+    var cw = 2.2 * k; rr(X(xc) - cw / 2, Y(C.axisH - R - 0.4) - 1, cw, 1 * k, 2); ctx.fillStyle = '#9aa0b0'; ctx.fill(); ctx.strokeStyle = '#444'; ctx.stroke();
+    knob(X(xc) + 1.1 * k + 3, Y(C.axisH - R - 0.4) + 3);
+    var hw = 0.7 * k, r = R * k;
     ctx.beginPath();
     if (st.lens === 'convex') {
       ctx.moveTo(X(xc), cy - r); ctx.quadraticCurveTo(X(xc) + hw * 2, cy, X(xc), cy + r); ctx.quadraticCurveTo(X(xc) - hw * 2, cy, X(xc), cy - r);
@@ -114,7 +117,7 @@
 
   function drawScreenStand() {
     var k = G.k, xc = st.screenX, hh = C.screen.h / 2;
-    base(xc, 6); pole(xc, C.axisH - hh);
+    base(xc, 7); pole(xc, C.axisH - hh);
     knob(X(xc) + 0.95 * k + 3, Y(C.axisH - hh) + 6);
     var bw = 0.7 * k, y1 = Y(C.axisH + hh), y2 = Y(C.axisH - hh);
     var g = ctx.createLinearGradient(X(xc) - bw / 2, 0, X(xc) + bw / 2, 0); g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#b9bdc9');
@@ -133,7 +136,7 @@
 
   function drawLampStand() {
     var k = G.k, L = C.lamp, xc = st.objX - L.len / 2, s = L.size;
-    base(xc, 6); pole(xc, C.axisH - 0.3);
+    base(xc, 7); pole(xc, C.axisH - 0.3);
     rr(X(xc) - 0.9 * k, Y(C.axisH) - 0.35 * k, 1.8 * k, 0.55 * k, 2); ctx.fillStyle = '#9aa0b0'; ctx.fill(); ctx.strokeStyle = '#444'; ctx.stroke();
     var w = L.windows, x0 = st.objX - L.len, off = 0.2 * k;
     // 側面照：從「正面看的左邊」看過去 → 左排（紅）最近，右排（綠、藍）在後面，稍微往左上錯開表示前後
@@ -194,7 +197,8 @@
   }
 
   function drawSide() {
-    ctx.fillStyle = '#10121b'; ctx.fillRect(0, 0, G.W, G.sideH);
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, G.leftW, G.H); ctx.clip();
+    ctx.fillStyle = '#10121b'; ctx.fillRect(0, 0, G.leftW, G.H);
     drawAxis(); drawRuler();
     drawScreenStand(); drawLensStand(); drawLampStand();
     drawFocusMarks();
@@ -204,14 +208,27 @@
     if (st.drag) { // 抓住時的光暈
       var xc = st.drag.who === 'obj' ? st.objX - C.lamp.len / 2 : st.screenX, hw = standHalfWidth();
       ctx.strokeStyle = 'rgba(255,224,102,.8)'; ctx.lineWidth = 2; ctx.setLineDash([5, 4]);
-      rr(X(xc) - hw, Y(C.axisH + 3.2), hw * 2, Y(0) - Y(C.axisH + 3.2) + 2, 8); ctx.stroke(); ctx.setLineDash([]);
+      var topH = C.axisH + 2 * C.lamp.size + 0.8;
+      rr(X(xc) - hw, Y(topH), hw * 2, Y(0) - Y(topH) + 2, 8); ctx.stroke(); ctx.setLineDash([]);
     }
+    ctx.restore();
   }
 
-  // ---------- 下方三個小圖 ----------
-  function panel(p, title) {
-    rr(p.x, p.y, p.w, p.h, 8); ctx.fillStyle = '#12141d'; ctx.fill(); ctx.strokeStyle = '#2a2e3e'; ctx.lineWidth = 1; ctx.stroke();
-    text(title, p.x + 8, p.y + 14, '#9aa3cc', 11, 'left');
+  // ---------- 右欄三張小圖：圖在左、說明文字在右 ----------
+  function frame(p) { rr(p.x, p.y, p.w, p.h, 8); ctx.fillStyle = '#12141d'; ctx.fill(); ctx.strokeStyle = '#2a2e3e'; ctx.lineWidth = 1; ctx.stroke(); }
+  function wrap(s, x, y, maxW, lh, color, size, bold) { // 逐字折行（中文）
+    ctx.font = (bold ? 'bold ' : '') + size + 'px ' + FONT; ctx.fillStyle = color; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    var lineStr = '';
+    for (var i = 0; i < s.length; i++) {
+      var t = lineStr + s[i];
+      if (ctx.measureText(t).width > maxW && lineStr) { ctx.fillText(lineStr, x, y); y += lh; lineStr = s[i]; } else lineStr = t;
+    }
+    if (lineStr) { ctx.fillText(lineStr, x, y); y += lh; }
+    return y;
+  }
+  function sideText(p, tx, title, caption) { // 標題（灰）＋說明（亮）
+    var tw = p.x + p.w - 8 - tx, y = wrap(title, tx, p.y + 18, tw, 15, '#9aa3cc', 12, true);
+    if (caption) wrap(caption, tx, y + 8, tw, 16, '#e3e7fa', 13, true);
   }
   function spot(cx, cy, r, blur, color, strength) { // 一個發光圓點（模糊時攤成大圓、變淡）
     var R = r + blur, a = Math.min(1, (r / Math.max(R, 1e-6)) * (r / Math.max(R, 1e-6))) * (strength == null ? 1 : strength);
@@ -226,29 +243,28 @@
   }
 
   function drawFront(p) { // 燈具正面（從透鏡這側看）：三個方塊的正面 + 一點深度
-    panel(p, '燈具正面（從透鏡這側看）');
-    var L = C.lamp, ka = Math.min((p.w - 16) / 3.4, (p.h - 36) / 3.4), cx = p.x + p.w / 2, yb = p.y + p.h - 12;
-    line(cx - ka * 2, yb, cx + ka * 2, yb, 'rgba(160,175,240,.3)', 1, [4, 4]);
-    var order = [L.windows[1], L.windows[2], L.windows[0]];
-    order.forEach(function (w) {
-      var x = cx + (w.r - L.size / 2) * ka, y = yb - (w.y + L.size / 2) * ka, s = L.size * ka, d = 0.18 * ka;
-      rr(x - d, y - d, s, s, s * 0.2); ctx.fillStyle = shade(w.color, -0.55); ctx.fill();          // 後面的燈身（深度）
-      var g = ctx.createLinearGradient(0, y, 0, y + s); g.addColorStop(0, shade(w.color, 0.35)); g.addColorStop(1, shade(w.color, -0.3));
-      rr(x, y, s, s, s * 0.2); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = shade(w.color, -0.6); ctx.lineWidth = 1; ctx.stroke();
-      var wx = x + s / 2, wy = y + s / 2, wr = L.windowR * ka;
-      ctx.beginPath(); ctx.arc(wx, wy, wr * 1.25, 0, 6.283); ctx.fillStyle = shade(w.color, -0.5); ctx.fill();
+    frame(p);
+    var L = C.lamp, span = 2 * L.size + 0.5, ka = Math.min((p.w * 0.5 - 8) / span, (p.h - 14) / span);
+    var cx = p.x + 8 + (span * ka) / 2, yb = p.y + p.h - 8;
+    line(cx - ka * (span / 2 + 0.2), yb, cx + ka * (span / 2 + 0.2), yb, 'rgba(160,175,240,.3)', 1, [4, 4]);
+    [L.windows[1], L.windows[2], L.windows[0]].forEach(function (w) {
+      var x = cx + (w.r - L.size / 2) * ka, y = yb - (w.y + L.size / 2) * ka, s2 = L.size * ka, d = 0.16 * ka;
+      rr(x - d, y - d, s2, s2, s2 * 0.2); ctx.fillStyle = shade(w.color, -0.55); ctx.fill();          // 後面的燈身（深度）
+      var g = ctx.createLinearGradient(0, y, 0, y + s2); g.addColorStop(0, shade(w.color, 0.35)); g.addColorStop(1, shade(w.color, -0.3));
+      rr(x, y, s2, s2, s2 * 0.2); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = shade(w.color, -0.6); ctx.lineWidth = 1; ctx.stroke();
+      var wx = x + s2 / 2, wy = y + s2 / 2, wr = L.windowR * ka;
+      ctx.beginPath(); ctx.arc(wx, wy, wr * 1.2, 0, 6.283); ctx.fillStyle = shade(w.color, -0.5); ctx.fill();
       var gg = ctx.createRadialGradient(wx, wy, 0, wx, wy, wr); gg.addColorStop(0, '#fff'); gg.addColorStop(0.6, shade(w.color, 0.55)); gg.addColorStop(1, rgba(w.color, 1));
       ctx.beginPath(); ctx.arc(wx, wy, wr, 0, 6.283); ctx.fillStyle = gg; ctx.fill();
     });
     ctx.beginPath(); ctx.arc(cx, yb, 3, 0, 6.283); ctx.fillStyle = '#a0b0ff'; ctx.fill();
-    text('光軸', cx - ka * 2 - 4, yb + 4, '#a0b0ff', 10, 'right');
+    sideText(p, p.x + 16 + span * ka, '燈具正面（透鏡側看）', '光軸在最下面的虛線');
   }
 
   function drawScreenView(p) {
-    var f = F(), u = U(), s = S(), R = C.lensRadius, L = C.lamp;
-    panel(p, st.back ? '光屏（從光屏背面看）' : '光屏（從透鏡這側看）');
-    var bw = C.screen.w, bh = C.screen.h, kb = Math.min((p.w - 16) / bw, (p.h - 44) / bh);
-    var cx = p.x + p.w / 2, cy = p.y + 20 + (p.h - 40) / 2;
+    var f = F(), u = U(), s = S(), R = C.lensRadius, L = C.lamp, bw = C.screen.w, bh = C.screen.h;
+    var kb = Math.min((p.w * 0.5 - 8) / bw, (p.h - 14) / bh), cx = p.x + 8 + bw * kb / 2, cy = p.y + p.h / 2;
+    frame(p);
     ctx.fillStyle = '#23262f'; ctx.fillRect(cx - bw * kb / 2, cy - bh * kb / 2, bw * kb, bh * kb);
     line(cx - bw * kb / 2, cy, cx + bw * kb / 2, cy, 'rgba(160,175,240,.25)', 1, [3, 3]); line(cx, cy - bh * kb / 2, cx, cy + bh * kb / 2, 'rgba(160,175,240,.25)', 1, [3, 3]);
     ctx.save(); ctx.beginPath(); ctx.rect(cx - bw * kb / 2, cy - bh * kb / 2, bw * kb, bh * kb); ctx.clip(); ctx.globalCompositeOperation = 'lighter';
@@ -259,17 +275,15 @@
     });
     ctx.restore();
     ctx.strokeStyle = '#8a91ad'; ctx.lineWidth = 2; ctx.strokeRect(cx - bw * kb / 2, cy - bh * kb / 2, bw * kb, bh * kb);
-    if (st.data) {
-      var msg = st.lens === 'concave' ? '凹透鏡：光屏上不會成像' : maxBlur < 0.12 ? '像很清楚' : '像模糊（移動光屏找清楚的位置）';
-      text(msg, p.x + p.w / 2, p.y + p.h - 5, '#cfd5f0', 11, 'center');
-    }
+    var msg = st.data ? (st.lens === 'concave' ? '凹透鏡：光屏上不會成像' : maxBlur < 0.12 ? '像很清楚' : '像模糊，移動光屏找清楚的位置') : '';
+    sideText(p, p.x + 16 + bw * kb, st.back ? '光屏（背面看）' : '光屏（透鏡側看）', msg);
   }
 
   var NOUN = { enlarged: '放大', reduced: '縮小', same: '等大' };
   function drawLensView(p) {
     var f = F(), u = U(), d = C.eye.dist, R = C.lensRadius, L = C.lamp;
-    panel(p, '看透鏡（眼睛在透鏡後 ' + d + ' cm）');
-    var rc = Math.min(p.w - 20, p.h - 40) / 2, kc = rc / R, cx = p.x + p.w / 2, cy = p.y + 20 + (p.h - 40) / 2;
+    frame(p);
+    var rc = Math.min((p.w * 0.5 - 8) / 2, (p.h - 14) / 2), kc = rc / R, cx = p.x + 8 + rc, cy = p.y + p.h / 2;
     var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rc); g.addColorStop(0, '#171a27'); g.addColorStop(1, '#0c0d14');
     ctx.beginPath(); ctx.arc(cx, cy, rc, 0, 6.283); ctx.fillStyle = g; ctx.fill();
     ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, rc, 0, 6.283); ctx.clip(); ctx.globalCompositeOperation = 'lighter';
@@ -286,20 +300,21 @@
     }
     ctx.restore();
     ctx.beginPath(); ctx.arc(cx, cy, rc, 0, 6.283); ctx.strokeStyle = '#8fd0ff'; ctx.lineWidth = 3; ctx.stroke();
+    var msg = '';
     if (st.data) {
-      var ds = O.describe(f, u), msg;
+      var ds = O.describe(f, u);
       if (!focus || huge) msg = '對不到焦（像在眼前太近或在眼睛後面）';
       else if (ds.kind === 'infinity') msg = '像在無限遠（平行光）';
       else msg = (ds.kind === 'real' ? '實像' : '虛像') + '・' + (ds.upright ? '正立' : '倒立') + '・' + NOUN[ds.size];
-      text(msg, p.x + p.w / 2, p.y + p.h - 5, '#cfd5f0', 11, 'center');
     }
+    sideText(p, p.x + 16 + 2 * rc, '看透鏡（眼睛在後 ' + d + ' cm）', msg);
   }
 
   function render() {
     if (!G.k) return;
     ctx.clearRect(0, 0, G.W, G.H);
     ctx.fillStyle = '#0b0d14'; ctx.fillRect(0, 0, G.W, G.H);
-    drawSide(); drawFront(G.panels[0]); drawScreenView(G.panels[1]); drawLensView(G.panels[2]);
+    drawSide(); drawScreenView(G.panels[0]); drawLensView(G.panels[1]); drawFront(G.panels[2]);
   }
   var pending = false;
   function requestRender() { if (!pending) { pending = true; requestAnimationFrame(function () { pending = false; render(); }); } }
@@ -309,11 +324,11 @@
   function pos(e) { var r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
   function worldX(px) { return (px - G.x0) / G.k; }
   function hit(p) {
-    if (p.y > G.sideH) return null;
+    if (p.x > G.leftW || p.y < BAR_H) return null;
     var hw = standHalfWidth(), best = null, bd = 1e9;
     [{ who: 'obj', xc: st.objX - C.lamp.len / 2 }, { who: 'screen', xc: st.screenX }].forEach(function (s) {
       var d = Math.abs(p.x - X(s.xc));
-      if (d <= hw && p.y >= Y(C.axisH + 5) && d < bd) { bd = d; best = s; }
+      if (d <= hw && p.y >= Y(C.axisH + 2 * C.lamp.size + 2) && d < bd) { bd = d; best = s; }
     });
     return best;
   }

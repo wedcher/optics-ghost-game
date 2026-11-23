@@ -656,7 +656,7 @@ Sprint 01 通過後，不停留在美化凹透鏡：
 
 ### 交接點（實驗桌模擬器，2026-11-23，分支 `claude/awesome-mccarthy-xqaq2v`）
 
-- 做了：`bench/`（`index.html`、`app.js`、`optics.js`、`config.js`）、`tests/check-bench.js`（`npm run check:bench`，55 項）、`docs/bench-simulator.md`。headless 實測：拖曳、凸／凹透鏡、虛像、光屏模糊都正常。
+- 做了：`bench/`（`index.html`、`app.js`、`optics.js`、`config.js`）、`tests/check-bench.js`（`npm run check:bench`，56 項）、`docs/bench-simulator.md`。headless 實測：拖曳、凸／凹透鏡、虛像、光屏模糊都正常。
 - **還沒做／還沒驗證**：實體手機（拖曳手感、觸控範圍）；學生自己畫光線的工具；側面圖縮放。
 - 下一步：使用者在手機試玩後回報（物體造型、尺寸、預設值）；決定是否搬到新 repo。
 - **檔案分工**：這個工作階段只新增 `bench/*`、`tests/check-bench.js`、`docs/bench-simulator.md`，並動了 `package.json`（加一行 script）與 `PROJECT.md`；沒動遊戲本體檔案。
