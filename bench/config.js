@@ -25,6 +25,7 @@
         { id: 'green', r:  1, y: 1, color: [34, 197, 94] }
       ]
     },
+    analysisStretch: 2.5,    // 分析畫面上下方向放大幾倍（使用者給的參考圖：透鏡約 2.5 倍焦距高；上下拉伸不改變光學，直線與交點照樣成立）
     screen: { w: 16, h: 18 },       // 光屏大小，中心在光軸上
     eye: { dist: 30, near: 10 },    // 看透鏡時眼睛在透鏡後方的距離；近點（再近就對不了焦）
     range: { objMin: 4, objMax: 25, screenMinFromLens: 8, screenMax: 82 },

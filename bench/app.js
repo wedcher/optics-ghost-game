@@ -1,24 +1,37 @@
 /*
  * app.js — 光學實驗桌模擬器的畫面與操作。光學計算在 optics.js，數字在 config.js。
- * 畫面分兩塊：上面是側面圖（光具座、燈具、透鏡、光屏、光路、F 與 2F），
- * 下面三個小圖：燈具正面、光屏、看透鏡。
+ * 左邊大的側面圖（實驗桌／分析光路），右邊由上到下三張小圖：光屏、看透鏡、燈具正面。
+ *
+ * 流程（和遊戲一樣）：移動燈具與光屏 → 「標記像」（實像要光屏上清楚；虛像要隔著透鏡看得到）
+ *   → 「分析光路」：燈具、透鏡、光屏位置鎖住，學生從標示點（O、F、物、像…）拖曳畫線，
+ *   碰到另一個點、或拉成水平／垂直，線就變實線、放開留下；虛線放開會消失。沒有任何自動畫好的光路
+ *   （「對答案」按鈕才會畫出三條主光線）。
  */
 (function () {
   'use strict';
   var C = BenchConfig, O = BenchOptics;
   var canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
   var FONT = '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
-  var st = { lens: 'convex', objX: C.start.objX, screenX: C.start.screenX, rays: true, data: true, back: false, drag: null };
+  var BAR_H = 36;
+  var st = {
+    lens: 'convex', objX: C.start.objX, screenX: C.start.screenX,
+    rays: false, data: true, back: false,          // rays＝示範光路（自動畫的三條主光線，預設關）
+    mode: 'obs',                                    // 'obs' 實驗桌｜'ana' 分析光路
+    marker: null, lines: [], prev: null, gest: null, ans: false, drag: null
+  };
   var G = {};
 
+  function $(id) { return document.getElementById(id); }
   function F() { return st.lens === 'convex' ? C.f : -C.f; }
   function U() { return C.lensX - st.objX; }
   function S() { return st.screenX - C.lensX; }
-  function srcY() { return Math.max.apply(null, C.lamp.windows.map(function (w) { return w.y + C.lamp.windowR; })); }
+  function srcY() { return Math.max.apply(null, C.lamp.windows.map(function (w) { return w.y + C.lamp.windowR; })); } // 物的上端（光線的出發點）
 
   // ---------- 小工具 ----------
   function X(x) { return G.x0 + x * G.k; }
-  function Y(h) { return G.baseY - h * G.k; }
+  function Y(h) { return G.baseY - h * G.k; }                       // h：離尺上緣的高度（實驗桌視角）
+  function PY(h) { return st.mode === 'ana' ? G.axisA - h * G.ky : Y(C.axisH + h); } // h：離光軸的高度（兩種視角通用）
+  function KY() { return st.mode === 'ana' ? G.ky : G.k; }
   function rr(x, y, w, h, r) {
     r = Math.min(r, w / 2, h / 2);
     ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
@@ -38,8 +51,15 @@
     ctx.fillStyle = color; ctx.fill();
   }
 
+  var msgTimer = null;
+  function say(t, sticky) {
+    var el = $('msg'); clearTimeout(msgTimer);
+    if (!t) { el.hidden = true; return; }
+    el.textContent = t; el.hidden = false;
+    if (!sticky) msgTimer = setTimeout(function () { el.hidden = true; }, 4500);
+  }
+
   // ---------- 版面 ----------
-  var BAR_H = 36;
   function layout() {
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var W = canvas.clientWidth, H = canvas.clientHeight;
@@ -54,11 +74,19 @@
     G.baseY = BAR_H + 4 + (availH - (top + bottom) * k) / 2 + top * k;   // 側面圖在左欄裡上下置中
     var gap = 6, ph = (H - 8 - 2 * gap) / 3, px = leftW + 4;
     G.panels = [0, 1, 2].map(function (i) { return { x: px, y: 4 + i * (ph + gap), w: rightW, h: ph }; });
-    $('bar').style.width = leftW + 'px';
+    $('bar').style.width = leftW + 'px'; $('msg').style.maxWidth = (leftW - 16) + 'px';
+    anaScale();
     return true;
   }
+  /** 分析畫面：x 照實際比例，y 拉伸（參考圖：透鏡約 2.5 倍焦距高）；像很大時自動縮小以免超出畫面。 */
+  function anaScale() {
+    var availH = G.H - BAR_H - 8;
+    var ext = Math.max(C.lensRadius * 1.25, srcY() * 1.3, st.marker ? Math.abs(st.marker.y) * 1.25 : 0);
+    G.ky = Math.min(C.analysisStretch * G.k, (availH / 2 - 14) / ext);
+    G.axisA = BAR_H + 4 + availH / 2;
+  }
 
-  // ---------- 側面圖 ----------
+  // ---------- 實驗桌（側面圖） ----------
   function drawRuler() {
     var k = G.k, y0 = Y(0), h = 2.5 * k;
     var g = ctx.createLinearGradient(0, y0, 0, y0 + h); g.addColorStop(0, '#f3b8c8'); g.addColorStop(1, '#d98aa3');
@@ -88,30 +116,32 @@
     var k = G.k, h = 1.3 * k, x = X(xc - w / 2), y = Y(0) - h;
     var g = ctx.createLinearGradient(0, y, 0, y + h); g.addColorStop(0, '#3a3e4a'); g.addColorStop(1, '#14161c');
     rr(x, y, w * k, h, 2); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = '#05060a'; ctx.stroke();
-    return y;
   }
-  function pole(xc, topH, color) {
+  function pole(xc, topH) {
     var k = G.k, w = 1.2 * k, x = X(xc) - w / 2, y1 = Y(0) - 1.3 * k, y2 = Y(topH);
     var g = ctx.createLinearGradient(x, 0, x + w, 0); g.addColorStop(0, '#8d929e'); g.addColorStop(0.45, '#eef0f5'); g.addColorStop(1, '#6b7080');
-    ctx.fillStyle = color || g; ctx.fillRect(x, y2, w, y1 - y2);
+    ctx.fillStyle = g; ctx.fillRect(x, y2, w, y1 - y2);
     ctx.strokeStyle = 'rgba(0,0,0,.45)'; ctx.lineWidth = 1; ctx.strokeRect(x, y2, w, y1 - y2);
   }
   function knob(x, y) { ctx.beginPath(); ctx.arc(x, y, Math.max(2.5, G.k * 0.45), 0, 6.283); ctx.fillStyle = '#c9ccd6'; ctx.fill(); ctx.strokeStyle = '#444'; ctx.lineWidth = 1; ctx.stroke(); }
+
+  function lensShape(cx, cy, halfW, halfH, thin) { // 透鏡側面輪廓（凸：兩邊弧；凹：中間薄）
+    ctx.beginPath();
+    if (st.lens === 'convex') {
+      ctx.moveTo(cx, cy - halfH); ctx.quadraticCurveTo(cx + halfW * 2, cy, cx, cy + halfH); ctx.quadraticCurveTo(cx - halfW * 2, cy, cx, cy - halfH);
+    } else {
+      ctx.moveTo(cx - halfW, cy - halfH); ctx.lineTo(cx + halfW, cy - halfH); ctx.quadraticCurveTo(cx + (thin || 2), cy, cx + halfW, cy + halfH);
+      ctx.lineTo(cx - halfW, cy + halfH); ctx.quadraticCurveTo(cx - (thin || 2), cy, cx - halfW, cy - halfH);
+    }
+    ctx.closePath(); ctx.fillStyle = 'rgba(150,215,255,.55)'; ctx.fill(); ctx.strokeStyle = '#bfe8ff'; ctx.lineWidth = 1.5; ctx.stroke();
+  }
 
   function drawLensStand() {
     var k = G.k, R = C.lensRadius, xc = C.lensX, cy = Y(C.axisH);
     base(xc, 7); pole(xc, C.axisH - R - 0.4);
     var cw = 2.2 * k; rr(X(xc) - cw / 2, Y(C.axisH - R - 0.4) - 1, cw, 1 * k, 2); ctx.fillStyle = '#9aa0b0'; ctx.fill(); ctx.strokeStyle = '#444'; ctx.stroke();
     knob(X(xc) + 1.1 * k + 3, Y(C.axisH - R - 0.4) + 3);
-    var hw = 0.7 * k, r = R * k;
-    ctx.beginPath();
-    if (st.lens === 'convex') {
-      ctx.moveTo(X(xc), cy - r); ctx.quadraticCurveTo(X(xc) + hw * 2, cy, X(xc), cy + r); ctx.quadraticCurveTo(X(xc) - hw * 2, cy, X(xc), cy - r);
-    } else {
-      ctx.moveTo(X(xc) - hw, cy - r); ctx.lineTo(X(xc) + hw, cy - r); ctx.quadraticCurveTo(X(xc) + 0.1 * k, cy, X(xc) + hw, cy + r);
-      ctx.lineTo(X(xc) - hw, cy + r); ctx.quadraticCurveTo(X(xc) - 0.1 * k, cy, X(xc) - hw, cy - r);
-    }
-    ctx.closePath(); ctx.fillStyle = 'rgba(150,215,255,.55)'; ctx.fill(); ctx.strokeStyle = '#bfe8ff'; ctx.lineWidth = 1.5; ctx.stroke();
+    lensShape(X(xc), cy, 0.7 * k, R * k, 0.1 * k);
     text(st.lens === 'convex' ? '凸透鏡' : '凹透鏡', X(xc), Y(C.axisH + R + 0.9), '#9fd8ff', Math.max(11, k * 1.4), 'center');
   }
 
@@ -125,44 +155,45 @@
     text('光屏', X(xc), Y(C.axisH + hh + 0.8), '#e6e9f5', Math.max(11, k * 1.4), 'center');
   }
 
-  function lampBox(x0, y0, w, h, color, dx, dy) {
-    var k = G.k, x = X(x0) + dx, y = Y(y0 + h) + dy, pw = w * k, ph = h * k;
+  function lampBox(x0, y0, w, h, color, dx, dy) { // y0：離光軸的高度（cm）；實驗桌與分析畫面通用
+    var k = G.k, x = X(x0) + dx, y = PY(y0 + h) + dy, pw = w * k, ph = h * KY();
     var g = ctx.createLinearGradient(0, y, 0, y + ph); g.addColorStop(0, shade(color, 0.5)); g.addColorStop(0.4, rgba(color, 1)); g.addColorStop(1, shade(color, -0.4));
     rr(x, y, pw, ph, Math.min(pw, ph) * 0.2); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = shade(color, -0.6); ctx.lineWidth = 1; ctx.stroke();
     ctx.fillStyle = 'rgba(255,255,255,.25)'; rr(x + pw * 0.08, y + ph * 0.1, pw * 0.84, ph * 0.18, ph * 0.09); ctx.fill();
-    // 燈窗那端的小圓蓋（面向透鏡）
-    var cw = 0.35 * k; rr(x + pw - cw * 0.2, y + ph * 0.18, cw, ph * 0.64, cw * 0.4); ctx.fillStyle = shade(color, 0.7); ctx.fill(); ctx.strokeStyle = shade(color, -0.5); ctx.stroke();
+    var cw = 0.35 * k; rr(x + pw - cw * 0.2, y + ph * 0.18, cw, ph * 0.64, cw * 0.4); ctx.fillStyle = shade(color, 0.7); ctx.fill(); ctx.strokeStyle = shade(color, -0.5); ctx.stroke(); // 燈窗那端的小圓蓋（面向透鏡）
   }
-
+  function drawLampBoxes() {
+    var L = C.lamp, s = L.size, w = L.windows, x0 = st.objX - L.len, off = 0.2 * G.k;
+    // 側面照：從「正面看的左邊」看過去 → 左排（紅）最近，右排（綠、藍）在後面，稍微往左上錯開表示前後
+    lampBox(x0, 0, L.len, s, w[2].color, -off, -off);                 // 綠（後排下）
+    lampBox(x0, s, L.len, s, w[0].color, -off, -off);                 // 藍（後排上）
+    lampBox(x0, 0, L.len, s, w[1].color, 0, 0);                       // 紅（前排下）
+    text('燈具', X(st.objX - L.len / 2), PY(2 * s + 0.9), '#ffb4a8', Math.max(11, G.k * 1.4), 'center');
+  }
   function drawLampStand() {
-    var k = G.k, L = C.lamp, xc = st.objX - L.len / 2, s = L.size;
+    var k = G.k, L = C.lamp, xc = st.objX - L.len / 2;
     base(xc, 7); pole(xc, C.axisH - 0.3);
     rr(X(xc) - 0.9 * k, Y(C.axisH) - 0.35 * k, 1.8 * k, 0.55 * k, 2); ctx.fillStyle = '#9aa0b0'; ctx.fill(); ctx.strokeStyle = '#444'; ctx.stroke();
-    var w = L.windows, x0 = st.objX - L.len, off = 0.2 * k;
-    // 側面照：從「正面看的左邊」看過去 → 左排（紅）最近，右排（綠、藍）在後面，稍微往左上錯開表示前後
-    lampBox(x0, C.axisH, L.len, s, w[2].color, -off, -off);                 // 綠（後排下）
-    lampBox(x0, C.axisH + s, L.len, s, w[0].color, -off, -off);             // 藍（後排上）
-    lampBox(x0, C.axisH, L.len, s, w[1].color, 0, 0);                       // 紅（前排下）
-    text('燈具', X(xc), Y(C.axisH + 2 * s + 0.9), '#ffb4a8', Math.max(11, k * 1.4), 'center');
+    drawLampBoxes();
   }
 
   function drawAxis() { line(X(-1.5), Y(C.axisH), X(C.benchLength + 1.5), Y(C.axisH), 'rgba(160,175,240,.4)', 1, [6, 5]); }
 
+  /** 自動畫的三條主光線（「示範光路」與分析的「對答案」）。 */
   function drawRays() {
-    var f = F(), u = U(), R = C.lensRadius, yo = srcY(), k = G.k, xl = C.lensX, xEnd = st.screenX;
+    var f = F(), u = U(), R = C.lensRadius, yo = srcY(), k = G.k, xl = C.lensX, xEnd = st.screenX, ana = st.mode === 'ana', lw = ana ? 3 : 1.8;
     var im = O.image(f, u), list = O.rays(f, u, yo, R);
     var colors = { parallel: '#ffe066', center: '#7ee0a0', focus: '#ff9f6b' };
-    ctx.save(); ctx.beginPath(); ctx.rect(X(-1.5), 0, (C.benchLength + 3) * k, Y(0)); ctx.clip();
-    ctx.beginPath(); ctx.arc(X(st.objX), Y(C.axisH + yo), 3.5, 0, 6.283); ctx.fillStyle = '#ffe066'; ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, G.leftW, G.H); ctx.clip();
+    ctx.beginPath(); ctx.arc(X(st.objX), PY(yo), 3.5, 0, 6.283); ctx.fillStyle = '#ffe066'; ctx.fill();
     list.forEach(function (r) {
       if (r.blocked) return;
-      var col = colors[r.name], xP = X(xl), yP = Y(C.axisH + r.yP);
-      line(X(st.objX), Y(C.axisH + yo), xP, yP, col, 1.8);
-      var xe = xEnd - xl; // 光線打到光屏為止
-      line(xP, yP, X(xEnd), Y(C.axisH + r.yP + r.slope * xe), col, 1.8);
+      var col = colors[r.name], xP = X(xl), yP = PY(r.yP);
+      line(X(st.objX), PY(yo), xP, yP, col, lw);
+      line(xP, yP, X(xEnd), PY(r.yP + r.slope * (xEnd - xl)), col, lw);   // 光線打到光屏為止
       if (im.dImg < 0 && isFinite(im.dImg)) { // 虛像：反向延長線（虛線）
         var xb = Math.max(0, xl + im.dImg);
-        line(xP, yP, X(xb), Y(C.axisH + r.yP + r.slope * (xb - xl)), col, 1.4, [4, 4]);
+        line(xP, yP, X(xb), PY(r.yP + r.slope * (xb - xl)), col, lw * 0.8, [4, 4]);
       }
     });
     ctx.restore();
@@ -170,11 +201,19 @@
       var xi = xl + im.dImg, yi = im.m * yo;
       if (xi >= -1 && xi <= C.benchLength + 1) {
         var virt = im.dImg < 0, col2 = virt ? '#c3a6ff' : '#ff7ad9';
-        line(X(xi), Y(C.axisH), X(xi), Y(C.axisH + yi), col2, 2.4, virt ? [4, 3] : []);
-        var dir = yi >= 0 ? -1 : 1; arrowHead(X(xi), Y(C.axisH + yi), 0, dir, 7, col2);
-        text(virt ? '虛像' : '實像', X(xi) + (virt ? -6 : 6), Y(C.axisH + yi) + (yi >= 0 ? -4 : 12), col2, Math.max(11, k * 1.4), virt ? 'right' : 'left');
+        line(X(xi), PY(0), X(xi), PY(yi), col2, 2.4, virt ? [4, 3] : []);
+        arrowHead(X(xi), PY(yi), 0, yi >= 0 ? -1 : 1, 7, col2);
+        text(virt ? '虛像' : '實像', X(xi) + (virt ? -6 : 6), PY(yi) + (yi >= 0 ? -4 : 12), col2, Math.max(11, k * 1.4), virt ? 'right' : 'left');
       }
     }
+  }
+
+  function drawMarker() { // 已標記的像（實驗桌視角）
+    if (!st.marker) return;
+    var x = X(st.marker.x), y = PY(st.marker.y), col = st.marker.virtual ? '#c3a6ff' : '#ff7ad9';
+    ctx.beginPath(); ctx.arc(x, y, 7, 0, 6.283); ctx.strokeStyle = col; ctx.lineWidth = 2.5; ctx.stroke();
+    line(x - 11, y, x + 11, y, col, 1.5); line(x, y - 11, x, y + 11, col, 1.5);
+    text(st.marker.virtual ? '虛像標記' : '實像標記', x + 12, y - 8, col, Math.max(11, G.k * 1.4), 'left');
   }
 
   function drawEye() {
@@ -196,21 +235,148 @@
     dim(C.lensX, st.screenX, yy, '像距 ' + S().toFixed(1) + ' cm', '#ffb86b');
   }
 
-  function drawSide() {
-    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, G.leftW, G.H); ctx.clip();
-    ctx.fillStyle = '#10121b'; ctx.fillRect(0, 0, G.leftW, G.H);
+  function drawBench() {
     drawAxis(); drawRuler();
     drawScreenStand(); drawLensStand(); drawLampStand();
     drawFocusMarks();
     if (st.rays) drawRays();
+    drawMarker();
     drawEye();
     if (st.data) drawDims();
     if (st.drag) { // 抓住時的光暈
-      var xc = st.drag.who === 'obj' ? st.objX - C.lamp.len / 2 : st.screenX, hw = standHalfWidth();
+      var xc = st.drag.who === 'obj' ? st.objX - C.lamp.len / 2 : st.screenX, hw = standHalfWidth(), topH = C.axisH + 2 * C.lamp.size + 0.8;
       ctx.strokeStyle = 'rgba(255,224,102,.8)'; ctx.lineWidth = 2; ctx.setLineDash([5, 4]);
-      var topH = C.axisH + 2 * C.lamp.size + 0.8;
       rr(X(xc) - hw, Y(topH), hw * 2, Y(0) - Y(topH) + 2, 8); ctx.stroke(); ctx.setLineDash([]);
     }
+  }
+
+  // ---------- 分析光路 ----------
+  function toPx(p) { return { x: X(p.x), y: PY(p.y) }; }
+  function geom(l) {
+    if (l.kind === 'parallel') return { p: l.a, d: { x: 1, y: 0 } };
+    if (l.kind === 'vertical') return { p: l.a, d: { x: 0, y: 1 } };
+    return { p: l.a, d: { x: l.b.x - l.a.x, y: l.b.y - l.a.y } };
+  }
+  function atX(g, x0) { if (Math.abs(g.d.x) < 1e-9) return null; var t = (x0 - g.p.x) / g.d.x; return { x: x0, y: g.p.y + t * g.d.y }; }
+  function meet(g1, g2) {
+    var den = g1.d.x * g2.d.y - g1.d.y * g2.d.x; if (Math.abs(den) < 1e-9) return null;
+    var t = ((g2.p.x - g1.p.x) * g2.d.y - (g2.p.y - g1.p.y) * g2.d.x) / den; return { x: g1.p.x + t * g1.d.x, y: g1.p.y + t * g1.d.y };
+  }
+  function strokeLine(l, color, w, dash) { // 通過標示點、自動向兩邊延長的直線
+    var a = toPx(l.a), b = l.kind === 'line' ? toPx(l.b) : l.kind === 'parallel' ? { x: a.x + 1, y: a.y } : { x: a.x, y: a.y + 1 };
+    var dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy); if (len < 1e-6) return; dx /= len; dy /= len;
+    line(a.x - dx * 4000, a.y - dy * 4000, a.x + dx * 4000, a.y + dy * 4000, color, w, dash);
+  }
+  function lineColor(l) { return l.kind === 'line' ? '#ffd166' : '#7dffb2'; }
+
+  /** 可吸附的標示點：O、F（兩側）、物（上端）、像標記，以及學生畫的線與透鏡平面的交點 P。 */
+  function snapPoints() {
+    var f = F(), xl = C.lensX;
+    var pts = [
+      { id: 'O', label: 'O', x: xl, y: 0 },
+      { id: 'F', label: 'F', x: xl - f, y: 0 },
+      { id: 'F2', label: 'F′', x: xl + f, y: 0 },
+      { id: 'T', label: '物', x: st.objX, y: srcY() }
+    ];
+    if (st.marker) pts.push({ id: 'I', label: st.marker.virtual ? '虛像' : '實像', x: st.marker.x, y: st.marker.y });
+    st.lines.forEach(function (l) {
+      var p = atX(geom(l), xl);
+      if (!p || Math.abs(p.y) > C.lensRadius * 3) return;
+      for (var i = 0; i < pts.length; i++) if (Math.hypot(pts[i].x - p.x, pts[i].y - p.y) < 0.15) return;
+      pts.push({ id: 'P', label: 'P', x: xl, y: p.y });
+    });
+    return pts;
+  }
+  var SNAP_PX = 26, AXIS_MIN_PX = 30, AXIS_TOL_PX = 8, AXIS_TOL_RATIO = 0.12, THROUGH_PX = 14;
+  function nearestSnap(sx, sy) {
+    var best = null, bd = SNAP_PX;
+    snapPoints().forEach(function (p) { var q = toPx(p), d = Math.hypot(q.x - sx, q.y - sy); if (d <= bd) { bd = d; best = p; } });
+    return best;
+  }
+  function pointOnDragRay(a, p) { // 從起點往手指方向延伸的線經過某個點（手指不必真的拖到那個點上）
+    var a0 = toPx(a), ux = p.x - a0.x, uy = p.y - a0.y, len = Math.hypot(ux, uy), best = null;
+    if (len < AXIS_MIN_PX) return null;
+    ux /= len; uy /= len;
+    snapPoints().forEach(function (sp) {
+      if (Math.hypot(sp.x - a.x, sp.y - a.y) < 0.15) return;
+      var q = toPx(sp), along = (q.x - a0.x) * ux + (q.y - a0.y) * uy, off = Math.abs((q.x - a0.x) * uy - (q.y - a0.y) * ux);
+      if (along <= 0 || off > THROUGH_PX) return;
+      var gap = Math.abs(along - len);
+      if (!best || off < best.off - 0.5 || (Math.abs(off - best.off) <= 0.5 && gap < best.gap)) best = { sp: sp, off: off, gap: gap };
+    });
+    return best;
+  }
+  function updatePreview(p) {
+    var g = st.gest, a = { x: g.snap.x, y: g.snap.y, label: g.snap.label };
+    var dx = Math.abs(p.x - g.x0), dy = Math.abs(p.y - g.y0), hit = nearestSnap(p.x, p.y), snap = null, b = null;
+    if (hit && Math.hypot(hit.x - a.x, hit.y - a.y) >= 0.15) { snap = 'point'; b = { x: hit.x, y: hit.y, label: hit.label }; }
+    else {
+      var axis = null, axisOff = Infinity;
+      if (dx >= AXIS_MIN_PX && dy <= Math.max(AXIS_TOL_PX, dx * AXIS_TOL_RATIO)) { axis = 'h'; axisOff = dy; }
+      else if (dy >= AXIS_MIN_PX && dx <= Math.max(AXIS_TOL_PX, dy * AXIS_TOL_RATIO)) { axis = 'v'; axisOff = dx; }
+      var thru = pointOnDragRay(a, p);
+      if (thru && thru.off <= axisOff) { snap = 'point'; b = { x: thru.sp.x, y: thru.sp.y, label: thru.sp.label }; } else snap = axis;
+    }
+    var was = st.prev ? st.prev.snap + (st.prev.b ? st.prev.b.label : '') : '', now = snap ? snap + (b ? b.label : '') : '';
+    st.prev = { a: a, snap: snap, b: b, cur: p };
+    if (now !== was) say(snap === 'point' ? '放開：畫出通過「' + a.label + '」與「' + b.label + '」的直線。'
+      : snap === 'h' ? '放開：畫出通過「' + a.label + '」的水平線（平行主光軸）。'
+      : snap === 'v' ? '放開：畫出通過「' + a.label + '」的垂直線。'
+      : '虛線放開會消失。拖到另一個點上，或拉成水平／垂直，線才會留下。', true);
+  }
+  function finishDrag(commit) {
+    var pv = st.prev; st.prev = null; st.gest = null;
+    if (pv && pv.snap && commit) {
+      st.lines.push(pv.snap === 'point' ? { kind: 'line', a: pv.a, b: pv.b } : { kind: pv.snap === 'h' ? 'parallel' : 'vertical', a: pv.a });
+      say(pv.snap === 'point' ? '已畫出通過「' + pv.a.label + '」與「' + pv.b.label + '」的直線。' : pv.snap === 'h' ? '已畫出通過「' + pv.a.label + '」的水平線。' : '已畫出通過「' + pv.a.label + '」的垂直線。');
+    } else say('沒有畫線。從標示點拖到另一個點，或拉成水平／垂直再放開。');
+    sync();
+  }
+
+  function drawAnalysis() {
+    var k = G.k, f = C.f, xl = C.lensX, R = C.lensRadius, ay = PY(0), fs = Math.max(14, k * 2.4), convex = st.lens === 'convex';
+    ctx.fillStyle = '#0d1530'; ctx.fillRect(0, 0, G.leftW, G.H);
+    // 軸線與刻度（參考圖：白色粗線、F 與 2F 大字）
+    line(X(-1.5), ay, X(C.benchLength + 1.5), ay, '#ffffff', 3);
+    [-2 * f, -f, 0, f, 2 * f].forEach(function (t) {
+      var x = X(xl + t); line(x, ay - 12, x, ay + 12, '#ffffff', 3);
+      var lab = t === 0 ? 'O' : (Math.abs(t) > f ? '2F' : 'F') + (((t > 0) === convex) ? '′' : '');
+      text(lab, x, ay + 14 + fs, '#ffffff', fs, 'center');
+    });
+    // 光屏（細白棒）
+    var sx = X(st.screenX), hh = C.screen.h / 2;
+    line(sx, PY(hh), sx, PY(-hh), '#e6e9f5', 5); text('光屏', sx, PY(hh) - 6, '#e6e9f5', Math.max(12, k * 1.6), 'center');
+    // 透鏡（又高又細）
+    lensShape(X(xl), ay, 8, R * G.ky, 2);
+    // 物（燈具側面）
+    drawLampBoxes();
+    // 學生畫的線（粗）與兩線交點
+    st.lines.forEach(function (l) { strokeLine(l, lineColor(l), 3.5); });
+    if (st.ans) drawRays();
+    for (var i = 0; i < st.lines.length; i++) for (var j = i + 1; j < st.lines.length; j++) {
+      var p = meet(geom(st.lines[i]), geom(st.lines[j]));
+      if (!p || Math.abs(p.y) > 40 || p.x < -5 || p.x > C.benchLength + 5) continue;
+      var q = toPx(p); ctx.beginPath(); ctx.arc(q.x, q.y, 4.5, 0, 6.283); ctx.fillStyle = '#ffffff'; ctx.fill(); ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.stroke();
+    }
+    // 拖曳中的預覽：能吸附就是實線（放開會留下），否則虛線（放開消失）
+    if (st.prev) {
+      var pv = st.prev;
+      if (pv.snap) strokeLine(pv.snap === 'point' ? { kind: 'line', a: pv.a, b: pv.b } : { kind: pv.snap === 'h' ? 'parallel' : 'vertical', a: pv.a }, pv.snap === 'point' ? '#ffd166' : '#7dffb2', 3.5);
+      else { var a0 = toPx(pv.a); line(a0.x, a0.y, pv.cur.x, pv.cur.y, 'rgba(255,255,255,.75)', 2.5, [7, 6]); }
+    }
+    // 標示點
+    snapPoints().forEach(function (sp) {
+      var q = toPx(sp), mark = sp.id === 'I' ? (st.marker.virtual ? '#c3a6ff' : '#ff7ad9') : sp.id === 'T' ? '#ffe066' : sp.id === 'P' ? '#ffffff' : '#9fd8ff';
+      ctx.beginPath(); ctx.arc(q.x, q.y, 7, 0, 6.283); ctx.fillStyle = 'rgba(13,21,48,.85)'; ctx.fill(); ctx.strokeStyle = mark; ctx.lineWidth = 2.5; ctx.stroke();
+      ctx.beginPath(); ctx.arc(q.x, q.y, 2.5, 0, 6.283); ctx.fillStyle = mark; ctx.fill();
+      if (sp.id === 'I' || sp.id === 'T' || sp.id === 'P') text(sp.label, q.x + 10, q.y + (sp.y < 0 ? 24 : -9), mark, Math.max(12, k * 1.7), 'left');
+    });
+  }
+
+  function drawSide() {
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, G.leftW, G.H); ctx.clip();
+    ctx.fillStyle = '#10121b'; ctx.fillRect(0, 0, G.leftW, G.H);
+    if (st.mode === 'ana') drawAnalysis(); else drawBench();
     ctx.restore();
   }
 
@@ -319,7 +485,27 @@
   var pending = false;
   function requestRender() { if (!pending) { pending = true; requestAnimationFrame(function () { pending = false; render(); }); } }
 
-  // ---------- 拖曳 ----------
+  // ---------- 標記像 ----------
+  function markImage() {
+    var f = F(), u = U(), s = S(), R = C.lensRadius, yo = srcY(), im = O.image(f, u);
+    if (im.infinity) { say('物在焦點上，像在無限遠，無法標記。'); return; }
+    var xI = C.lensX + im.dImg, yI = im.m * yo;
+    if (im.dImg > 0) { // 實像：要在光屏上看得清楚
+      if (R * Math.abs(1 - s / im.dImg) > 0.4) { say('光屏上的像還不夠清楚，請移動光屏再標記。'); return; }
+      if (Math.abs(yI) > C.screen.h / 2 || xI > C.range.screenMax) { say('像超出光屏，無法標記。'); return; }
+      st.marker = { x: xI, y: yI, virtual: false };
+    } else { // 虛像：隔著透鏡看，要看得到
+      var lv = O.lensSpot(f, u, C.eye.dist, C.eye.near, { r: 0, y: yo }, 0);
+      if (Math.abs(lv.y) > R) { say('像太大，超出鏡片，看不到。'); return; }
+      if (xI < 0) { say('像在桌面外，無法標記。'); return; }
+      st.marker = { x: xI, y: yI, virtual: true };
+    }
+    say((st.marker.virtual ? '已標記虛像（隔著透鏡看到的位置）' : '已標記實像（光屏上清楚的位置）') + '。按「分析光路」開始畫圖。');
+    sync();
+  }
+  function clearWork() { st.marker = null; st.lines = []; st.prev = null; st.gest = null; st.ans = false; }
+
+  // ---------- 操作 ----------
   function standHalfWidth() { return Math.max(4 * G.k, 34); }
   function pos(e) { var r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
   function worldX(px) { return (px - G.x0) / G.k; }
@@ -334,41 +520,76 @@
   }
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   function setX(who, x) {
-    if (who === 'obj') st.objX = clamp(Math.round(x * 10) / 10, C.range.objMin, C.range.objMax);
+    if (who === 'obj') { var nx = clamp(Math.round(x * 10) / 10, C.range.objMin, C.range.objMax); if (nx !== st.objX) { st.objX = nx; clearWork(); } }
     else st.screenX = clamp(Math.round(x * 10) / 10, C.lensX + C.range.screenMinFromLens, C.range.screenMax);
   }
   canvas.addEventListener('pointerdown', function (e) {
-    var p = pos(e), h = hit(p); if (!h) return;
+    var p = pos(e);
+    if (st.mode === 'ana') {
+      if (p.x > G.leftW) return;
+      var sp = nearestSnap(p.x, p.y);
+      if (!sp) { say('從標示點（O、F、物、像…）開始拖曳畫線。'); return; }
+      st.gest = { id: e.pointerId, snap: sp, x0: p.x, y0: p.y, moved: false };
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+      e.preventDefault(); return;
+    }
+    var h = hit(p); if (!h) return;
     st.drag = { who: h.who, dx: worldX(p.x) - h.xc, id: e.pointerId };
-    try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+    try { canvas.setPointerCapture(e.pointerId); } catch (err2) { /* ignore */ }
     e.preventDefault(); requestRender();
   });
   canvas.addEventListener('pointermove', function (e) {
+    var p = pos(e);
+    if (st.gest && e.pointerId === st.gest.id) {
+      if (!st.gest.moved && Math.hypot(p.x - st.gest.x0, p.y - st.gest.y0) > 6) st.gest.moved = true;
+      if (st.gest.moved) { updatePreview(p); requestRender(); }
+      e.preventDefault(); return;
+    }
     if (!st.drag || e.pointerId !== st.drag.id) return;
-    var x = worldX(pos(e).x) - st.drag.dx;
+    var x = worldX(p.x) - st.drag.dx;
     setX(st.drag.who, st.drag.who === 'obj' ? x + C.lamp.len / 2 : x);
-    e.preventDefault(); requestRender();
+    e.preventDefault(); sync();
   });
-  function endDrag(e) { if (st.drag && e.pointerId === st.drag.id) { st.drag = null; requestRender(); } }
-  canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointercancel', endDrag);
+  function endPointer(e, cancelled) {
+    if (st.gest && e.pointerId === st.gest.id) { if (st.gest.moved) finishDrag(!cancelled); else { st.gest = null; st.prev = null; sync(); } return; }
+    if (st.drag && e.pointerId === st.drag.id) { st.drag = null; sync(); }
+  }
+  canvas.addEventListener('pointerup', function (e) { endPointer(e, false); });
+  canvas.addEventListener('pointercancel', function (e) { endPointer(e, true); });
+  canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  // 拖曳時不讓瀏覽器啟動甩動（fling）：快甩放開後第一次點按鈕會被吃掉（遊戲本體實測過）
+  canvas.addEventListener('touchmove', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
 
   // ---------- 按鈕 ----------
-  function $(id) { return document.getElementById(id); }
   function sync() {
+    var ana = st.mode === 'ana';
+    $('grp-obs').hidden = ana; $('grp-ana').hidden = !ana;
     $('b-convex').setAttribute('aria-pressed', st.lens === 'convex'); $('b-concave').setAttribute('aria-pressed', st.lens === 'concave');
-    $('t-rays').setAttribute('aria-pressed', st.rays); $('t-data').setAttribute('aria-pressed', st.data);
+    $('t-rays').setAttribute('aria-pressed', st.rays); $('t-data').setAttribute('aria-pressed', st.data); $('t-ans').setAttribute('aria-pressed', st.ans);
     $('t-back').setAttribute('aria-pressed', st.back); $('t-back').textContent = st.back ? '光屏：背面看' : '光屏：透鏡側看';
+    $('b-undo').disabled = !st.lines.length; $('b-clear').disabled = !st.lines.length;
+    if (G.k) anaScale();
     requestRender();
   }
-  $('b-convex').onclick = function () { st.lens = 'convex'; sync(); };
-  $('b-concave').onclick = function () { st.lens = 'concave'; sync(); };
+  function setLens(l) { if (st.lens !== l) { st.lens = l; clearWork(); } sync(); }
+  $('b-convex').onclick = function () { setLens('convex'); };
+  $('b-concave').onclick = function () { setLens('concave'); };
+  $('b-mark').onclick = markImage;
+  $('b-ana').onclick = function () {
+    if (!st.marker) { say('請先「標記像」：移動光屏到像清楚（凹透鏡或焦點內的虛像，則隔著透鏡看）再標記。'); return; }
+    st.mode = 'ana'; st.drag = null; sync(); say('從標示點（O、F、物、像）拖曳到另一個點，或拉成水平線，畫出光的路徑。', true);
+  };
+  $('b-back').onclick = function () { st.mode = 'obs'; st.prev = null; st.gest = null; st.ans = false; say(''); sync(); };
+  $('b-undo').onclick = function () { st.lines.pop(); sync(); };
+  $('b-clear').onclick = function () { st.lines = []; sync(); };
+  $('t-ans').onclick = function () { st.ans = !st.ans; sync(); };
   $('t-rays').onclick = function () { st.rays = !st.rays; sync(); };
   $('t-data').onclick = function () { st.data = !st.data; sync(); };
   $('t-back').onclick = function () { st.back = !st.back; sync(); };
-  $('b-reset').onclick = function () { st.objX = C.start.objX; st.screenX = C.start.screenX; sync(); };
+  $('b-reset').onclick = function () { st.objX = C.start.objX; st.screenX = C.start.screenX; clearWork(); say(''); sync(); };
 
   function onResize() { if (layout()) requestRender(); }
   window.addEventListener('resize', onResize); window.addEventListener('orientationchange', onResize);
-  window.BenchDebug = { state: st, geom: G, X: X, Y: Y, render: render, layout: layout };
+  window.BenchDebug = { state: st, geom: G, X: X, Y: Y, PY: PY, render: render, layout: layout, snapPoints: snapPoints, markImage: markImage };
   onResize(); sync();
 })();

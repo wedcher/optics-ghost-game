@@ -657,6 +657,7 @@ Sprint 01 通過後，不停留在美化凹透鏡：
 ### 交接點（實驗桌模擬器，2026-11-23，分支 `claude/awesome-mccarthy-xqaq2v`）
 
 - 做了：`bench/`（`index.html`、`app.js`、`optics.js`、`config.js`）、`tests/check-bench.js`（`npm run check:bench`，56 項）、`docs/bench-simulator.md`。headless 實測：拖曳、凸／凹透鏡、虛像、光屏模糊都正常。
-- **還沒做／還沒驗證**：實體手機（拖曳手感、觸控範圍）；學生自己畫光線的工具；側面圖縮放。
+- 2026-11-23 後續：版面改成左側面圖＋右三小圖；透鏡與燈具放大（f 不變）；**加上「標記像 → 分析光路 → 學生自己拖曳畫線」**（照遊戲規則，使用者說這是最重要的功能；沒有自動畫好的光路，「對答案」才會畫），分析畫面上下拉伸 2.5 倍（使用者給的參考圖）。測試：`npm run check:bench`（56）、`npm run test:bench`（17）。
+- **還沒做／還沒驗證**：實體手機（拖曳手感、觸控範圍）；分析畫面縮放／平移；點兩個點連線。
 - 下一步：使用者在手機試玩後回報（物體造型、尺寸、預設值）；決定是否搬到新 repo。
-- **檔案分工**：這個工作階段只新增 `bench/*`、`tests/check-bench.js`、`docs/bench-simulator.md`，並動了 `package.json`（加一行 script）與 `PROJECT.md`；沒動遊戲本體檔案。
+- **檔案分工**：這個工作階段只新增 `bench/*`、`tests/check-bench.js`、`tests/e2e-bench.js`、`docs/bench-simulator.md`，並動了 `package.json`（加一行 script）與 `PROJECT.md`；沒動遊戲本體檔案。
