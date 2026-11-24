@@ -93,6 +93,24 @@ function ok(c, msg) { n++; if (!c) { fails++; console.log('FAIL', msg); } }
   await q.mouse.click(bc.x, bc.y); // 按「標記像」（沒對準，會提示但不會出錯）
   await q.screenshot({ path: path.join(shots || '/tmp', 'bench-rot.png') });
   ok(errs2.length === 0, '直拿沒有 JS 錯誤 ' + JSON.stringify(errs2));
+
+  // 12. 光屏經過焦點（F′ x=40、2F′ x=50）吸附；微調鈕不吸附
+  await p.click('#b-back').catch(() => {}); await p.click('#b-reset');
+  async function dragScreen(toX) { const cur = (await st()).screenX; await drag({ x: g.x0 + cur * g.k, y: yb }, { x: g.x0 + toX * g.k, y: yb }); return (await st()).screenX; }
+  ok(await dragScreen(50.4) === 50, '光屏吸附在 2F');
+  ok(await dragScreen(40.5) === 40, '光屏吸附在 F');
+  const free2 = await dragScreen(45); ok(Math.abs(free2 - 45) < 0.3, '45 不吸附 → ' + free2);
+  await dragScreen(50.2); nr = await p.evaluate(() => BenchDebug.nudgeRects()); await p.mouse.click(nr[1].x + 24, nr[1].y + 24); s = await st(); ok(Math.abs(s.screenX - 50.1) < 0.001 || Math.abs(s.screenX - 50) < 0.001 && false, '微調鈕不吸附（50 → ' + s.screenX + '）');
+  // 13. iPhone（沒有 Fullscreen API）：按鈕變成「加入主畫面」說明
+  const ip = await b.newContext({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true, userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' });
+  await ip.addInitScript(() => { delete Element.prototype.requestFullscreen; delete Element.prototype.webkitRequestFullscreen; });
+  const ipp = await ip.newPage(); await ipp.goto('file://' + path.resolve(__dirname, '../bench/index.html')); await ipp.waitForTimeout(200);
+  ok(await ipp.evaluate(() => document.getElementById('b-full').classList.contains('is-install')), 'iPhone：按鈕是「加入主畫面」');
+  await ipp.click('#b-full'); ok(await ipp.evaluate(() => !document.getElementById('install').hidden), 'iPhone：點了出現說明');
+  await ipp.screenshot({ path: path.join(shots || '/tmp', 'bench-ios.png') });
+  await ipp.click('#install-ok'); ok(await ipp.evaluate(() => document.getElementById('install').hidden), 'iPhone：說明可關閉');
+  // manifest 與圖示
+  ok(await p.evaluate(() => !!document.querySelector('link[rel=manifest]') && !!document.querySelector('link[rel=apple-touch-icon]')), 'manifest 與 apple-touch-icon 連結都在');
   ok(errs.length === 0, '沒有 JS 錯誤 ' + JSON.stringify(errs));
   console.log(n + ' checks, ' + fails + ' failed'); await b.close(); process.exit(fails ? 1 : 0);
 })();

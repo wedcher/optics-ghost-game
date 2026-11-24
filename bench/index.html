@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>光學實驗桌</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="光學實驗桌">
+<meta name="theme-color" content="#0b0d14">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<link rel="icon" type="image/png" href="assets/icon-192.png">
 <style>
   html, body { margin: 0; height: 100%; background: #0b0d14; color: #dde2f5; overflow: hidden;
     font-family: "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif; -webkit-user-select: none; user-select: none; }
@@ -12,6 +20,10 @@
   .grp { display: inline-flex; gap: 6px; align-items: center; }
   .grp[hidden], #msg[hidden] { display: none; }
   button.primary { background: #2f6b4a; border-color: #4fb37e; }
+  #install { position: fixed; inset: 0; z-index: 9; background: rgba(5,6,12,.78); display: flex; align-items: center; justify-content: center; padding: 16px; }
+  #install[hidden] { display: none; }
+  #install .card { background: #1a1f35; border: 1px solid #3c4468; border-radius: 12px; padding: 14px 18px; max-width: 420px; font-size: 15px; line-height: 1.7; }
+  #install ol { margin: 8px 0 12px; padding-left: 22px; }
   #msg { position: fixed; left: 8px; bottom: 8px; max-width: 60%; z-index: 3; background: rgba(20,24,40,.94); border: 1px solid #3c4468;
     border-radius: 8px; padding: 6px 10px; font-size: 13px; line-height: 1.5; color: #f1f3ff; pointer-events: none; }
   button { font: inherit; font-size: 13px; color: #dde2f5; background: #20253b; border: 1px solid #343b5c; border-radius: 8px;
@@ -25,6 +37,7 @@
     background: rgba(32,37,59,.92); border-radius: 10px; }
   #b-full[hidden] { display: none; }
   #b-full svg { width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  #b-full .i-share { display: none; } #b-full.is-install .i-in, #b-full.is-install .i-out { display: none; } #b-full.is-install .i-share { display: block; }
   #b-full .i-out { display: none; } #b-full.is-full .i-in { display: none; } #b-full.is-full .i-out { display: block; }
 </style>
 </head>
@@ -51,7 +64,9 @@
 <button id="b-full" aria-label="全螢幕" title="全螢幕">
   <svg class="i-in" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
   <svg class="i-out" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>
+  <svg class="i-share" viewBox="0 0 24 24"><path d="M12 15V3M8 7l4-4 4 4M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>
 </button>
+<div id="install" hidden><div class="card"><b>iPhone 要全螢幕（沒有網址列）</b><ol><li>點 Safari 的「分享」按鈕（方框加向上箭頭）</li><li>選「加入主畫面」</li><li>以後從主畫面的圖示開啟就是全螢幕</li></ol><button id="install-ok">知道了</button></div></div>
 <script src="landscape.js"></script>
 <script src="config.js"></script>
 <script src="optics.js"></script>

@@ -18,7 +18,16 @@
     btn.title = full ? '縮小' : '全螢幕';
   }
   if (!btn) return;
-  if (!supported) { btn.hidden = true; return; }
+  // iPhone Safari：網頁不能全螢幕 → 按鈕改成「加入主畫面」說明；從主畫面圖示開（standalone）就不顯示
+  var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (!supported) {
+    if (!ios || navigator.standalone || mm('(display-mode: standalone)') || mm('(display-mode: fullscreen)')) { btn.hidden = true; return; }
+    var card = document.getElementById('install');
+    btn.classList.add('is-install'); btn.setAttribute('aria-label', '加入主畫面（全螢幕）'); btn.title = '加入主畫面';
+    btn.onclick = function () { card.hidden = false; };
+    document.getElementById('install-ok').onclick = function () { card.hidden = true; };
+    return;
+  }
   btn.onclick = function () {
     try {
       if (isFull()) { exit.call(document); return; }

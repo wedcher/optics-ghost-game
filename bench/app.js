@@ -17,7 +17,7 @@
     lens: 'convex', objX: C.start.objX, screenX: C.start.screenX,
     rays: false, data: true, back: false,          // rays＝示範光路（自動畫的三條主光線，預設關）
     mode: 'obs',                                    // 'obs' 實驗桌｜'ana' 分析光路
-    marker: null, lines: [], prev: null, gest: null, ans: false, ansT0: 0, drag: null, snapTo: null, nudge: null
+    marker: null, lines: [], prev: null, gest: null, ans: false, ansT0: 0, drag: null, snapTo: null, snapScr: null, nudge: null
   };
   var G = {};
 
@@ -109,7 +109,7 @@
       ctx.font = 'bold ' + fs + 'px ' + FONT; var tw = ctx.measureText(m[1]).width + 8;
       rr(X(x) - tw / 2, ty - fs, tw, fs + 4, 4); ctx.fillStyle = 'rgba(16,18,27,.88)'; ctx.fill(); ctx.strokeStyle = '#ffd166'; ctx.lineWidth = 1; ctx.stroke();
       text(m[1], X(x), ty + 1, two ? '#ffe9a8' : '#ffd166', fs, 'center');
-      if (m[0] < 0 && st.snapTo === m[1]) { rr(X(x) - tw / 2 - 3, ty - fs - 3, tw + 6, fs + 10, 6); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke(); }
+      if ((m[0] < 0 && st.snapTo === m[1]) || (m[0] > 0 && st.snapScr === (m[1] === 'F' ? 'F' : 'F2'))) { rr(X(x) - tw / 2 - 3, ty - fs - 3, tw + 6, fs + 10, 6); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke(); }
     });
   }
 
@@ -280,7 +280,7 @@
       ctx.fillStyle = on ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.5)'; ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1.5; ctx.stroke();
     });
   }
-  function nudgeScreen(dir) { setX('screen', Math.round((st.screenX + dir * NUDGE_STEP) * 10) / 10); sync(); }
+  function nudgeScreen(dir) { setX('screen', Math.round((st.screenX + dir * NUDGE_STEP) * 10) / 10, true); sync(); }
   function nudgeStop() { if (st.nudge) { clearTimeout(st.nudge.t1); clearInterval(st.nudge.t2); st.nudge = null; requestRender(); } }
 
   function drawBench() {
@@ -573,14 +573,19 @@
   }
   var SNAP_CM = 0.7;
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
-  function setX(who, x) {
+  function setX(who, x, noSnap) {
     if (who === 'obj') {
       var nx = clamp(Math.round(x * 10) / 10, C.range.objMin, C.range.objMax), snapTo = null;
       [[C.lensX - C.f, 'F'], [C.lensX - 2 * C.f, '2F']].forEach(function (t) { if (Math.abs(nx - t[0]) <= SNAP_CM) { nx = t[0]; snapTo = t[1]; } }); // 經過 F、2F 時吸附一下
       if (snapTo !== st.snapTo) { st.snapTo = snapTo; if (snapTo) { say('燈具吸附在 ' + snapTo + '（物距 ' + (C.lensX - nx) + ' cm）'); try { if (navigator.vibrate) navigator.vibrate(8); } catch (e) { /* ignore */ } } }
       if (nx !== st.objX) { st.objX = nx; clearWork(); }
     }
-    else st.screenX = clamp(Math.round(x * 10) / 10, C.lensX + C.range.screenMinFromLens, C.range.screenMax);
+    else {
+      var sx = clamp(Math.round(x * 10) / 10, C.lensX + C.range.screenMinFromLens, C.range.screenMax), ss = null;
+      if (!noSnap) [[C.lensX + C.f, 'F'], [C.lensX + 2 * C.f, 'F2']].forEach(function (t) { if (Math.abs(sx - t[0]) <= SNAP_CM) { sx = t[0]; ss = t[1]; } }); // 光屏經過焦點時吸附一下
+      if (ss !== st.snapScr) { st.snapScr = ss; if (ss) { say('光屏吸附在' + (ss === 'F' ? ' F' : ' 2F') + '（像距 ' + (sx - C.lensX) + ' cm）'); try { if (navigator.vibrate) navigator.vibrate(8); } catch (e) { /* ignore */ } } }
+      st.screenX = sx;
+    }
   }
   canvas.addEventListener('pointerdown', function (e) {
     var p = pos(e);

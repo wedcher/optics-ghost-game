@@ -46,3 +46,5 @@ f = 10 cm（固定）、鏡徑 10 cm、光具座 84 cm、透鏡在 30 cm；L 形
 - **手機直拿自動轉 90°**（`bench/landscape.js`，從遊戲簡化而來、不引用遊戲檔案；順時針，和遊戲一致）；觸控座標一律用 `BenchLandscape.toLocal`。取代原本的「請橫放」遮罩。
 - 試玩網址：`raw.githack.com` 是開發測試用的服務，給學生長期用建議改放 GitHub Pages（新 repo 或 main）。
 - 按鈕「標記像」改名「找到像了」（使用者 2026-11-24；內部還是標記像的位置）。
+- **光屏經過焦點吸附**（使用者 2026-11-24）：拖曳光屏經過 F（像距 10）、2F（像距 20）0.7 cm 內吸住，標示亮白框、輕震；**微調鈕不吸附**（才能細調到像清楚）。
+- **iPhone（使用者 2026-11-24：「你做 iPhone 的」）**：iPhone Safari 網頁不能全螢幕，所以：①右下角按鈕在 iPhone 變成「分享」圖示，點了出現說明卡（分享 → 加入主畫面 → 從圖示開啟）；②加了 `manifest.webmanifest`、`apple-touch-icon`、`apple-mobile-web-app-capable`（狀態列 `black`，內容不會被狀態列蓋住），從主畫面開啟時沒有網址列，這時按鈕自動隱藏；③圖示 `bench/assets/icon-180／192／512.png` 是這個模擬器自己的（L 形燈具、凸透鏡、光線、像），不是遊戲的圖。**只用 UA 模擬在 headless Chromium 測過，還沒在真的 iPhone 驗證**（尤其主畫面開啟後的直拿轉向、狀態列）。
