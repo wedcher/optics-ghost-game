@@ -2,7 +2,7 @@
  * app.js — 光學實驗桌模擬器的畫面與操作。光學計算在 optics.js，數字在 config.js。
  * 左邊大的側面圖（實驗桌／分析光路），右邊由上到下三張小圖：光屏、看透鏡、燈具正面。
  *
- * 流程（和遊戲一樣）：移動燈具與光屏 → 「標記像」（實像要光屏上清楚；虛像要隔著透鏡看得到）
+ * 流程（和遊戲一樣）：移動燈具與光屏 → 「找到像了」（實像要光屏上清楚；虛像要隔著透鏡看得到）
  *   → 「分析光路」：燈具、透鏡、光屏位置鎖住，學生從標示點（O、F、物、像…）拖曳畫線，
  *   碰到另一個點、或拉成水平／垂直，線就變實線、放開留下；虛線放開會消失。沒有任何自動畫好的光路
  *   （「對答案」按鈕才會畫出三條主光線）。
@@ -643,7 +643,7 @@
   $('b-concave').onclick = function () { setLens('concave'); };
   $('b-mark').onclick = markImage;
   $('b-ana').onclick = function () {
-    if (!st.marker) { say('請先「標記像」：移動光屏到像清楚（凹透鏡或焦點內的虛像，則隔著透鏡看）再標記。'); return; }
+    if (!st.marker) { say('請先移動光屏找到清楚的像（凹透鏡或焦點內的虛像，則隔著透鏡看），再按「找到像了」。'); return; }
     st.mode = 'ana'; st.drag = null; sync(); say('從標示點（O、F、物、像）拖曳到另一個點，或拉成水平線，畫出光的路徑。', true);
   };
   $('b-back').onclick = function () { st.mode = 'obs'; st.prev = null; st.gest = null; st.ans = false; say(''); sync(); };
