@@ -17,7 +17,7 @@
     lens: 'convex', objX: C.start.objX, screenX: C.start.screenX,
     rays: false, data: true, back: false,          // rays＝示範光路（自動畫的三條主光線，預設關）
     mode: 'obs',                                    // 'obs' 實驗桌｜'ana' 分析光路
-    marker: null, lines: [], prev: null, gest: null, ans: false, drag: null
+    marker: null, lines: [], prev: null, gest: null, ans: false, ansT0: 0, drag: null, snapTo: null, nudge: null
   };
   var G = {};
 
@@ -66,7 +66,7 @@
     if (!W || !H) return false;
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     var rightW = Math.max(190, Math.min(300, W * 0.28)), leftW = W - rightW - 8;
-    var top = C.axisH + C.screen.h / 2 + 3, bottom = 6.5;          // 尺上緣以上／以下要放得下的公分數
+    var top = C.axisH + C.screen.h / 2 + 9, bottom = 6.5;          // 尺上緣以上／以下要放得下的公分數
     var availH = H - BAR_H - 8;
     var k = Math.min(leftW / (C.benchLength + 4), availH / (top + bottom));
     G.W = W; G.H = H; G.k = k; G.leftW = leftW;
@@ -109,6 +109,7 @@
       ctx.font = 'bold ' + fs + 'px ' + FONT; var tw = ctx.measureText(m[1]).width + 8;
       rr(X(x) - tw / 2, ty - fs, tw, fs + 4, 4); ctx.fillStyle = 'rgba(16,18,27,.88)'; ctx.fill(); ctx.strokeStyle = '#ffd166'; ctx.lineWidth = 1; ctx.stroke();
       text(m[1], X(x), ty + 1, two ? '#ffe9a8' : '#ffd166', fs, 'center');
+      if (m[0] < 0 && st.snapTo === m[1]) { rr(X(x) - tw / 2 - 3, ty - fs - 3, tw + 6, fs + 10, 6); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke(); }
     });
   }
 
@@ -179,31 +180,63 @@
 
   function drawAxis() { line(X(-1.5), Y(C.axisH), X(C.benchLength + 1.5), Y(C.axisH), 'rgba(160,175,240,.4)', 1, [6, 5]); }
 
-  /** 自動畫的三條主光線（「示範光路」與分析的「對答案」）。 */
-  function drawRays() {
-    var f = F(), u = U(), R = C.lensRadius, yo = srcY(), k = G.k, xl = C.lensX, xEnd = st.screenX, ana = st.mode === 'ana', lw = ana ? 3 : 1.8;
-    var im = O.image(f, u), list = O.rays(f, u, yo, ana ? Infinity : R);
-    var colors = { parallel: '#ffe066', center: '#7ee0a0', focus: '#ff9f6b' };
-    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, G.leftW, G.H); ctx.clip();
-    ctx.beginPath(); ctx.arc(X(st.objX), PY(yo), 3.5, 0, 6.283); ctx.fillStyle = '#ffe066'; ctx.fill();
+  /** 自動畫的三條主光線（「示範光路」與分析的「對答案」）。分析時用粗線、深色＋發光，光從物的上端「放出」（短動畫）。 */
+  var BOLD = { parallel: '#ff3b3b', center: '#d500f9', focus: '#ff9100' }, animNeed = false;
+  function drawRaysBold(list, im, yo, xl, xEnd) {
+    var now = performance.now(), p = Math.min(1, (now - st.ansT0) / 1400), ease = 1 - Math.pow(1 - p, 3), tipX = X(st.objX), tipY = PY(yo);
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, G.leftW, G.H); ctx.clip(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    var hr = 26 * (1 + 0.15 * Math.sin(now / 180)), hg = ctx.createRadialGradient(tipX, tipY, 0, tipX, tipY, hr); // 物上端的光暈
+    hg.addColorStop(0, 'rgba(255,255,255,.95)'); hg.addColorStop(0.35, 'rgba(255,214,102,.6)'); hg.addColorStop(1, 'rgba(255,214,102,0)');
+    ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(tipX, tipY, hr, 0, 6.283); ctx.fill();
     list.forEach(function (r) {
       if (r.blocked) return;
-      var col = colors[r.name], xP = X(xl), yP = PY(r.yP);
-      line(X(st.objX), PY(yo), xP, yP, col, lw);
-      line(xP, yP, X(xEnd), PY(r.yP + r.slope * (xEnd - xl)), col, lw);   // 光線打到光屏為止
-      if (im.dImg < 0 && isFinite(im.dImg)) { // 虛像：反向延長線（虛線）
+      var col = BOLD[r.name], xP = X(xl), yP = PY(r.yP), xe = X(xEnd), ye = PY(r.yP + r.slope * (xEnd - xl));
+      var pts = [[tipX, tipY], [xP, yP], [xe, ye]], l1 = Math.hypot(xP - tipX, yP - tipY), l2 = Math.hypot(xe - xP, ye - yP), left = (l1 + l2) * ease, head = [tipX, tipY];
+      ctx.shadowColor = col; ctx.shadowBlur = 14; ctx.strokeStyle = col; ctx.lineWidth = 5.5; ctx.beginPath(); ctx.moveTo(tipX, tipY);
+      [l1, l2].forEach(function (len, i) {
+        if (left <= 0) return;
+        var t = Math.min(1, left / len), a0 = pts[i], a1 = pts[i + 1];
+        head = [a0[0] + (a1[0] - a0[0]) * t, a0[1] + (a1[1] - a0[1]) * t]; ctx.lineTo(head[0], head[1]); left -= len;
+      });
+      ctx.stroke(); ctx.shadowBlur = 0;
+      if (p < 1) { ctx.beginPath(); ctx.arc(head[0], head[1], 6, 0, 6.283); ctx.fillStyle = '#fff'; ctx.fill(); }
+      if (p >= 1 && im.dImg < 0 && isFinite(im.dImg)) { // 虛像：反向延長線（虛線）
         var xb = Math.max(0, xl + im.dImg);
-        line(xP, yP, X(xb), PY(r.yP + r.slope * (xb - xl)), col, lw * 0.8, [4, 4]);
+        ctx.shadowColor = col; ctx.shadowBlur = 8; line(xP, yP, X(xb), PY(r.yP + r.slope * (xb - xl)), col, 4, [7, 6]); ctx.shadowBlur = 0;
       }
     });
     ctx.restore();
-    if (isFinite(im.dImg)) { // 像（箭頭）
+    if (p < 1) animNeed = true;
+    return p;
+  }
+
+  function drawRays() {
+    var f = F(), u = U(), R = C.lensRadius, yo = srcY(), k = G.k, xl = C.lensX, xEnd = st.screenX, ana = st.mode === 'ana';
+    var im = O.image(f, u), list = O.rays(f, u, yo, ana ? Infinity : R), p = 1;
+    if (ana) p = drawRaysBold(list, im, yo, xl, xEnd);
+    else {
+      var colors = { parallel: '#ffe066', center: '#7ee0a0', focus: '#ff9f6b' };
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, G.leftW, G.H); ctx.clip();
+      ctx.beginPath(); ctx.arc(X(st.objX), PY(yo), 3.5, 0, 6.283); ctx.fillStyle = '#ffe066'; ctx.fill();
+      list.forEach(function (r) {
+        if (r.blocked) return;
+        var col = colors[r.name], xP = X(xl), yP = PY(r.yP);
+        line(X(st.objX), PY(yo), xP, yP, col, 1.8);
+        line(xP, yP, X(xEnd), PY(r.yP + r.slope * (xEnd - xl)), col, 1.8);   // 光線打到光屏為止
+        if (im.dImg < 0 && isFinite(im.dImg)) { // 虛像：反向延長線（虛線）
+          var xb = Math.max(0, xl + im.dImg);
+          line(xP, yP, X(xb), PY(r.yP + r.slope * (xb - xl)), col, 1.4, [4, 4]);
+        }
+      });
+      ctx.restore();
+    }
+    if (p >= 1 && isFinite(im.dImg)) { // 像（箭頭）
       var xi = xl + im.dImg, yi = im.m * yo;
       if (xi >= -1 && xi <= C.benchLength + 1) {
         var virt = im.dImg < 0, col2 = virt ? '#c3a6ff' : '#ff7ad9';
         line(X(xi), PY(0), X(xi), PY(yi), col2, 2.4, virt ? [4, 3] : []);
         arrowHead(X(xi), PY(yi), 0, yi >= 0 ? -1 : 1, 7, col2);
-        text(virt ? '虛像' : '實像', X(xi) + (virt ? -6 : 6), PY(yi) + (yi >= 0 ? -4 : 12), col2, Math.max(11, k * 1.4), virt ? 'right' : 'left');
+        if (!ana) text(virt ? '虛像' : '實像', X(xi) + (virt ? -6 : 6), PY(yi) + (yi >= 0 ? -4 : 12), col2, Math.max(11, k * 1.4), virt ? 'right' : 'left'); // 分析畫面已有標示點的標籤
       }
     }
   }
@@ -235,10 +268,25 @@
     dim(C.lensX, st.screenX, yy, '像距 ' + S().toFixed(1) + ' cm', '#ffb86b');
   }
 
+  var NUDGE_STEP = 0.1;   // 微調一次移動 0.1 cm（像清楚的範圍約 ±0.4～1.6 cm，所以要細）
+  function nudgeRects() { // 光屏上方的左右三角鈕（跟著光屏）；大小是手指好按的 44×48 px
+    var cx = X(st.screenX), cy = Y(C.axisH + C.screen.h / 2 + 0.8) - 34;
+    return [{ dir: -1, x: cx - 56, y: cy - 24, w: 48, h: 48 }, { dir: 1, x: cx + 8, y: cy - 24, w: 48, h: 48 }];
+  }
+  function drawNudge() {
+    nudgeRects().forEach(function (r) {
+      var on = st.nudge && st.nudge.dir === r.dir, cx = r.x + r.w / 2, cy = r.y + r.h / 2, d = r.dir;
+      ctx.beginPath(); ctx.moveTo(cx + d * 13, cy); ctx.lineTo(cx - d * 11, cy - 17); ctx.lineTo(cx - d * 11, cy + 17); ctx.closePath();
+      ctx.fillStyle = on ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.5)'; ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1.5; ctx.stroke();
+    });
+  }
+  function nudgeScreen(dir) { setX('screen', Math.round((st.screenX + dir * NUDGE_STEP) * 10) / 10); sync(); }
+  function nudgeStop() { if (st.nudge) { clearTimeout(st.nudge.t1); clearInterval(st.nudge.t2); st.nudge = null; requestRender(); } }
+
   function drawBench() {
     drawAxis(); drawRuler();
     drawScreenStand(); drawLensStand(); drawLampStand();
-    drawFocusMarks();
+    drawFocusMarks(); drawNudge();
     if (st.rays) drawRays();
     drawMarker();
     drawEye();
@@ -427,7 +475,7 @@
       ctx.beginPath(); ctx.arc(wx, wy, wr, 0, 6.283); ctx.fillStyle = gg; ctx.fill();
     });
     ctx.beginPath(); ctx.arc(cx, yb, 3, 0, 6.283); ctx.fillStyle = '#a0b0ff'; ctx.fill();
-    sideText(p, p.x + 16 + span * ka, '燈具正面（透鏡側看）', '光軸在最下面的虛線');
+    sideText(p, p.x + 16 + span * ka, '燈具正面（透鏡側看）', '');
   }
 
   function drawScreenView(p) {
@@ -481,9 +529,11 @@
 
   function render() {
     if (!G.k) return;
+    animNeed = false;
     ctx.clearRect(0, 0, G.W, G.H);
     ctx.fillStyle = '#0b0d14'; ctx.fillRect(0, 0, G.W, G.H);
     drawSide(); drawScreenView(G.panels[0]); drawLensView(G.panels[1]); drawFront(G.panels[2]);
+    if (animNeed) requestRender();
   }
   var pending = false;
   function requestRender() { if (!pending) { pending = true; requestAnimationFrame(function () { pending = false; render(); }); } }
@@ -510,7 +560,7 @@
 
   // ---------- 操作 ----------
   function standHalfWidth() { return Math.max(4 * G.k, 34); }
-  function pos(e) { var r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+  function pos(e) { return BenchLandscape.toLocal(e, canvas); }
   function worldX(px) { return (px - G.x0) / G.k; }
   function hit(p) {
     if (p.x > G.leftW || p.y < BAR_H) return null;
@@ -521,9 +571,15 @@
     });
     return best;
   }
+  var SNAP_CM = 0.7;
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   function setX(who, x) {
-    if (who === 'obj') { var nx = clamp(Math.round(x * 10) / 10, C.range.objMin, C.range.objMax); if (nx !== st.objX) { st.objX = nx; clearWork(); } }
+    if (who === 'obj') {
+      var nx = clamp(Math.round(x * 10) / 10, C.range.objMin, C.range.objMax), snapTo = null;
+      [[C.lensX - C.f, 'F'], [C.lensX - 2 * C.f, '2F']].forEach(function (t) { if (Math.abs(nx - t[0]) <= SNAP_CM) { nx = t[0]; snapTo = t[1]; } }); // 經過 F、2F 時吸附一下
+      if (snapTo !== st.snapTo) { st.snapTo = snapTo; if (snapTo) { say('燈具吸附在 ' + snapTo + '（物距 ' + (C.lensX - nx) + ' cm）'); try { if (navigator.vibrate) navigator.vibrate(8); } catch (e) { /* ignore */ } } }
+      if (nx !== st.objX) { st.objX = nx; clearWork(); }
+    }
     else st.screenX = clamp(Math.round(x * 10) / 10, C.lensX + C.range.screenMinFromLens, C.range.screenMax);
   }
   canvas.addEventListener('pointerdown', function (e) {
@@ -535,6 +591,13 @@
       st.gest = { id: e.pointerId, snap: sp, x0: p.x, y0: p.y, moved: false };
       try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
       e.preventDefault(); return;
+    }
+    var nr = nudgeRects().filter(function (r) { return p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h; })[0];
+    if (nr) { // 按住會連續微調
+      nudgeStop(); nudgeScreen(nr.dir);
+      st.nudge = { dir: nr.dir, id: e.pointerId, t1: setTimeout(function () { st.nudge.t2 = setInterval(function () { nudgeScreen(nr.dir); }, 70); }, 380), t2: null };
+      try { canvas.setPointerCapture(e.pointerId); } catch (err3) { /* ignore */ }
+      e.preventDefault(); requestRender(); return;
     }
     var h = hit(p); if (!h) return;
     st.drag = { who: h.who, dx: worldX(p.x) - h.xc, id: e.pointerId };
@@ -554,6 +617,7 @@
     e.preventDefault(); sync();
   });
   function endPointer(e, cancelled) {
+    if (st.nudge && e.pointerId === st.nudge.id) { nudgeStop(); return; }
     if (st.gest && e.pointerId === st.gest.id) { if (st.gest.moved) finishDrag(!cancelled); else { st.gest = null; st.prev = null; sync(); } return; }
     if (st.drag && e.pointerId === st.drag.id) { st.drag = null; sync(); }
   }
@@ -585,14 +649,14 @@
   $('b-back').onclick = function () { st.mode = 'obs'; st.prev = null; st.gest = null; st.ans = false; say(''); sync(); };
   $('b-undo').onclick = function () { st.lines.pop(); sync(); };
   $('b-clear').onclick = function () { st.lines = []; sync(); };
-  $('t-ans').onclick = function () { st.ans = !st.ans; sync(); };
+  $('t-ans').onclick = function () { st.ans = !st.ans; if (st.ans) st.ansT0 = performance.now(); sync(); };
   $('t-rays').onclick = function () { st.rays = !st.rays; sync(); };
   $('t-data').onclick = function () { st.data = !st.data; sync(); };
   $('t-back').onclick = function () { st.back = !st.back; sync(); };
   $('b-reset').onclick = function () { st.objX = C.start.objX; st.screenX = C.start.screenX; clearWork(); say(''); sync(); };
 
   function onResize() { if (layout()) requestRender(); }
-  window.addEventListener('resize', onResize); window.addEventListener('orientationchange', onResize);
-  window.BenchDebug = { state: st, geom: G, X: X, Y: Y, PY: PY, render: render, layout: layout, snapPoints: snapPoints, markImage: markImage };
+  window.addEventListener('resize', onResize); window.addEventListener('orientationchange', onResize); window.addEventListener('benchlandscape', function () { requestAnimationFrame(onResize); });
+  window.BenchDebug = { nudgeRects: nudgeRects, state: st, geom: G, X: X, Y: Y, PY: PY, render: render, layout: layout, snapPoints: snapPoints, markImage: markImage };
   onResize(); sync();
 })();

@@ -51,6 +51,48 @@ function ok(c, msg) { n++; if (!c) { fails++; console.log('FAIL', msg); } }
   await p.click('#b-concave'); await p.click('#b-mark'); s = await st(); ok(s.marker && s.marker.virtual && s.marker.y > 0, '凹透鏡標記虛像（正立）');
   await p.click('#b-ana'); s = await st(); ok(s.mode === 'ana', '凹透鏡進入分析');
   await p.screenshot({ path: path.join(shots || '/tmp', 'bench-ana-concave.png') });
+
+  // 7. 燈具經過 F（x=20）、2F（x=10）時吸附：拖到 20.4 → 20、拖到 10.5 → 10、拖到 15 → 不吸附
+  await p.click('#b-back'); await p.click('#b-reset'); await p.click('#b-convex'); s = await st();
+  async function dragLamp(toX) { const cur = (await st()).objX; await drag({ x: g.x0 + (cur - 2) * g.k, y: yb }, { x: g.x0 + (toX - 2) * g.k, y: yb }); return (await st()).objX; }
+  ok(await dragLamp(20.4) === 20, '吸附在 F');
+  ok(await dragLamp(10.5) === 10, '吸附在 2F');
+  const free = await dragLamp(15); ok(free !== 10 && free !== 20 && Math.abs(free - 15) < 0.3, '15 不吸附 → ' + free);
+  // 8. 光屏左右微調：按一下 0.1 cm，按住會連續移動
+  await p.click('#b-reset'); s = await st(); const s0 = s.screenX;
+  let nr = await p.evaluate(() => BenchDebug.nudgeRects());
+  await p.mouse.click(nr[1].x + 24, nr[1].y + 24); s = await st(); ok(Math.abs(s.screenX - (s0 + 0.1)) < 0.001, '右鈕 +0.1 → ' + s.screenX);
+  nr = await p.evaluate(() => BenchDebug.nudgeRects());
+  await p.mouse.click(nr[0].x + 24, nr[0].y + 24); await p.mouse.click(nr[0].x + 24, nr[0].y + 24); s = await st(); ok(Math.abs(s.screenX - (s0 - 0.1)) < 0.001, '左鈕兩下 → ' + s.screenX);
+  nr = await p.evaluate(() => BenchDebug.nudgeRects());
+  await p.mouse.move(nr[1].x + 24, nr[1].y + 24); await p.mouse.down(); await p.waitForTimeout(900); await p.mouse.up(); s = await st(); ok(s.screenX > s0 + 0.5, '按住連續微調 → ' + s.screenX);
+  // 微調不會清掉標記
+  await p.click('#b-reset'); await drag({ x: g.x0 + 62 * g.k, y: yb }, { x: g.x0 + 46.7 * g.k, y: yb }); await p.click('#b-mark');
+  nr = await p.evaluate(() => BenchDebug.nudgeRects()); await p.mouse.click(nr[1].x + 24, nr[1].y + 24); s = await st(); ok(s.marker, '微調光屏不清掉標記');
+  // 9. 「對答案」：動畫跑完後，畫面上有粗線（取樣光線的顏色）
+  await p.click('#b-ana'); await p.click('#t-ans'); await p.waitForTimeout(1700);
+  await p.screenshot({ path: path.join(shots || '/tmp', 'bench-ans.png') });
+  // 10. 全螢幕按鈕在右下角（燈具正面旁）；不支援的瀏覽器會隱藏
+  const fb = await p.evaluate(() => { const b = document.getElementById('b-full'), r = b.getBoundingClientRect(); return { hidden: b.hidden, r: [r.right, r.bottom], vw: innerWidth, vh: innerHeight }; });
+  ok(fb.hidden || (fb.r[0] > fb.vw - 20 && fb.r[1] > fb.vh - 20), '全螢幕鈕在右下角 ' + JSON.stringify(fb));
+  await p.screenshot({ path: path.join(shots || '/tmp', 'bench-full.png') });
+  ok(errs.length === 0, '沒有 JS 錯誤（新功能）' + JSON.stringify(errs));
+
+  // 11. 手機直拿：整個畫面轉 90° 變橫的，拖曳與按鈕照常
+  const m = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true });
+  const q = await m.newPage(); const errs2 = []; q.on('pageerror', e => errs2.push(e.message));
+  await q.goto('file://' + path.resolve(__dirname, '../bench/index.html')); await q.waitForTimeout(300);
+  const rot = await q.evaluate(() => ({ cls: document.documentElement.classList.contains('gl-rot'), W: BenchDebug.geom.W, H: BenchDebug.geom.H }));
+  ok(rot.cls && rot.W > rot.H, '直拿時轉成橫的 ' + JSON.stringify(rot));
+  const gq = await q.evaluate(() => ({ x0: BenchDebug.geom.x0, k: BenchDebug.geom.k, base: BenchDebug.geom.baseY }));
+  const cl = (x, y) => q.evaluate(([x, y]) => BenchLandscape.toClient({ x, y }, document.getElementById('c')), [x, y]);
+  const a1 = await cl(gq.x0 + 62 * gq.k, gq.base - 0.8 * gq.k), a2 = await cl(gq.x0 + 50 * gq.k, gq.base - 0.8 * gq.k);
+  await q.mouse.move(a1.x, a1.y); await q.mouse.down(); await q.mouse.move((a1.x + a2.x) / 2, (a1.y + a2.y) / 2, { steps: 4 }); await q.mouse.move(a2.x, a2.y, { steps: 4 }); await q.mouse.up();
+  const sx = await q.evaluate(() => BenchDebug.state.screenX); ok(Math.abs(sx - 50) < 0.4, '直拿時拖曳光屏 → ' + sx);
+  const bc = await q.evaluate(() => { const r = document.getElementById('b-mark').getBoundingClientRect(); return BenchLandscape.toClient({ x: 0, y: 0 }, document.getElementById('c')) && { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
+  await q.mouse.click(bc.x, bc.y); // 按「標記像」（沒對準，會提示但不會出錯）
+  await q.screenshot({ path: path.join(shots || '/tmp', 'bench-rot.png') });
+  ok(errs2.length === 0, '直拿沒有 JS 錯誤 ' + JSON.stringify(errs2));
   ok(errs.length === 0, '沒有 JS 錯誤 ' + JSON.stringify(errs));
   console.log(n + ' checks, ' + fails + ' failed'); await b.close(); process.exit(fails ? 1 : 0);
 })();
