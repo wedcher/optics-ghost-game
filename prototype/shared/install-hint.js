@@ -39,11 +39,18 @@
       'font-size:16px;line-height:1.5;box-shadow:0 -6px 24px rgba(0,0,0,.5)';
     var text = document.createElement('div');
     text.style.cssText = 'flex:1 1 220px;min-width:0';
-    text.textContent = mode === 'prompt'
-      ? '安裝體驗更好（全螢幕、沒有網址列）；不安裝也可以直接用瀏覽器玩。'
-      : mode === 'ios'
-        ? '安裝體驗更好（全螢幕、沒有網址列）：點 Safari 的「分享」→「加入主畫面」。不安裝也可以直接用瀏覽器玩。'
+    if (mode === 'ios') {
+      // 使用者 2026-11-24：字少一點，分享圖示用畫的（docs/ios-hint/share-icon.svg）
+      text.innerHTML = 'iPhone：Safari → 分享圖示 ' +
+        '<svg viewBox="0 0 48 48" width="26" height="26" fill="none" stroke="#5aa9ff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" ' +
+        'style="vertical-align:-6px" aria-hidden="true"><path d="M17 19h-4a2 2 0 0 0-2 2v19a2 2 0 0 0 2 2h22a2 2 0 0 0 2-2V21a2 2 0 0 0-2-2h-4"/>' +
+        '<path d="M24 30V6"/><path d="M16 14l8-8 8 8"/></svg> → 加到主畫面' +
+        '<div style="font-size:14px;opacity:.8">不安裝也能玩</div>';
+    } else {
+      text.textContent = mode === 'prompt'
+        ? '安裝體驗更好（全螢幕、沒有網址列）；不安裝也可以直接用瀏覽器玩。'
         : '安裝體驗更好（全螢幕、沒有網址列）：打開瀏覽器的選單，選「安裝應用程式」或「加到主畫面」。不安裝也可以直接用瀏覽器玩。';
+    }
     bar.appendChild(text);
     function button(label, primary, onClick) {
       var b = document.createElement('button');

@@ -126,7 +126,7 @@ const IPHONE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleW
     await page.goto(BASE + 'game.html');
     await page.waitForSelector('#installHint');
     const t1 = await page.textContent('#installHint');
-    ok(/分享/.test(t1) && /加入主畫面/.test(t1), 'iPhone 第一次：自動跳「分享 → 加入主畫面」提示', t1);
+    ok(/分享/.test(t1) && /加到主畫面/.test(t1), 'iPhone 第一次：自動跳「分享圖示 → 加到主畫面」提示', t1);
     await page.reload();
     await page.waitForFunction(() => { const f = document.getElementById('game'); return f && f.contentDocument && f.contentDocument.querySelector('a.card'); });
     await page.waitForTimeout(300);
