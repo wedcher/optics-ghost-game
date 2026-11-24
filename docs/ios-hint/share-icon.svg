@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="#007aff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <!-- iOS Safari 分享圖示：開口向上的方框 + 向上箭頭 -->
+  <path d="M17 19h-4a2 2 0 0 0-2 2v19a2 2 0 0 0 2 2h22a2 2 0 0 0 2-2V21a2 2 0 0 0-2-2h-4"/>
+  <path d="M24 30V6"/>
+  <path d="M16 14l8-8 8 8"/>
+</svg>
